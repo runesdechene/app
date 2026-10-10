@@ -38,8 +38,9 @@ import { useMoi } from '../hooks/useMoi'
 import { adresseCourte } from '../lib/adresse'
 import { enrichisseurs, liaison } from '../lib/credit'
 import { ligneDeFaits } from '../lib/faits'
-import { Carnet } from './Carnet'
-import { CoeursDesAuteurs, PastilleCoeurs } from './CoeursLieu'
+import { CarnetDuLieu } from './CarnetDuLieu'
+import { PastilleCoeurs } from '@/shared/ui/PastilleCoeurs'
+import { CoeursDesAuteurs } from './CoeursLieu'
 import styles from './FicheLieu.module.css'
 
 const DEPUIS = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' })
@@ -306,7 +307,7 @@ export function FicheLieu({
           )}
         </footer>
 
-        <Carnet id={id} limite={3} />
+        <CarnetDuLieu id={id} limite={3} />
       </div>
     </article>
   )

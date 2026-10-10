@@ -1,41 +1,61 @@
 /**
- * QUOI     — le Carnet de passage d'un lieu (maquette Figma « Lieu — le carnet de passage (sur la
- *            fiche) », validée par Uriel le 30/09) : le titre et le nombre de mots, écrire, puis
- *            les mots — qui, « est venu·e » s'il a visité le lieu, quand, le texte, les photos,
- *            ♥ (un par personne, Uriel 30/09), « Répondre » (un seul niveau), « Effacer » pour le sien.
- * POURQUOI — les commentaires de la V1 reviennent sous la fiche, dans le ton de la V2. Sur la fiche,
- *            les trois derniers mots et « Lire les N mots » ; la page du carnet les montre tous.
+ * QUOI     — un carnet (maquette Figma « Lieu — le carnet de passage (sur la fiche) », validée par
+ *            Uriel le 30/09) : le titre et le nombre de mots, écrire, puis les mots — qui, « est
+ *            venu·e » s'il a visité le lieu, quand, le texte, les photos, ♥ (un par personne, Uriel
+ *            30/09), « Répondre » (un seul niveau), « Effacer » pour le sien.
+ * POURQUOI — le même carnet sous la fiche d'un lieu et sous une mise à jour (Uriel, 11/10 : « tout
+ *            pareil ») : il reçoit le carnet lu et les actions de qui l'affiche, et ne parle jamais
+ *            à la base. Les textes d'en-tête et l'indication du champ viennent de lui aussi.
  */
-import { aLaTaille } from '@/shared/lib/image'
+import type { ReactNode } from 'react'
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { aLaTaille } from '@/shared/lib/image'
+import type { Carnet as LeCarnet, Mot } from '@/shared/lib/carnet'
 import { ilYA } from '@/shared/lib/ilYA'
-import { Avatar } from '@/shared/ui/Avatar'
-import type { Mot } from '../api/lireLieu'
-import { useCarnet } from '../hooks/useCarnet'
-import { EcrireAuCarnet } from './EcrireAuCarnet'
+import { Avatar } from './Avatar'
+import { EcrireAuCarnet, type Ecrit } from './EcrireAuCarnet'
 import styles from './Carnet.module.css'
 
 const pluriel = (n: number) => `${String(n)} ${n > 1 ? 'mots' : 'mot'}`
 
-export function Carnet({ id, limite }: { id: string; limite: number | null }) {
-  const { carnet, ecrire, aimer, effacer } = useCarnet(id, limite)
-  if (!carnet) return null
+export type ActionsDuCarnet = {
+  ecrire: (ecrit: Ecrit, options: { onSuccess: () => void }) => void
+  enCours: boolean
+  erreur: unknown
+  aimer: (mot: number) => void
+  effacer: (mot: number) => void
+}
 
-  const actions = { ecrire: ecrire.mutate, enCours: ecrire.isPending, aimer, effacer }
-
+export function Carnet({
+  carnet,
+  actions,
+  titre,
+  chapo,
+  indication,
+  page = false,
+  lireTout,
+}: {
+  carnet: LeCarnet
+  actions: ActionsDuCarnet
+  titre: string
+  chapo: string
+  indication: string
+  page?: boolean
+  lireTout?: ReactNode
+}) {
   return (
-    <section
-      className={styles.carnet}
-      aria-label="Carnet de passage"
-      data-page={limite === null || undefined}
-    >
+    <section className={styles.carnet} aria-label={titre} data-page={page || undefined}>
       <h3 className={styles.titre}>
-        Carnet de passage
+        {titre}
         {carnet.total > 0 && <span className={styles.compte}>{pluriel(carnet.total)}</span>}
       </h3>
-      <p className={styles.chapo}>Ce que les Explorateurs ont laissé ici : conseils, souvenirs…</p>
-      <EcrireAuCarnet onEcrire={ecrire.mutate} enCours={ecrire.isPending} erreur={ecrire.error} />
+      <p className={styles.chapo}>{chapo}</p>
+      <EcrireAuCarnet
+        indication={indication}
+        onEcrire={actions.ecrire}
+        enCours={actions.enCours}
+        erreur={actions.erreur}
+      />
       <ul className={styles.mots}>
         {carnet.mots.map((m) => (
           <li key={m.id}>
@@ -43,21 +63,9 @@ export function Carnet({ id, limite }: { id: string; limite: number | null }) {
           </li>
         ))}
       </ul>
-      {limite !== null &&
-        carnet.total > carnet.mots.reduce((n, m) => n + 1 + m.reponses.length, 0) && (
-          <Link className={styles.tout} to="carnet" relative="path">
-            Lire les {pluriel(carnet.total)} ›
-          </Link>
-        )}
+      {lireTout}
     </section>
   )
-}
-
-type Actions = {
-  ecrire: Parameters<typeof EcrireAuCarnet>[0]['onEcrire']
-  enCours: boolean
-  aimer: (mot: number) => void
-  effacer: (mot: number) => void
 }
 
 function MotDuCarnet({
@@ -66,7 +74,7 @@ function MotDuCarnet({
   parent = null,
 }: {
   mot: Mot
-  actions: Actions
+  actions: ActionsDuCarnet
   parent?: number | null
 }) {
   const [repondre, setRepondre] = useState(false)

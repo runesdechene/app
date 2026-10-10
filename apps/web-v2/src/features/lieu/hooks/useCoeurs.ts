@@ -6,7 +6,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { aimerLieu, fetchCoeurs } from '../api/lieu'
-import type { Coeurs } from '../api/lireLieu'
+import type { Coeurs } from '@/shared/lib/carnet'
 import { cheminsKey, coeursDuLieuKey } from '@/shared/lib/cles'
 const aimerKey = ['lieu', 'aimer'] as const
 

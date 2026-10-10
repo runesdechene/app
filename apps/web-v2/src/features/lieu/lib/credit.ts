@@ -4,7 +4,7 @@
  * POURQUOI — deux lignes de crédit, l'ajout puis l'enrichissement : plus clair qu'un « Récit partagé »
  *            sous le texte (Uriel, 05/10).
  */
-import type { Personne } from '../api/lireLieu'
+import type { Personne } from '@/shared/lib/carnet'
 
 export function enrichisseurs(recitPar: Personne[], auteur: string | null): Personne[] {
   return recitPar.filter((p) => p.id !== auteur)

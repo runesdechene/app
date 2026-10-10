@@ -1,0 +1,11 @@
+/*
+ * QUOI     — « Lire les N mots », sous les trois derniers mots du carnet, sur la fiche.
+ */
+.tout {
+  justify-self: start;
+  color: var(--color-ocre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+}

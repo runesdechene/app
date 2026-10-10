@@ -6,15 +6,12 @@
  *            fiche : la fiche relue, le carnet l'est aussi.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { PhotoAEnvoyer } from '@/shared/lib/photo'
 import { basculerCoeurMot, ecrireAuCarnet, effacerMot, fetchCarnet } from '../api/lieu'
-import type { Carnet } from '../api/lireLieu'
-import { basculerCoeur } from '../lib/carnet'
+import { basculerCoeur, type Carnet } from '@/shared/lib/carnet'
+import type { Ecrit } from '@/shared/ui/EcrireAuCarnet'
 import { ficheKey } from './useFiche'
 
 const carnetKey = (id: string) => [...ficheKey(id), 'carnet'] as const
-
-export type Ecrit = { texte: string; photos: PhotoAEnvoyer[]; parent: number | null }
 
 export function useCarnet(id: string, limite: number | null) {
   const queryClient = useQueryClient()

@@ -4,9 +4,9 @@
  * POURQUOI — rien n'est supposé : chaque champ est prouvé ; `null` veut dire « introuvable ou
  *            invisible », et l'écran le dit.
  */
+import { lirePersonne, type Personne } from '@/shared/lib/carnet'
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
 
-export type Personne = { id: string; nom: string; avatar: string | null }
 export type Compagnon = Personne & { distance: number }
 export type Version = {
   id: number | null
@@ -16,20 +16,6 @@ export type Version = {
   note: string | null
   qui: Personne | null
 }
-export type Mot = {
-  id: number
-  quand: string
-  texte: string
-  qui: Personne
-  venu: boolean
-  photos: string[]
-  coeurs: number
-  miens: number
-  aMoi: boolean
-  reponses: Mot[]
-}
-export type Carnet = { total: number; mots: Mot[] }
-export type Coeurs = { total: number; miens: number; gens: (Personne & { nombre: number })[] }
 export type FicheLieu = {
   id: string
   slug: string | null // la page publique du lieu (/lieu/<slug>), quand elle existe
@@ -67,11 +53,6 @@ export type Recompense = {
   niveau: number
   avant: number
   apres: number
-}
-
-function lirePersonne(v: unknown): Personne {
-  const p = objet(v)
-  return { id: chaine(p.id), nom: chaine(p.nom), avatar: ouNull(chaine)(p.avatar) }
 }
 
 function lirePhoto(v: unknown) {
@@ -160,17 +141,6 @@ export function lireCompagnons(json: unknown): Compagnon[] {
   return liste((v) => ({ ...lirePersonne(v), distance: nombre(objet(v).distance) }))(json)
 }
 
-// Les cœurs d'un lieu (mig 384) ; null : le lieu n'est pas visible.
-export function lireCoeurs(json: unknown): Coeurs | null {
-  if (json === null) return null
-  const c = objet(json)
-  return {
-    total: nombre(c.total),
-    miens: nombre(c.miens),
-    gens: liste((v) => ({ ...lirePersonne(v), nombre: nombre(objet(v).nombre) }))(c.gens),
-  }
-}
-
 // L'histoire d'une fiche (mig 387) ; null : le lieu n'est pas visible. La version d'origine
 // d'un lieu jamais modifié n'a pas d'identifiant : on n'y revient pas.
 export function lireHistoire(json: unknown): Version[] | null {
@@ -220,28 +190,6 @@ export function lireVersionDetail(json: unknown): VersionDetail | null {
   }
 }
 
-// Le Carnet de passage (mig 389) ; null : le lieu n'est pas visible.
-function lireMot(v: unknown): Mot {
-  const m = objet(v)
-  return {
-    id: nombre(m.id),
-    quand: chaine(m.quand),
-    texte: chaine(m.texte),
-    qui: lirePersonne(m.qui),
-    venu: booleen(m.venu),
-    photos: liste(chaine)(m.photos),
-    coeurs: nombre(m.coeurs),
-    miens: nombre(m.miens),
-    aMoi: booleen(m.aMoi),
-    reponses: m.reponses === undefined ? [] : liste(lireMot)(m.reponses),
-  }
-}
-
-export function lireCarnet(json: unknown): Carnet | null {
-  if (json === null) return null
-  const c = objet(json)
-  return { total: nombre(c.total), mots: liste(lireMot)(c.mots) }
-}
 
 // Le prix d'une découverte depuis ma position, et ma jauge (cout_decouverte, migration 399).
 // `distanceKm` est null sans position : le prix est alors le plus haut.

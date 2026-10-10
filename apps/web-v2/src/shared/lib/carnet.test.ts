@@ -2,8 +2,7 @@
  * QUOI     — mon cœur sur un mot s'allume puis s'éteint, sur le bon mot, réponses comprises.
  */
 import { expect, test } from 'vitest'
-import type { Mot } from '../api/lireLieu'
-import { basculerCoeur } from './carnet'
+import { basculerCoeur, type Mot } from './carnet'
 
 const mot = (id: number, reponses: Mot[] = []): Mot => ({
   id,

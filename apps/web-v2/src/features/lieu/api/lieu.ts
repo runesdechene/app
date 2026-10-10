@@ -8,9 +8,8 @@ import { supabase } from '@/shared/supabase/client'
 import type { Point } from '@/shared/lib/distance'
 import type { PhotoAEnvoyer } from '@/shared/lib/photo'
 import { envoyerPhotos } from '@/shared/supabase/photos'
+import { lireCarnet, lireCoeurs } from '@/shared/lib/carnet'
 import {
-  lireCarnet,
-  lireCoeurs,
   lireCompagnons,
   lireCoutDecouverte,
   lireHistoire,

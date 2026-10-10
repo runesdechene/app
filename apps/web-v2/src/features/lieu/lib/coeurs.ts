@@ -3,7 +3,7 @@
  * POURQUOI — sous les crédits, une ligne dit qui a aimé le lieu (« Kelpie, Luna et 4 autres ont
  *            envoyé 42 cœurs ») ; le bouton nomme ceux qu'on félicite (l'auteur, qui l'a enrichi).
  */
-import type { Coeurs } from '../api/lireLieu'
+import type { Coeurs } from '@/shared/lib/carnet'
 
 const coeurs = (n: number) => `${String(n)} ${n > 1 ? 'cœurs' : 'cœur'}`
 

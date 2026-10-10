@@ -1,15 +1,15 @@
 /**
- * QUOI     — les cœurs d'un lieu, à deux places de la fiche (maquettes Figma « Lieu — aimer » A
- *            et B, 30/09) : la pastille ♥ en haut, et sous les crédits « Féliciter Luna et
- *            Mathéo », puis la rangée de ceux qui ont envoyé des cœurs (elle ouvre la liste).
+ * QUOI     — les cœurs d'un lieu sous les crédits (maquette Figma « Lieu — aimer » B, 30/09) :
+ *            « Féliciter Luna et Mathéo », puis la rangée de ceux qui ont envoyé des cœurs (elle
+ *            ouvre la liste). La pastille ♥ du haut de la fiche est commune (`shared/ui`).
  * POURQUOI — Uriel, 30/09 : aimer un lieu félicite ceux qui l'ont fait, « addictif comme pour
  *            les Activités » : chaque toucher envoie un cœur qui s'envole. Sur son propre lieu,
- *            on lit ses cœurs sans pouvoir s'en envoyer : la pastille ouvre alors la liste.
+ *            on lit ses cœurs sans pouvoir s'en envoyer.
  */
 import { Avatar } from '@/shared/ui/Avatar'
 import { useEnvols } from '@/shared/hooks/useEnvols'
 import { Envols } from '@/shared/ui/Envols'
-import type { Coeurs } from '../api/lireLieu'
+import type { Coeurs } from '@/shared/lib/carnet'
 import { libelleFeliciter, phraseDesCoeurs } from '../lib/coeurs'
 import styles from './CoeursLieu.module.css'
 
@@ -18,40 +18,6 @@ type Proprietes = {
   peutAimer: boolean
   onAimer: () => void
   onVoir: () => void
-}
-
-export function PastilleCoeurs({ coeurs, peutAimer, onAimer, onVoir }: Proprietes) {
-  const { envols, lancer, finir } = useEnvols()
-  if (!peutAimer) {
-    if (coeurs.total === 0) return null
-    return (
-      <button
-        type="button"
-        className={styles.pastille}
-        aria-label={`Voir les cœurs (${String(coeurs.total)})`}
-        onClick={onVoir}
-      >
-        <span className={styles.coeur} aria-hidden="true" />
-        {coeurs.total}
-      </button>
-    )
-  }
-  return (
-    <button
-      type="button"
-      className={styles.pastille}
-      aria-label={`Envoyer un cœur (${String(coeurs.total)})`}
-      aria-pressed={coeurs.miens > 0}
-      onClick={() => {
-        onAimer()
-        lancer()
-      }}
-    >
-      <span className={styles.coeur} aria-hidden="true" />
-      {coeurs.total > 0 && coeurs.total}
-      <Envols envols={envols} onFin={finir} />
-    </button>
-  )
 }
 
 export function CoeursDesAuteurs({

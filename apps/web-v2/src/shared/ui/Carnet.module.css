@@ -304,7 +304,7 @@ button.coeurs,
   width: 14px;
   height: 14px;
   background: currentcolor;
-  mask: url('../../../assets/ui/coeur.svg') center / contain no-repeat;
+  mask: url('../../assets/ui/coeur.svg') center / contain no-repeat;
 }
 
 .action {
@@ -317,15 +317,6 @@ button.coeurs,
 
 .effacer {
   color: var(--color-accent);
-}
-
-.tout {
-  justify-self: start;
-  color: var(--color-ocre);
-  font-family: var(--font-corps);
-  font-size: var(--sous-titre-size);
-  font-weight: var(--weight-gras);
-  text-decoration: none;
 }
 
 @keyframes apparaitre {

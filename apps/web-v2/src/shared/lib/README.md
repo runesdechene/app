@@ -17,3 +17,5 @@
 - `styleSatellite.ts` — le fond satellite de la carte : le plan de l'étape « Où » et de la pose d'un pin.
 - `validitePin.ts` — un pin vaut 15 jours : l'échéance et le temps restant (« Tes pins », fiche d'un pin).
 - `adresse.ts` — l'endroit en mots (adresse lisible d'une position) : l'ajout d'un lieu et les pins le partagent.
+- `carnet.ts` — un carnet (mots, réponses) et des cœurs, lus du JSON, et le cœur d'un mot qui bascule :
+  le Carnet de passage d'un lieu et celui d'une mise à jour (Nouveautés) le partagent.

@@ -15,7 +15,7 @@ import { ModifierFiche } from '@/features/ajout/components/ModifierFiche'
 import { QuestionAbandon } from '@/features/ajout/components/QuestionAbandon'
 import { DecouverteLieu } from '@/features/lieu/components/DecouverteLieu'
 import { FenetreRevendication } from '@/features/lieu/components/FenetreRevendication'
-import { Carnet } from '@/features/lieu/components/Carnet'
+import { CarnetDuLieu } from '@/features/lieu/components/CarnetDuLieu'
 import { FeuilleCoeurs } from '@/features/lieu/components/FeuilleCoeurs'
 import { FeuilleHistoire } from '@/features/lieu/components/FeuilleHistoire'
 import { FeuilleOptions } from '@/features/lieu/components/FeuilleOptions'
@@ -150,7 +150,7 @@ export function RouteCarnet() {
   const { id = '' } = useParams()
   return (
     <DetailPane title="Carnet de passage">
-      <Carnet id={id} limite={null} />
+      <CarnetDuLieu id={id} limite={null} />
     </DetailPane>
   )
 }

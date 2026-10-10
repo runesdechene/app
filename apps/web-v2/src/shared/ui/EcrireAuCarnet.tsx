@@ -1,7 +1,8 @@
 /**
- * QUOI     — écrire dans le Carnet de passage : « Laisse un mot sur ce lieu… », l'appareil pour y
- *            joindre jusqu'à quatre photos, « Envoyer » dès qu'il y a un mot. En réponse, le même
- *            champ, plus petit, sous le mot auquel on répond.
+ * QUOI     — écrire dans un carnet (celui d'un lieu, celui d'une mise à jour) : l'indication de qui
+ *            l'affiche (« Laisse un mot sur ce lieu… »), l'appareil pour y joindre jusqu'à quatre
+ *            photos, « Envoyer » dès qu'il y a un mot. En réponse, le même champ, plus petit, sous le
+ *            mot auquel on répond.
  * POURQUOI — un seul champ pour écrire et répondre ; chaque photo est réduite dès qu'elle est
  *            choisie, comme à l'ajout d'un lieu. Un refus se dit en clair ; le mot reste écrit.
  */
@@ -9,10 +10,11 @@ import { useState } from 'react'
 import appareil from '@/assets/ui/appareil-photo.svg'
 import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import { preparerPhoto, type PhotoAEnvoyer } from '@/shared/lib/photo'
-import type { Ecrit } from '../hooks/useCarnet'
 import styles from './Carnet.module.css'
 
 const MAX_PHOTOS = 4
+
+export type Ecrit = { texte: string; photos: PhotoAEnvoyer[]; parent: number | null }
 
 function messageDeRefus(erreur: unknown): string {
   const indice =
@@ -24,14 +26,14 @@ function messageDeRefus(erreur: unknown): string {
 
 export function EcrireAuCarnet({
   parent = null,
-  indication = 'Laisse un mot sur ce lieu…',
+  indication,
   onEcrire,
   enCours,
   erreur,
   onEcrit,
 }: {
   parent?: number | null
-  indication?: string
+  indication: string
   onEcrire: (ecrit: Ecrit, options: { onSuccess: () => void }) => void
   enCours: boolean
   erreur: unknown

@@ -18,3 +18,7 @@ Supabase ; aucune n'écrit une valeur visuelle en dur (Stylelint).
 - `Envols` — les cœurs qui s'envolent d'un bouton, un par toucher (saluts, cœurs d'un lieu).
 - `Segments` — un choix exclusif en segments ; la zone éclairée glisse sous le choix.
 - `PlanSatellite` — le plan satellite d'un endroit (pose d'un pin, étape « Où » de l'ajout).
+- `Carnet`, `EcrireAuCarnet` — un carnet de mots (réponses, photos, un cœur par personne) et son
+  champ d'écriture : sous la fiche d'un lieu et sous une mise à jour. Il reçoit le carnet et les actions.
+- `PastilleCoeurs`, `FeuilleDesCoeurs` — les cœurs à volonté et la feuille de ceux qui en ont envoyé :
+  un lieu et une mise à jour.

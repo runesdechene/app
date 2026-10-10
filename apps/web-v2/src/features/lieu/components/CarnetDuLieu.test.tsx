@@ -7,7 +7,7 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
-import { Carnet } from './Carnet'
+import { CarnetDuLieu } from './CarnetDuLieu'
 
 const api = vi.hoisted(() => ({
   fetchCarnet: vi.fn(),
@@ -51,7 +51,7 @@ function monter() {
     <QueryClientProvider client={new QueryClient()}>
       <MemoryRouter initialEntries={['/accueil/lieu/a']}>
         <Routes>
-          <Route path=":tab/lieu/:id" element={<Carnet id="a" limite={3} />} />
+          <Route path=":tab/lieu/:id" element={<CarnetDuLieu id="a" limite={3} />} />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>,

@@ -12,6 +12,11 @@ import type { VueCarte } from '@/shared/lib/styleSatellite'
 import { Avatar } from '@/shared/ui/Avatar'
 import { BilleType } from '@/shared/ui/BilleType'
 import { Button } from '@/shared/ui/Button'
+import type { Carnet as LeCarnet, Coeurs } from '@/shared/lib/carnet'
+import { Carnet } from '@/shared/ui/Carnet'
+import { EcrireAuCarnet } from '@/shared/ui/EcrireAuCarnet'
+import { FeuilleDesCoeurs } from '@/shared/ui/FeuilleDesCoeurs'
+import { PastilleCoeurs } from '@/shared/ui/PastilleCoeurs'
 import { Champ } from '@/shared/ui/Champ'
 import { ChoixDuCalendrier } from '@/shared/ui/ChoixDuCalendrier'
 import { useEnvols } from '@/shared/hooks/useEnvols'
@@ -54,6 +59,40 @@ const LIEU = {
 function rien() {
   return undefined
 }
+
+const LUNA = { id: 'luna', nom: 'Luna', avatar: null }
+const CARNET: LeCarnet = {
+  total: 2,
+  mots: [
+    {
+      id: 1,
+      quand: new Date().toISOString(),
+      texte: 'Le chemin est glissant après la pluie.',
+      qui: LUNA,
+      venu: true,
+      photos: [],
+      coeurs: 3,
+      miens: 1,
+      aMoi: false,
+      reponses: [
+        {
+          id: 2,
+          quand: new Date().toISOString(),
+          texte: 'Merci du conseil !',
+          qui: { id: 'matheo', nom: 'Mathéo', avatar: null },
+          venu: false,
+          photos: [],
+          coeurs: 0,
+          miens: 0,
+          aMoi: true,
+          reponses: [],
+        },
+      ],
+    },
+  ],
+}
+const COEURS: Coeurs = { total: 5, miens: 0, gens: [{ ...LUNA, nombre: 5 }] }
+const ACTIONS_DU_CARNET = { ecrire: rien, enCours: false, erreur: null, aimer: rien, effacer: rien }
 
 async function envoyerPourRien() {}
 
@@ -215,6 +254,30 @@ export function DaBriques() {
             <Text variant="corps">Mon profil</Text>
             <Text variant="corps">Préférences</Text>
           </Feuille>
+        </div>
+      </DaSection>
+
+      <DaSection name="PastilleCoeurs">
+        <PastilleCoeurs coeurs={COEURS} peutAimer onAimer={rien} onVoir={rien} />
+      </DaSection>
+
+      <DaSection name="Carnet">
+        <Carnet
+          carnet={CARNET}
+          actions={ACTIONS_DU_CARNET}
+          titre="Carnet de passage"
+          chapo="Ce que les Explorateurs ont laissé ici : conseils, souvenirs…"
+          indication="Laisse un mot sur ce lieu…"
+        />
+      </DaSection>
+
+      <DaSection name="EcrireAuCarnet">
+        <EcrireAuCarnet indication="Laisse un mot…" onEcrire={rien} enCours={false} erreur={null} />
+      </DaSection>
+
+      <DaSection name="FeuilleDesCoeurs">
+        <div className={styles.cadreFeuille}>
+          <FeuilleDesCoeurs coeurs={COEURS} onFermer={rien} />
         </div>
       </DaSection>
 
