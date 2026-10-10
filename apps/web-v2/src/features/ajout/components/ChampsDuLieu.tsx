@@ -167,7 +167,7 @@ export function ChampsDuLieu({
             setAnneeOuverte(true)
           }}
         >
-          ＋ Préciser l’année (1142, 52 av. J.-C.…)
+          ＋ Préciser l’année (1142, 52 av. è. c.…)
         </button>
       )}
     </>
