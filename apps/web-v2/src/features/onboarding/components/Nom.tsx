@@ -18,7 +18,7 @@ export function Nom() {
   const enregistrer = useMutation({
     mutationFn: () => nommer(nom.trim()),
     onSuccess: () => {
-      aller('fin')
+      aller('calendrier')
     },
   })
   const n = parcours.fragments

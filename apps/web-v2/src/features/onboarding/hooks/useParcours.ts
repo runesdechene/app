@@ -12,7 +12,7 @@ export type Parcours = {
   email: string | null
   fragments: number
 }
-export type Etape = 'preambule' | 'charte' | 'email' | 'code' | 'nom' | 'fin'
+export type Etape = 'preambule' | 'charte' | 'email' | 'code' | 'nom' | 'calendrier' | 'fin'
 
 function lireParcours(etat: unknown): Parcours {
   const p = typeof etat === 'object' && etat !== null ? etat : {}

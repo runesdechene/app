@@ -1,11 +1,12 @@
 /**
- * QUOI     — /bienvenue/<étape> : les six écrans d'entrée, un par adresse.
+ * QUOI     — /bienvenue/<étape> : les sept écrans d'entrée, un par adresse.
  * POURQUOI — l'onboarding vit AVANT la garde d'accès : on y arrive sans compte, depuis la vitrine
  *            (/bienvenue). Le retour est celui du navigateur ; une étape inconnue ramène à la
  *            vitrine.
  */
 import { Navigate, useParams } from 'react-router'
 import { Bienvenue } from './Bienvenue'
+import { Calendrier } from './Calendrier'
 import { Charte } from './Charte'
 import { Code } from './Code'
 import { Email } from './Email'
@@ -18,6 +19,7 @@ const ECRANS = {
   email: Email,
   code: Code,
   nom: Nom,
+  calendrier: Calendrier,
   fin: Bienvenue,
 }
 

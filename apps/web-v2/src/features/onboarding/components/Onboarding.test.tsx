@@ -5,7 +5,7 @@
  * ATTENTION — jsdom n'anime pas : la fin du remplissage du cercle est simulée (`animationEnd`).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -21,6 +21,12 @@ const api = vi.hoisted(() => ({
   fetchEntree: vi.fn(),
 }))
 vi.mock('../api/entree', () => api)
+
+const calendrier = vi.hoisted(() => ({
+  lireCalendrier: vi.fn((): Promise<'chretien'> => Promise.resolve('chretien')),
+  reglerCalendrier: vi.fn<(c: string) => Promise<void>>(() => Promise.resolve()),
+}))
+vi.mock('@/shared/lib/calendrierDuCompte', () => calendrier)
 
 beforeEach(() => {
   api.envoyerCode.mockResolvedValue(undefined)
@@ -86,6 +92,13 @@ test('du Préambule à la bienvenue : l’e-mail, le code, puis la Charte', asyn
   await userEvent.type(screen.getByLabelText('Ton nom'), 'Claire M.')
   await userEvent.click(screen.getByRole('button', { name: /Suivant/ }))
   expect(api.nommer).toHaveBeenCalledWith('Claire M.')
+  expect(await screen.findByRole('heading', { name: 'Quel calendrier ?' })).toBeInTheDocument()
+  expect(screen.getByRole('radio', { name: /Chrétien/ })).toBeChecked()
+  await userEvent.click(screen.getByRole('radio', { name: /Moderne/ }))
+  await userEvent.click(screen.getByRole('button', { name: /Suivant/ }))
+  await waitFor(() => {
+    expect(calendrier.reglerCalendrier.mock.calls[0]?.[0]).toBe('moderne')
+  })
   expect(await screen.findByText('Claire M.')).toBeInTheDocument()
   expect(screen.getByText(/Explorateur n°/)).toHaveTextContent('Explorateur n° 4 979')
   expect(screen.getByRole('button', { name: 'Voir mes deux Fragments' })).toBeInTheDocument()
@@ -139,4 +152,12 @@ test('venu d’un lieu de la vitrine, « Ouvrir la carte » ouvre ce lieu', asyn
   const router = monter('/bienvenue/fin')
   await userEvent.click(await screen.findByRole('button', { name: 'Ouvrir la carte' }))
   expect(router.state.location.pathname).toBe('/carte/lieu/d1')
+})
+
+test('un calendrier refusé par la base le dit, et on reste sur l’écran', async () => {
+  calendrier.reglerCalendrier.mockRejectedValueOnce(new Error('refusé'))
+  monter('/bienvenue/calendrier')
+  await userEvent.click(await screen.findByRole('button', { name: /Suivant/ }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('n’a pas pu être enregistré')
+  expect(screen.getByRole('heading', { name: 'Quel calendrier ?' })).toBeInTheDocument()
 })
