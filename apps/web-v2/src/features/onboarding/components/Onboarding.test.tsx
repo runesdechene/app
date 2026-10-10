@@ -4,6 +4,7 @@
  *            signée ne la revoit jamais ; le client connu qui ne l'a pas signée la signe, connecté.
  * ATTENTION — jsdom n'anime pas : la fin du remplissage du cercle est simulée (`animationEnd`).
  */
+import type { Calendrier } from '@runes/calendrier'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -23,7 +24,7 @@ const api = vi.hoisted(() => ({
 vi.mock('../api/entree', () => api)
 
 const calendrier = vi.hoisted(() => ({
-  lireCalendrier: vi.fn((): Promise<'chretien'> => Promise.resolve('chretien')),
+  lireCalendrier: vi.fn((): Promise<Calendrier> => Promise.resolve('chretien')),
   reglerCalendrier: vi.fn<(c: string) => Promise<void>>(() => Promise.resolve()),
 }))
 vi.mock('@/shared/lib/calendrierDuCompte', () => calendrier)
@@ -160,4 +161,16 @@ test('un calendrier refusé par la base le dit, et on reste sur l’écran', asy
   await userEvent.click(await screen.findByRole('button', { name: /Suivant/ }))
   expect(await screen.findByRole('alert')).toHaveTextContent('n’a pas pu être enregistré')
   expect(screen.getByRole('heading', { name: 'Quel calendrier ?' })).toBeInTheDocument()
+})
+
+test('un calendrier déjà enregistré est celui qui est coché, et Suivant le garde', async () => {
+  calendrier.lireCalendrier.mockResolvedValueOnce('rome')
+  monter('/bienvenue/calendrier')
+  await waitFor(() => {
+    expect(screen.getByRole('radio', { name: /Fondation de Rome/ })).toBeChecked()
+  })
+  await userEvent.click(screen.getByRole('button', { name: /Suivant/ }))
+  await waitFor(() => {
+    expect(calendrier.reglerCalendrier.mock.calls[0]?.[0]).toBe('rome')
+  })
 })
