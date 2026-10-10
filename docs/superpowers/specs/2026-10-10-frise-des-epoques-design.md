@@ -111,3 +111,20 @@ Le choix d'une époque à l'ajout et à la modification d'un lieu (ses propres b
 - Dans le navigateur, sur PC et en largeur téléphone : ouvrir la frise, resserrer la plage, voir les lieux
   disparaître en direct, refermer (le sablier reste à l'encre), « Réinitialiser » dans les filtres ; passer
   en calendrier de Rome et voir les bornes changer.
+
+## La date du jour (Uriel, 11/10)
+
+La date du jour s'écrit dans le calendrier du joueur, à trois endroits :
+- **sur la carte, toujours** : une ligne sous le nom du territoire (« Comté de Nice »), centrée, plus
+  petite et plus discrète que lui, à l'encre de la carte. Elle reste même quand le nom s'efface
+  (au-dessus de la mer) ; membres seulement, pas la vitrine ;
+- **dans la frise**, en tête de bande : « Aujourd'hui · 11 octobre 2779 ap. la fondation de Rome » ;
+- **dans le choix du calendrier** (Préférences et onboarding, `ChoixDuCalendrier`) : sous l'explication
+  de chaque calendrier, « Aujourd'hui : 11 octobre 2779 ap. la fondation de Rome » — on voit ce que
+  donne chaque choix avant de le prendre.
+
+Le jour et le mois ne changent pas (« 1er » pour le premier du mois) ; l'année passe par
+`anneeEnClair` (chrétien « 11 octobre 2026 », moderne « 11 octobre 2026 », Constantinople
+« 11 octobre 573 ap. la chute de Constantinople »). Nouveau dans `@runes/calendrier` :
+`dateEnClair(date: Date, calendrier)` — pure, la date passée en argument (testable), lue dans le fuseau
+de l'appareil.
