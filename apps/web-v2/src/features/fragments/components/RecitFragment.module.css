@@ -103,7 +103,7 @@
   color: var(--color-texte);
   font-family: var(--font-corps);
   font-size: var(--corps-size);
-  line-height: 24px;
+  line-height: var(--carnet-leading);
   transition: opacity var(--duree-douce) var(--courbe-douce);
 
   @starting-style {
@@ -122,7 +122,7 @@
   background: none;
   color: var(--color-encre);
   font-family: var(--font-corps);
-  font-size: 0.9375rem;
+  font-size: var(--recit-enigme-size);
   font-weight: var(--weight-semi);
   text-decoration: underline;
   cursor: pointer;
