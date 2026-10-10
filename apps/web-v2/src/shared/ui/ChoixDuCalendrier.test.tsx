@@ -7,9 +7,9 @@ import { ChoixDuCalendrier } from './ChoixDuCalendrier'
 
 test('chacun des quatre calendriers montre sa date du jour', () => {
   render(<ChoixDuCalendrier valeur="chretien" onChange={() => undefined} />)
-  const lignes = screen.getAllByText(/^Aujourd'hui : /).map((l) => l.textContent)
+  const lignes = screen.getAllByText(/^Aujourd’hui : /).map((l) => l.textContent)
   const jour = new Date()
   expect(lignes).toEqual(
-    CALENDRIERS.map((c) => `Aujourd'hui : ${dateEnClair(jour, c.id)}`),
+    CALENDRIERS.map((c) => `Aujourd’hui : ${dateEnClair(jour, c.id)}`),
   )
 })

@@ -5,11 +5,11 @@
  *            carte publique, sans filtre ni préférences, et elle glisse jusqu'au lieu ouvert.
  * POURQUOI — MapLibre ne tourne pas dans jsdom : la fausse carte vient de `src/test/`.
  */
+import { dateEnClair } from '@runes/calendrier'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
-import { dateEnClair } from '@runes/calendrier'
 import { vi } from 'vitest'
 import { FausseCarte } from '@/test/fausseCarte'
 import type { LieuCarte } from '../api/lireCarte'

@@ -47,7 +47,7 @@ export function FriseDesEpoques({ epoques, choix, onChoix }: Props) {
         <div>
           <p className={styles.titre}>{titre}</p>
           <p className={styles.detail}>{detail}</p>
-          <p className={styles.aujourdhui}>{`Aujourd'hui · ${dateEnClair(new Date(), calendrier)}`}</p>
+          <p className={styles.aujourdhui}>Aujourd’hui · {dateEnClair(new Date(), calendrier)}</p>
         </div>
         {!repos && (
           <button

@@ -2,10 +2,10 @@
  * QUOI     — la frise : l'en-tête suit la plage, une poignée ne dépasse pas l'autre, « Tout »
  *            remet au repos, rien ne s'affiche sans époques datées.
  */
+import { dateEnClair } from '@runes/calendrier'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { dateEnClair } from '@runes/calendrier'
 import { expect, test, vi } from 'vitest'
 import type { EpoqueFiltre } from '../api/lireCarte'
 import { FriseDesEpoques } from './FriseDesEpoques'
@@ -110,5 +110,5 @@ test('une plage qui part du premier bout : son année de fin seule, pas le nom d
 
 test('l’en-tête dit la date du jour dans le calendrier du joueur', () => {
   afficher()
-  expect(screen.getByText(`Aujourd'hui · ${dateEnClair(new Date(), 'rome')}`)).toBeInTheDocument()
+  expect(screen.getByText(`Aujourd’hui · ${dateEnClair(new Date(), 'rome')}`)).toBeInTheDocument()
 })

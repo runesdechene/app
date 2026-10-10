@@ -33,7 +33,7 @@ export function ChoixDuCalendrier({
             <span className={styles.libelle}>{c.libelle}</span>
             <span className={styles.explication}>{c.explication}</span>
             <span className={styles.explication}>
-              {`Aujourd'hui : ${dateEnClair(new Date(), c.id)}`}
+              {`Aujourd’hui : ${dateEnClair(new Date(), c.id)}`}
             </span>
           </span>
         </label>
