@@ -1,13 +1,14 @@
 /**
  * QUOI     — la frise des époques, en bande sur la carte (maquette Figma 539:851 PC, 542:878
  *            téléphone) : la plage en clair, une case par époque datée, deux poignées et leurs
- *            bornes dans le calendrier du joueur.
+ *            bornes dans le calendrier du joueur, et la date du jour sous le détail.
  * POURQUOI — spec 2026-10-10-frise-des-epoques : elle remplace les boutons « Époques » de la
  *            feuille des filtres. Deux `<input type="range">` natifs : le clavier et les lecteurs
  *            d'écran sans bibliothèque.
  * ATTENTION — une poignée s'arrête sur l'autre ; la plage n'est jamais inversée. Le CSS place
  *            chaque slider pour que sa poignée tombe au bord d'une case (voir le module CSS).
  */
+import { dateEnClair } from '@runes/calendrier'
 import { useCalendrier } from '@/shared/hooks/useCalendrier'
 import type { EpoqueFiltre } from '../api/lireCarte'
 import {
@@ -46,6 +47,7 @@ export function FriseDesEpoques({ epoques, choix, onChoix }: Props) {
         <div>
           <p className={styles.titre}>{titre}</p>
           <p className={styles.detail}>{detail}</p>
+          <p className={styles.aujourdhui}>{`Aujourd'hui · ${dateEnClair(new Date(), calendrier)}`}</p>
         </div>
         {!repos && (
           <button

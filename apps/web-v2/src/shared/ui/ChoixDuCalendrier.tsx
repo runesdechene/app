@@ -2,8 +2,9 @@
  * QUOI     — les quatre calendriers, chacun avec sa ligne d'explication : un seul se choisit.
  * POURQUOI — le même choix à l'onboarding et dans les Préférences (spec calendrier). De vrais
  *            boutons radio, comme `Segments` : clavier et lecteurs d'écran sans code maison.
+ *            Chaque option montre la date du jour qu'elle donnerait : on voit avant de choisir.
  */
-import { CALENDRIERS, type Calendrier } from '@runes/calendrier'
+import { CALENDRIERS, dateEnClair, type Calendrier } from '@runes/calendrier'
 import { useId } from 'react'
 import styles from './ChoixDuCalendrier.module.css'
 
@@ -31,6 +32,9 @@ export function ChoixDuCalendrier({
           <span className={styles.texte}>
             <span className={styles.libelle}>{c.libelle}</span>
             <span className={styles.explication}>{c.explication}</span>
+            <span className={styles.explication}>
+              {`Aujourd'hui : ${dateEnClair(new Date(), c.id)}`}
+            </span>
           </span>
         </label>
       ))}

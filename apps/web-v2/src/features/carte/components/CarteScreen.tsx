@@ -60,6 +60,7 @@ import { CompteurActifs } from './CompteurActifs'
 import { FeuilleActifs } from './FeuilleActifs'
 import { FiltreFeuille } from './FiltreFeuille'
 import { FriseDesEpoques } from './FriseDesEpoques'
+import { DateDuJour } from './DateDuJour'
 import { Inscription } from './Inscription'
 import { Recherche } from './Recherche'
 import { Sablier } from './Sablier'
@@ -370,6 +371,7 @@ function CarteVivante({
       )}
       <div className={styles.inscription}>
         <Inscription nom={territoire} />
+        {!visiteur && <DateDuJour />}
       </div>
       <img className={styles.rose} src={roseDesVents} alt="" />
       {sansPosition && (

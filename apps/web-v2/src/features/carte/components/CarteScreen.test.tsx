@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
+import { dateEnClair } from '@runes/calendrier'
 import { vi } from 'vitest'
 import { FausseCarte } from '@/test/fausseCarte'
 import type { LieuCarte } from '../api/lireCarte'
@@ -429,4 +430,10 @@ test('le visiteur voit la carte publique, sans filtre ni préférences, jusqu’
   expect(api.fetchFiltres).not.toHaveBeenCalled()
   expect(screen.queryByRole('button', { name: 'Filtre' })).not.toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Frise des époques' })).not.toBeInTheDocument()
+  expect(screen.queryByText(dateEnClair(new Date(), 'chretien'))).not.toBeInTheDocument()
+})
+
+test('un membre voit la date du jour sous le nom du territoire, dans son calendrier', () => {
+  afficher()
+  expect(screen.getByText(dateEnClair(new Date(), 'chretien'))).toBeInTheDocument()
 })
