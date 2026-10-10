@@ -156,7 +156,7 @@ export function ChampsDuLieu({
                 changerAnnee(annee === null ? '' : String(Math.abs(annee)), e.target.checked)
               }}
             />
-            av. J.-C.
+            av. è. c.
           </label>
         </div>
       ) : (

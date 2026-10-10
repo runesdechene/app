@@ -95,7 +95,7 @@ test('une époque, ou « je ne sais pas » ; l’année sur demande, avant J.-C.
   expect(dernier()?.epoque).toBeNull()
   await userEvent.click(screen.getByRole('button', { name: /Préciser l’année/ }))
   await userEvent.type(screen.getByRole('spinbutton', { name: 'Année' }), '52')
-  await userEvent.click(screen.getByRole('checkbox', { name: 'av. J.-C.' }))
+  await userEvent.click(screen.getByRole('checkbox', { name: 'av. è. c.' }))
   expect(dernier()?.annee).toBe(-52)
 })
 

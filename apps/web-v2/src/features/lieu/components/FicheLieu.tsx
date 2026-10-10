@@ -27,6 +27,7 @@ import signetPlein from '@/assets/ui/signet-plein.svg'
 import signet from '@/assets/ui/signet.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import { DefilePhotos } from './DefilePhotos'
+import { useCalendrier } from '@/shared/hooks/useCalendrier'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import type { FicheLieu as Fiche } from '../api/lireLieu'
@@ -69,6 +70,7 @@ export function FicheLieu({
   const { basculer, echec } = useEnvie(id)
   const { coeurs, aimer } = useCoeurs(id)
   const moi = useMoi()
+  const calendrier = useCalendrier()
   const [grande, setGrande] = useState(0)
   // La photo change (au doigt, aux flèches) : sa vignette se range dans la partie visible.
   const galerie = useRef<HTMLDivElement>(null)
@@ -89,7 +91,7 @@ export function FicheLieu({
   if (fiche === undefined) return <div className={styles.chargement} aria-busy="true" />
   if (fiche === null) return <EmptyState>Ce lieu n’existe pas ou n’est plus visible</EmptyState>
 
-  const faits = ligneDeFaits(fiche.faits)
+  const faits = ligneDeFaits(fiche.faits, calendrier)
   const enrichi = enrichisseurs(fiche.recitPar, fiche.auteur?.id ?? null)
   // On ne s'envoie pas de cœurs sur son propre lieu (la base le refuse aussi).
   const peutAimer = moi !== undefined && moi.id !== fiche.auteur?.id

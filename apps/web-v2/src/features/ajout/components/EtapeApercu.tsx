@@ -6,6 +6,8 @@
  *            son étape). La Charte, signée à l'entrée, n'est plus trois cases à cocher : une
  *            phrase au moment de poser. Un refus se dit en clair, avec quoi faire.
  */
+import { anneeEnClair } from '@runes/calendrier'
+import { useCalendrier } from '@/shared/hooks/useCalendrier'
 import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import { useEpoques, useNatures, usePoser } from '../hooks/useAjout'
 import type { Ajout } from '../api/lireAjout'
@@ -59,15 +61,11 @@ export function EtapeApercu({
   const natures = useNatures()
   const epoques = useEpoques()
   const poser = usePoser()
+  const calendrier = useCalendrier()
   const photo = useUrlDe(brouillon.photos[0]?.grande)
   const [principale, ...autres] = brouillon.natures.map((id) => natures.find((n) => n.id === id))
   const epoque = epoques.find((e) => e.id === brouillon.epoque)
-  const annee =
-    brouillon.annee === null
-      ? null
-      : brouillon.annee < 0
-        ? `${String(-brouillon.annee)} av. J.-C.`
-        : String(brouillon.annee)
+  const annee = brouillon.annee === null ? null : anneeEnClair(brouillon.annee, calendrier)
   const faits = [epoque?.nom, annee, ...autres.map((n) => n?.nom)].filter(Boolean).join(' · ')
   const endroit = brouillon.endroit
     ? [brouillon.endroit.titre, brouillon.endroit.detail].filter(Boolean).join(', ')
