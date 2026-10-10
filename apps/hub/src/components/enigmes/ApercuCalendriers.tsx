@@ -5,7 +5,7 @@ import type { EnigmaForm } from './types'
 // Une date s'écrit entre accolades, en chrétien : {52 av. J.-C.}, {IIIe siècle av. J.-C.}. Une balise
 // incomprise s'afficherait telle quelle chez le joueur : on la signale.
 export function ApercuCalendriers({ form }: { form: EnigmaForm }) {
-  const choix = form.format === 'qcm' ? form.choices ?? [] : []
+  const choix = form.format === 'qcm' ? (form.choices ?? []).filter(c => c.trim()) : []
   const textes = [form.lore_text, form.question, ...choix, form.answer, form.explanation]
   if (!textes.some(t => /[{}]/.test(t))) return null
   const incomprises = textes.flatMap(balisesIncomprises)
