@@ -1,7 +1,7 @@
 /**
  * QUOI     — le cadre commun des écrans d'entrée (maquettes 94:142 à 95:107) : le parchemin, la
  *            flèche de retour quand il y en a une, le contenu, puis l'action en bas.
- * POURQUOI — six écrans sur sept ont ce cadre ; l'écrire une fois garde chaque écran court.
+ * POURQUOI — les sept écrans ont ce cadre ; l'écrire une fois garde chaque écran court.
  *            Le retour est celui du navigateur : chaque écran a son adresse.
  */
 import type { ReactNode } from 'react'
