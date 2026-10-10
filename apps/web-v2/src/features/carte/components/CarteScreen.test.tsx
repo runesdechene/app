@@ -310,6 +310,14 @@ test('le bouton Filtre ouvre la feuille ; un filtre choisi se voit, et le bouton
   expect(screen.queryByRole('button', { name: 'Renaissance' })).not.toBeInTheDocument()
 })
 
+test('un membre a les époques dès la carte, avant d’ouvrir la frise', async () => {
+  api.fetchFiltres.mockClear()
+  afficher()
+  await waitFor(() => {
+    expect(api.fetchFiltres).toHaveBeenCalled()
+  })
+})
+
 test('le sablier ouvre la frise ; refermée sur une plage, il reste à l’encre', async () => {
   afficher()
   const sablier = screen.getByRole('button', { name: 'Frise des époques' })
@@ -400,6 +408,7 @@ test('le visiteur voit la carte publique, sans filtre ni préférences, jusqu’
   tiroirDe(0)
   api.fetchCartePublique.mockResolvedValue(LIEUX)
   api.fetchLieuxEnCouleur.mockClear()
+  api.fetchFiltres.mockClear()
   render(
     <QueryClientProvider client={new QueryClient()}>
       <MemoryRouter initialEntries={['/bienvenue/carte/lieu/inconnu']}>
@@ -417,6 +426,7 @@ test('le visiteur voit la carte publique, sans filtre ni préférences, jusqu’
   })
   expect(api.fetchCarteLieux).not.toHaveBeenCalled()
   expect(api.fetchLieuxEnCouleur).not.toHaveBeenCalled()
+  expect(api.fetchFiltres).not.toHaveBeenCalled()
   expect(screen.queryByRole('button', { name: 'Filtre' })).not.toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Frise des époques' })).not.toBeInTheDocument()
 })

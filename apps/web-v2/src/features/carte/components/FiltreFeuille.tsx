@@ -110,7 +110,6 @@ export function FiltreFeuille({
               </button>
             ))}
           </div>
-
         </div>
 
         <button type="button" className={styles.voir} onClick={onFermer}>

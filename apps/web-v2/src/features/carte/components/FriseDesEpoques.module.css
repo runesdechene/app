@@ -70,6 +70,9 @@
   background: var(--color-sable);
   color: var(--color-texte-doux);
   text-align: center;
+  transition:
+    background var(--duree-douce) var(--courbe-douce),
+    color var(--duree-douce) var(--courbe-douce);
 }
 
 .case:first-child {
@@ -125,6 +128,7 @@
 }
 
 .poignee::-webkit-slider-thumb {
+  box-sizing: border-box;
   width: 22px;
   height: 22px;
   border: 2px solid var(--color-encre);
@@ -202,6 +206,23 @@
   left: calc((var(--a) + 1) / var(--n) * 100%);
 }
 
+/* Une année posée au bord de la bande s'y aligne, au lieu de déborder de sa demi-largeur. */
+.annee[data-cote='debut'][data-bord] {
+  translate: 0 0;
+}
+
+.annee[data-cote='fin'][data-bord] {
+  translate: -100% 0;
+}
+
+/* Sur téléphone, une case ne fait que 25 à 28 px : une seule époque, ses deux années se
+   chevaucheraient. L'en-tête dit déjà « de X à Y ». */
+@media (width < 1024px) {
+  .bornes[data-seule] .annee {
+    display: none;
+  }
+}
+
 @media (width >= 1024px) {
   .case,
   .poignee {
@@ -216,5 +237,11 @@
 
   .bout {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case {
+    transition: none;
   }
 }

@@ -74,3 +74,35 @@ test('sans au moins deux époques datées, rien', () => {
   afficher(new Set(), [])
   expect(screen.queryByRole('region', { name: 'La frise des époques' })).not.toBeInTheDocument()
 })
+
+const bornesAffichees = () => ({
+  debut: document.querySelector('[data-cote="debut"]')?.textContent ?? null,
+  fin: document.querySelector('[data-cote="fin"]')?.textContent ?? null,
+})
+
+test('au repos : les noms des deux bouts, aucune année', () => {
+  afficher()
+  expect(bornesAffichees()).toEqual({ debut: null, fin: null })
+  // La piste ne porte pas ces noms (cases) : ils sont dans les bornes, une fois chacun de plus.
+  expect(screen.getAllByText('Préhistoire')).toHaveLength(2)
+  expect(screen.getAllByText('Ère digitale')).toHaveLength(2)
+})
+
+test('une plage : ses deux années, plus les noms des bouts', () => {
+  afficher(new Set(['early-middle-ages', 'renaissance']))
+  expect(bornesAffichees()).toEqual({ debut: '1229', fin: '2353' })
+  expect(screen.getAllByText('Préhistoire')).toHaveLength(1)
+  expect(screen.getAllByText('Ère digitale')).toHaveLength(1)
+})
+
+test('une seule époque : l’en-tête porte les bornes', () => {
+  afficher(new Set(['renaissance']))
+  expect(screen.getAllByText('Renaissance')).toHaveLength(2) // la case et le titre
+  expect(screen.getByText(/^de 2206 à 2353/)).toBeInTheDocument()
+})
+
+test('une plage qui part du premier bout : son année de fin seule, pas le nom du bout', () => {
+  afficher(new Set(['prehistory', 'early-middle-ages']))
+  expect(bornesAffichees()).toEqual({ debut: null, fin: '1753' })
+  expect(screen.getAllByText('Préhistoire')).toHaveLength(1) // la case seule
+})

@@ -83,6 +83,7 @@ export function lireFiltres(json: unknown): FiltresDeCarte {
       return {
         id: chaine(e.id),
         nom: chaine(e.nom),
+        // `?? null` : une réponse d'avant la migration 477 (clés absentes) se lit en bornes ouvertes.
         debut: ouNull(nombre)(e.debut ?? null),
         fin: ouNull(nombre)(e.fin ?? null),
       }

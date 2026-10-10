@@ -100,20 +100,37 @@ export function FriseDesEpoques({ epoques, choix, onChoix }: Props) {
             choisir({ de: plage.de, a: Math.max(Number(ev.target.value), plage.de) })
           }}
         />
-        <p className={styles.bornes} aria-hidden="true">
-          {debut === null ? (
-            <span className={styles.bout}>{frise[0]?.nom}</span>
+        <p
+          className={styles.bornes}
+          data-seule={plage.de === plage.a || undefined}
+          aria-hidden="true"
+        >
+          {repos ? (
+            <>
+              <span className={styles.bout}>{frise[0]?.nom}</span>
+              <span className={styles.boutFin}>{frise[dernier]?.nom}</span>
+            </>
           ) : (
-            <span className={styles.annee} data-cote="debut">
-              {debut}
-            </span>
-          )}
-          {fin === null ? (
-            <span className={styles.boutFin}>{frise[dernier]?.nom}</span>
-          ) : (
-            <span className={styles.annee} data-cote="fin">
-              {fin}
-            </span>
+            <>
+              {debut !== null && (
+                <span
+                  className={styles.annee}
+                  data-cote="debut"
+                  data-bord={plage.de === 0 || undefined}
+                >
+                  {debut}
+                </span>
+              )}
+              {fin !== null && (
+                <span
+                  className={styles.annee}
+                  data-cote="fin"
+                  data-bord={plage.a === dernier || undefined}
+                >
+                  {fin}
+                </span>
+              )}
+            </>
           )}
         </p>
       </div>

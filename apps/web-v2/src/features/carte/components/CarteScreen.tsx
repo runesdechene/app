@@ -139,7 +139,7 @@ function CarteVivante({
   const [friseOuverte, setFriseOuverte] = useState(false)
   const [filtres, setFiltres] = useState(FILTRES_VIDES)
   // Même clé de cache que la feuille des filtres : une seule lecture.
-  const { epoques } = useFiltresDeCarte(friseOuverte)
+  const { epoques } = useFiltresDeCarte(!visiteur)
   // Un dessin des marques qui échoue (canevas absent, icône illisible) se dit comme un échec de
   // chargement ; « Réessayer » relance les deux.
   const [marquesEnPanne, setMarquesEnPanne] = useState(false)
