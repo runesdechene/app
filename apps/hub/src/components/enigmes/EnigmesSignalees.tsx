@@ -88,7 +88,7 @@ export function EnigmesSignalees() {
                 <span className="signalement-etiquette">Attendue</span>
                 <span className="signalement-reponse">{texteEnClair(s.enigme.reponse, 'chretien')}</span>
                 {s.enigme.variantes.length > 0 && (
-                  <span className="signalement-variantes">ou {s.enigme.variantes.join(', ')}</span>
+                  <span className="signalement-variantes">ou {s.enigme.variantes.map(v => texteEnClair(v, 'chretien')).join(', ')}</span>
                 )}
               </div>
               <div>
@@ -103,7 +103,7 @@ export function EnigmesSignalees() {
 
             {s.reponseProposee && (
               <p className="signalement-proposition">
-                Selon {s.qui.nom}, la bonne réponse serait <strong>{s.reponseProposee}</strong>
+                Selon {s.qui.nom}, la bonne réponse serait <strong>{texteEnClair(s.reponseProposee, 'chretien')}</strong>
               </p>
             )}
 

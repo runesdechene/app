@@ -186,15 +186,14 @@ export function Enigmas() {
   }
 
   async function handleSaveForm() {
-    setSaving(true)
     setSaveError(null)
-    // Une réponse libre ne se balise pas : personne ne taperait « 702 ap. la fondation de Rome »
+    // Une réponse libre (ou une variante) ne se balise pas : personne ne taperait « 702 ap. la fondation de Rome »
     // (spec calendrier).
-    if (editForm.format === 'free' && /[{}]/.test(editForm.answer)) {
-      setSaveError('Une réponse libre ne peut pas être une date balisée : passe en QCM, ou écris-la sans accolades.')
-      setSaving(false)
+    if (editForm.format === 'free' && [editForm.answer, ...editForm.accepted_answers].some(a => /[{}]/.test(a))) {
+      setSaveError('Une réponse libre (ou une variante) ne peut pas être une date balisée : passe en QCM, ou écris-la sans accolades.')
       return
     }
+    setSaving(true)
     try {
       const payload = {
         type: editForm.type,
