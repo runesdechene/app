@@ -1,15 +1,24 @@
 /*
- * QUOI     — la date sous l'inscription : plus petite et plus discrète que le nom, même encre et
- *            même halo de parchemin, sans prise sur la carte.
+ * QUOI     — la date sous l'inscription : plus petite que le nom, même encre et même halo de
+ *            parchemin, sans prise sur la carte.
+ * ATTENTION — en italique IM Fell, moins de 16 px ne se lit plus sur le relief (Uriel, 11/10 :
+ *            « on voit que dalle » à 12 px) ; 18 px sur PC.
  */
 .date {
   margin: 0;
   color: var(--color-carte-encre);
   font-family: var(--font-inscription);
-  font-size: var(--legende-size);
+  font-size: var(--corps-size);
   font-style: italic;
-  opacity: 0.75;
   text-align: center;
-  text-shadow: 0 0 3px var(--color-carte-halo);
+  text-shadow:
+    0 0 3px var(--color-carte-halo),
+    0 0 6px var(--color-carte-halo);
   pointer-events: none;
+}
+
+@media (width >= 1024px) {
+  .date {
+    font-size: var(--rangee-size);
+  }
 }
