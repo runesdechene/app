@@ -113,3 +113,12 @@ test('une réponse d’énigme acceptée dans le Hub (mig 473)', () => {
     'Ta réponse à l’énigme n° 287 est acceptée : ton point t’est rendu',
   )
 })
+
+test('sous une mise à jour (mig 478) : son titre en ocre, entre guillemets', () => {
+  const sous = { ...base, lieu: null, extrait: 'Remonte le temps' }
+  expect(texte({ ...sous, type: 'mot_mise_a_jour' })).toBe('Kelpie a commenté « Remonte le temps »')
+  expect(texte({ ...sous, type: 'reponse_mise_a_jour' })).toBe('Kelpie t’a répondu sous « Remonte le temps »')
+  expect(texte({ ...sous, type: 'coeur_mot_mise_a_jour' })).toBe('Kelpie a aimé ton mot sous « Remonte le temps »')
+  expect(texte({ ...sous, type: 'coeur_mise_a_jour' })).toBe('Kelpie aime « Remonte le temps »')
+  expect(phraseDe({ ...sous, type: 'coeur_mise_a_jour' })[2]).toEqual({ texte: 'Remonte le temps', sorte: 'lieu' })
+})

@@ -56,6 +56,17 @@ beforeEach(() => {
       evenement: null,
     },
     {
+      id: 4,
+      type: 'reponse_mise_a_jour',
+      quand: maintenant.toISOString(),
+      lu: false,
+      qui: { id: 'm', nom: 'Mathéo', avatar: null },
+      lieu: null,
+      nombre: null,
+      extrait: 'Remonte le temps',
+      evenement: null,
+    },
+    {
       id: 1,
       type: 'mise_a_jour',
       quand: maintenant.toISOString(),
@@ -101,6 +112,14 @@ test('une mise à jour mène aux Nouveautés', async () => {
   const aujourdhui = await screen.findByRole('region', { name: 'Aujourd’hui' })
   expect(
     within(aujourdhui).getByRole('link', { name: /Nouveautés d’Explore : Filtrer la carte/ }),
+  ).toHaveAttribute('href', '/accueil/nouveautes')
+})
+
+test('une réponse sous une mise à jour mène aux Nouveautés', async () => {
+  afficher()
+  const aujourdhui = await screen.findByRole('region', { name: 'Aujourd’hui' })
+  expect(
+    within(aujourdhui).getByRole('link', { name: /Mathéo t’a répondu sous « Remonte le temps »/ }),
   ).toHaveAttribute('href', '/accueil/nouveautes')
 })
 

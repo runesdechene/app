@@ -56,7 +56,8 @@ export function Notifications() {
 function cibleDe(n: Notification) {
   if (n.type === 'mention') return '/messages'
   if (n.type === 'salut' && n.evenement === 'message') return '/messages'
-  if (n.type === 'mise_a_jour') return '../nouveautes'
+  // Une mise à jour, ou ce qu'on en dit (mig 478).
+  if (n.type === 'mise_a_jour' || n.type.endsWith('_mise_a_jour')) return '../nouveautes'
   if (n.type === 'enigme_acceptee') return '../enigmes'
   if (n.compagnie) {
     return n.type === 'demande_compagnie'

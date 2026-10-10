@@ -1,0 +1,64 @@
+/*
+ * QUOI     — sous une mise à jour : la pastille ♥ puis le carnet, qui apparaissent en fondu ;
+ *            repliée, ses comptes en petit et « Lire les commentaires » en ocre.
+ */
+.ouverte {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    translate var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 var(--space-2);
+  }
+}
+
+/* Le carnet prend toute la largeur ; il garde sa marge du haut sous la pastille. */
+.ouverte > section {
+  justify-self: stretch;
+}
+
+.repliee {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.compte {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+}
+
+.coeur {
+  width: 14px;
+  height: 14px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/coeur.svg') center / contain no-repeat;
+}
+
+.lire {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-ocre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ouverte {
+    transition: none;
+  }
+}

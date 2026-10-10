@@ -13,6 +13,8 @@ export function phraseDe(n: Notification): Morceau[] {
   const qui: Morceau = { texte: n.qui?.nom ?? 'Quelqu’un', sorte: 'qui' }
   const lieu: Morceau = { texte: n.lieu?.nom ?? 'un lieu disparu', sorte: 'lieu' }
   const combien = String(n.nombre ?? 0)
+  // Sous une mise à jour (mig 478) : son titre tient lieu d'extrait.
+  const note: Morceau = { texte: n.extrait ?? 'une mise à jour', sorte: 'lieu' }
 
   switch (n.type) {
     case 'like_contribution':
@@ -73,6 +75,14 @@ export function phraseDe(n: Notification): Morceau[] {
         { texte: n.extrait ?? '', sorte: 'lieu' },
         t(' est acceptée : ton point t’est rendu'),
       ]
+    case 'mot_mise_a_jour':
+      return [qui, t(' a commenté « '), note, t(' »')]
+    case 'reponse_mise_a_jour':
+      return [qui, t(' t’a répondu sous « '), note, t(' »')]
+    case 'coeur_mot_mise_a_jour':
+      return [qui, t(' a aimé ton mot sous « '), note, t(' »')]
+    case 'coeur_mise_a_jour':
+      return [qui, t(' aime « '), note, t(' »')]
     case 'mise_a_jour':
       return [
         { texte: 'Nouveautés d’Explore', sorte: 'qui' },

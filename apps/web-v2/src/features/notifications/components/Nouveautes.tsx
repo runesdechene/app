@@ -1,7 +1,8 @@
 /**
  * QUOI     — la page « Nouveautés » (maquette « Nouveautés — la mise à jour ouverte », 30/09) : la
  *            dernière mise à jour en entier sur une carte, les précédentes dessous, plus discrètes.
- *            Une image et un numéro de version, quand la mise à jour en a (migration 436).
+ *            Une image et un numéro de version, quand la mise à jour en a (migration 436). Sous
+ *            chacune, ses cœurs et son carnet (478) : ouverts sous la dernière, repliés dessous.
  * POURQUOI — on y arrive en touchant « Nouveautés d'Explore » dans la cloche. Le texte vient du
  *            Hub ; `blocsDuTexte` le met en paragraphes et en listes.
  */
@@ -12,6 +13,7 @@ import type { MiseAJour } from '../api/nouveautes'
 import { useNouveautes } from '../hooks/useNouveautes'
 import { blocsDuTexte } from '../lib/texte'
 import styles from './Nouveautes.module.css'
+import { SousMiseAJour } from './SousMiseAJour'
 
 const LE = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' })
 const LARGEUR_IMAGE = 360 // la largeur de la carte, au plus
@@ -37,6 +39,7 @@ export function Nouveautes() {
     <div className={styles.nouveautes}>
       <article className={styles.derniere}>
         <MiseAJourEcrite miseAJour={derniere} premiere />
+        <SousMiseAJour miseAJour={derniere} depliee />
       </article>
       {precedentes.length > 0 && (
         <section className={styles.precedentes} aria-label="Précédentes">
@@ -44,6 +47,7 @@ export function Nouveautes() {
           {precedentes.map((m) => (
             <article key={m.id} className={styles.precedente}>
               <MiseAJourEcrite miseAJour={m} />
+              <SousMiseAJour miseAJour={m} />
             </article>
           ))}
         </section>
