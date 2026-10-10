@@ -103,3 +103,15 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 - [ ] **Feuille des admins** : `agir` sans `catch` — un `ajouter_vue` raté ne dit rien.
 - [ ] **SQL** : `noter_scan` ouvert à tous sans limite (le chiffre des scans peut être gonflé ; les bips de l'atelier comptent) ; `remplacer_empreintes_illustration` efface sans filtrer sur `modele` (ajouter `AND modele = p_modele`) ; le test des RPC vit hors dépôt (à ranger sous `supabase/tests/`).
 - [ ] **Retour du scanner** : un lien vers `/accueil` ou `/bienvenue`, pas le retour du navigateur ; depuis la carte, on revient sur l'Accueil.
+
+## Le choix du calendrier — mineurs de la relecture (10/10/2026)
+
+> Relecture de la branche `feat/choix-du-calendrier` (spec `2026-10-09-choix-du-calendrier`) : aucun
+> point important ; ceux-ci sont reportés.
+
+- [ ] **Ouverture à froid** : le calendrier n'est pas dans le cache persisté — l'appli affiche une seconde le chrétien avant le choix du joueur.
+- [ ] **Onboarding** : « Suivant » pressé avant la fin de la lecture du calendrier enregistre `chretien` par-dessus un choix déjà fait (lien direct ou retour arrière seulement ; les Préférences corrigent).
+- [ ] **Paquet `calendrier`** : la regex des siècles accepte des chiffres romains mal formés ; `anneeEnClair(0)` n'est pas gardé ; `romain()` mute `reste` dans un `reduce` (un `for…of` serait plus simple) ; une année démesurée donne un chiffre romain géant.
+- [ ] **Hub** : la recherche des énigmes porte sur le texte brut (avec accolades) ; le garde QCM compare la réponse rognée mais enregistre la réponse telle quelle (sans effet : `percer_enigme` normalise) ; des accolades tapées par un joueur dans un signalement disparaissent à l'affichage.
+- [ ] **Énigme #58** : QCM dont la réponse n'est pas l'un des choix (antérieur au calendrier, injouable).
+- [ ] **Lockfile** : un second vitest/vite résout `@types/node` 25.2.0 (24.19.0 ailleurs) — aligner le devDep pour dédoublonner.
