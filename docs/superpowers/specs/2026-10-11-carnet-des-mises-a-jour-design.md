@@ -8,7 +8,8 @@
 Uriel veut que les Explorateurs puissent réagir aux notes de mise à jour et les commenter : savoir ce
 que la communauté pense d'une version, et la faire parler autour. « Plus simple : même fil de
 commentaires que sur un lieu, exactement le même, et les cœurs à volonté aussi. Tout pareil »
-(11/10).
+(11/10). Tout pareil : à volonté sur la note (comme sur un lieu), un par personne sur un mot
+(comme sur un mot du Carnet, mig 390).
 
 ## Ce que voit le joueur, sur « Nouveautés »
 
@@ -21,7 +22,8 @@ Chaque note reçoit ce qu'a un lieu, avec les **mêmes composants** et le **mêm
   - les mots du plus récent au plus ancien, chacun avec ses réponses (un seul niveau, dans l'ordre) ;
   - un mot de 1 à 2000 signes, jusqu'à quatre photos (mêmes contrôles que sur un lieu : le dossier du
     compte, le fichier existe) ; trente mots par jour ;
-  - des cœurs à volonté sur chaque mot (pas sur le sien) ;
+  - un cœur par personne sur chaque mot, qu'on allume ou éteint (pas sur le sien) — comme sur un
+    lieu depuis la mig 390 : sur un mot, le cœur dit « c'est utile », un vote honnête ;
   - « Répondre » ; une réponse à une réponse va sous le mot d'origine ;
   - « Effacer » pour l'auteur du mot ou l'équipe (`_is_staff`) ; ses réponses partent avec lui.
 - **Où** : la dernière note (en entier, en haut) montre ses cœurs et son carnet ouverts ; les notes
@@ -33,8 +35,8 @@ Chaque note reçoit ce qu'a un lieu, avec les **mêmes composants** et le **mêm
 
 ## Les notifications
 
-- **Comme le Carnet** : celui à qui l'on répond est prévenu (`comment_reply`) ; le premier cœur d'une
-  personne sur un mot prévient son auteur (`coeur_mot`).
+- **Comme le Carnet** : celui à qui l'on répond est prévenu (`comment_reply`) ; le cœur d'une
+  personne sur un mot prévient son auteur une seule fois, même éteint puis rallumé (`coeur_mot`).
 - **Chaque nouveau mot ou réponse** prévient **tous les administrateurs** (`users.role = 'admin'`),
   sauf celui qui l'a écrit : dans la cloche **et en push** (catégorie `important`, qui suit
   `push_important_enabled`). Un nouveau type, `mot_mise_a_jour`, pour que la cloche et le push disent
@@ -52,7 +54,8 @@ un lieu) :
 
 - `mots_mise_a_jour` : `id`, `mise_a_jour_id → mises_a_jour ON DELETE CASCADE`, `user_id`, `texte`,
   `images jsonb`, `parent_id → mots_mise_a_jour ON DELETE CASCADE`, `created_at`.
-- `coeurs_mot_mise_a_jour` : `(mot_id, user_id)` unique, `nombre > 0` — comme `coeurs_mot`.
+- `coeurs_mot_mise_a_jour` : `(mot_id, user_id)` unique — un cœur par personne, comme `coeurs_mot`
+  depuis la 390 (avec `premier_le` pour ne prévenir l'auteur qu'une fois).
 - `coeurs_mise_a_jour` : `(mise_a_jour_id, user_id)` unique, `nombre > 0` — comme `coeurs_lieu`.
 
 RLS active, aucune policy directe : tout passe par des RPC `SECURITY DEFINER`, réservées à
@@ -63,7 +66,7 @@ migration) :
 |---|---|
 | `carnet_du_lieu(p_id, p_limite)` | `carnet_de_mise_a_jour(p_id, p_limite)` |
 | `ecrire_au_carnet(p_id, p_texte, p_images, p_parent)` | `ecrire_sous_mise_a_jour(p_id, p_texte, p_images, p_parent)` |
-| `aimer_mot(p_id)` | `aimer_mot_mise_a_jour(p_id)` |
+| `basculer_coeur_mot(p_id)` (390) | `basculer_coeur_mot_mise_a_jour(p_id)` |
 | `effacer_mot(p_id)` | `effacer_mot_mise_a_jour(p_id)` |
 | `aimer_lieu(p_id)` | `aimer_mise_a_jour(p_id)` |
 | `coeurs_du_lieu(p_id)` | `coeurs_de_mise_a_jour(p_id)` |
