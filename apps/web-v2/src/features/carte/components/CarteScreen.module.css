@@ -212,10 +212,11 @@
 }
 
 /* La bande de la frise, en bas : elle apparaît en glissant. À partir de 1024 px, `margin-inline:
-   auto` la centre entre ses deux bords, donc sur la partie carte. */
+   auto` la centre entre ses deux bords, donc sur la partie carte. Elle se tient 44 px au-dessus
+   du bas, hors de la mention OpenStreetMap (obligatoire, ~34 px de haut sur téléphone). */
 .frise {
   position: absolute;
-  bottom: 20px;
+  bottom: 44px;
   left: calc(24px + var(--decalage-carte));
   right: 24px;
   z-index: 1;
