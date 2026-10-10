@@ -16,6 +16,8 @@ type Data = Record<string, unknown>
 const texte = (v: unknown, repli = ''): string =>
   v === undefined || v === null || v === '' ? repli : String(v)
 
+const NOUVEAUTES = '/accueil/nouveautes'
+
 const ficheDuLieu = (data: Data): string => {
   const id = texte(data.placeId)
   return id ? `/accueil/lieu/${id}` : '/accueil'
@@ -24,6 +26,8 @@ const ficheDuLieu = (data: Data): string => {
 export function formatPayload(type: string, data: Data): PushPayload | null {
   const qui = texte(data.actorName, 'Quelqu’un')
   const lieu = texte(data.placeTitle, 'un de tes lieux')
+  // Une mise à jour (mig 478) : son titre entre guillemets, ou « une mise à jour ».
+  const note = data.titre ? `« ${texte(data.titre)} »` : 'une mise à jour'
   const nombre = Number(data.viewCount ?? data.explorerCount ?? data.likeCount ?? data.visitorsToday ?? 0)
   const surLeLieu = (title: string, body: string): PushPayload => ({
     title,
@@ -123,11 +127,19 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
         url: '/accueil/enigmes',
       }
 
+    case 'mot_mise_a_jour':
+      return { title: `${qui} a commenté ${note}`, body: texte(data.extrait, 'Un nouveau mot sous une mise à jour.'), url: NOUVEAUTES }
+    case 'reponse_mise_a_jour':
+      return { title: `${qui} t’a répondu`, body: `Sous ${note}.`, url: NOUVEAUTES }
+    case 'coeur_mot_mise_a_jour':
+      return { title: `${qui} a aimé ton mot`, body: `Sous ${note}.`, url: NOUVEAUTES }
+    case 'coeur_mise_a_jour':
+      return { title: `${qui} aime ${note}`, body: 'Ta mise à jour plaît.', url: NOUVEAUTES }
     case 'mise_a_jour':
       return {
         title: 'Nouveautés d’Explore',
         body: texte(data.titre, 'Une mise à jour est arrivée.'),
-        url: '/accueil/nouveautes',
+        url: NOUVEAUTES,
       }
 
     default:

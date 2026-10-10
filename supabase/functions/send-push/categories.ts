@@ -21,6 +21,10 @@ export const CATEGORY_BY_TYPE: Record<string, Category> = {
   demande_compagnie: 'important',
   demande_acceptee: 'important',
   mise_a_jour: 'important',
+  mot_mise_a_jour: 'important', // mig 478 : un mot sous une mise à jour, à tous les admins
+  reponse_mise_a_jour: 'important', // mig 478 : on te répond sous une mise à jour
+  coeur_mot_mise_a_jour: 'important', // mig 478 : on aime ton mot sous une mise à jour
+  coeur_mise_a_jour: 'important', // mig 478 : on aime ta mise à jour
   visite: 'important', // mig 464 : la première visite d'un Explorateur sur ton lieu
   revendication_reprise: 'important', // mig 464 : on revendique un lieu que tu tenais
   nouveau_membre: 'important', // mig 464 : quelqu'un rejoint ta Compagnie

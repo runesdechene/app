@@ -64,3 +64,19 @@ Deno.test('une réponse d’énigme acceptée part et ouvre « Les énigmes » (
   assertEquals(p?.body, 'Énigme n° 287 : ton point t’est rendu.')
   assertEquals(p?.url, '/accueil/enigmes')
 })
+
+Deno.test('les mots et les cœurs sous une mise à jour (mig 478) partent vers « Nouveautés »', () => {
+  const mot = formatPayload('mot_mise_a_jour', { actorName: 'Luna', titre: 'Remonte le temps', extrait: 'Génial, la frise !' })
+  assertEquals(mot?.title, 'Luna a commenté « Remonte le temps »')
+  assertEquals(mot?.body, 'Génial, la frise !')
+  assertEquals(mot?.url, '/accueil/nouveautes')
+  assertEquals(formatPayload('reponse_mise_a_jour', { actorName: 'Luna', titre: 'Remonte le temps' })?.title, 'Luna t’a répondu')
+  assertEquals(formatPayload('reponse_mise_a_jour', { actorName: 'Luna', titre: 'Remonte le temps' })?.body, 'Sous « Remonte le temps ».')
+  assertEquals(formatPayload('coeur_mot_mise_a_jour', { actorName: 'Luna', titre: 'Remonte le temps' })?.title, 'Luna a aimé ton mot')
+  assertEquals(formatPayload('coeur_mise_a_jour', { actorName: 'Luna', titre: 'Remonte le temps' })?.title, 'Luna aime « Remonte le temps »')
+  assertEquals(formatPayload('coeur_mise_a_jour', {})?.title, 'Quelqu’un aime une mise à jour')
+  for (const type of ['mot_mise_a_jour', 'reponse_mise_a_jour', 'coeur_mot_mise_a_jour', 'coeur_mise_a_jour']) {
+    assertEquals(categoryOf(type), 'important')
+    assertEquals(formatPayload(type, {})?.url, '/accueil/nouveautes')
+  }
+})
