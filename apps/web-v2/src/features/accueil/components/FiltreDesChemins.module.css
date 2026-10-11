@@ -1,6 +1,7 @@
 /*
  * QUOI     — le filtre du fil : trois petites gélules sous le titre. Allumée : un fond ocre très
- *            léger, l'encre et une petite coche ; éteinte : sans fond, le texte pâle. Tout en fondu.
+ *            léger, l'encre et une petite coche ; éteinte : un fond sable pâle, le texte doux, sans
+ *            coche. Tout en fondu.
  */
 .filtre {
   display: flex;
@@ -20,8 +21,8 @@
   padding: 3px 10px 3px 8px;
   border: none;
   border-radius: var(--radius-rond);
-  background: transparent;
-  color: var(--color-texte-pale);
+  background: color-mix(in srgb, var(--color-sable) 45%, transparent);
+  color: var(--color-texte-doux);
   font: inherit;
   font-weight: var(--weight-semi);
   cursor: pointer;
