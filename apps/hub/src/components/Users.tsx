@@ -227,10 +227,9 @@ export function Users() {
   useEffect(() => { setPage(1) }, [sortAsc])
 
   const updateRole = async (userId: string, newRole: Role) => {
-    const { error } = await supabase
-      .from('users')
-      .update({ role: newRole })
-      .eq('id', userId)
+    // Par une fonction réservée aux admins (mig 499) : l'écriture directe était refusée sans bruit.
+    const { error } = await supabase.rpc('changer_role', { p_user: userId, p_role: newRole })
+    if (error) window.alert(`Le rôle n'a pas pu être changé : ${error.message}`)
 
     if (!error) {
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u))
