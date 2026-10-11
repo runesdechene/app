@@ -1,7 +1,7 @@
 /**
  * QUOI     — la page publique d'un lieu (maquettes Figma 566:614 téléphone, 566:752 ordinateur,
  *            validées par Uriel le 11/10) : la photo, la fiche telle que l'appli la lit, les lieux
- *            à proximité, le bas de page de la marque. Puis tout ce que Google lit : titre,
+ *            « Vous pourriez aussi aimer », le bas de page de la marque. Puis tout ce que Google lit : titre,
  *            description, Open Graph, schema.org.
  * POURQUOI — la page d'arrivée depuis Google : elle dit le lieu et mène à son aperçu sur la
  *            carte d'Explore, sans compte (le lieu est retenu jusqu'à l'inscription).

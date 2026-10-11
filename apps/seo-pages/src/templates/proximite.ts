@@ -1,5 +1,6 @@
 /**
- * QUOI     — « À proximité » : les quatre lieux les plus proches, comme les lieux de la vitrine
+ * QUOI     — « Vous pourriez aussi aimer » (Uriel, 11/10, plutôt qu'« À proximité ») : les quatre
+ *            lieux les plus proches, comme les lieux de la vitrine
  *            (la photo, la nature posée dessus, le nom, le département et la distance).
  * POURQUOI — Google suit ces liens de fiche en fiche ; le visiteur, lui, voit quoi faire autour.
  */
@@ -13,7 +14,7 @@ function distance(km: number): string {
 export function renderProximite(lieux: NearbyPlace[], numeros: Map<string, string>): string {
   if (lieux.length === 0) return '';
   return `<section class="proximite" aria-labelledby="a-proximite">
-  <h2 id="a-proximite">À proximité</h2>
+  <h2 id="a-proximite">Vous pourriez aussi aimer</h2>
   <ul>
     ${lieux
       .map((l) => {
