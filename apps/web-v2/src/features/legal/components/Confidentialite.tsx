@@ -152,10 +152,6 @@ export function Confidentialite() {
       <ul>
         <li>Supabase (base de données, serveurs en Irlande) ;</li>
         <li>Netlify (hébergement de l’application) ;</li>
-        <li>
-          Google (Firebase), qui héberge encore une partie des photos les plus anciennes, le temps
-          que nous les rapatriions ;
-        </li>
         <li>Shopify (la boutique et ses paiements, la lettre d’information) ;</li>
         <li>Resend (l’envoi des e-mails) ;</li>
         <li>Google, Apple et Mozilla (l’acheminement des notifications vers ton appareil) ;</li>

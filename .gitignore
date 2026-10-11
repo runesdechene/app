@@ -62,3 +62,6 @@ supabase/.temp/
 .wolf-archive/
 *.openwolf-era
 .mcp.json
+
+# La correspondance Firebase → Supabase (jetons d'accès des anciens fichiers)
+scripts/rapatriement-firebase.json
