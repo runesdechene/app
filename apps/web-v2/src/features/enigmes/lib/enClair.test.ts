@@ -14,10 +14,10 @@ test('l’encart dit ce qui reste, et où ça s’éveille', () => {
   expect(encartEnClair(58, 'Byzance', 'entre la Thrace et l’Asie Mineure')).toEqual({
     titre: 'Encore 58 énigmes à percer',
     phrase:
-      'Chaque matin, une énigme de Byzance s’éveille entre la Thrace et l’Asie Mineure. Zoome sur la carte : elles t’y attendent.',
+      'Au fil des jours, les énigmes de Byzance s’éveillent entre la Thrace et l’Asie Mineure. Zoome sur la carte : elles t’y attendent.',
   })
   expect(encartEnClair(1, 'Rome', null).titre).toBe('Encore une énigme à percer')
-  expect(encartEnClair(1, 'Rome', null).phrase).toContain('s’éveille quelque part dans sa zone.')
+  expect(encartEnClair(1, 'Rome', null).phrase).toContain('s’éveillent quelque part dans sa zone.')
   expect(encartEnClair(0, 'Rome', null)).toEqual({ titre: 'Tout est percé', phrase: 'De nouvelles énigmes viendront.' })
 })
 

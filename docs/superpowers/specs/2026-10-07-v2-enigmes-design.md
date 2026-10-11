@@ -21,8 +21,9 @@ Cette spec remplace, pour les énigmes, la ligne « Couronnes et énigmes en som
   cercles qu'on veut, tracés dans le Hub (5 km à 1 000 km), mer comprise — chacun tiré à égalité, un
   petit cercle vaut un site précis (Uriel, 07/10, migration 444). Les zones **se chevauchent exprès** (l'Égée est grecque et
   byzantine).
-- **Le réveil** : chaque matin, chaque culture éveille **une énigme**, posée à un point tiré **au hasard dans
-  sa zone**. Les positions sont **les mêmes pour tous**. Au plus **7 énigmes éveillées par culture** : au-delà,
+- **Le réveil** : chaque matin, **trois énigmes** s'éveillent, chaque culture à son tour (Uriel, 11/10 —
+  une par culture en posait cinq par jour, mig 482), chacune posée à un point tiré **au hasard dans sa
+  zone**. Les positions sont **les mêmes pour tous**. Au plus **7 énigmes éveillées en tout** : au-delà,
   la plus ancienne s'efface.
 - **Sur la carte** :
   - dézoomé, chaque énigme est **un éclat** (petit point rouge, halo), à sa place, **sans regroupement** ni
@@ -96,13 +97,14 @@ Tout `CREATE OR REPLACE` part de la définition live.
 3. **`enigma_responses`** gagne `eveil_id` (FK `enigmes_eveillees`, null pour les réponses V1). Contrainte :
    une réponse par compte et par éveil.
 4. **Le réveil** — fonction `_eveiller_enigmes()`, planifiée par **pg_cron** chaque matin (comme les tâches
-   des migs 144-146 : `cron.unschedule … WHERE EXISTS` avant `cron.schedule`). Pour chaque culture active
-   ayant des cercles :
+   des migs 144-146 : `cron.unschedule … WHERE EXISTS` avant `cron.schedule`). Pour les trois cultures
+   actives ayant des cercles réveillées le moins récemment (jamais d'abord) :
    - choisit l'énigme du stock **réveillée le moins récemment** (jamais réveillée d'abord) : la réserve
      tourne en cycle, et une énigme revient d'elle-même après un tour complet (~75 jours à une par jour) ;
    - tire un point au hasard : un cercle au hasard (pondéré par sa surface), puis un point uniforme dans le
      cercle ;
-   - insère l'éveil, puis efface (`effacee_le = now()`) les plus anciens au-delà de 7.
+   - insère l'éveil ; puis, toutes cultures confondues, efface (`effacee_le = now()`) les plus anciens
+     au-delà de 7.
    Heure : 7 h à Paris l'été (cron en UTC, `0 5 * * *` ; 6 h l'hiver, accepté).
 5. **`enigmes_en_attente()`** — pour le compte connecté : les éveils non effacés, sans réponse de ce compte à
    cet éveil, dont l'énigme n'a jamais été percée par ce compte. Renvoie **`id`, `lat`, `lng` seulement**.

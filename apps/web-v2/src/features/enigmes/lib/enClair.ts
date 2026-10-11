@@ -11,7 +11,7 @@ export function encartEnClair(restantes: number, culture: string, zone: string |
   if (restantes <= 0) return { titre: 'Tout est percé', phrase: 'De nouvelles énigmes viendront.' }
   return {
     titre: restantes === 1 ? 'Encore une énigme à percer' : `Encore ${String(restantes)} énigmes à percer`,
-    phrase: `Chaque matin, une énigme de ${culture} s’éveille ${zone ?? 'quelque part dans sa zone'}. Zoome sur la carte : elles t’y attendent.`,
+    phrase: `Au fil des jours, les énigmes de ${culture} s’éveillent ${zone ?? 'quelque part dans sa zone'}. Zoome sur la carte : elles t’y attendent.`,
   }
 }
 

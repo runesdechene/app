@@ -51,7 +51,7 @@ test('le compte, l’encart et le lien qui vole sur la zone', async () => {
   afficher()
   expect(await screen.findByText('14 / 72')).toBeInTheDocument()
   expect(screen.getByText('Encore 58 énigmes à percer')).toBeInTheDocument()
-  expect(screen.getByText(/s’éveille entre la Thrace et l’Asie Mineure/)).toBeInTheDocument()
+  expect(screen.getByText(/s’éveillent entre la Thrace et l’Asie Mineure/)).toBeInTheDocument()
   expect(screen.getByRole('link', { name: /Les chercher sur la carte/ })).toHaveAttribute('href', '/carte?centre=41,28.9,6.5')
 })
 
