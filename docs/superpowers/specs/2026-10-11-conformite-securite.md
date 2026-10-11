@@ -18,6 +18,7 @@
 - **Mig 494** — sans compte, 20 fonctions publiques au lieu de 250 ; les fonctions à venir naissent fermées à anon.
 - **Mig 495** — `search_path` figé sur les 112 SECURITY DEFINER qui n'en avaient pas.
 - Règles : `.claude/rules/supabase.md` ; tests : `supabase/tests/securite/`.
+- **Mig 496-497, Pythéas 1.21.0** — « Tes données » dans les Préférences : supprimer son compte (pierre tombale « Un Voyageur », compte de connexion supprimé, chefferie transmise), télécharger ses données (JSON).
 
 ## 1. Sécurité — à faire
 
