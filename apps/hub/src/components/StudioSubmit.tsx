@@ -160,7 +160,7 @@ export function StudioSubmit() {
       //    ne laisse jamais de soumission vide orpheline, et un fichier fautif (vidéo
       //    trop lourde, format exotique) n'emporte plus tout le lot avec lui.
       const folder = crypto.randomUUID()
-      const uploaded: { path: string; url: string; size: string | null }[] = []
+      const uploaded: { path: string; size: string | null }[] = []
       const failures: string[] = []
       for (let i = 0; i < files.length; i++) {
         let file = files[i]
@@ -173,8 +173,7 @@ export function StudioSubmit() {
         const path = `submissions/${folder}/${crypto.randomUUID()}.${ext}`
         const { error: upErr } = await supabase.storage.from('community-photos').upload(path, file, { contentType: file.type, upsert: false })
         if (upErr) { failures.push(`« ${files[i].name} » : ${upErr.message}`); continue }
-        const { data: urlData } = supabase.storage.from('community-photos').getPublicUrl(path)
-        uploaded.push({ path, url: urlData.publicUrl, size: sizes[i] })
+        uploaded.push({ path, size: sizes[i] })
       }
 
       // 2. Aucun fichier n'a pu être envoyé → on n'enregistre RIEN (pas de compte ni de
@@ -183,44 +182,23 @@ export function StudioSubmit() {
         throw new Error(failures[0] || "Aucun de tes contenus n'a pu être envoyé. Réessaie ou change de fichier.")
       }
 
-      // 3. Compte
-      setProgress('Vérification du compte…')
-      const { data: existing } = await supabase.from('users_admin').select('id').eq('email_address', email.toLowerCase().trim()).limit(1)
-      let userId: string
-      if (existing && existing.length > 0) { userId = existing[0].id; setIsNewAccount(false) }
-      else {
-        setIsNewAccount(true); setProgress('Création du compte…')
-        const newId = crypto.randomUUID()
-        const { error } = await supabase.rpc('create_user_from_submission', {
-          p_id: newId, p_email: email.toLowerCase().trim(), p_first_name: name.trim(), p_instagram: null,
-        })
-        if (error) throw new Error(`Compte : ${error.message}`)
-        userId = newId
-      }
-
-      // 4. Soumission (seulement maintenant qu'on a au moins une image en storage)
+      // 3. Le serveur retrouve (ou crée) le compte de l'adresse, puis enregistre la
+      //    soumission et ses contenus, en un seul geste (mig 501).
       setProgress('Enregistrement…')
       const parsedHeightCm = (() => { const h = parseInt(heightCm, 10); return Number.isFinite(h) && h >= 100 && h <= 250 ? h : null })()
-      const { data: subId, error: subErr } = await supabase.rpc('create_photo_submission', {
-        p_user_id: userId, p_submitter_name: name.trim(), p_submitter_email: email.toLowerCase().trim(),
-        p_submitter_instagram: null, p_message: message.trim() || null,
+      const { data: depot, error: depotErr } = await supabase.rpc('deposer_contenu', {
+        p_email: email, p_nom: name,
+        p_images: uploaded,
         p_consent_brand: consentBrand, p_consent_account: consentAccount,
+        p_message: message.trim() || null,
         p_departement: departement || null, p_quest_ref: selectedQuest,
         p_model_height_cm: parsedHeightCm,
         p_rating_experience: ratingExperience || null,
         p_rating_products: ratingProducts || null,
         p_team_note: teamNote.trim() || null,
       })
-      if (subErr) throw new Error(`Soumission : ${subErr.message}`)
-
-      // 5. Rattacher les images déjà uploadées
-      for (let i = 0; i < uploaded.length; i++) {
-        const img = uploaded[i]
-        const { error: imgErr } = await supabase.rpc('add_submission_image', {
-          p_submission_id: subId, p_storage_path: img.path, p_image_url: img.url, p_sort_order: i, p_size: img.size,
-        })
-        if (imgErr) throw new Error(`Enregistrement image ${i + 1} : ${imgErr.message}`)
-      }
+      if (depotErr) throw new Error(depotErr.message)
+      setIsNewAccount((depot as { nouveauCompte: boolean }).nouveauCompte)
 
       // Succès partiel : certains fichiers ont été ignorés mais au moins un est passé.
       if (failures.length > 0) console.warn('[StudioSubmit] fichiers ignorés :', failures)
