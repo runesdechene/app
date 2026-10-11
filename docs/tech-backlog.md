@@ -40,6 +40,7 @@
 
 ## Dette / cohérence
 
+- [ ] **Une seule colonne de nom** (11/10/2026) — `users.first_name` (écrite) et `display_name` (lue, `COALESCE(display_name, first_name)` dans ~190 lectures SQL) disent la même chose depuis la mig 488, tenues égales par `trg_sync_display_name_with_first_name`. Garder `display_name`, reprendre les lectures et l'écriture d'`update_my_profile`, puis retirer `first_name` (vérifier le Hub et seo-pages). Les noms par défaut des comptes sans nom varient encore selon les fonctions (« Voyageur », « Un Voyageur »…).
 - [ ] **2 migrations orphelines non filées** — `grade_founding_always_counts_306/307` (appliquées prod via MCP le 25/06, SQL perdu au `repair --reverted`). Effet **superseded** par 306/307/311/312/318 → repo = source de vérité OK ; à reconstituer seulement si on veut un repo 100 % rejouable.
 
 ## Hub — les « Réactivations » ne mesurent pas des réactivations (découvert le 01/10/2026)
