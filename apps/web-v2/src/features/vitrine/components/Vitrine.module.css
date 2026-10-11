@@ -243,17 +243,6 @@
     filter: blur(4px);
   }
 
-  /* La lisière de forêt de l'appli ferme le premier écran (Uriel, 11/10 : pas de dégradé). */
-  .ecran::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 -1px;
-    aspect-ratio: 1920 / 74;
-    background: var(--color-fond);
-    mask: url('../../../assets/ui/barre-lisiere.png') bottom center / 100% 100% no-repeat;
-    pointer-events: none;
-  }
-
   .haut {
     display: contents;
   }
