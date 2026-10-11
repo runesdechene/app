@@ -1,0 +1,39 @@
+/*
+ * QUOI     — la feuille des actions sur son message : titre Bebas, le champ pour modifier.
+ */
+.titre {
+  margin: 0 0 var(--space-2);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+}
+
+.consigne,
+.refus {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+.consigne {
+  color: var(--color-texte);
+}
+
+.refus {
+  color: var(--color-accent);
+}
+
+.champ {
+  width: 100%;
+  margin-bottom: var(--space-2);
+  padding: var(--space-3) 14px;
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-feuille);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  resize: vertical;
+}

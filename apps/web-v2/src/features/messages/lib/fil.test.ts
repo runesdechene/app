@@ -11,6 +11,7 @@ function message(id: number, quand: string): Message {
     canalNom: null,
     canalCouleur: null,
     texte: 'bonjour',
+    modifie: false,
     quand,
     auteur: { id: 'u1', nom: 'Uriel', avatar: null },
     moi: false,

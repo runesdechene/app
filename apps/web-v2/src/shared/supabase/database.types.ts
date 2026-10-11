@@ -428,34 +428,40 @@ export type Database = {
       chat_messages: {
         Row: {
           channel: string
-          content: string
+          content: string | null
           created_at: string
           faction_color: string | null
           faction_id: string | null
           faction_pattern: string | null
           id: number
+          modifie_le: string | null
+          retire_le: string | null
           user_id: string
           user_name: string
         }
         Insert: {
           channel: string
-          content: string
+          content?: string | null
           created_at?: string
           faction_color?: string | null
           faction_id?: string | null
           faction_pattern?: string | null
           id?: number
+          modifie_le?: string | null
+          retire_le?: string | null
           user_id: string
           user_name: string
         }
         Update: {
           channel?: string
-          content?: string
+          content?: string | null
           created_at?: string
           faction_color?: string | null
           faction_id?: string | null
           faction_pattern?: string | null
           id?: number
+          modifie_le?: string | null
+          retire_le?: string | null
           user_id?: string
           user_name?: string
         }
@@ -2836,7 +2842,9 @@ export type Database = {
           de: string
           id: number
           lu_le: string | null
-          texte: string
+          modifie_le: string | null
+          retire_le: string | null
+          texte: string | null
         }
         Insert: {
           a: string
@@ -2844,7 +2852,9 @@ export type Database = {
           de: string
           id?: number
           lu_le?: string | null
-          texte: string
+          modifie_le?: string | null
+          retire_le?: string | null
+          texte?: string | null
         }
         Update: {
           a?: string
@@ -2852,7 +2862,9 @@ export type Database = {
           de?: string
           id?: number
           lu_le?: string | null
-          texte?: string
+          modifie_le?: string | null
+          retire_le?: string | null
+          texte?: string | null
         }
         Relationships: [
           {
@@ -7104,10 +7116,12 @@ export type Database = {
       }
       carte_lieux: { Args: never; Returns: Json }
       carte_publique: { Args: never; Returns: Json }
-      changer_role: {
-        Args: { p_id: string; p_role: string; p_user: string }
-        Returns: undefined
-      }
+      changer_role:
+        | {
+            Args: { p_id: string; p_role: string; p_user: string }
+            Returns: undefined
+          }
+        | { Args: { p_role: string; p_user: string }; Returns: undefined }
       cheat_refill: { Args: { p_user_id: string }; Returns: Json }
       cheat_refill_target: {
         Args: { p_caller_id: string; p_target_name: string }
@@ -7328,6 +7342,23 @@ export type Database = {
       }
       delete_voyage_media: {
         Args: { p_media_id: string; p_user_id: string }
+        Returns: Json
+      }
+      deposer_contenu: {
+        Args: {
+          p_consent_account: boolean
+          p_consent_brand: boolean
+          p_departement?: string
+          p_email: string
+          p_images: Json
+          p_message?: string
+          p_model_height_cm?: number
+          p_nom: string
+          p_quest_ref?: string
+          p_rating_experience?: number
+          p_rating_products?: number
+          p_team_note?: string
+        }
         Returns: Json
       }
       discover_place: {
@@ -8070,6 +8101,10 @@ export type Database = {
         }
         Returns: Json
       }
+      modifier_message: {
+        Args: { p_message: number; p_texte: string }
+        Returns: undefined
+      }
       modifier_mise_a_jour: {
         Args: {
           p_id: number
@@ -8079,6 +8114,10 @@ export type Database = {
           p_version?: string
         }
         Returns: Json
+      }
+      modifier_murmure: {
+        Args: { p_murmure: number; p_texte: string }
+        Returns: undefined
       }
       mon_energie: { Args: never; Returns: Json }
       mon_entree: { Args: never; Returns: Json }
@@ -8321,6 +8360,8 @@ export type Database = {
         Args: { p_id: string; p_user: string }
         Returns: undefined
       }
+      retirer_message: { Args: { p_message: number }; Returns: undefined }
+      retirer_murmure: { Args: { p_murmure: number }; Returns: undefined }
       revendiquer_lieu: {
         Args: {
           p_compagnons: string[]

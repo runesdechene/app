@@ -8,6 +8,8 @@
  *            retire pas un cœur en tapotant). Sous le texte, une gélule : les portraits de qui a
  *            aimé (ils ouvrent la liste), puis le cœur et le nombre, qu'on allume ou éteint.
  *            Jamais « 0 ». Son propre message s'aime aussi : « ça peut arriver » (05/10).
+ *            Le sien s'ouvre d'un appui long (ou d'un clic droit) : le modifier dans ses 15 minutes,
+ *            le retirer (11/10, migration 502). Retiré, il laisse « Message retiré », sans cœur.
  */
 import { Fragment, useRef, useState } from 'react'
 import { Link } from 'react-router'
@@ -17,8 +19,11 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { Envols } from '@/shared/ui/Envols'
 import { Feuille } from '@/shared/ui/Feuille'
 import type { Mention, Message } from '../api/lireRegistre'
+import { useAppuiLong } from '../hooks/useAppuiLong'
 import { heureDe } from '../lib/jour'
 import { decouper } from '../lib/mentions'
+import { encoreModifiable } from '../lib/retouche'
+import { FeuilleMessage } from './FeuilleMessage'
 import styles from './LigneMessage.module.css'
 
 // Deux touchers plus rapprochés que ça : un double toucher.
@@ -31,16 +36,29 @@ export function LigneMessage({
   prefixe,
   aimeEnCours,
   onAimer,
+  onModifier,
+  onRetirer,
 }: {
   message: Message
   suite: boolean // la suite d'un même auteur : ni portrait ni nom
   prefixe: string | null // « [Bug & Suggestions] », « [Le Lys de Fer] » devant le texte
   aimeEnCours: boolean | undefined // mon cœur parti, pas encore compté par la base
   onAimer: (id: number, aime: boolean) => void
+  onModifier: (id: number, texte: string) => Promise<void>
+  onRetirer: (id: number) => Promise<void>
 }) {
   const { envols, lancer, finir } = useEnvols()
   const dernierToucher = useRef<number | null>(null)
   const [liste, setListe] = useState(false)
+  const [actions, setActions] = useState(false)
+  const texte = m.texte
+  const appui = useAppuiLong(
+    m.moi && texte !== null
+      ? () => {
+          setActions(true)
+        }
+      : null,
+  )
   const aime = aimeEnCours ?? m.aime
   const nombre = m.coeurs.length + (aime === m.aime ? 0 : aime ? 1 : -1)
   const nom = `Aimer le message de ${m.auteur.nom}`
@@ -57,8 +75,10 @@ export function LigneMessage({
         .join(' ')}
       data-canal={m.canalCouleur === null ? m.canal : 'compagnie'}
       style={m.canalCouleur === null ? undefined : teinteCompagnie(m.canalCouleur)}
+      {...appui}
       onPointerUp={(e) => {
-        if (aime || e.pointerType === 'mouse') return
+        appui.onPointerUp?.()
+        if (aime || texte === null || e.pointerType === 'mouse') return
         const avant = dernierToucher.current
         if (avant !== null && e.timeStamp - avant < DOUBLE_TOUCHER_MS) {
           dernierToucher.current = null
@@ -82,14 +102,19 @@ export function LigneMessage({
           </>
         )}
         {prefixe && <span className={styles.prefixe}>{prefixe} </span>}
-        <TexteAvecMentions texte={m.texte} mentions={m.mentions} />
+        {texte === null ? (
+          <em className={styles.retire}>Message retiré</em>
+        ) : (
+          <TexteAvecMentions texte={texte} mentions={m.mentions} />
+        )}
+        {m.modifie && texte !== null && <span className={styles.modifie}> (modifié)</span>}
       </p>
       <time className={styles.heure} dateTime={m.quand}>
         {heureDe(m.quand)}
       </time>
 
       {/* Sur PC, au survol, le cœur prend la place de l'heure — tant que je n'ai pas aimé. */}
-      {!aime && (
+      {!aime && texte !== null && (
         <button type="button" className={styles.aimer} aria-label={nom} onClick={basculer}>
           <span className={styles.coeur} aria-hidden="true" />
           <Envols envols={envols} onFin={finir} />
@@ -122,6 +147,19 @@ export function LigneMessage({
             {nombre}
           </button>
         </div>
+      )}
+
+      {actions && texte !== null && (
+        <FeuilleMessage
+          texte={texte}
+          modifiable={encoreModifiable(m.quand)}
+          maximum={500}
+          onModifier={(t) => onModifier(m.id, t)}
+          onRetirer={() => onRetirer(m.id)}
+          onFermer={() => {
+            setActions(false)
+          }}
+        />
       )}
 
       {liste && (

@@ -1,6 +1,7 @@
 /**
  * QUOI     — la forme des Murmures lus depuis la migration 372 : la liste des correspondants,
- *            une conversation, l'en-tête d'un correspondant.
+ *            une conversation, l'en-tête d'un correspondant. Un murmure retiré n'a plus
+ *            de texte (`null`), un murmure modifié le dit (migration 502).
  * POURQUOI — rien n'est supposé : chaque champ est prouvé.
  */
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
@@ -8,12 +9,13 @@ import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire
 export type Personne = { id: string; nom: string; avatar: string | null }
 export type Fil = {
   avec: Personne
-  dernier: { texte: string; quand: string; deMoi: boolean }
+  dernier: { texte: string | null; quand: string; deMoi: boolean }
   nonLus: number
 }
 export type Murmure = {
   id: number
-  texte: string
+  texte: string | null // null : retiré par son auteur
+  modifie: boolean
   quand: string
   deMoi: boolean
   luLe: string | null
@@ -30,7 +32,7 @@ export const lireFils = liste((v): Fil => {
   const d = objet(f.dernier)
   return {
     avec: lirePersonne(f.avec),
-    dernier: { texte: chaine(d.texte), quand: chaine(d.quand), deMoi: booleen(d.deMoi) },
+    dernier: { texte: ouNull(chaine)(d.texte), quand: chaine(d.quand), deMoi: booleen(d.deMoi) },
     nonLus: nombre(f.nonLus),
   }
 })
@@ -39,7 +41,8 @@ export const lireConversation = liste((v): Murmure => {
   const m = objet(v)
   return {
     id: nombre(m.id),
-    texte: chaine(m.texte),
+    texte: ouNull(chaine)(m.texte),
+    modifie: m.modifie === true, // absent avant la migration 502
     quand: chaine(m.quand),
     deMoi: booleen(m.deMoi),
     luLe: ouNull(chaine)(m.luLe),

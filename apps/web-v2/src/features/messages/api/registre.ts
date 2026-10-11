@@ -44,6 +44,17 @@ export async function aimerMessage(id: number, aime: boolean) {
   if (error) throw error
 }
 
+// Son propre message (migration 502) : le modifier dans ses 15 minutes, le retirer quand on veut.
+export async function modifierMessage(id: number, texte: string) {
+  const { error } = await supabase.rpc('modifier_message', { p_message: id, p_texte: texte })
+  if (error) throw error
+}
+
+export async function retirerMessage(id: number) {
+  const { error } = await supabase.rpc('retirer_message', { p_message: id })
+  if (error) throw error
+}
+
 // Les Explorateurs dont le nom commence par ce qu'on tape après « @ ».
 export async function chercherExplorateurs(debut: string) {
   // Jusqu'à 12 : « le » en touche des dizaines (migration 407).
@@ -55,13 +66,13 @@ export async function chercherExplorateurs(debut: string) {
   return lirePersonnes(data)
 }
 
-// Prévient à chaque nouveau message ; rend de quoi arrêter d'écouter.
+// Prévient à chaque message écrit, modifié ou retiré ; rend de quoi arrêter d'écouter.
 // Un canal par écoute (comme les Murmures) : le Registre ouvert et le point de l'onglet écoutent
 // en même temps, et Supabase refuse d'abonner deux fois le même nom.
 export function ecouterRegistre(nouveau: () => void): () => void {
   const canal = supabase
     .channel(`registre-${crypto.randomUUID()}`)
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, nouveau)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages' }, nouveau)
     .subscribe()
   return () => {
     void supabase.removeChannel(canal)

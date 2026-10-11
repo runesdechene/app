@@ -38,7 +38,7 @@ export function ListeMurmures() {
               <span className={styles.quand}>{moment(f.dernier.quand)}</span>
               <span className={styles.dernier}>
                 {f.dernier.deMoi && 'Toi : '}
-                {f.dernier.texte}
+                {f.dernier.texte ?? 'Message retiré'}
               </span>
               {f.nonLus > 0 && (
                 <img

@@ -9,6 +9,7 @@ Supabase (ESLint le refuse) : les données arrivent par `../hooks/`, qui passe p
 - `LignePassage` — dans le Registre, qui a rejoint EXPLORE (les arrivées d'affilée en une ligne) et la bienvenue.
 - `ListeMurmures` — les correspondants, le sceau sur ce qui n'est pas lu.
 - `Conversation` — une conversation de Murmures, sans bulles.
+- `FeuilleMessage` — modifier son message (15 minutes) ou le retirer, au Registre comme aux Murmures.
 - `BarreEcrire` — la barre pour écrire, partagée par le Registre et les Murmures.
 - `ChoixCanal` — le choix du canal où l'on écrit (un select maison, à la couleur du canal).
 - `ListeMentions` — les Explorateurs à mentionner quand on tape « @ ».

@@ -19,6 +19,8 @@ const api = vi.hoisted(() => ({
   marquerRegistreLu: vi.fn(() => Promise.resolve()),
   fetchPassages: vi.fn<() => Promise<Passage[]>>(() => Promise.resolve([])),
   aimerMessage: vi.fn(() => Promise.resolve()),
+  modifierMessage: vi.fn(() => Promise.resolve()),
+  retirerMessage: vi.fn(() => Promise.resolve()),
 }))
 vi.mock('../api/registre', () => api)
 const canaux = vi.hoisted(() => ({
@@ -380,10 +382,7 @@ test('mes Compagnies sont des gélules à leur couleur, cochées d’office', as
   const g = await screen.findByRole('button', { name: 'Le Lys de Fer' })
   expect(g).toHaveAttribute('aria-pressed', 'true')
   expect(g.style.getPropertyValue('--couleur')).toBe('#5f6f86')
-  expect(screen.getByRole('link', { name: /Compagnies/ })).toHaveAttribute(
-    'href',
-    '/compagnies',
-  )
+  expect(screen.getByRole('link', { name: /Compagnies/ })).toHaveAttribute('href', '/compagnies')
 })
 
 test('écrire dans une Compagnie : le champ le dit, et le message part dans son canal', async () => {

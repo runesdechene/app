@@ -211,6 +211,18 @@
   justify-self: end;
   color: var(--color-encre);
   text-align: right;
+  -webkit-touch-callout: none; /* l'appui long ouvre les actions, pas le menu du téléphone */
+}
+
+/* Un murmure retiré (migration 502) : sa place reste, en italique pâle ; modifié : à peine dit. */
+.retire,
+.modifie {
+  color: var(--color-texte-pale);
+  font-style: italic;
+}
+
+.modifie {
+  font-size: var(--legende-size);
 }
 
 .lu {

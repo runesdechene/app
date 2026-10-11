@@ -1,7 +1,8 @@
 /**
  * QUOI     — la forme d'un message du Registre, lue depuis le JSON de la migration 371 (son canal :
  *            le général, les bugs, ou une Compagnie, migration 422) ; et celle
- *            d'une arrivée (quelqu'un a rejoint EXPLORE), migrations 408 et 411.
+ *            d'une arrivée (quelqu'un a rejoint EXPLORE), migrations 408 et 411. Un message retiré
+ *            n'a plus de texte (`null`), un message modifié le dit (migration 502).
  * POURQUOI — rien n'est supposé : un canal ou un passage inconnu est refusé, pas deviné.
  */
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
@@ -12,7 +13,8 @@ export type Message = {
   canal: Canal
   canalNom: string | null // une Compagnie : son nom et sa couleur
   canalCouleur: string | null
-  texte: string
+  texte: string | null // null : retiré par son auteur
+  modifie: boolean
   quand: string
   auteur: { id: string; nom: string; avatar: string | null }
   moi: boolean
@@ -67,7 +69,8 @@ function lireMessage(v: unknown): Message {
     // Absents avant la migration 422 : le général et les bugs n'en ont pas.
     canalNom: ouNull(chaine)(m.canalNom ?? null),
     canalCouleur: ouNull(chaine)(m.canalCouleur ?? null),
-    texte: chaine(m.texte),
+    texte: ouNull(chaine)(m.texte),
+    modifie: m.modifie === true, // absent avant la migration 502
     quand: chaine(m.quand),
     auteur: { id: chaine(a.id), nom: chaine(a.nom), avatar: ouNull(chaine)(a.avatar) },
     moi: booleen(m.moi),

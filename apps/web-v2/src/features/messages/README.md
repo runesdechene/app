@@ -2,7 +2,7 @@
 
 Conception : `docs/superpowers/specs/2026-08-18-app-v2-design.md`, §10 ; maquettes Figma 45:278 (le
 Registre) et 264:128 / 264:162 / 264:185 (les Murmures, version zen). Base : migrations 371-373,
-et 408 pour les gens qui passent.
+408 pour les gens qui passent, 502 pour modifier (15 minutes) ou retirer son message.
 
 « Un chat de MMO, pas une messagerie. » Deux onglets : **La communauté** (le Registre, public — les
 canaux « général » et « Bugs & suggestions » de la table `chat_messages`, partagée avec la V1) et
@@ -20,9 +20,11 @@ dans `chat_messages` : la V1 n'en voit rien.
   conversation marque lus les murmures reçus).
 - `lib/` — `moment` (« ce matin », « hier soir »), `presence` (« Dernière connexion il y a 2 j »),
   `suite` (grouper les messages d'affilée), `mentions` (repérer, insérer, afficher « @Nom »),
-  `jour` (le séparateur de jour, l'heure d'une ligne), `fil` (ranger les passages entre les messages).
+  `jour` (le séparateur de jour, l'heure d'une ligne), `fil` (ranger les passages entre les messages),
+  `retouche` (les 15 minutes pour modifier). `hooks/useAppuiLong` : l'appui long (ou le clic droit) qui
+  ouvre les actions sur son message.
 - `components/` — `MessagesScreen` (les deux onglets), `Registre`, `LignePassage`, `ListeMurmures`,
-  `Conversation`,
+  `Conversation`, `FeuilleMessage` (modifier ou retirer son message, des deux côtés),
   `BarreEcrire` (la barre d'écriture, la même partout), `ChoixCanal` et `ListeMentions` (les deux
   menus, au style commun `Menu.module.css`).
 - À venir : la pastille de non-lus sur l'onglet ; le menhir dessiné par Uriel pour une conversation

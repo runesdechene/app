@@ -28,6 +28,7 @@
 
 .texte {
   margin: 0;
+  -webkit-touch-callout: none; /* l'appui long ouvre les actions, pas le menu du téléphone */
   color: var(--color-texte);
   font-family: var(--font-corps);
   font-size: var(--corps-size);
@@ -228,4 +229,15 @@
   .heure {
     transition: none;
   }
+}
+
+/* Un message retiré (migration 502) : sa place reste, en italique pâle ; modifié : à peine dit. */
+.retire,
+.modifie {
+  color: var(--color-texte-pale);
+  font-style: italic;
+}
+
+.modifie {
+  font-size: var(--legende-size);
 }

@@ -30,12 +30,24 @@ export async function murmurer(a: string, texte: string) {
   if (error) throw error
 }
 
+// Son propre murmure (migration 502) : le modifier dans ses 15 minutes, le retirer quand on veut
+// (il disparaît aussi chez l'autre).
+export async function modifierMurmure(id: number, texte: string) {
+  const { error } = await supabase.rpc('modifier_murmure', { p_murmure: id, p_texte: texte })
+  if (error) throw error
+}
+
+export async function retirerMurmure(id: number) {
+  const { error } = await supabase.rpc('retirer_murmure', { p_murmure: id })
+  if (error) throw error
+}
+
 export async function lireMurmures(avec: string) {
   const { error } = await supabase.rpc('lire_murmures', { p_avec: avec })
   if (error) throw error
 }
 
-// Prévient à chaque murmure écrit ou lu ; rend de quoi arrêter d'écouter.
+// Prévient à chaque murmure écrit, lu, modifié ou retiré ; rend de quoi arrêter d'écouter.
 export function ecouterMurmures(changement: () => void): () => void {
   // Un canal par écoute : supabase rend le canal existant quand le nom est déjà pris, et
   // l'onglet Messages écoute en même temps que l'écran (fermer l'un couperait l'autre).

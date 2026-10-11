@@ -10,7 +10,7 @@
  *            est doucement surligné. Un séparateur marque chaque nouveau jour (« Hier », « Samedi 26
  *            septembre ») : minuit coupe aussi un groupe. Entre les messages du canal général, les
  *            arrivées (migrations 408, 411) : qui a rejoint EXPLORE, d'affilée en une ligne. Chaque message se dessine par
- *            `LigneMessage`, avec ses cœurs (migration 410).
+ *            `LigneMessage`, avec ses cœurs (migration 410) ; le sien se modifie ou se retire (502).
  *            Chaque Compagnie dont je suis membre est un canal de plus (migration 422) : une gélule à
  *            sa couleur, ses messages à son encre, et « ＋ Compagnies » mène à la page des Compagnies.
  *            Les gélules tiennent sur une ligne qui défile, sans barre visible ; à la souris, on la
@@ -77,10 +77,8 @@ export function Registre() {
 function Fil({ compagnies }: { compagnies: CanalCompagnie[] }) {
   const ids = compagnies.map((c) => c.id)
   const connus = [...FILTRES_FIXES, ...ids]
-  const { messages, passages, erreur, ecrire, aimer, aimeEnCours, echecEnvoi } = useRegistre([
-    ...CANAUX_FIXES,
-    ...ids,
-  ])
+  const { messages, passages, erreur, ecrire, aimer, aimeEnCours, echecEnvoi, modifier, retirer } =
+    useRegistre([...CANAUX_FIXES, ...ids])
   // « ?canal= » (« Ouvrir le canal » sur la fiche d'une Compagnie) : coché et choisi à l'arrivée.
   const [demande] = useSearchParams()
   const glisser = useGlisser()
@@ -197,6 +195,8 @@ function Fil({ compagnies }: { compagnies: CanalCompagnie[] }) {
                 prefixe={prefixe}
                 aimeEnCours={aimeEnCours?.id === m.id ? aimeEnCours.aime : undefined}
                 onAimer={aimer}
+                onModifier={modifier}
+                onRetirer={retirer}
               />
             </Fragment>
           )

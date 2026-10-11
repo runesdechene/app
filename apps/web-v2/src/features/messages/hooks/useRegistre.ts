@@ -8,6 +8,8 @@
  *            (`aimeEnCours`), puis le Registre se relit et la base fait foi.
  *            Les gens qui passent (migration 408) n'arrivent pas en temps réel : ils sont relus
  *            chaque minute, et à chaque nouveau message. Ils ne comptent pas dans les non-lus.
+ *            Son propre message se modifie (15 minutes) ou se retire (migration 502) : le Registre se
+ *            relit, chez tous par le temps réel.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
@@ -20,6 +22,8 @@ import {
   fetchRegistreNonLus,
   aimerMessage,
   marquerRegistreLu,
+  modifierMessage,
+  retirerMessage,
 } from '../api/registre'
 
 const registreKey = ['registre'] as const
@@ -65,8 +69,12 @@ export function useRegistre(canaux: readonly Canal[]) {
     onSettled: () => queryClient.invalidateQueries({ queryKey: filKey }),
   })
 
+  const relire = () => queryClient.invalidateQueries({ queryKey: registreKey })
+
   return {
     messages: query.data,
+    modifier: (id: number, texte: string) => modifierMessage(id, texte).then(relire),
+    retirer: (id: number) => retirerMessage(id).then(relire),
     aimer: (id: number, aime: boolean) => {
       coeur.mutate({ id, aime })
     },

@@ -1,9 +1,10 @@
 /**
  * QUOI     — les Murmures : la liste (le sceau sur ce qui n'est pas lu, « Toi : »), une
- *            conversation (le moment après un silence, « lu », le silence du début) et murmurer.
+ *            conversation (le moment après un silence, « lu », le silence du début) et murmurer ;
+ *            modifier ou retirer le sien (migration 502).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -16,6 +17,8 @@ const api = vi.hoisted(() => ({
   fetchCorrespondant: vi.fn(),
   murmurer: vi.fn(),
   lireMurmures: vi.fn(),
+  modifierMurmure: vi.fn(),
+  retirerMurmure: vi.fn(),
   ecouterMurmures: vi.fn(() => () => undefined),
 }))
 vi.mock('../api/murmures', () => api)
@@ -61,6 +64,7 @@ beforeEach(() => {
   ])
   api.murmurer.mockResolvedValue(undefined)
   api.lireMurmures.mockResolvedValue(undefined)
+  api.retirerMurmure.mockResolvedValue(undefined)
 })
 
 function monter(element: React.ReactNode) {
@@ -111,4 +115,45 @@ test('ouvrir une conversation marque lus les murmures reçus', async () => {
   monter(<Conversation avec="u2" />)
   await screen.findByText('Samedi ?')
   expect(api.lireMurmures).toHaveBeenCalledWith('u2')
+})
+
+test('un murmure retiré laisse sa place ; un murmure modifié le dit', async () => {
+  api.fetchConversation.mockResolvedValue([
+    { id: 1, texte: null, modifie: false, quand: '2026-09-28T09:00:00Z', deMoi: false, luLe: null },
+    {
+      id: 2,
+      texte: 'Samedi ?',
+      modifie: true,
+      quand: '2026-09-28T09:01:00Z',
+      deMoi: false,
+      luLe: null,
+    },
+  ])
+  monter(<Conversation avec="u2" />)
+  expect(await screen.findByText('Message retiré')).toBeInTheDocument()
+  expect(screen.getByText('(modifié)')).toBeInTheDocument()
+})
+
+test('je retire mon murmure : un appui long, puis la confirmation', async () => {
+  monter(<Conversation avec="u2" />)
+  fireEvent.contextMenu(await screen.findByText('J’apporte le café.'))
+  await userEvent.click(screen.getByRole('button', { name: 'Supprimer' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Retirer le message' }))
+  expect(api.retirerMurmure).toHaveBeenCalledWith(3)
+})
+
+test('le murmure de l’autre n’ouvre rien', async () => {
+  monter(<Conversation avec="u2" />)
+  fireEvent.contextMenu(await screen.findByText('J’ai trouvé ton menhir.'))
+  expect(screen.queryByRole('button', { name: 'Supprimer' })).toBeNull()
+})
+
+test('dans la liste, un dernier murmure retiré se dit', async () => {
+  api.fetchFils.mockResolvedValue([
+    { avec: LUNA, dernier: { texte: null, quand: '2026-09-28T09:00:00Z', deMoi: true }, nonLus: 0 },
+  ])
+  monter(<ListeMurmures />)
+  expect(await screen.findByRole('link', { name: /Luna/ })).toHaveTextContent(
+    'Toi : Message retiré',
+  )
 })

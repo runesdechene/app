@@ -3,6 +3,7 @@
  *            en-tête), murmurer ; le tout relu à chaque murmure écrit ou lu (temps réel).
  * POURQUOI — ouvrir une conversation marque lus les murmures reçus : le sceau disparaît de la
  *            liste. Toutes les clés sont sous ['murmures'] : une seule invalidation relit tout.
+ *            Son propre murmure se modifie (15 minutes) ou se retire (migration 502).
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
@@ -12,7 +13,9 @@ import {
   fetchCorrespondant,
   fetchFils,
   lireMurmures,
+  modifierMurmure,
   murmurer,
+  retirerMurmure,
 } from '../api/murmures'
 
 const murmuresKey = ['murmures'] as const
@@ -75,8 +78,12 @@ export function useConversation(avec: string) {
     },
   })
 
+  const relire = () => queryClient.invalidateQueries({ queryKey: murmuresKey })
+
   return {
     murmures: conversation.data,
+    modifier: (id: number, texte: string) => modifierMurmure(id, texte).then(relire),
+    retirer: (id: number) => retirerMurmure(id).then(relire),
     correspondant: correspondant.data,
     introuvable: correspondant.data === null,
     envoyer: (texte: string) => envoi.mutateAsync(texte),
