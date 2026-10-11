@@ -17,8 +17,7 @@
 .famille {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 10px 3px 8px;
+  padding: 3px 10px;
   border: none;
   border-radius: var(--radius-rond);
   background: color-mix(in srgb, var(--color-sable) 45%, transparent);
@@ -31,18 +30,19 @@
     color var(--duree-douce) var(--courbe-douce);
 }
 
-/* La coche : sa place est gardée même éteinte, pour que rien ne bouge quand on bascule. */
+/* La coche : éteinte, elle se replie avec sa place ; allumée, elle se déplie devant le mot. */
 .famille::before {
   content: '';
-  width: 10px;
+  width: 0;
   height: 10px;
+  margin-right: 0;
   background: currentcolor;
   mask: url('../../../assets/ui/coche-choisie.svg') center / contain no-repeat;
   opacity: 0;
-  scale: 0.5;
   transition:
-    opacity var(--duree-douce) var(--courbe-douce),
-    scale var(--duree-elan) var(--courbe-elan);
+    width var(--duree-elan) var(--courbe-elan),
+    margin-right var(--duree-elan) var(--courbe-elan),
+    opacity var(--duree-douce) var(--courbe-douce);
 }
 
 .famille[aria-pressed='true'] {
@@ -51,8 +51,9 @@
 }
 
 .famille[aria-pressed='true']::before {
+  width: 10px;
+  margin-right: 4px;
   opacity: 1;
-  scale: 1;
 }
 
 .famille:focus-visible {
