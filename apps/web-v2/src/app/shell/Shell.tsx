@@ -25,6 +25,7 @@ import {
 } from 'react'
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router'
 import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
+import { CarteNouveaute } from '@/features/notifications/components/CarteNouveaute'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { JaugeEnergie } from '@/features/energie/components/JaugeEnergie'
@@ -58,7 +59,8 @@ import { TabBar } from './TabBar'
 import styles from './Shell.module.css'
 
 const SCREENS: Record<TabId, () => ReactNode> = {
-  accueil: AccueilScreen,
+  // La carte des Nouveautés (zone notifications) dans l'emplacement de l'Accueil.
+  accueil: () => <AccueilScreen nouveaute={<CarteNouveaute />} />,
   carte: CarteDeLaCoquille,
   messages: MessagesScreen,
   compagnies: PageCompagnies,

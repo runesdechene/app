@@ -321,3 +321,18 @@ test('une revendication pour une Compagnie la nomme', async () => {
     'Luna vient de revendiquer Pointe du Becquet pour Le Lys de Fer',
   )
 })
+
+test('l’emplacement de la nouveauté se pose sous la bannière, avant les lieux', async () => {
+  const router = createMemoryRouter(
+    [{ path: '*', element: <AccueilScreen nouveaute={<p>La carte des Nouveautés</p>} /> }],
+    { initialEntries: ['/accueil'] },
+  )
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  const carte = screen.getByText('La carte des Nouveautés')
+  const ajoutes = await screen.findByRole('region', { name: 'Ajoutés récemment' })
+  expect(carte.compareDocumentPosition(ajoutes) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+})

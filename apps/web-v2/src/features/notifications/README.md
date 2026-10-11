@@ -16,6 +16,8 @@ les mêmes que sous un lieu ; ce qu'on y écrit et aime revient dans la cloche.
   pastille de la cloche, posée par la coquille) ; `useNouveautes` (les mises à jour publiées) ;
   `useCarnetDeMiseAJour` et `useCoeursDeMiseAJour` (le carnet et les cœurs d'une note).
 - `lib/` — `phrase` (la tournure de chaque sorte, en morceaux), `moments` (Aujourd'hui, Cette
-  semaine, Plus tôt), `texte` (le texte d'une mise à jour en paragraphes et listes).
+  semaine, Plus tôt), `texte` (le texte d'une mise à jour en paragraphes et listes), `aLAccueil` (la note à montrer sur
+  la page Explore : moins de 14 jours, ou pas encore lue).
 - `components/` — `Notifications` (le tiroir), `Nouveautes` (la page des mises à jour),
-  `SousMiseAJour` (ses cœurs et son carnet, sous chaque note).
+  `SousMiseAJour` (ses cœurs et son carnet, sous chaque note), `CarteNouveaute` (la dernière note sur
+  la page Explore, posée par la coquille dans l'emplacement de l'Accueil).

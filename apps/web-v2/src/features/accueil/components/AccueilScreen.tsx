@@ -6,7 +6,10 @@
  *            Un lieu ouvre sa fiche dans l'Accueil, et la fiche sait que l'Accueil est derrière
  *            elle. Un bloc vide ne s'affiche pas. En tête, une bannière de la boutique a remplacé
  *            « Nouvelles de la marque » (Uriel, 28/09 : les annonces du Hub ne sont pas à jour).
+ *            Dessous, l'emplacement de la dernière mise à jour (Uriel, 11/10) : la coquille y pose la
+ *            carte des Nouveautés, qui vit dans une autre zone.
  */
+import type { ReactNode } from 'react'
 import sectionAjoutes from '@/assets/ui/section-ajoutes.svg'
 import { useGlisser } from '@/shared/hooks/useGlisser'
 import { useMaPosition } from '@/shared/hooks/useMaPosition'
@@ -18,10 +21,11 @@ import { GrandsExplorateurs } from './GrandsExplorateurs'
 import { PresDeToi } from './PresDeToi'
 import { SurLesChemins } from './SurLesChemins'
 
-export function AccueilScreen() {
+export function AccueilScreen({ nouveaute }: { nouveaute?: ReactNode }) {
   return (
     <div className={styles.accueil}>
       <Banniere />
+      {nouveaute}
       <Ajoutes />
       <PresDeToi />
       <GrandsExplorateurs />

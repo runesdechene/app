@@ -4,7 +4,8 @@
  *            sous chacune, son carnet et ses cœurs : les lire, écrire, aimer, effacer.
  * POURQUOI — la page « Nouveautés » : la cloche n'en montre que le titre. Le carnet et les cœurs
  *            d'une note sont ceux d'un lieu (même JSON, même lecture : `shared/lib/carnet`).
- * ATTENTION — une base d'avant la 478 n'a pas les comptes : ils se lisent à zéro.
+ * ATTENTION — une base d'avant la 478 n'a pas les comptes : ils se lisent à zéro ; avant la 480,
+ *            une note se lit comme lue.
  */
 import { lireCarnet, lireCoeurs } from '@/shared/lib/carnet'
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
@@ -23,6 +24,7 @@ export type MiseAJour = {
   miens: number
   mots: number
   aMoi: boolean // je l'ai publiée : pas de cœur à soi
+  lue: boolean // la cloche ouverte depuis sa parution (480)
 }
 
 export const lireMisesAJour = liste((v): MiseAJour => {
@@ -38,6 +40,7 @@ export const lireMisesAJour = liste((v): MiseAJour => {
     miens: nombre(m.miens ?? 0),
     mots: nombre(m.mots ?? 0),
     aMoi: booleen(m.aMoi ?? false),
+    lue: booleen(m.lue ?? true),
   }
 })
 
