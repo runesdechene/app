@@ -294,3 +294,13 @@ lien). La fiche naît à la confirmation (mig 455 : `on_auth_user_created` seule
 d'emblée, `on_auth_user_confirmed` sinon). Signe d'un compte créé sans humain : confirmé moins
 d'une seconde après sa création. Demander un code laisse une ligne « en attente » dans
 `auth.users`, sans fiche : invisible dans l'appli.
+
+## Une ligne neuve dans « Sur les chemins » doit aussi entrer dans `_auteur_du_chemin`
+
+**Le piège** (11/10/2026, mig 481) : la 449 a ajouté les énigmes percées au fil (`enigme:<qui>:<culture>:<jour>`)
+sans toucher `_auteur_du_chemin`. `saluer` levait « Introuvable », l'appli retirait le cœur posé d'avance :
+« le like ne reste pas », pendant quatre jours, sans erreur visible ailleurs que dans la réponse de l'RPC.
+
+**How to apply :** tout nouveau type d'événement de `sur_les_chemins` → un `WHEN` dans `_auteur_du_chemin`
+(qui le salue, avec les mêmes conditions que la ligne du fil), une phrase de `salut` dans la cloche
+(`features/notifications/lib/phrase.ts`), et un test qui appelle `saluer` sur une vraie ligne.

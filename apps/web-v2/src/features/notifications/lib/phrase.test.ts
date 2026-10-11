@@ -122,3 +122,9 @@ test('sous une mise à jour (mig 478) : son titre en ocre, entre guillemets', ()
   expect(texte({ ...sous, type: 'coeur_mise_a_jour' })).toBe('Kelpie aime « Remonte le temps »')
   expect(phraseDe({ ...sous, type: 'coeur_mise_a_jour' })[2]).toEqual({ texte: 'Remonte le temps', sorte: 'lieu' })
 })
+
+test('un salut sur une énigme percée (mig 481)', () => {
+  expect(texte({ ...base, type: 'salut', lieu: null, evenement: 'enigme' })).toBe(
+    'Kelpie a salué ton énigme percée',
+  )
+})
