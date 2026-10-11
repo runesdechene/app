@@ -130,16 +130,46 @@
   border-bottom-color: var(--color-encre);
 }
 
-.precision,
-.note {
+.precision {
   margin: 0;
   color: var(--color-texte-doux);
   font-family: var(--font-corps);
   font-size: var(--legende-size);
 }
 
-.note {
-  text-align: center;
+/* « Montre-toi aux autres » : le rond, puis la pastille ocre de Modifier mon profil ; en bas,
+   « Plus tard » à gauche, « Suivant » à droite. */
+.deuxChoix {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.photo {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+}
+
+.choisirPhoto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px var(--space-3);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-ocre) 14%, transparent);
+  color: var(--color-ocre);
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--libelle-tracking);
+  cursor: pointer;
+}
+
+.choisirPhoto img {
+  width: 14px;
+  height: 14px;
 }
 
 .alerte {

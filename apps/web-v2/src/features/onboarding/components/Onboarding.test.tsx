@@ -19,6 +19,7 @@ const api = vi.hoisted(() => ({
   reclamerFragments: vi.fn(),
   signerCharte: vi.fn(),
   nommer: vi.fn(),
+  changerAvatar: vi.fn(),
   fetchEntree: vi.fn(),
 }))
 vi.mock('../api/entree', () => api)
@@ -41,6 +42,7 @@ beforeEach(() => {
   api.reclamerFragments.mockResolvedValue(2)
   api.signerCharte.mockResolvedValue(undefined)
   api.nommer.mockResolvedValue(undefined)
+  api.changerAvatar.mockResolvedValue('https://exemple.fr/avatar.webp')
   api.fetchEntree.mockResolvedValue({ nom: null, numero: 4979, fragments: 2, charteSignee: true })
 })
 
@@ -104,6 +106,9 @@ test('du Préambule à la bienvenue : l’e-mail, le code, puis la Charte', asyn
   await userEvent.type(screen.getByLabelText('Ton nom'), 'Claire M.')
   await userEvent.click(screen.getByRole('button', { name: /Suivant/ }))
   expect(api.nommer).toHaveBeenCalledWith('Claire M.')
+  expect(await screen.findByRole('heading', { name: 'Montre-toi aux autres' })).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Plus tard' }))
+  expect(api.changerAvatar).not.toHaveBeenCalled()
   expect(await screen.findByRole('heading', { name: 'Quel calendrier ?' })).toBeInTheDocument()
   expect(screen.getByRole('radio', { name: /Chrétien/ })).toBeChecked()
   await userEvent.click(screen.getByRole('radio', { name: /Moderne/ }))
@@ -114,6 +119,63 @@ test('du Préambule à la bienvenue : l’e-mail, le code, puis la Charte', asyn
   expect(await screen.findByText('Claire M.')).toBeInTheDocument()
   expect(screen.getByText(/Explorateur n°/)).toHaveTextContent('Explorateur n° 4 979')
   expect(screen.getByRole('button', { name: 'Voir mes deux Fragments' })).toBeInTheDocument()
+})
+
+test('la photo choisie s’enregistre, puis la bienvenue la montre', async () => {
+  api.fetchEntree.mockResolvedValue({
+    nom: 'Gautier',
+    numero: 5012,
+    fragments: 0,
+    charteSignee: true,
+    avatar: null,
+  })
+  URL.createObjectURL = vi.fn(() => 'blob:apercu')
+  URL.revokeObjectURL = vi.fn()
+  const router = monter('/bienvenue/photo')
+  expect(await screen.findByRole('img', { name: 'Gautier' })).toHaveTextContent('G')
+  expect(screen.getByRole('button', { name: /Suivant/ })).toBeDisabled()
+
+  const photo = new File(['x'], 'moi.jpg', { type: 'image/jpeg' })
+  await userEvent.upload(screen.getByLabelText('Choisir une photo'), photo)
+  expect(screen.getByRole('img', { name: 'Gautier' })).toHaveAttribute('src', 'blob:apercu')
+
+  api.fetchEntree.mockResolvedValue({
+    nom: 'Gautier',
+    numero: 5012,
+    fragments: 0,
+    charteSignee: true,
+    avatar: 'https://exemple.fr/avatar.webp',
+  })
+  await userEvent.click(screen.getByRole('button', { name: /Suivant/ }))
+  expect(api.changerAvatar).toHaveBeenCalledWith(photo)
+  expect(await screen.findByRole('heading', { name: 'Quel calendrier ?' })).toBeInTheDocument()
+
+  await router.navigate('/bienvenue/fin')
+  expect(await screen.findByRole('img', { name: 'Gautier' })).toHaveAttribute(
+    'src',
+    'https://exemple.fr/avatar.webp',
+  )
+})
+
+test('une photo refusée le dit, et on reste sur l’écran', async () => {
+  api.changerAvatar.mockRejectedValueOnce(new Error('refusé'))
+  api.fetchEntree.mockResolvedValue({
+    nom: 'Gautier',
+    numero: 5012,
+    fragments: 0,
+    charteSignee: true,
+    avatar: null,
+  })
+  URL.createObjectURL = vi.fn(() => 'blob:apercu')
+  URL.revokeObjectURL = vi.fn()
+  monter('/bienvenue/photo')
+  await userEvent.upload(
+    await screen.findByLabelText('Choisir une photo'),
+    new File(['x'], 'moi.jpg', { type: 'image/jpeg' }),
+  )
+  await userEvent.click(screen.getByRole('button', { name: /Suivant/ }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('n’a pas pu être envoyée')
+  expect(screen.getByRole('heading', { name: 'Montre-toi aux autres' })).toBeInTheDocument()
 })
 
 test('un client connu se connecte sans avoir signé : il signe, connecté, puis entre', async () => {

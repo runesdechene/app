@@ -6,7 +6,7 @@
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Titre } from '../api/lireProfil'
-import { changerAvatar } from '../api/avatar'
+import { changerAvatar } from '@/shared/supabase/avatar'
 import { choisirAccord, choisirTitres, enregistrerProfil, titresDebloques } from '../api/monProfil'
 import { mesPreferences } from '../api/preferences'
 import { explorateurKey, useExplorateur } from './useExplorateur'

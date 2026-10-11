@@ -1,5 +1,6 @@
 /**
  * QUOI     — change la photo de profil : réduite en webp 400 px, envoyée, puis enregistrée.
+ *            Deux portes : Modifier mon profil, et l'écran « Montre-toi » de l'onboarding.
  * POURQUOI — la nouvelle photo part sous un nom NEUF (`avatar-<horodatage>.webp`, dans le
  *            dossier de l'Explorateur, seau `place-images` comme en V1). Tant qu'elle n'est
  *            pas envoyée et enregistrée, l'ancienne reste en place : une coupure réseau ne
@@ -7,8 +8,7 @@
  * ATTENTION — les anciennes photos du dossier sont supprimées à la fin, sans bloquer si ça
  *            échoue (un fichier orphelin ne gêne personne).
  */
-import { supabase } from '@/shared/supabase/client'
-import { monIdentifiant } from './session'
+import { supabase } from './client'
 
 const SEAU = 'place-images'
 const COTE_MAX = 400
@@ -33,7 +33,8 @@ async function versWebp(fichier: File): Promise<Blob> {
 }
 
 export async function changerAvatar(fichier: File): Promise<string> {
-  const moi = await monIdentifiant()
+  const { data: session } = await supabase.auth.getSession()
+  const moi = session.session?.user.id
   if (!moi) throw new Error('Connexion requise')
   const seau = supabase.storage.from(SEAU)
   const image = await versWebp(fichier)

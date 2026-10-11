@@ -18,7 +18,7 @@ export function Nom() {
   const enregistrer = useMutation({
     mutationFn: () => nommer(nom.trim()),
     onSuccess: () => {
-      aller('calendrier')
+      aller('photo')
     },
   })
   const n = parcours.fragments
@@ -71,7 +71,6 @@ export function Nom() {
           </p>
         </div>
       )}
-      <p className={styles.note}>Ta photo pourra venir plus tard, depuis ton profil.</p>
     </Page>
   )
 }

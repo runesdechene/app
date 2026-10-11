@@ -14,10 +14,13 @@ const stockage = vi.hoisted(() => ({
 }))
 const rpc = vi.hoisted(() => vi.fn(() => Promise.resolve({ data: { success: true }, error: null })))
 
-vi.mock('@/shared/supabase/client', () => ({
-  supabase: { storage: { from: () => stockage }, rpc },
+const auth = vi.hoisted(() => ({
+  getSession: () => Promise.resolve({ data: { session: { user: { id: 'u1' } } } }),
 }))
-vi.mock('./session', () => ({ monIdentifiant: () => Promise.resolve('u1') }))
+
+vi.mock('./client', () => ({
+  supabase: { storage: { from: () => stockage }, rpc, auth },
+}))
 
 import { changerAvatar } from './avatar'
 

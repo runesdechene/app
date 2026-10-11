@@ -11,7 +11,8 @@ Conception : `docs/superpowers/specs/2026-09-27-v2-compte-design.md` (et §0 de
 Chemin des données : `components/` → `hooks/` → `api/` → Supabase. Les écrans sont branchés
 sur la coquille par `app/routes/compte.tsx`.
 
-- `api/` — lectures et écritures Supabase (profil, titres, avatar, préférences, session).
+- `api/` — lectures et écritures Supabase (profil, titres, préférences, session ; la photo est dans
+  `shared/supabase/avatar.ts`, l'onboarding s'en sert aussi).
 - `hooks/` — le cache TanStack Query de ces lectures.
 - `lib/` — le calcul pur, sans état (découpage de la présentation).
 - `components/` — les écrans.

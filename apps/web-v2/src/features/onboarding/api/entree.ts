@@ -1,6 +1,6 @@
 /**
  * QUOI     — tout ce que l'onboarding demande à Supabase : le code par e-mail (envoi et vérification), puis, une fois connecté, les Fragments achetés,
- *            la Charte, le nom, « mon entrée ».
+ *            la Charte, le nom, la photo, « mon entrée ».
  * POURQUOI — pas de mot de passe : Supabase envoie un code à 6 chiffres, comme la V1. Un e-mail
  *            inconnu crée le compte (le déclencheur handle_new_user fait le reste).
  * ATTENTION — les Fragments se réclament avec l'e-mail vérifié par la connexion (migration 369) :
@@ -43,6 +43,9 @@ export async function nommer(nom: string) {
   const { error } = await supabase.rpc('nommer_explorateur', { p_nom: nom })
   if (error) throw error
 }
+
+// La photo : la même porte que Modifier mon profil.
+export { changerAvatar } from '@/shared/supabase/avatar'
 
 export async function fetchEntree() {
   const { data, error } = await supabase.rpc('mon_entree')

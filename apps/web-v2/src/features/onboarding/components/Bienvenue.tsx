@@ -1,14 +1,16 @@
 /**
- * QUOI     — la bienvenue (maquette 95:107) : le voyageur, « Bienvenue Claire », son numéro
+ * QUOI     — la bienvenue (maquette 95:107) : sa photo (ou le voyageur), « Bienvenue Claire », son numéro
  *            d'Explorateur, une promesse, puis « Ouvrir la carte ».
  * POURQUOI — le numéro est le rang de l'inscription (mon_entree, migration 370) : vrai, jamais
  *            inventé. « Voir mes Fragments » n'apparaît que s'il y en a. Venu d'un lieu de la
- *            vitrine, « Ouvrir la carte » ouvre ce lieu.
+ *            vitrine, « Ouvrir la carte » ouvre ce lieu. La photo vient de l'écran d'avant (Uriel,
+ *            11/10) ; sans elle, le voyageur de la maquette.
  */
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
 import voyageur from '@/assets/onboarding/voyageur.webp'
 import { reprendreLieu } from '@/shared/lib/apresEntree'
+import { Avatar } from '@/shared/ui/Avatar'
 import { fetchEntree } from '../api/entree'
 import { enLettres } from '../lib/enLettres'
 import styles from './Onboarding.module.css'
@@ -50,7 +52,11 @@ export function Bienvenue() {
       }
     >
       <div className={styles.bienvenue}>
-        <img className={styles.voyageur} src={voyageur} alt="" />
+        {entree?.avatar ? (
+          <Avatar url={entree.avatar} nom={entree.nom ?? ''} taille="grand" />
+        ) : (
+          <img className={styles.voyageur} src={voyageur} alt="" />
+        )}
         <h1 className={styles.salut}>
           <span className={styles.salutMot}>Bienvenue</span>
           <span className={styles.salutNom}>{entree?.nom ?? ''}</span>

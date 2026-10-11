@@ -1,6 +1,6 @@
 /**
  * QUOI     — « Quel calendrier ? » : où s'afficheront les dates des lieux et des énigmes.
- * POURQUOI — Uriel, 09/10 : le choix se propose à l'entrée, juste après le nom (spec calendrier).
+ * POURQUOI — Uriel, 09/10 : le choix se propose à l'entrée, juste après le nom et la photo (spec calendrier).
  *            Est coché le calendrier déjà enregistré (chrétien, le défaut, pour un compte neuf) :
  *            « Suivant » sans rien toucher le garde.
  * ATTENTION — un compte déjà entré ne passe pas par ici : il change de calendrier dans les

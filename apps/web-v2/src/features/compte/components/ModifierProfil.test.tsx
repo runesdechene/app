@@ -23,7 +23,7 @@ const api = vi.hoisted(() => ({
   ),
 }))
 vi.mock('../api/monProfil', () => api)
-vi.mock('../api/avatar', () => ({ changerAvatar: vi.fn() }))
+vi.mock('@/shared/supabase/avatar', () => ({ changerAvatar: vi.fn() }))
 vi.mock('../api/session', () => ({ monIdentifiant: () => Promise.resolve('u1') }))
 vi.mock('../api/preferences', () => ({
   mesPreferences: () =>

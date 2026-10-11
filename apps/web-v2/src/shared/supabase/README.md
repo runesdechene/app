@@ -1,6 +1,7 @@
 # supabase — la porte vers la base
 
 - `client.ts` — le client. Ne jamais en créer un second.
+- `avatar.ts`, `photos.ts`, `canaux.ts`, `conditions.ts` — ce que plusieurs features partagent.
 - `database.types.ts` — **généré, ne jamais modifier à la main.** Après chaque migration :
   `pnpm --filter web-v2 gen:types`, puis commit.
 
