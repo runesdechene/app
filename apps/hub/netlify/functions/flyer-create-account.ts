@@ -10,6 +10,11 @@ const PROMO_CODE = process.env.FLYER_PROMO_CODE || 'CONFRERIE'
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000 // 1 heure
 const RATE_LIMIT_MAX = 15 // tentatives max par IP et par fenêtre
 
+// Le consentement à la newsletter Shopify, daté du moment où il est donné.
+function abonne() {
+  return { state: 'subscribed', opt_in_level: 'single_opt_in', consent_updated_at: new Date().toISOString() }
+}
+
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -49,9 +54,11 @@ export default async function handler(request: Request) {
   if (!SUPABASE_URL || !SUPABASE_KEY) return json({ error: 'Missing Supabase env vars' }, 500)
 
   let email: string
+  let newsletter = false
   try {
     const body = await request.json()
     email = String(body.email || '').trim().toLowerCase()
+    newsletter = body.newsletter === true
   } catch {
     return json({ error: 'Invalid JSON' }, 400)
   }
@@ -125,11 +132,8 @@ export default async function handler(request: Request) {
             customer: {
               id: customerId,
               tags: buildTags(existing.tags || ''),
-              email_marketing_consent: {
-                state: 'subscribed',
-                opt_in_level: 'single_opt_in',
-                consent_updated_at: new Date().toISOString(),
-              },
+              // La newsletter seulement si la case est cochée (L34-5 CPCE) ; sinon on ne touche pas au choix du client.
+              ...(newsletter ? { email_marketing_consent: abonne() } : {}),
             },
           }),
         })
@@ -145,11 +149,8 @@ export default async function handler(request: Request) {
           customer: {
             email,
             tags: buildTags(''),
-            email_marketing_consent: {
-              state: 'subscribed',
-              opt_in_level: 'single_opt_in',
-              consent_updated_at: new Date().toISOString(),
-            },
+            // La newsletter seulement si la case est cochée (L34-5 CPCE) ; sinon on ne touche pas au choix du client.
+            ...(newsletter ? { email_marketing_consent: abonne() } : {}),
           },
         }),
       })

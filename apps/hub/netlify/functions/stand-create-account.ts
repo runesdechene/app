@@ -2,10 +2,14 @@
 // Flow : Shopify d'abord (pour avoir customer_id avant l'insert Supabase),
 // puis user Supabase fantôme (id = "shopify-{customer.id}", account_source = 'stand').
 // Si Shopify échoue, rien n'est inséré → retry propre.
-// L'email de bienvenue Shopify part automatiquement via le flow newsletter (email_marketing_consent: subscribed).
-
+// La newsletter seulement si le client l'a accepté à voix haute (case cochée par l'équipe, L34-5 CPCE).
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+// Le consentement à la newsletter Shopify, daté du moment où il est donné.
+function abonne() {
+  return { state: 'subscribed', opt_in_level: 'single_opt_in', consent_updated_at: new Date().toISOString() }
+}
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -68,11 +72,13 @@ export default async function handler(request: Request) {
   if ('error' in auth) return json({ error: auth.error }, auth.status)
 
   let email: string, firstName: string | null, factionTitle: string | null
+  let newsletter = false
   try {
     const body = await request.json()
     email = String(body.email || '').trim().toLowerCase()
     firstName = body.firstName ? String(body.firstName).trim() : null
     factionTitle = body.factionTitle || null
+    newsletter = body.newsletter === true
   } catch {
     return json({ error: 'Invalid JSON' }, 400)
   }
@@ -122,11 +128,8 @@ export default async function handler(request: Request) {
           customer: {
             id: customerId,
             tags: newTags,
-            email_marketing_consent: {
-              state: 'subscribed',
-              opt_in_level: 'single_opt_in',
-              consent_updated_at: new Date().toISOString(),
-            },
+            // La newsletter seulement si la case est cochée (L34-5 CPCE) ; sinon on ne touche pas au choix du client.
+            ...(newsletter ? { email_marketing_consent: abonne() } : {}),
             ...(firstName && !existing.first_name ? { first_name: firstName } : {}),
           },
         }
@@ -148,11 +151,8 @@ export default async function handler(request: Request) {
             email,
             ...(firstName ? { first_name: firstName } : {}),
             tags: buildTags('', factionTitle),
-            email_marketing_consent: {
-              state: 'subscribed',
-              opt_in_level: 'single_opt_in',
-              consent_updated_at: new Date().toISOString(),
-            },
+            // La newsletter seulement si la case est cochée (L34-5 CPCE) ; sinon on ne touche pas au choix du client.
+            ...(newsletter ? { email_marketing_consent: abonne() } : {}),
           },
         }),
       })

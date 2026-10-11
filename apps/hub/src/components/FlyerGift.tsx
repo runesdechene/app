@@ -17,6 +17,8 @@ const SHOP_URL = 'https://runesdechene.com'
 
 export function FlyerGift() {
   const [email, setEmail] = useState('')
+  // La newsletter se demande, décochée (L34-5 CPCE) : le code promo ne l'impose pas.
+  const [newsletter, setNewsletter] = useState(false)
   const [phase, setPhase] = useState<Phase>('form')
   const [promoCode, setPromoCode] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -34,7 +36,7 @@ export function FlyerGift() {
       const resp = await fetch('/.netlify/functions/flyer-create-account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: value }),
+        body: JSON.stringify({ email: value, newsletter }),
       })
       const data = await resp.json()
       if (!resp.ok || !data.success) {
@@ -88,10 +90,23 @@ export function FlyerGift() {
               disabled={submitting}
               autoFocus
             />
+            <label style={consentement}>
+              <input
+                type="checkbox"
+                checked={newsletter}
+                onChange={e => setNewsletter(e.target.checked)}
+                disabled={submitting}
+              />
+              <span>Je veux recevoir les nouvelles de Runes de Chêne (nouveaux Fragments, ventes privées). Désinscription en un clic.</span>
+            </label>
             {error && <p style={errorText}>{error}</p>}
             <button onClick={submit} disabled={submitting} style={button}>
               {submitting ? 'Un instant…' : 'Recevoir mon cadeau'}
             </button>
+            <p style={mention}>
+              Ton e-mail sert à t'envoyer ton code et, si tu as coché la case, nos nouvelles.{' '}
+              <a href="https://app.runesdechene.com/legal/confidentialite" style={{ color: 'inherit' }}>Données personnelles</a>
+            </p>
           </>
         ) : (
           <>
@@ -110,6 +125,24 @@ export function FlyerGift() {
       </div>
     </div>
   )
+}
+
+const consentement: React.CSSProperties = {
+  display: 'flex',
+  gap: 10,
+  alignItems: 'flex-start',
+  margin: '14px 0 4px',
+  fontSize: 14,
+  lineHeight: 1.4,
+  textAlign: 'left',
+  color: C.inkLight,
+}
+
+const mention: React.CSSProperties = {
+  margin: '14px 0 0',
+  fontSize: 12,
+  lineHeight: 1.4,
+  color: C.inkLight,
 }
 
 const panel: React.CSSProperties = {

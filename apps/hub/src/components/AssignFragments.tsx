@@ -36,6 +36,8 @@ export function AssignFragments() {
 
   // Création compte stand (festival) — modale avec champ prénom focus auto
   const [firstNameInput, setFirstNameInput] = useState('')
+  // La newsletter : seulement si le client l'accepte, à voix haute (L34-5 CPCE).
+  const [newsletterInput, setNewsletterInput] = useState(false)
   const [creatingAccount, setCreatingAccount] = useState(false)
   const [accountModalOpen, setAccountModalOpen] = useState(false)
   const [accountModalEmail, setAccountModalEmail] = useState('')
@@ -104,6 +106,7 @@ export function AssignFragments() {
     setSearch('')
     setResults([])
     setFirstNameInput('')
+    setNewsletterInput(false)
 
     // Charger les fragments pending existants pour cet email
     const { data } = await supabase
@@ -122,6 +125,7 @@ export function AssignFragments() {
     if (!email) return
     setAccountModalEmail(email)
     setFirstNameInput('')
+    setNewsletterInput(false)
     setAccountModalOpen(true)
   }
 
@@ -129,6 +133,7 @@ export function AssignFragments() {
     if (creatingAccount) return
     setAccountModalOpen(false)
     setFirstNameInput('')
+    setNewsletterInput(false)
   }
 
   async function confirmCreateStandAccount() {
@@ -152,6 +157,7 @@ export function AssignFragments() {
         body: JSON.stringify({
           email: accountModalEmail,
           firstName: firstNameInput.trim() || null,
+          newsletter: newsletterInput,
         }),
       })
 
@@ -173,6 +179,7 @@ export function AssignFragments() {
       setSearch('')
       setResults([])
       setFirstNameInput('')
+    setNewsletterInput(false)
       setAccountModalOpen(false)
       setAccountModalEmail('')
       setPlayerFragmentIds(new Set())
@@ -190,6 +197,7 @@ export function AssignFragments() {
     setPlayerFragmentIds(new Set())
     setPendingFragmentIds(new Set())
     setFirstNameInput('')
+    setNewsletterInput(false)
   }
 
   async function toggleFragment(fragmentId: number) {
@@ -408,6 +416,16 @@ export function AssignFragments() {
             <p className="modal-hint">
               Optionnel — utilisé pour personnaliser l'email Shopify de bienvenue.
             </p>
+            <label className="modal-label" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input
+                type="checkbox"
+                checked={newsletterInput}
+                onChange={e => setNewsletterInput(e.target.checked)}
+                disabled={creatingAccount}
+              />
+              Le client veut recevoir la newsletter
+            </label>
+            <p className="modal-hint">À lui demander : sans son accord, pas de newsletter.</p>
 
             <div className="modal-actions">
               <button
