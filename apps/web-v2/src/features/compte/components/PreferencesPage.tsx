@@ -8,6 +8,7 @@
  *            « Sur ce téléphone » abonne ce téléphone aux notifications push (spec bascule §3) ;
  *            sur iPhone hors de l'appli installée, la ligne dit comment faire.
  *            Le calendrier (spec 2026-10-09) : où s'affichent les dates des lieux et des énigmes.
+ *            « Tes données » (RGPD, 11/10) : les télécharger, supprimer son compte.
  * ATTENTION — un réglage refusé par la base revient à sa place, avec un message : jamais un
  *            interrupteur qui ment.
  */
@@ -38,6 +39,7 @@ import {
   type Reglage,
 } from '../hooks/usePreferences'
 import { usePush } from '../hooks/usePush'
+import { MesDonnees } from './MesDonnees'
 import styles from './PreferencesPage.module.css'
 
 // Ce que dit la ligne « Apparaître sur la carte » : on ne retire pas une autorisation depuis la
@@ -191,6 +193,10 @@ export function PreferencesPage() {
           </span>
           <img className={styles.chevron} src={chevron} alt="" />
         </a>
+      </Carte>
+
+      <Carte titre="Tes données">
+        <MesDonnees />
       </Carte>
 
       <Text variant="libelle">Runes de Chêne — Porte l’Histoire · {VERSION}</Text>

@@ -8,7 +8,10 @@ const PSEUDO = /^[A-Za-z0-9._]{1,30}$/
 
 export function pseudoInstagram(saisie: string | null): string | null {
   if (!saisie) return null
-  const sansAdresse = saisie.trim().replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i, '').replace(/[/?#].*$/, '')
+  const sansAdresse = saisie
+    .trim()
+    .replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i, '')
+    .replace(/[/?#].*$/, '')
   const pseudo = sansAdresse.replace(/^@+/, '')
   return PSEUDO.test(pseudo) ? pseudo : null
 }

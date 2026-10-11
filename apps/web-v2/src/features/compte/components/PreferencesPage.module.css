@@ -85,3 +85,10 @@
   font-size: var(--legende-size);
   font-weight: var(--weight-semi);
 }
+
+/* La feuille « Supprimer mon compte » : ce qui part, ce qui reste, puis le mot à écrire. */
+.suppression {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-6);
+}

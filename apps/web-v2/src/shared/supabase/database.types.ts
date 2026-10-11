@@ -5522,6 +5522,7 @@ export type Database = {
           show_departement: boolean
           show_envies: boolean
           signe_fragment_id: number | null
+          supprime_le: string | null
           timezone: string
           title_gender: string
           tutorial_completed_at: string | null
@@ -5590,6 +5591,7 @@ export type Database = {
           show_departement?: boolean
           show_envies?: boolean
           signe_fragment_id?: number | null
+          supprime_le?: string | null
           timezone?: string
           title_gender?: string
           tutorial_completed_at?: string | null
@@ -5658,6 +5660,7 @@ export type Database = {
           show_departement?: boolean
           show_envies?: boolean
           signe_fragment_id?: number | null
+          supprime_le?: string | null
           timezone?: string
           title_gender?: string
           tutorial_completed_at?: string | null
@@ -7977,6 +7980,7 @@ export type Database = {
       marquer_notifications_lues: { Args: never; Returns: number }
       marquer_registre_lu: { Args: never; Returns: undefined }
       mes_canaux: { Args: never; Returns: Json }
+      mes_donnees: { Args: never; Returns: Json }
       mes_enigmes: { Args: never; Returns: Json }
       mes_enigmes_culture: { Args: { p_theme: string }; Returns: Json }
       mes_murmures: { Args: never; Returns: Json }
@@ -8474,6 +8478,7 @@ export type Database = {
       signer_charte: { Args: never; Returns: undefined }
       soundex: { Args: { "": string }; Returns: string }
       supprimer_mise_a_jour: { Args: { p_id: number }; Returns: Json }
+      supprimer_mon_compte: { Args: never; Returns: undefined }
       sur_les_chemins: { Args: { p_limite?: number }; Returns: Json }
       synchroniser_fragments: {
         Args: { p_illustrations: Json }

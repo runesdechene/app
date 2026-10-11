@@ -161,8 +161,18 @@ test('ses connaissances : une gélule par culture — son titre, son rang en ét
   afficher({
     ...PROFIL,
     connaissances: [
-      { culture: { id: 'byzantine', nom: 'Byzance', couleur: '#a93d76', icone: null }, titre: 'Sage de Byzance', rang: 6, enigmes: 36 },
-      { culture: { id: 'celtique', nom: 'Celtique', couleur: '#57b33d', icone: null }, titre: 'Érudit celte', rang: 5, enigmes: 61 },
+      {
+        culture: { id: 'byzantine', nom: 'Byzance', couleur: '#a93d76', icone: null },
+        titre: 'Sage de Byzance',
+        rang: 6,
+        enigmes: 36,
+      },
+      {
+        culture: { id: 'celtique', nom: 'Celtique', couleur: '#57b33d', icone: null },
+        titre: 'Érudit celte',
+        rang: 5,
+        enigmes: 61,
+      },
     ],
     polymathe: 'Polymathe',
   })
@@ -172,7 +182,9 @@ test('ses connaissances : une gélule par culture — son titre, son rang en ét
   expect(poly).toHaveTextContent('Polymathe')
   expect(byzance).toHaveTextContent('Sage de Byzance')
   expect(byzance).toHaveTextContent('36 énigmes')
-  expect(within(byzance as HTMLElement).getByRole('img', { name: 'rang 6 sur 7' })).toBeInTheDocument()
+  expect(
+    within(byzance as HTMLElement).getByRole('img', { name: 'rang 6 sur 7' }),
+  ).toBeInTheDocument()
 })
 
 test('sans connaissance, pas de section « Connaissances »', async () => {

@@ -38,9 +38,10 @@ const push = vi.hoisted(() => ({
 vi.mock('../lib/push', () => push)
 
 type Position = { autorisation: Autorisation | null; autoriser: Mock<() => Promise<void>> }
-const position = vi.hoisted(
-  (): Position => ({ autorisation: 'accordee', autoriser: vi.fn(() => Promise.resolve()) }),
-)
+const position = vi.hoisted((): Position => ({
+  autorisation: 'accordee',
+  autoriser: vi.fn(() => Promise.resolve()),
+}))
 vi.mock('@/shared/hooks/useAutorisationPosition', () => ({
   useAutorisationPosition: () => position,
 }))
@@ -196,7 +197,9 @@ test('« Apparaître sur la carte » : refusée, elle dit où la rouvrir', async
 test('sans géolocalisation, pas de ligne « Apparaître sur la carte »', async () => {
   position.autorisation = 'impossible'
   ouvrir()
-  expect(await screen.findByRole('region', { name: 'Ta présence sur la carte' })).toBeInTheDocument()
+  expect(
+    await screen.findByRole('region', { name: 'Ta présence sur la carte' }),
+  ).toBeInTheDocument()
   expect(screen.queryByText('Apparaître sur la carte')).toBeNull()
   position.autorisation = 'accordee'
 })

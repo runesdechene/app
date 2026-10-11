@@ -37,7 +37,12 @@ const COMPLET = {
   fragmentsADecouvrir: 5,
   compagnies: [],
   connaissances: [
-    { culture: { id: 'byzantine', nom: 'Byzance', couleur: '#a93d76', icone: null }, titre: 'Sage de Byzance', rang: 6, enigmes: 36 },
+    {
+      culture: { id: 'byzantine', nom: 'Byzance', couleur: '#a93d76', icone: null },
+      titre: 'Sage de Byzance',
+      rang: 6,
+      enigmes: 36,
+    },
   ],
   polymathe: null,
   estMoi: true,
