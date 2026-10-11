@@ -1,12 +1,12 @@
 /*
- * QUOI     — le filtre du fil, discret : trois mots en petit sous le titre.
- *            Allumé : l'encre et une bille ocre ; éteint : le texte pâle. Tout passe en fondu.
+ * QUOI     — le filtre du fil : trois petites gélules sous le titre. Allumée : un fond ocre très
+ *            léger, l'encre et une petite coche ; éteinte : sans fond, le texte pâle. Tout en fondu.
  */
 .filtre {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-2);
   margin-top: calc(-1 * var(--space-1));
   padding: 0 var(--space-6);
   font-family: var(--font-corps);
@@ -16,32 +16,36 @@
 .famille {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 2px 0;
+  gap: 4px;
+  padding: 3px 10px 3px 8px;
   border: none;
-  background: none;
+  border-radius: var(--radius-rond);
+  background: transparent;
   color: var(--color-texte-pale);
   font: inherit;
   font-weight: var(--weight-semi);
   cursor: pointer;
-  transition: color var(--duree-douce) var(--courbe-douce);
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    color var(--duree-douce) var(--courbe-douce);
 }
 
-/* La bille : présente même éteinte, pour que rien ne bouge quand on bascule. */
+/* La coche : sa place est gardée même éteinte, pour que rien ne bouge quand on bascule. */
 .famille::before {
   content: '';
-  width: 5px;
-  height: 5px;
-  border-radius: var(--radius-rond);
-  background: var(--color-ocre);
+  width: 10px;
+  height: 10px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/coche-choisie.svg') center / contain no-repeat;
   opacity: 0;
-  scale: 0.4;
+  scale: 0.5;
   transition:
     opacity var(--duree-douce) var(--courbe-douce),
     scale var(--duree-elan) var(--courbe-elan);
 }
 
 .famille[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--color-ocre) 16%, transparent);
   color: var(--color-encre);
 }
 
@@ -51,7 +55,6 @@
 }
 
 .famille:focus-visible {
-  border-radius: var(--radius-petit);
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
