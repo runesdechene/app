@@ -19,6 +19,7 @@ export type Mot = {
   coeurs: number
   miens: number
   aMoi: boolean
+  peutEffacer: boolean // son auteur, ou l'équipe sous une mise à jour (mig 479)
   reponses: Mot[]
 }
 export type Carnet = { total: number; mots: Mot[] }
@@ -41,6 +42,8 @@ function lireMot(v: unknown): Mot {
     coeurs: nombre(m.coeurs),
     miens: nombre(m.miens),
     aMoi: booleen(m.aMoi),
+    // Le carnet d'un lieu ne le dit pas : seul son auteur efface un mot.
+    peutEffacer: booleen(m.peutEffacer ?? m.aMoi),
     reponses: m.reponses === undefined ? [] : liste(lireMot)(m.reponses),
   }
 }

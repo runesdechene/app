@@ -130,7 +130,7 @@ function MotDuCarnet({
           >
             Répondre
           </button>
-          {mot.aMoi &&
+          {mot.peutEffacer &&
             (effacer ? (
               <>
                 <button

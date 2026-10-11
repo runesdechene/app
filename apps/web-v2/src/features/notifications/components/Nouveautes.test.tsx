@@ -143,3 +143,21 @@ test('sa propre note : on lit ses cœurs sans s’en envoyer', async () => {
   expect(await screen.findByRole('button', { name: 'Voir les cœurs (12)' })).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: /Envoyer un cœur/ })).not.toBeInTheDocument()
 })
+
+test('l’équipe efface le mot d’un autre (mig 479)', async () => {
+  api.effacerMotDeMiseAJour.mockResolvedValue(undefined)
+  api.fetchCarnetDeMiseAJour.mockResolvedValue({
+    total: 1,
+    mots: [
+      { id: 9, quand: '2026-10-11T10:00:00Z', texte: 'Un mot déplacé.', qui: kelpie, venu: false, photos: [], coeurs: 0, miens: 0, aMoi: false, peutEffacer: true, reponses: [] },
+    ],
+  })
+  afficher()
+  const carnet = await screen.findByRole('region', { name: 'Commentaires' })
+  await within(carnet).findByText('Un mot déplacé.')
+  await userEvent.click(within(carnet).getByRole('button', { name: 'Effacer' }))
+  await userEvent.click(within(carnet).getByRole('button', { name: 'Effacer ce mot' }))
+  await waitFor(() => {
+    expect(api.effacerMotDeMiseAJour.mock.calls[0]?.[0]).toBe(9)
+  })
+})

@@ -7,6 +7,7 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
+import type { Mot } from '@/shared/lib/carnet'
 import { CarnetDuLieu } from './CarnetDuLieu'
 
 const api = vi.hoisted(() => ({
@@ -17,7 +18,9 @@ const api = vi.hoisted(() => ({
 }))
 vi.mock('../api/lieu', () => api)
 
-const mot = (id: number, nom: string, texte: string, extra = {}) => ({
+// Comme la lecture d'un carnet de lieu : seul son auteur peut effacer un mot.
+const mot = (id: number, nom: string, texte: string, extra: Partial<Mot> = {}) => ({
+  peutEffacer: extra.aMoi ?? false,
   id,
   quand: new Date().toISOString(),
   texte,

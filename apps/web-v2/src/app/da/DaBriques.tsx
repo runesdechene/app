@@ -74,6 +74,7 @@ const CARNET: LeCarnet = {
       coeurs: 3,
       miens: 1,
       aMoi: false,
+      peutEffacer: false,
       reponses: [
         {
           id: 2,
@@ -85,6 +86,7 @@ const CARNET: LeCarnet = {
           coeurs: 0,
           miens: 0,
           aMoi: true,
+          peutEffacer: true,
           reponses: [],
         },
       ],

@@ -14,6 +14,7 @@ const mot = (id: number, reponses: Mot[] = []): Mot => ({
   coeurs: 2,
   miens: 0,
   aMoi: false,
+  peutEffacer: false,
   reponses,
 })
 
