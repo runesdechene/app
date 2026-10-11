@@ -9,12 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      # La version de pnpm vient de package.json (packageManager) : la répéter ici fait échouer
+      # l'installation dès qu'elles divergent (toutes les nuits du 07 au 11/10/2026).
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+          node-version: 24
           cache: pnpm
 
       - run: pnpm install --filter @runes/seo-pages
