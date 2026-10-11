@@ -152,9 +152,17 @@ export function Conditions() {
 
       <h2>10. Droit applicable</h2>
       <p>
-        Ces conditions sont soumises au droit français. En cas de désaccord, écris-nous d’abord :
-        nous chercherons ensemble une solution. À défaut, les tribunaux français sont compétents,
-        dans le respect des règles qui protègent le consommateur.
+        Ces conditions sont soumises au droit français. En cas de désaccord, écris-nous d’abord à{' '}
+        <a href="mailto:contact@runesdechene.com">contact@runesdechene.com</a> : nous chercherons
+        ensemble une solution.
+      </p>
+      <p>
+        Si notre réponse ne te satisfait pas, tu peux recourir gratuitement au médiateur de la
+        consommation (code de la consommation, art. L. 612-1) : CM2C, 49 rue de Ponthieu, 75008
+        Paris — 01 89 47 00 14 —{' '}
+        <a href="https://www.cm2c.net/declarer-un-litige.php">cm2c.net/declarer-un-litige.php</a> —{' '}
+        <a href="mailto:litiges@cm2c.net">litiges@cm2c.net</a>. À défaut d’accord, les tribunaux
+        français sont compétents, dans le respect des règles qui protègent le consommateur.
       </p>
     </PageLegale>
   )
