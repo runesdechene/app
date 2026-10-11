@@ -4,7 +4,10 @@
  *            place-images/rapatrie/, puis son adresse est remplacée partout où la base la cite.
  * POURQUOI — audit RGPD du 11/10/2026 : 2 562 photos de lieux et 481 photos de profil faisaient
  *            contacter Google par chaque visiteur. La politique de confidentialité le dit ; ce
- *            script le règle, et la ligne « Google (Firebase) » pourra en partir.
+ *            script le règle, et la ligne « Google (Firebase) » pourra en partir. Deux formes
+ *            d'adresse : firebasestorage.googleapis.com et storage.googleapis.com/wanderers-… (la
+ *            seconde, oubliée au premier passage : 238 photos de lieux, 17 de profil, rattrapées le
+ *            soir même).
  * ATTENTION — `--essai` compte sans rien changer. Sans lui, il écrit : la correspondance
  *            ancienne → nouvelle adresse est gardée dans scripts/rapatriement-firebase.json (le
  *            retour arrière). Rejouable : un fichier déjà copié n'est pas recopié, une ligne déjà
@@ -25,7 +28,8 @@ const CLE = env.SUPABASE_SERVICE_ROLE_KEY
 const ESSAI = process.argv.includes('--essai')
 const SEAU = 'place-images'
 const JOURNAL = new URL('./rapatriement-firebase.json', import.meta.url)
-const FIREBASE = /https:\/\/firebasestorage\.googleapis\.com\/[^"\s\\]+/g
+const FIREBASE = /https:\/\/(?:firebasestorage|storage)\.googleapis\.com\/[^"\s\\]+/g
+const TRACE = 'googleapis.com'
 
 // Les colonnes qui citent Firebase (relevé du 11/10) : table, clé, colonne.
 // Une colonne JSON ne se filtre pas avec `like` par PostgREST : on la lit en entier, on trie ici.
@@ -41,7 +45,7 @@ const COLONNES = [
 const entetes = { apikey: CLE, Authorization: `Bearer ${CLE}` }
 
 async function lignes(table, cle, colonne, sorte) {
-  const filtre = sorte === 'texte' ? `&${colonne}=like.*firebasestorage*` : ''
+  const filtre = sorte === 'texte' ? `&${colonne}=like.*${TRACE}*` : ''
   const toutes = []
   for (let debut = 0; ; debut += 1000) {
     const r = await fetch(
@@ -50,13 +54,13 @@ async function lignes(table, cle, colonne, sorte) {
     )
     if (!r.ok) throw new Error(`${table} : ${r.status} ${await r.text()}`)
     const page = await r.json()
-    toutes.push(...page.filter((l) => JSON.stringify(l[colonne] ?? '').includes('firebasestorage')))
+    toutes.push(...page.filter((l) => JSON.stringify(l[colonne] ?? '').includes(TRACE)))
     if (page.length < 1000) return toutes
   }
 }
 
 function nouveauChemin(ancienne, type) {
-  const nom = decodeURIComponent(new URL(ancienne).pathname.split('/o/')[1] ?? 'fichier')
+  const nom = decodeURIComponent(new URL(ancienne).pathname.split('/').at(-1) ?? 'fichier')
   const extension = (nom.match(/\.([a-z0-9]{2,5})$/i)?.[1] ?? type.split('/')[1] ?? 'bin').toLowerCase()
   const empreinte = createHash('sha1').update(ancienne.split('?')[0]).digest('hex').slice(0, 20)
   return `rapatrie/${empreinte}.${extension}`
