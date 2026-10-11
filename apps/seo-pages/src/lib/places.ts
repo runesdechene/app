@@ -238,7 +238,7 @@ export async function getPlaceContributions(placeId: string): Promise<Contributi
     .select(`
       id, type, title, content, image_url, images,
       votes_up, votes_down, created_at,
-      users ( first_name, avatar_url )
+      users!place_contributions_user_id_fkey ( first_name, avatar_url )
     `)
     .eq('place_id', placeId)
     .eq('type', 'carnet')
