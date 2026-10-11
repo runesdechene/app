@@ -13,6 +13,7 @@ import {
   fetchApercu,
   fetchChiffres,
   fetchConnecte,
+  fetchLieuxAuHasard,
   fetchNatures,
 } from '../api/vitrine'
 
@@ -29,6 +30,14 @@ export function useConnecte() {
 export function useNatures() {
   return (
     useQuery({ queryKey: ['vitrine', 'natures'], queryFn: fetchNatures, staleTime: Infinity })
+      .data ?? []
+  )
+}
+
+// Un tirage par visite : le HTML rendu au déploiement en montre un, l'appli en tire un autre.
+export function useLieuxAuHasard() {
+  return (
+    useQuery({ queryKey: ['vitrine', 'lieux'], queryFn: fetchLieuxAuHasard, staleTime: Infinity })
       .data ?? []
   )
 }

@@ -13,6 +13,18 @@ vi.mock('@/features/vitrine/api/vitrine', () => ({
       { id: 'n1', nom: 'Dolmens & mégalithes', icone: null, couleur: null, nombre: 37 },
     ]),
   fetchActivite: vi.fn(),
+  fetchLieuxAuHasard: vi.fn().mockResolvedValue([
+    {
+      id: 'l1',
+      nom: 'Abbaye de Fontfroide',
+      slug: 'abbaye-de-fontfroide',
+      region: 'Aude',
+      numero: '11',
+      nature: null,
+      photo: 'https://exemple.fr/photo.webp',
+      auteur: { nom: 'Uriel', avatar: null },
+    },
+  ]),
   fetchConnecte: vi.fn(),
   chercher: vi.fn(),
   fetchApercu: vi.fn(),
@@ -24,6 +36,7 @@ test('la vitrine rendue porte son texte, ses chiffres et ses natures', async () 
   expect(html).toContain('3 068')
   expect(html).toContain('Dolmens &amp; mégalithes')
   expect(html).toContain('Runes de Chêne')
+  expect(html).toContain('href="/lieu/abbaye-de-fontfroide"')
   expect(html).not.toContain('vient de découvrir')
 })
 

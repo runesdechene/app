@@ -1,7 +1,8 @@
 /**
  * QUOI     — la vitrine (maquettes 314:146 téléphone, 314:203 ordinateur) : la photo des deux
  *            voyageurs, le logo, l'activité de la carte, la recherche, la devise, les natures,
- *            « Commencer mon périple » et l'entrée des clients déjà connus.
+ *            « Commencer mon périple » et l'entrée des clients déjà connus. Sous ce premier écran,
+ *            quelques lieux de la carte et le bas de page de la marque (549:828, 549:1097).
  * POURQUOI — l'esprit de l'Accueil de l'onboarding, qu'elle remplace (Uriel, 30/09), et une vraie
  *            recherche ouverte à tous : on cherche et on voit un lieu sans compte ; le reste
  *            s'ouvre en rejoignant. Les chiffres sont vrais (get_landing_stats), jamais en dur.
@@ -13,10 +14,11 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router'
 import logo from '@/assets/onboarding/logo-clair.webp'
-import { VERSION } from '@/shared/lib/version'
-import { useChiffres, useConnecte, useNatures } from '../hooks/useVitrine'
+import { useChiffres, useConnecte, useLieuxAuHasard, useNatures } from '../hooks/useVitrine'
 import { ApercuActivite } from './ApercuActivite'
 import { DefileNatures } from './DefileNatures'
+import { LieuxAuHasard } from './LieuxAuHasard'
+import { PiedDeVitrine } from './PiedDeVitrine'
 import { Recherche } from './Recherche'
 import styles from './Vitrine.module.css'
 
@@ -30,6 +32,7 @@ export function Vitrine() {
   const chiffres = useChiffres()
   const natures = useNatures()
   const connecte = useConnecte()
+  const lieux = useLieuxAuHasard()
   const [texte, setTexte] = useState('')
   const [nature, setNature] = useState<string | null>(null)
   const champ = useRef<HTMLInputElement>(null)
@@ -39,88 +42,96 @@ export function Vitrine() {
       {/* React place le titre et la description dans l'en-tête de la page (moteurs de recherche). */}
       <title>Carte des lieux insolites et oubliés — Runes de Chêne Explore</title>
       <meta name="description" content={DESCRIPTION} />
-      <div className={styles.haut}>
-        <header className={styles.entete}>
-          <img className={styles.logo} src={logo} alt="Runes de Chêne" />
-          <span className={styles.logotype} role="img" aria-label="Runes de Chêne Explore" />
-          <p className={styles.explore}>Explore</p>
-          <div className={styles.vie}>
-            {chiffres && (
-              <p className={styles.chiffres}>
-                <strong>{NOMBRE.format(chiffres.lieux)}</strong> lieux d’Histoire sortis de l’oubli
-              </p>
-            )}
-            <ApercuActivite />
+      <div className={styles.ecran}>
+        <div className={styles.haut}>
+          <header className={styles.entete}>
+            <img className={styles.logo} src={logo} alt="Runes de Chêne" />
+            <span className={styles.logotype} role="img" aria-label="Runes de Chêne Explore" />
+            <p className={styles.explore}>Explore</p>
+            <div className={styles.vie}>
+              {chiffres && (
+                <p className={styles.chiffres}>
+                  <strong>{NOMBRE.format(chiffres.lieux)}</strong> lieux d’Histoire sortis de
+                  l’oubli
+                </p>
+              )}
+              <ApercuActivite />
+            </div>
+          </header>
+
+          {chiffres && (
+            <p className={styles.phrase}>
+              <strong>{NOMBRE.format(chiffres.lieux)}</strong> hauts lieux, anciens, magiques ou
+              atypiques de nos contrées, ajoutés par{' '}
+              <strong>{NOMBRE.format(chiffres.explorateurs)}</strong> explorateurs.
+            </p>
+          )}
+
+          <div className={styles.cherche}>
+            <Recherche
+              ref={champ}
+              texte={texte}
+              nature={natures.find((n) => n.id === nature) ?? null}
+              onTexte={setTexte}
+              onRetirerNature={() => {
+                setNature(null)
+                champ.current?.focus()
+              }}
+            />
           </div>
-        </header>
+          {/* Sur téléphone, le parchemin de la page commence sous la photo. */}
+          <span className={styles.parchemin} aria-hidden="true" />
+        </div>
 
-        {chiffres && (
-          <p className={styles.phrase}>
-            <strong>{NOMBRE.format(chiffres.lieux)}</strong> hauts lieux, anciens, magiques ou
-            atypiques de nos contrées, ajoutés par{' '}
-            <strong>{NOMBRE.format(chiffres.explorateurs)}</strong> explorateurs.
+        <h1 className={styles.devise}>
+          <span className={styles.porter}>Porter l’Histoire</span>
+          <span className={styles.explorer}>Explorer le monde</span>
+        </h1>
+
+        <div className={styles.description}>
+          {/* Uriel, 30/09 : ce que les gens se disent — « pourquoi ça n'existe pas ? » */}
+          <p className={styles.accroche}>
+            Rejoins une confrérie moderne d’aventuriers et découvre des milliers de lieux insolites,
+            anciens et oubliés, autour de chez toi ou à l’autre bout du monde
           </p>
-        )}
+          <p className={styles.signature}>
+            Gratuite, et offerte avec amour par{' '}
+            <a href="https://runesdechene.com" target="_blank" rel="noopener">
+              Runes de Chêne
+            </a>
+          </p>
+        </div>
 
-        <div className={styles.cherche}>
-          <Recherche
-            ref={champ}
-            texte={texte}
-            nature={natures.find((n) => n.id === nature) ?? null}
-            onTexte={setTexte}
-            onRetirerNature={() => {
-              setNature(null)
+        <div className={styles.natures}>
+          <DefileNatures
+            natures={natures}
+            choisie={nature}
+            onChoisir={(id) => {
+              // La recherche prend le focus : ses résultats s'ouvrent, filtrés par la nature.
+              setNature(id)
               champ.current?.focus()
             }}
           />
         </div>
+
+        <div className={styles.actions}>
+          <Link className={styles.commencer} to={connecte ? '/carte' : '/bienvenue/preambule'}>
+            Commencer mon périple
+          </Link>
+          <Link className={styles.connecter} to={connecte ? '/carte' : '/bienvenue/email'}>
+            {/* Un seul bloc de texte : la grille du lien ne coupe pas la phrase en trois. */}
+            <span>
+              Se connecter avec mon <strong>Compte</strong>{' '}
+              <strong className={styles.marque}>Runes de Chêne</strong>
+            </span>
+          </Link>
+        </div>
       </div>
 
-      <h1 className={styles.devise}>
-        <span className={styles.porter}>Porter l’Histoire</span>
-        <span className={styles.explorer}>Explorer le monde</span>
-      </h1>
-
-      <div className={styles.description}>
-        {/* Uriel, 30/09 : ce que les gens se disent — « pourquoi ça n'existe pas ? » */}
-        <p className={styles.accroche}>
-          Rejoins une confrérie moderne d’aventuriers et découvre des milliers de lieux insolites,
-          anciens et oubliés, autour de chez toi ou à l’autre bout du monde
-        </p>
-        <p className={styles.signature}>
-          Gratuite, et offerte avec amour par{' '}
-          <a href="https://runesdechene.com" target="_blank" rel="noopener">
-            Runes de Chêne
-          </a>
-        </p>
+      <div className={styles.suite}>
+        <LieuxAuHasard lieux={lieux} lieuxSurLaCarte={chiffres?.lieux ?? null} />
+        <PiedDeVitrine connecte={connecte} />
       </div>
-
-      <div className={styles.natures}>
-        <DefileNatures
-          natures={natures}
-          choisie={nature}
-          onChoisir={(id) => {
-            // La recherche prend le focus : ses résultats s'ouvrent, filtrés par la nature.
-            setNature(id)
-            champ.current?.focus()
-          }}
-        />
-      </div>
-
-      <div className={styles.actions}>
-        <Link className={styles.commencer} to={connecte ? '/carte' : '/bienvenue/preambule'}>
-          Commencer mon périple
-        </Link>
-        <Link className={styles.connecter} to={connecte ? '/carte' : '/bienvenue/email'}>
-          {/* Un seul bloc de texte : la grille du lien ne coupe pas la phrase en trois. */}
-          <span>
-            Se connecter avec mon <strong>Compte client</strong>{' '}
-            <strong className={styles.marque}>Runes de Chêne</strong>
-          </span>
-        </Link>
-      </div>
-
-      <p className={styles.version}>{VERSION}</p>
     </main>
   )
 }

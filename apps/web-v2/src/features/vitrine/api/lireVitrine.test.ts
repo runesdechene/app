@@ -2,7 +2,13 @@
  * QUOI     — la forme de ce que la vitrine lit : chaque champ prouvé, une sorte inconnue refusée.
  */
 import { expect, test } from 'vitest'
-import { lireActivite, lireApercu, lireChiffres, lireResultats } from './lireVitrine'
+import {
+  lireActivite,
+  lireApercu,
+  lireChiffres,
+  lireLieuxAuHasard,
+  lireResultats,
+} from './lireVitrine'
 import { phraseActivite } from '../lib/activite'
 
 test('les chiffres de l’accueil', () => {
@@ -58,4 +64,41 @@ test('un aperçu : null pour un lieu qui n’est pas public', () => {
       suite: true,
     })?.suite,
   ).toBe(true)
+})
+
+test('des lieux au hasard : le département et son numéro, qui l’a ajouté', () => {
+  const [lieu, sansAuteur] = lireLieuxAuHasard([
+    {
+      id: 'l1',
+      nom: 'Abbaye de Fontfroide',
+      slug: 'abbaye-de-fontfroide',
+      region: 'Aude',
+      numero: '11',
+      nature: { id: 'n1', nom: 'Sanctuaires', icone: null, couleur: '#6e487f' },
+      photo: 'https://exemple.fr/photo.webp',
+      auteur: { nom: 'Uriel', avatar: null },
+    },
+    {
+      id: 'l2',
+      nom: 'Kourion',
+      slug: 'kourion',
+      region: 'Chypre',
+      numero: null,
+      nature: null,
+      photo: 'https://exemple.fr/k.webp',
+      auteur: null,
+    },
+  ])
+  expect(lieu).toEqual({
+    id: 'l1',
+    nom: 'Abbaye de Fontfroide',
+    slug: 'abbaye-de-fontfroide',
+    region: 'Aude',
+    numero: '11',
+    nature: { id: 'n1', nom: 'Sanctuaires', icone: null, couleur: '#6e487f' },
+    photo: 'https://exemple.fr/photo.webp',
+    auteur: { nom: 'Uriel', avatar: null },
+  })
+  expect(sansAuteur?.auteur).toBeNull()
+  expect(sansAuteur?.numero).toBeNull()
 })

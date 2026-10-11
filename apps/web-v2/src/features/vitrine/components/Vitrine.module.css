@@ -1,10 +1,14 @@
 /*
  * QUOI     — la vitrine. Téléphone (314:146) : la photo légèrement floue en haut, le logo,
- *            l'activité, la phrase des chiffres ; la recherche posée sur le bord déchiré ; puis
- *            le parchemin : la devise, les natures, le bouton, l'entrée client.
+ *            l'activité, la phrase des chiffres ; la recherche posée à cheval sur le bas de la
+ *            photo, sans coupure (Uriel, 11/10) ; puis le parchemin : la devise, les natures, le
+ *            bouton, l'entrée client.
  *            Ordinateur (314:203) : la photo sur tout l'écran, assombrie ; le logotype à gauche,
  *            les chiffres et l'activité à droite ; au centre, la devise, la description, la
  *            recherche, les natures d'un bord à l'autre, le bouton.
+ *            Dessous (549:828, 549:1097) : quelques lieux de la carte et le bas de page. Sur
+ *            téléphone, le parchemin de l'appli commence sous la photo et porte toute la suite ;
+ *            sur ordinateur, le premier écran finit sur la lisière, puis vient la gravure du site.
  */
 .vitrine {
   display: grid;
@@ -16,6 +20,11 @@
   padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-2));
   overflow-x: clip; /* le flou de la photo déborde de quelques pixels */
   background: var(--color-fond);
+  isolation: isolate; /* le parchemin, en z-index -1, reste au-dessus de ce fond */
+}
+
+.ecran {
+  display: contents;
 }
 
 /* ——— Téléphone ——— */
@@ -26,7 +35,9 @@
   grid-template-rows: auto 1fr auto auto;
   justify-items: center;
   min-height: 64dvh;
-  padding: calc(env(safe-area-inset-top) + 11dvh) 26px 0;
+
+  /* 12 px de plus : le logo s'écarte de la bulle d'activité (Uriel, 11/10). */
+  padding: calc(env(safe-area-inset-top) + 11dvh + 12px) 26px 0;
 }
 
 /* La photo, cadrée sur les deux voyageurs, un rien floue pour que le texte se lise. Elle déborde
@@ -38,17 +49,6 @@
   z-index: 0;
   background: url('../../../assets/onboarding/photo-accueil.webp') 66% center / cover no-repeat;
   filter: blur(2px);
-}
-
-/* Le bord déchiré du parchemin, sa lisière posée sur le bas de la photo. */
-.haut::after {
-  content: '';
-  position: absolute;
-  inset: auto 0 -1px;
-  z-index: 0;
-  aspect-ratio: 1024 / 90;
-  background: url('../../../assets/onboarding/bord-dechire.webp') center / 100% 100% no-repeat;
-  pointer-events: none;
 }
 
 .entete {
@@ -104,7 +104,20 @@
   text-shadow: 0 1px 8px color-mix(in srgb, var(--color-ombre) 50%, transparent);
 }
 
-/* La recherche chevauche le bord déchiré : sa moitié basse est déjà sur le parchemin. */
+/* Le parchemin de l'appli, une seule fois à sa taille, sous la photo : il porte la devise, les
+   lieux et la forêt du bas de page ; plus bas, le fond de la page a sa couleur. */
+.parchemin {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  aspect-ratio: 390 / 732;
+  background: url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto no-repeat;
+  pointer-events: none;
+}
+
+/* La recherche chevauche le bas de la photo : sa moitié basse est déjà sur le parchemin. */
 .cherche {
   position: relative;
   z-index: 2;
@@ -173,7 +186,7 @@
   font-family: var(--font-corps);
   font-size: var(--sous-titre-size);
   text-align: center;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .connecter strong {
@@ -182,16 +195,6 @@
 
 .marque {
   font-style: italic;
-}
-
-.version {
-  margin: 0;
-  padding: 0 28px;
-  color: var(--color-texte-doux);
-  font-family: var(--font-corps);
-  font-size: var(--micro-size);
-  font-weight: var(--weight-gras);
-  text-align: right;
 }
 
 @keyframes apparaitre {
@@ -205,22 +208,30 @@
 
 @media (width >= 1024px) {
   .vitrine {
+    display: block;
+    max-width: none;
+    padding: 0;
+    background: var(--color-gravure);
+  }
+
+  .ecran {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-width: none;
-    padding: 30px 0 var(--space-8);
+    min-height: 100dvh;
+    padding: 30px 0 96px;
+    overflow: clip;
     background: var(--color-ombre);
-    isolation: isolate; /* la photo, en z-index -1, reste sous le contenu mais dans la page */
+    isolation: isolate; /* la photo, en z-index -1, reste sous le contenu mais dans l'écran */
   }
 
   /* La photo sur tout l'écran, floutée et assombrie pour que le crème s'y lise (Uriel, 30/09).
-     Elle déborde de 12 px : sans cela, le flou éclaircit ses bords. Pas de flou sur .vitrine
-     elle-même : il couperait celui des gélules et de l'activité (.claude/rules/v2.md). */
-  .vitrine::before {
+     Elle déborde de 12 px : sans cela, le flou éclaircit ses bords. Pas de flou sur .ecran
+     lui-même : il couperait celui des gélules et de l'activité (.claude/rules/v2.md). */
+  .ecran::before {
     content: '';
-    position: fixed;
+    position: absolute;
     inset: -12px;
     z-index: -1;
     background:
@@ -232,12 +243,23 @@
     filter: blur(4px);
   }
 
+  /* La lisière de forêt de l'appli ferme le premier écran (Uriel, 11/10 : pas de dégradé). */
+  .ecran::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -1px;
+    aspect-ratio: 1920 / 74;
+    background: var(--color-fond);
+    mask: url('../../../assets/ui/barre-lisiere.png') bottom center / 100% 100% no-repeat;
+    pointer-events: none;
+  }
+
   .haut {
     display: contents;
   }
 
   .haut::before,
-  .haut::after,
+  .parchemin,
   .logo,
   .explore,
   .phrase {
@@ -361,12 +383,15 @@
     color: var(--color-sur-accent);
   }
 
-  .version {
-    position: absolute;
-    right: var(--space-4);
-    bottom: var(--space-4);
-    padding: 0;
-    color: var(--color-sur-accent);
+  /* La gravure du site à sa largeur, puis sa couleur : sous les lieux et la forêt. */
+  .suite {
+    display: grid;
+    justify-items: center;
+    background: url('../../../assets/ui/gravure-boutique.webp') center top / 100% auto no-repeat;
+  }
+
+  .suite > footer {
+    justify-self: stretch;
   }
 }
 

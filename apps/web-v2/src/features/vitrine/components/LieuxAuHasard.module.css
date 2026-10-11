@@ -1,0 +1,208 @@
+/*
+ * QUOI     — « Quelques lieux de la carte ». Téléphone (549:1097) : deux colonnes, six lieux,
+ *            sur le parchemin de la page. Ordinateur (549:828) : quatre colonnes, huit lieux.
+ *            La nature est posée sur la photo, à sa couleur (comme sur la fiche d'un lieu).
+ */
+.section {
+  display: grid;
+  justify-items: center;
+  padding: 56px var(--space-6) 0;
+  text-align: center;
+}
+
+.surtitre {
+  margin: 0 0 var(--space-2);
+  color: var(--color-boutique-or);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--vitrine-lieux-titre-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.sous {
+  max-width: 34ch;
+  margin: var(--space-2) 0 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-wrap: balance;
+}
+
+.lieux {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px var(--space-6);
+  width: 100%;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+/* Six sur téléphone : les deux derniers attendent l'ordinateur. */
+.lieu:nth-child(n + 7) {
+  display: none;
+}
+
+.lien {
+  display: grid;
+  gap: var(--space-1);
+  color: inherit;
+  text-decoration: none;
+}
+
+.cadre {
+  position: relative;
+  display: block;
+  margin-bottom: var(--space-1);
+  overflow: hidden;
+  border-radius: var(--radius-carte);
+  aspect-ratio: 4 / 3;
+  background: var(--color-sable);
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: scale var(--duree-douce) var(--courbe-douce);
+}
+
+.lien:hover .photo {
+  scale: 1.04;
+}
+
+.nature {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-width: calc(100% - 2 * var(--space-2));
+  padding: 2px 10px 2px var(--space-2);
+  border-radius: var(--radius-rond);
+  background: var(--type, var(--color-fiche-badge));
+  color: var(--color-fiche-badge-texte);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-semi);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.icone {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  background: currentcolor;
+  mask: var(--icone) center / contain no-repeat;
+}
+
+.nom {
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  line-height: var(--dense-leading);
+}
+
+.region {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.auteur {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: var(--space-2) 0 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.auteur strong {
+  color: var(--color-encre);
+  font-weight: var(--weight-semi);
+}
+
+.carte {
+  margin-top: 32px;
+  padding: var(--space-3) 28px;
+  border: 1px solid var(--color-encre);
+  border-radius: var(--radius-rond);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+  transition: background-color var(--duree-douce) var(--courbe-douce);
+}
+
+.carte:hover {
+  background: color-mix(in srgb, var(--color-encre) 8%, transparent);
+}
+
+.lien:focus-visible,
+.carte:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+@media (width >= 1024px) {
+  .section {
+    width: min(1200px, 100%);
+    padding: 96px 40px 0;
+  }
+
+  .titre {
+    font-size: var(--vitrine-lieux-titre-pc-size);
+  }
+
+  .sous {
+    max-width: none;
+    font-size: var(--corps-size);
+  }
+
+  .lieux {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 40px 28px;
+    margin-top: 40px;
+  }
+
+  .lieu:nth-child(n + 7) {
+    display: block;
+  }
+
+  .nature {
+    font-size: var(--legende-size);
+  }
+
+  .nom {
+    font-size: var(--corps-size);
+  }
+
+  .region {
+    font-size: var(--flux-size);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo,
+  .carte {
+    transition: none;
+  }
+}

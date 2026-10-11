@@ -7887,6 +7887,7 @@ export type Database = {
       }
       lieu_a_modifier: { Args: { p_id: string }; Returns: Json }
       lieu_vu: { Args: { p_id: string }; Returns: undefined }
+      lieux_au_hasard: { Args: { p_nombre?: number }; Returns: Json }
       lieux_pres_du_pin: { Args: { p_pin: string }; Returns: Json }
       lieux_voisins: {
         Args: { p_latitude: number; p_longitude: number }

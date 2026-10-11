@@ -20,6 +20,7 @@ const api = vi.hoisted(() => ({
   fetchActivite: vi.fn(),
   fetchApercu: vi.fn(),
   fetchConnecte: vi.fn(),
+  fetchLieuxAuHasard: vi.fn(),
 }))
 vi.mock('../api/vitrine', () => api)
 
@@ -34,6 +35,7 @@ const CHEVRESSE = {
 
 beforeEach(() => {
   api.fetchConnecte.mockResolvedValue(false)
+  api.fetchLieuxAuHasard.mockResolvedValue([])
   api.fetchChiffres.mockResolvedValue({ lieux: 3473, explorateurs: 4750 })
   api.fetchNatures.mockResolvedValue([{ ...DOLMENS, nombre: 37 }])
   api.chercher.mockResolvedValue({ total: 37, lieux: [CHEVRESSE] })
@@ -119,13 +121,15 @@ test('toucher l’activité ouvre son lieu', async () => {
 test('déjà connecté, « Commencer mon périple » et « Se connecter » mènent à la carte', async () => {
   api.fetchConnecte.mockResolvedValue(true)
   monter('/bienvenue')
+  // En haut de la vitrine et dans son bas de page.
   await waitFor(() => {
-    expect(screen.getByRole('link', { name: 'Commencer mon périple' })).toHaveAttribute(
-      'href',
-      '/carte',
-    )
+    for (const lien of screen.getAllByRole('link', { name: 'Commencer mon périple' })) {
+      expect(lien).toHaveAttribute('href', '/carte')
+    }
   })
-  expect(screen.getByRole('link', { name: /Se connecter/ })).toHaveAttribute('href', '/carte')
+  for (const lien of screen.getAllByRole('link', { name: /Se connecter/ })) {
+    expect(lien).toHaveAttribute('href', '/carte')
+  }
 })
 
 test('chercher un mot mène à l’aperçu du lieu', async () => {

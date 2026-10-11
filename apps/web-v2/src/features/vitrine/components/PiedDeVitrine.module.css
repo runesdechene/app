@@ -1,0 +1,132 @@
+/*
+ * QUOI     — le bas de la vitrine, comme celui du site : la forêt immersive (trois images du
+ *            thème Shopify, crème sur transparent) se découpe sur ce qui la précède, puis la
+ *            crème. Téléphone : tout s'empile, les deux colonnes de liens côte à côte.
+ */
+.pied {
+  display: grid;
+}
+
+/* Les ruines et le porte-étendard à gauche, les sapins à droite, la lisière d'un bord à l'autre. */
+.foret {
+  height: 92px;
+  background:
+    url('../../../assets/ui/immersif-centre.webp') center bottom / 100% auto no-repeat,
+    url('../../../assets/ui/immersif-gauche.webp') left bottom / auto 94% no-repeat,
+    url('../../../assets/ui/immersif-droite.webp') right bottom / auto 100% no-repeat;
+}
+
+.creme {
+  display: grid;
+  gap: 28px;
+  padding: var(--space-4) var(--space-6) calc(env(safe-area-inset-bottom) + var(--space-6));
+  background: var(--color-boutique-creme);
+  color: var(--color-boutique-brun);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+}
+
+.reseaux {
+  display: flex;
+  gap: 20px;
+  margin: 0;
+}
+
+.reseaux a {
+  color: var(--color-boutique-rouge);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--libelle-tracking);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.haut {
+  display: grid;
+  gap: 32px;
+}
+
+.marque {
+  display: grid;
+  gap: 14px;
+  max-width: 330px;
+}
+
+.marque p {
+  margin: 0;
+  line-height: var(--corps-leading);
+}
+
+.logo {
+  width: 216px;
+}
+
+.devise {
+  font-weight: var(--weight-gras);
+}
+
+.liens {
+  display: flex;
+  gap: 48px;
+}
+
+.liens div {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.liens h2 {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--vitrine-pied-titre-size);
+  font-weight: var(--weight-normal);
+  line-height: 1;
+}
+
+.liens a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.reseaux a:hover,
+.liens a:hover {
+  text-decoration: underline;
+}
+
+.bas {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-size: var(--micro-size);
+}
+
+@media (width >= 1024px) {
+  .foret {
+    height: 216px;
+    background-size:
+      100% auto,
+      auto 208px,
+      auto 216px;
+  }
+
+  .creme {
+    gap: 36px;
+    padding: var(--space-6) 160px 32px;
+  }
+
+  .reseaux {
+    justify-content: end;
+  }
+
+  .haut {
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+  }
+
+  .liens {
+    gap: 72px;
+    text-align: right;
+  }
+}

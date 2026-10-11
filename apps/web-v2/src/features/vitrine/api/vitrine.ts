@@ -1,11 +1,19 @@
 /**
  * QUOI     — ce que la vitrine demande à Supabase, sans compte : les chiffres, les natures,
- *            chercher, l'activité récente, l'aperçu d'un lieu ; et si une session est déjà ouverte.
+ *            chercher, l'activité récente, l'aperçu d'un lieu, des lieux au hasard ; et si une
+ *            session est déjà ouverte.
  * POURQUOI — des fonctions en lecture, ouvertes aux visiteurs (migration 391) : jamais de
  *            position, jamais de personne ; le reste s'ouvre avec un compte.
  */
 import { supabase } from '@/shared/supabase/client'
-import { lireActivite, lireApercu, lireChiffres, lireNatures, lireResultats } from './lireVitrine'
+import {
+  lireActivite,
+  lireApercu,
+  lireChiffres,
+  lireLieuxAuHasard,
+  lireNatures,
+  lireResultats,
+} from './lireVitrine'
 
 export async function fetchChiffres() {
   const { data, error } = await supabase.rpc('get_landing_stats')
@@ -46,4 +54,11 @@ export async function fetchApercu(id: string) {
   const { data, error } = await supabase.rpc('apercu_lieu', { p_id: id })
   if (error) throw error
   return lireApercu(data)
+}
+
+// Huit lieux : la vitrine en montre huit sur ordinateur, six sur téléphone.
+export async function fetchLieuxAuHasard() {
+  const { data, error } = await supabase.rpc('lieux_au_hasard', { p_nombre: 8 })
+  if (error) throw error
+  return lireLieuxAuHasard(data)
 }

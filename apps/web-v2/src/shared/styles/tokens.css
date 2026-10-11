@@ -68,6 +68,13 @@
   --color-fiche-fleche: #fff; /* les flèches posées sur les photos d'un lieu (02/10) */
   --color-fiche-credit: #bc7f3b; /* « Luna », la date */
   --color-fiche-credit-texte: #524d4d;
+
+  /* La boutique, reprise au bas de la vitrine (thème Shopify, Figma 549:828) */
+  --color-boutique-brun: #403434; /* les titres et le texte du pied de page du site */
+  --color-boutique-or: #b4894f; /* les surtitres du site */
+  --color-boutique-rouge: #833434; /* Facebook, Instagram */
+  --color-boutique-creme: #fcf9f1; /* le pied de page, sous la forêt immersive */
+  --color-gravure: #f1ecdd; /* le parchemin de la gravure du site, sous l'image */
   --color-fiche-credit-pale: #ccc4c4; /* « Image + Texte » */
   --color-fiche-rond: #fbebd3; /* fond des boutons ronds, à 51 % */
   --color-fiche-vignette: #937558; /* le cadre de la vignette choisie */
@@ -144,6 +151,9 @@
   --vitrine-accroche-size: 1.1875rem; /* « Rejoins une confrérie… », sur ordinateur : 19 px */
   --vitrine-phrase-size: 0.9375rem; /* « 3 473 hauts lieux… » : 15 px */
   --vitrine-leading: 1.35; /* la phrase des chiffres et l'activité, sur la photo */
+  --vitrine-lieux-titre-size: 2.25rem; /* « Quelques lieux de la carte » : 36 px (549:1097) */
+  --vitrine-lieux-titre-pc-size: 3rem; /* le même, sur ordinateur : 48 px (549:828) */
+  --vitrine-pied-titre-size: 1.375rem; /* « Aller plus loin », « Explore » : 22 px */
   --corps-leading: 1.45;
   --dense-leading: 1.25;
   --carnet-leading: 24px; /* une ligne du carnet de l'ajout d'un lieu : le texte s'y pose */

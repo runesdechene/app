@@ -1,6 +1,7 @@
 /**
  * QUOI     — la forme de ce que la vitrine lit, sans compte (migration 391, get_landing_stats) :
- *            les deux chiffres, les natures, une recherche, l'activité récente, l'aperçu d'un lieu.
+ *            les deux chiffres, les natures, une recherche, l'activité récente, l'aperçu d'un lieu,
+ *            des lieux tirés au sort (migration 484).
  * POURQUOI — rien n'est supposé : chaque champ est prouvé.
  */
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
@@ -32,6 +33,17 @@ export type Apercu = {
   explorateurs: number
   extrait: string | null
   suite: boolean
+}
+
+export type LieuAuHasard = {
+  id: string
+  nom: string
+  slug: string
+  region: string | null
+  numero: string | null
+  nature: Nature | null
+  photo: string
+  auteur: { nom: string; avatar: string | null } | null
 }
 
 export function lireChiffres(json: unknown): Chiffres {
@@ -106,3 +118,20 @@ export function lireApercu(json: unknown): Apercu | null {
     suite: booleen(a.suite),
   }
 }
+
+export const lireLieuxAuHasard = liste((v): LieuAuHasard => {
+  const l = objet(v)
+  return {
+    id: chaine(l.id),
+    nom: chaine(l.nom),
+    slug: chaine(l.slug),
+    region: ouNull(chaine)(l.region),
+    numero: ouNull(chaine)(l.numero),
+    nature: ouNull(lireNature)(l.nature),
+    photo: chaine(l.photo),
+    auteur: ouNull((a: unknown) => {
+      const o = objet(a)
+      return { nom: chaine(o.nom), avatar: ouNull(chaine)(o.avatar) }
+    })(l.auteur),
+  }
+})
