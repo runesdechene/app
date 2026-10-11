@@ -13,6 +13,7 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router'
 import logo from '@/assets/onboarding/logo-clair.webp'
+import { VERSION } from '@/shared/lib/version'
 import { useChiffres, useConnecte, useNatures } from '../hooks/useVitrine'
 import { ApercuActivite } from './ApercuActivite'
 import { DefileNatures } from './DefileNatures'
@@ -20,11 +21,10 @@ import { Recherche } from './Recherche'
 import styles from './Vitrine.module.css'
 
 const NOMBRE = new Intl.NumberFormat('fr-FR')
-// Le nom de la version en cours, à changer à chaque version publiée.
-const VERSION = 'Version Pytheas 0.21'
 // Ce que montrent les moteurs de recherche sous le titre (~155 signes, sans chiffre qui vieillit).
+// Les mots que les gens cherchent (« lieux insolites », « oubliés »), et la marque (Uriel, 11/10).
 const DESCRIPTION =
-  'Une carte vivante du patrimoine de France : châteaux, dolmens, sources et lieux oubliés, ajoutés par des milliers d’Explorateurs. Gratuite, offerte par Runes de Chêne.'
+  'Châteaux en ruine, dolmens, sources sacrées, chapelles oubliées : des milliers de lieux insolites sur une carte gratuite, offerte par Runes de Chêne.'
 
 export function Vitrine() {
   const chiffres = useChiffres()
@@ -37,7 +37,7 @@ export function Vitrine() {
   return (
     <main className={styles.vitrine}>
       {/* React place le titre et la description dans l'en-tête de la page (moteurs de recherche). */}
-      <title>Runes de Chêne Explore — la carte des lieux d’Histoire et de Nature</title>
+      <title>Carte des lieux insolites et oubliés — Runes de Chêne Explore</title>
       <meta name="description" content={DESCRIPTION} />
       <div className={styles.haut}>
         <header className={styles.entete}>
@@ -84,8 +84,8 @@ export function Vitrine() {
       <div className={styles.description}>
         {/* Uriel, 30/09 : ce que les gens se disent — « pourquoi ça n'existe pas ? » */}
         <p className={styles.accroche}>
-          Rejoins une confrérie moderne d’aventuriers et découvre des milliers de lieux atypiques
-          autour de chez toi ou à l’autre bout du monde
+          Rejoins une confrérie moderne d’aventuriers et découvre des milliers de lieux insolites,
+          anciens et oubliés, autour de chez toi ou à l’autre bout du monde
         </p>
         <p className={styles.signature}>
           Gratuite, et offerte avec amour par{' '}

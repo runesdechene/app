@@ -9,6 +9,7 @@ import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { reprendreLieu } from '@/shared/lib/apresEntree'
+import { VERSION } from '@/shared/lib/version'
 import { ApercuLieu } from './ApercuLieu'
 import { Vitrine } from './Vitrine'
 
@@ -82,6 +83,11 @@ test('la vitrine dit les vrais chiffres et la dernière activité', async () => 
   expect(await screen.findByText(/vient de découvrir/)).toHaveTextContent(
     'Un Compagnon vient de découvrir Fort des Têtes',
   )
+})
+
+test('la vitrine porte la version en cours de l’appli', () => {
+  monter('/bienvenue')
+  expect(screen.getByText(VERSION)).toBeInTheDocument()
 })
 
 test('une activité s’efface, la suivante prend sa place', async () => {
