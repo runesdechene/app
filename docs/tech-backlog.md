@@ -126,3 +126,12 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 - [ ] **Tests** : `frise.ts` sans cas « frise vide » ni « ensemble non contigu » ; l'assertion « pas de bouton Renaissance » de la feuille peut passer avant la réponse ; le test du sablier ne vérifie que le libellé.
 - [ ] **CSS** : `Sablier.tsx` importe `CarteScreen.module.css` ; `FriseDesEpoques.module.css` est le seul fichier à utiliser `composes:` ; la règle `data-bord` (années aux bords) ne sert que si la première époque a un début ou la dernière une fin.
 - [ ] **SQL** : `supabase/tests/v2-carte/396_filtres_de_carte.sql` rejoue la 396 (sans `debut`/`fin`) : le pointer sur la 477 s'il resservait.
+
+## Le carnet des mises à jour — mineurs (11/10/2026)
+
+> Branche `feat/carnet-des-mises-a-jour` (spec `2026-10-11-carnet-des-mises-a-jour-design.md`), en
+> prod en Pythéas 1.17.0 (migs 478-479). Relecture faite par l'auteur seul (sans relecteur neuf).
+
+- [ ] **Sous une note** : pas de rangée de visages (seul l'auteur ouvre la liste des cœurs) ; la feuille des cœurs s'ouvre sans adresse (le retour quitte la page) ; un carnet qui ne se charge pas ne dit rien.
+- [ ] **Sur un lieu** : l'équipe n'y voit toujours « Effacer » que sur ses mots (`_mot` ne rend pas `peutEffacer`), alors que `effacer_mot` l'autorise.
+- [ ] **Essai** : pas encore vu en largeur téléphone ni avec un vrai mot écrit en prod (pour ne pas notifier les admins) — le premier commentaire réel fera foi.
