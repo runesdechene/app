@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && vite build --ssr src/prerendu/vitrine.tsx --outDir dist-ssr && node scripts/prerendre-vitrine.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "lint": "eslint . --max-warnings 0 && stylelint \"src/**/*.css\"",

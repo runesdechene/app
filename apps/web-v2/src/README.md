@@ -7,6 +7,7 @@
 | `shared/`    | ce que plusieurs zones utilisent : client Supabase, briques d'interface, styles    | quoi que ce soit propre à une zone            |
 | `assets/ui/` | les images de l'interface (brut Figma, remplaçables)                               | des images de contenu                         |
 | `test/`      | la préparation commune des tests                                                   | des tests (ils vivent à côté de leur fichier) |
+| `prerendu/`  | les pages rendues en HTML au build, pour les moteurs de recherche (la vitrine)     | du code que l'appli charge                    |
 
 ## Les trois règles (vérifiées par ESLint)
 
