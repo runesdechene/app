@@ -8,8 +8,10 @@
  *            aucun cache de l'ancien compte ne survit.
  */
 import { useState } from 'react'
+import { Link } from 'react-router'
 import chevron from '@/assets/ui/chevron.svg'
 import corbeille from '@/assets/ui/corbeille.svg'
+import question from '@/assets/ui/question.svg'
 import telecharger from '@/assets/ui/telecharger.svg'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
@@ -74,6 +76,15 @@ export function MesDonnees() {
         </span>
         <img className={styles.chevron} src={chevron} alt="" />
       </button>
+
+      <Link className={styles.ligne} to="/legal/confidentialite">
+        <img className={styles.icone} src={question} alt="" />
+        <span className={styles.texte}>
+          <span className={styles.titre}>Ta vie privée et nos conditions</span>
+          <span className={styles.description}>Ce que nous gardons, pourquoi, et tes droits.</span>
+        </span>
+        <img className={styles.chevron} src={chevron} alt="" />
+      </Link>
 
       {ouverte && (
         <Feuille

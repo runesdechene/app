@@ -9,6 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/alegreya": "^5.3.0",
+    "@fontsource/bebas-neue": "^5.3.0",
+    "@fontsource/cabin": "^5.3.0",
+    "@fontsource/cabin-condensed": "^5.3.0",
     "@mediapipe/tasks-vision": "1.1.0",
     "@runes/calendrier": "workspace:*",
     "@supabase/supabase-js": "^2.39.3",

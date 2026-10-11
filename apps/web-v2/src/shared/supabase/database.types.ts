@@ -5475,6 +5475,8 @@ export type Database = {
           brouiller_pistes: boolean
           calendrier: string
           charte_signee_le: string | null
+          conditions_acceptees_le: string | null
+          conditions_version: string | null
           conquest_points: number
           conquest_reset_at: string | null
           construction_points: number
@@ -5544,6 +5546,8 @@ export type Database = {
           brouiller_pistes?: boolean
           calendrier?: string
           charte_signee_le?: string | null
+          conditions_acceptees_le?: string | null
+          conditions_version?: string | null
           conquest_points?: number
           conquest_reset_at?: string | null
           construction_points?: number
@@ -5613,6 +5617,8 @@ export type Database = {
           brouiller_pistes?: boolean
           calendrier?: string
           charte_signee_le?: string | null
+          conditions_acceptees_le?: string | null
+          conditions_version?: string | null
           conquest_points?: number
           conquest_reset_at?: string | null
           construction_points?: number
@@ -6972,6 +6978,7 @@ export type Database = {
       }
       _xp_epoch: { Args: never; Returns: string }
       _xp_for_level: { Args: { p_level: number }; Returns: number }
+      accepter_conditions: { Args: { p_version: string }; Returns: undefined }
       accueil_ajoutes: { Args: { p_limite?: number }; Returns: Json }
       accueil_nouveaute: { Args: never; Returns: Json }
       actifs_carte: { Args: never; Returns: Json }
@@ -7980,6 +7987,7 @@ export type Database = {
       marquer_notifications_lues: { Args: never; Returns: number }
       marquer_registre_lu: { Args: never; Returns: undefined }
       mes_canaux: { Args: never; Returns: Json }
+      mes_conditions: { Args: never; Returns: string }
       mes_donnees: { Args: never; Returns: Json }
       mes_enigmes: { Args: never; Returns: Json }
       mes_enigmes_culture: { Args: { p_theme: string }; Returns: Json }

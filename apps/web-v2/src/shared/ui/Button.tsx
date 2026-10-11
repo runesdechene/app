@@ -26,7 +26,12 @@ export function Button({
 }) {
   if (href) {
     return (
-      <a className={[styles[kind], styles.lien].join(' ')} href={href} target="_blank" rel="noopener">
+      <a
+        className={[styles[kind], styles.lien].join(' ')}
+        href={href}
+        target="_blank"
+        rel="noopener"
+      >
         {children}
       </a>
     )

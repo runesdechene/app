@@ -33,7 +33,10 @@ export function renderPied(): string {
         </div>
       </nav>
     </div>
-    <p class="bas">© ${new Date().getFullYear()} Runes de Chêne</p>
+    <p class="bas">
+      <span>© ${new Date().getFullYear()} Runes de Chêne</span>
+      <span class="legal"><a href="/legal/mentions">Mentions légales</a> · <a href="/legal/confidentialite">Confidentialité</a> · <a href="/legal/conditions">Conditions d’utilisation</a></span>
+    </p>
   </div>
 </footer>`;
 }

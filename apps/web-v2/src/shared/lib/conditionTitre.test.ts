@@ -35,5 +35,3 @@ test('une condition se lit depuis la base, ou devient null si elle est illisible
   expect(lireCondition({ stat: 'plantages' })).toBeNull()
   expect(lireCondition(null)).toBeNull()
 })
-
-

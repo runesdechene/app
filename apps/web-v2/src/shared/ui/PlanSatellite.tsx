@@ -10,7 +10,13 @@ const VUES: { vue: VueCarte; nom: string }[] = [
   { vue: 'satellite', nom: 'Satellite' },
 ]
 
-export function PlanSatellite({ vue, onChanger }: { vue: VueCarte; onChanger: (v: VueCarte) => void }) {
+export function PlanSatellite({
+  vue,
+  onChanger,
+}: {
+  vue: VueCarte
+  onChanger: (v: VueCarte) => void
+}) {
   return (
     <div className={styles.vues} role="group" aria-label="Vue de la carte">
       {VUES.map((v) => (

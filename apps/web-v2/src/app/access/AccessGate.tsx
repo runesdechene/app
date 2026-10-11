@@ -6,6 +6,7 @@
  *            le bouton retour ne ramène pas vers une porte fermée.
  */
 import { useEffect, type ReactNode } from 'react'
+import { ConditionsAJour } from './ConditionsAJour'
 import { decideAccess } from './decideAccess'
 import { useV2Access } from './useV2Access'
 import styles from './AccessGate.module.css'
@@ -28,7 +29,8 @@ export function AccessGate({
     if (decision === 'leave') leave()
   }, [decision, leave])
 
-  if (decision === 'allow') return children
+  // Entrer, c'est avoir accepté les conditions en vigueur (11/10).
+  if (decision === 'allow') return <ConditionsAJour>{children}</ConditionsAJour>
   if (decision === 'retry') {
     return (
       <main className={styles.offline}>

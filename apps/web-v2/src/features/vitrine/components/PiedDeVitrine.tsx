@@ -55,6 +55,11 @@ export function PiedDeVitrine({ connecte }: { connecte: boolean }) {
 
         <p className={styles.bas}>
           <span>© {new Date().getFullYear()} Runes de Chêne</span>
+          <span className={styles.legal}>
+            <Link to="/legal/mentions">Mentions légales</Link> ·{' '}
+            <Link to="/legal/confidentialite">Confidentialité</Link> ·{' '}
+            <Link to="/legal/conditions">Conditions d’utilisation</Link>
+          </span>
           <span>{VERSION}</span>
         </p>
       </div>

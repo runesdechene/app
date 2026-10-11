@@ -21,6 +21,18 @@ importers:
 
   apps/hub:
     dependencies:
+      '@fontsource/alegreya':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/bebas-neue':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/cabin':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/cabin-condensed':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@mediapipe/tasks-vision':
         specifier: 1.1.0
         version: 1.1.0
@@ -89,6 +101,18 @@ importers:
 
   apps/web-v2:
     dependencies:
+      '@fontsource/bebas-neue':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/cabin':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/cabin-condensed':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/im-fell-english':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@mediapipe/tasks-vision':
         specifier: 1.1.0
         version: 1.1.0
@@ -1174,6 +1198,21 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@fontsource/alegreya@5.3.0':
+    resolution: {integrity: sha512-YCsp9dHYfMNdggXxinMMS0nkGlZkzs2MvPL7qPVjSO4DM1uJ29hmKEdTC/fBP+2K4Aa+4Z44JuOQz05eDcvNJA==}
+
+  '@fontsource/bebas-neue@5.3.0':
+    resolution: {integrity: sha512-nCxMEb9Bg9sjNWm9TIOsvHKDMLRUfEZPWpLgYu6m9KavZZVSA/WoHzI5wROwqA+eNwEi/PNBAcB5Co7HA3S0Cw==}
+
+  '@fontsource/cabin-condensed@5.3.0':
+    resolution: {integrity: sha512-A6Wv/0kemTc5m9GiSqxlfm16A2jfe2tQyOGAUJiwiZW5LfNx9Rfkf8+9Sn570C+DHh1zfL4qfPWdUTij2dhwNA==}
+
+  '@fontsource/cabin@5.3.0':
+    resolution: {integrity: sha512-c2NSbpO6XSqaq6E6ztHqgdNxzCPJCxkNvnSEjkQRidlL3Ycac00sS9XTRT6RfMFeB3+C7V3vgN1S40nM6lthuw==}
+
+  '@fontsource/im-fell-english@5.3.0':
+    resolution: {integrity: sha512-FcgdWfY9WeUM2gQkfmwhn4Ed9LVtlll8LSSZvHfbsUrnHK5tHHnGg6BgwAfHogp52adU3eE89J/3B52qV3b+Vw==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -5061,6 +5100,16 @@ snapshots:
       levn: 0.4.1
 
   '@exodus/bytes@1.16.0': {}
+
+  '@fontsource/alegreya@5.3.0': {}
+
+  '@fontsource/bebas-neue@5.3.0': {}
+
+  '@fontsource/cabin-condensed@5.3.0': {}
+
+  '@fontsource/cabin@5.3.0': {}
+
+  '@fontsource/im-fell-english@5.3.0': {}
 
   '@humanfs/core@0.19.2':
     dependencies:

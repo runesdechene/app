@@ -4,11 +4,16 @@
  */
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { type ReactNode } from 'react'
 import { vi } from 'vitest'
 import { AccessGate } from './AccessGate'
 import { useV2Access } from './useV2Access'
 
 vi.mock('./useV2Access', () => ({ useV2Access: vi.fn() }))
+// La fenêtre des conditions se teste à part (ConditionsAJour.test) : ici, elle laisse passer.
+vi.mock('./ConditionsAJour', () => ({
+  ConditionsAJour: ({ children }: { children: ReactNode }) => children,
+}))
 
 afterEach(() => {
   vi.mocked(useV2Access).mockReset()

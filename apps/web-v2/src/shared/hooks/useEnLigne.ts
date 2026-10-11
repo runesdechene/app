@@ -15,5 +15,9 @@ function suivre(rappel: () => void) {
 }
 
 export function useEnLigne(): boolean {
-  return useSyncExternalStore(suivre, () => navigator.onLine, () => true)
+  return useSyncExternalStore(
+    suivre,
+    () => navigator.onLine,
+    () => true,
+  )
 }

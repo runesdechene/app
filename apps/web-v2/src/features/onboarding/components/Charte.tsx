@@ -67,6 +67,8 @@ export function Charte() {
   const { parcours } = useParcours()
   const { signerPuisEntrer } = useEntrer()
   const [appui, setAppui] = useState(false)
+  // Les conditions et la politique de confidentialité s'acceptent en signant (Uriel, 11/10).
+  const [accepte, setAccepte] = useState(false)
   const { repere, lu } = useLuJusquauBout()
   // La Charte se signe connecté, quand elle manque au compte ; sans connexion, on la demande.
   if (!parcours.connecte) return <Navigate to="/bienvenue/email" replace />
@@ -83,15 +85,39 @@ export function Charte() {
     <Page
       bas={
         <div className={styles.signer}>
+          <label className={styles.conditions}>
+            <input
+              type="checkbox"
+              checked={accepte}
+              onChange={(e) => {
+                setAccepte(e.target.checked)
+              }}
+            />
+            <span>
+              J’accepte les{' '}
+              <a href="/legal/conditions" target="_blank" rel="noopener">
+                conditions d’utilisation
+              </a>{' '}
+              et la{' '}
+              <a href="/legal/confidentialite" target="_blank" rel="noopener">
+                politique de confidentialité
+              </a>
+              .
+            </span>
+          </label>
           <p className={styles.consigne}>
             <span className={styles.mot}>Signer</span>
-            {lu ? 'Tenir son doigt appuyé dans le cercle' : 'Lis la Charte jusqu’au bout'}
+            {!lu
+              ? 'Lis la Charte jusqu’au bout'
+              : accepte
+                ? 'Tenir son doigt appuyé dans le cercle'
+                : 'Coche la case pour signer'}
           </p>
           <button
             type="button"
             className={appui ? styles.cercleAppui : styles.cercle}
             aria-label="Signer la Charte : maintenir appuyé, ou maintenir la touche Espace"
-            disabled={!lu}
+            disabled={!lu || !accepte}
             onPointerDown={appuyer}
             onPointerUp={relacher}
             onPointerLeave={relacher}

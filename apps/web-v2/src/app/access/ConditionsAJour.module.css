@@ -1,0 +1,84 @@
+/*
+ * QUOI     — la fenêtre « Nos conditions évoluent » : une carte crème au centre, sur le parchemin.
+ */
+.voile {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: var(--space-6);
+  background: var(--color-fond) url('../../assets/ui/fond-parchemin.webp') center top / 100% auto
+    no-repeat;
+}
+
+.fenetre {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 440px;
+  padding: var(--space-6);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-surface);
+  color: var(--color-fiche-recit);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  line-height: var(--corps-leading);
+}
+
+.fenetre p {
+  margin: 0;
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.case {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  color: var(--color-encre);
+}
+
+.case input {
+  margin-top: 3px;
+  accent-color: var(--color-accent);
+}
+
+.case a {
+  color: var(--color-accent);
+}
+
+.continuer {
+  min-height: 48px;
+  border: 2px solid var(--color-accent-clair);
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bouton-tracking);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.continuer:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.alerte {
+  color: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .continuer {
+    transition: none;
+  }
+}

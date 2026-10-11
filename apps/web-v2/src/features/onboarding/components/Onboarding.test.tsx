@@ -23,6 +23,12 @@ const api = vi.hoisted(() => ({
 }))
 vi.mock('../api/entree', () => api)
 
+const conditions = vi.hoisted(() => ({
+  mesConditions: vi.fn(() => Promise.resolve(null)),
+  accepterConditions: vi.fn(() => Promise.resolve()),
+}))
+vi.mock('@/shared/supabase/conditions', () => conditions)
+
 const calendrier = vi.hoisted(() => ({
   lireCalendrier: vi.fn((): Promise<Calendrier> => Promise.resolve('chretien')),
   reglerCalendrier: vi.fn<(c: string) => Promise<void>>(() => Promise.resolve()),
@@ -55,7 +61,9 @@ function monter(depart: string) {
   return router
 }
 
+// Signer, c'est cocher l'accord aux conditions puis tenir le cercle (11/10).
 async function signerLaCharte() {
+  fireEvent.click(await screen.findByRole('checkbox', { name: /J’accepte les conditions/ }))
   const cercle = await screen.findByRole('button', { name: /Signer la Charte/ })
   fireEvent.pointerDown(cercle)
   const remplissage = cercle.querySelector('circle:last-of-type')
@@ -81,6 +89,9 @@ test('du Préambule à la bienvenue : l’e-mail, le code, puis la Charte', asyn
   api.fetchEntree.mockResolvedValue({ nom: null, numero: 4979, fragments: 2, charteSignee: true })
   await signerLaCharte()
   expect(api.signerCharte).toHaveBeenCalled()
+  await waitFor(() => {
+    expect(conditions.accepterConditions).toHaveBeenCalledWith('2026-10-11')
+  })
   expect(await screen.findByRole('heading', { name: 'Comment on t’appelle ?' })).toBeInTheDocument()
   expect(screen.getByText('Deux Fragments t’attendent')).toBeInTheDocument()
 

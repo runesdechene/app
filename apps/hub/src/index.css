@@ -1,6 +1,4 @@
-/* Fonts pour la preview live des bannières (alignées sur explore-web).
-   Réutilisables ailleurs si besoin. */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin+Condensed:wght@400;500;600;700&family=Alegreya:wght@500;600;700;800&display=swap');
+/* Les polices sont servies par le Hub lui-même (@fontsource, main.tsx) : plus de Google Fonts. */
 
 * {
   margin: 0;

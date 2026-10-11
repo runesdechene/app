@@ -8,6 +8,9 @@
  *            visiteurs, positions floutées, et l'aperçu d'un lieu par-dessus (…/lieu/<id>) ; /bienvenue/<étape> : les écrans d'entrée. Tous hors de la garde d'accès.
  */
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
+import { Conditions } from '@/features/legal/components/Conditions'
+import { Confidentialite } from '@/features/legal/components/Confidentialite'
+import { Mentions } from '@/features/legal/components/Mentions'
 import { Vitrine } from '@/features/vitrine/components/Vitrine'
 import { DaPage } from './da/DaPage'
 import { TabRoute } from './navigation/TabRoute'
@@ -58,6 +61,10 @@ export const routes: RouteObject[] = [
   },
   { path: '/bienvenue/:etape', Component: RouteOnboarding },
   // Le scan : public lui aussi, un QR du stand y mène sans compte (spec 2026-10-09-v2-scan).
+  // Les textes légaux, publics (11/10).
+  { path: '/legal/mentions', Component: Mentions },
+  { path: '/legal/confidentialite', Component: Confidentialite },
+  { path: '/legal/conditions', Component: Conditions },
   { path: '/scan', Component: RouteScan },
   { path: '/scan/fragments', Component: RouteScanFragments },
   { path: '/scan/fragment/:id', Component: RouteScanFragment },

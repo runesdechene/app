@@ -32,7 +32,11 @@ test('attente, puis la position et sa précision, qui s’affine', () => {
   act(() => {
     suivre({ coords: { latitude: 43.7, longitude: 7.2, accuracy: 340 } })
   })
-  expect(result.current).toEqual({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 340 })
+  expect(result.current).toEqual({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 340,
+  })
   act(() => {
     suivre({ coords: { latitude: 43.7, longitude: 7.2, accuracy: 8 } })
   })

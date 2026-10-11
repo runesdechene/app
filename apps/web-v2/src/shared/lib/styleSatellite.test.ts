@@ -16,7 +16,11 @@ function fausseCarte() {
 
 test('une source raster Esri World Imagery, créditée', () => {
   const source = STYLE_SATELLITE.sources['esri-satellite']
-  expect(source).toMatchObject({ type: 'raster', tileSize: 256, attribution: 'Esri, Maxar, Earthstar Geographics' })
+  expect(source).toMatchObject({
+    type: 'raster',
+    tileSize: 256,
+    attribution: 'Esri, Maxar, Earthstar Geographics',
+  })
   expect(JSON.stringify(source)).toContain('World_Imagery/MapServer/tile/{z}/{y}/{x}')
 })
 
@@ -33,6 +37,8 @@ test('le plan recharge le fond parchemin en entier (diff: false)', () => {
 })
 
 test('la vue satellite se lit sur la carte : son calque d’imagerie est là', () => {
-  expect(estSatellite({ getLayer: (id: string) => (id === 'satellite' ? { id } : undefined) })).toBe(true)
+  expect(
+    estSatellite({ getLayer: (id: string) => (id === 'satellite' ? { id } : undefined) }),
+  ).toBe(true)
   expect(estSatellite({ getLayer: () => undefined })).toBe(false)
 })

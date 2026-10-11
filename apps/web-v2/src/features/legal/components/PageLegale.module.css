@@ -1,0 +1,89 @@
+/*
+ * QUOI     — un texte légal : une colonne de lecture sur le parchemin, des titres en Bebas.
+ */
+.page {
+  min-height: 100dvh;
+  padding: var(--space-6) var(--space-6) var(--space-8);
+  background: var(--color-fond) url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto
+    no-repeat;
+  color: var(--color-encre);
+}
+
+.entete {
+  max-width: 720px;
+  margin: 0 auto var(--space-6);
+}
+
+.logo {
+  width: 180px;
+}
+
+.texte {
+  max-width: 720px;
+  margin: 0 auto;
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+.texte h1 {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.texte h2 {
+  margin: var(--space-8) 0 var(--space-2);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.texte h3 {
+  margin: var(--space-4) 0 var(--space-1);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+}
+
+.texte p,
+.texte li {
+  color: var(--color-fiche-recit);
+}
+
+.texte p {
+  margin: 0 0 var(--space-3);
+}
+
+.texte ul {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-6);
+}
+
+.texte a {
+  color: var(--color-accent);
+}
+
+.version {
+  margin-top: var(--space-1);
+  color: var(--color-texte-doux);
+  font-size: var(--sous-titre-size);
+}
+
+.autres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  max-width: 720px;
+  margin: var(--space-8) auto 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-sable);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+.autres a {
+  color: var(--color-encre);
+}

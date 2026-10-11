@@ -5,6 +5,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { MesDonnees } from './MesDonnees'
 
@@ -30,7 +31,9 @@ afterEach(() => {
 function monter() {
   render(
     <QueryClientProvider client={new QueryClient()}>
-      <MesDonnees />
+      <MemoryRouter>
+        <MesDonnees />
+      </MemoryRouter>
     </QueryClientProvider>,
   )
 }

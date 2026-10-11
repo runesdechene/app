@@ -57,9 +57,7 @@ export function renderMovementPage(photos: WallPhoto[], bgUrl: string | null = n
 <meta property="og:description" content="${escapeHtml(MANIFESTO_LEAD)}" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://app.runesdechene.com/mouvement" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin+Condensed:wght@500;600;700&family=Cabin:ital,wght@0,400;0,500;0,600;1,400&display=swap" />
+<link rel="stylesheet" href="/lieu/_static/polices.css" />
 <link rel="preconnect" href="https://ukpapqssgsxirsgmcvof.supabase.co" />
 <style>
   :root {
