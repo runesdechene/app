@@ -168,3 +168,16 @@ sans Docker ; `--linked` n'existe pas pour cette commande). Vérifier ensuite
 `curl -s -X POST <SUPABASE_URL>/functions/v1/send-push -d '{}'` → `unauthorized` (le refus de la
 fonction elle-même, faute de secret) ; un JSON « Missing authorization header » veut dire que la
 passerelle bloque encore.
+
+## La reconstruction nocturne de seo-pages échoue en silence — la regarder
+
+**Le piège** (payé de mi-septembre au 11/10/2026) : `.github/workflows/seo-nightly.yml` a échoué
+toutes les nuits sans que personne ne le voie. Fiches `/lieu/*` et sitemap figés : les lieux
+ajoutés n'avaient pas de page, `/bienvenue` n'entrait pas au sitemap. Deux causes successives :
+`pnpm/action-setup` recevait `version: 9` face au `packageManager` pnpm@10 (il refuse de
+choisir) ; puis une requête PostgREST devenue ambiguë (voir `supabase.md`).
+
+**How to apply :** après tout changement de pnpm, de Node, ou d'une table que seo-pages lit,
+`gh run list --workflow seo-nightly.yml --limit 3`, et relancer à la main
+(`gh workflow run seo-nightly.yml`) pour voir passer. Ne jamais répéter la version de pnpm
+dans un workflow : `packageManager` fait foi.

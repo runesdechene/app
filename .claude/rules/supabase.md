@@ -304,3 +304,15 @@ sans toucher `_auteur_du_chemin`. `saluer` levait « Introuvable », l'appli ret
 **How to apply :** tout nouveau type d'événement de `sur_les_chemins` → un `WHEN` dans `_auteur_du_chemin`
 (qui le salue, avec les mêmes conditions que la ligne du fil), une phrase de `salut` dans la cloche
 (`features/notifications/lib/phrase.ts`), et un test qui appelle `saluer` sur une vraie ligne.
+
+## Une nouvelle table de liaison rend ambigus les `select` imbriqués de PostgREST
+
+**Le piège** (11/10/2026) : `coeurs_mot (contribution_id, user_id)` relie elle aussi
+`place_contributions` à `users`. Le `select('… users ( first_name )')` de seo-pages a alors
+reçu PGRST201 (« more than one relationship was found ») et la génération s'est arrêtée,
+sans bruit, pendant des semaines.
+
+**How to apply :** une table qui porte deux clés étrangères vers deux tables déjà reliées crée
+un second chemin. Avant de la créer, chercher les `select` imbriqués entre ces deux tables
+(appli, Hub, seo-pages) ; dans le code, toujours nommer la clé :
+`users!place_contributions_user_id_fkey ( … )`.
