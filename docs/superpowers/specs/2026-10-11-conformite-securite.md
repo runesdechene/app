@@ -19,14 +19,18 @@
 - **Mig 495** — `search_path` figé sur les 112 SECURITY DEFINER qui n'en avaient pas.
 - Règles : `.claude/rules/supabase.md` ; tests : `supabase/tests/securite/`.
 - **Mig 496-497, Pythéas 1.21.0** — « Tes données » dans les Préférences : supprimer son compte (pierre tombale « Un Voyageur », compte de connexion supprimé, chefferie transmise), télécharger ses données (JSON).
+- **Mig 498, Pythéas 1.22.0** — textes légaux `/legal/*`, accord à l'inscription, fenêtre « Nos conditions évoluent ».
+- **Mig 499** — « Changer le rôle » du Hub passe par `changer_role` (admins seulement).
+- **Mig 500** — le mur photos de la boutique ne rend plus Instagram, ville ni code postal.
+- **Mig 501** — le Studio (`/soumettre-contenu`), cassé depuis la 347, dépose par `deposer_contenu` ;
+  les trois anciennes fonctions sont fermées à anon.
 
 ## 1. Sécurité — à faire
 
 1–5. Faits (migs 491-495, ci-dessus).
-6. **`get_community_photos_by_product`** (thème Shopify, sans compte) rend le code postal de
-   ceux qui envoient une photo : vérifier ce que le mur affiche, ne rendre que le nécessaire.
-7. **Le Hub** : « Changer le rôle » et « Réinitialiser le tutoriel » écrivent `users` en direct,
-   que la RLS refuse sans erreur — rien ne se passe. À faire passer par une RPC d'équipe.
+6. Fait (mig 500).
+7. **Le Hub** : « Réinitialiser le tutoriel » écrit `users` en direct, que la RLS refuse sans
+   erreur. Bouton de la V1 : à retirer (« Changer le rôle » : fait, mig 499).
 8. **Réglages Auth** (tableau de bord, Uriel) : protection des mots de passe divulgués, limites
    de débit, durée des sessions.
 
