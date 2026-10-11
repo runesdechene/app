@@ -3,6 +3,8 @@
  *            dernière mise à jour en entier sur une carte, les précédentes dessous, plus discrètes.
  *            Une image et un numéro de version, quand la mise à jour en a (migration 436). Sous
  *            chacune, ses cœurs et son carnet (478) : ouverts sous la dernière, repliés dessous.
+ *            Les précédentes se replient sur leur date et leur titre, pour ne pas prendre toute la
+ *            hauteur ; un toucher les déplie (Uriel, 11/10).
  * POURQUOI — on y arrive en touchant « Nouveautés d'Explore » dans la cloche. Le texte vient du
  *            Hub ; `blocsDuTexte` le met en paragraphes et en listes.
  */
@@ -38,7 +40,8 @@ export function Nouveautes() {
   return (
     <div className={styles.nouveautes}>
       <article className={styles.derniere}>
-        <MiseAJourEcrite miseAJour={derniere} premiere />
+        <Entete miseAJour={derniere} />
+        <Corps miseAJour={derniere} premiere />
         <SousMiseAJour miseAJour={derniere} depliee />
       </article>
       {precedentes.length > 0 && (
@@ -46,8 +49,15 @@ export function Nouveautes() {
           <h2 className={styles.rubrique}>Précédentes</h2>
           {precedentes.map((m) => (
             <article key={m.id} className={styles.precedente}>
-              <MiseAJourEcrite miseAJour={m} />
-              <SousMiseAJour miseAJour={m} />
+              <details className={styles.pli}>
+                <summary className={styles.sommaire}>
+                  <Entete miseAJour={m} />
+                </summary>
+                <div className={styles.deplie}>
+                  <Corps miseAJour={m} />
+                  <SousMiseAJour miseAJour={m} />
+                </div>
+              </details>
             </article>
           ))}
         </section>
@@ -56,14 +66,7 @@ export function Nouveautes() {
   )
 }
 
-// `premiere` : la dernière parue, en haut de page ; les images des précédentes attendent qu'on y descende.
-function MiseAJourEcrite({
-  miseAJour: m,
-  premiere = false,
-}: {
-  miseAJour: MiseAJour
-  premiere?: boolean
-}) {
+function Entete({ miseAJour: m }: { miseAJour: MiseAJour }) {
   return (
     <>
       <p className={styles.date}>
@@ -71,6 +74,14 @@ function MiseAJourEcrite({
         {m.version && ` · ${m.version}`}
       </p>
       <h3 className={styles.titre}>{m.titre}</h3>
+    </>
+  )
+}
+
+// `premiere` : la dernière parue, en haut de page ; les images des précédentes attendent qu'on y descende.
+function Corps({ miseAJour: m, premiere = false }: { miseAJour: MiseAJour; premiere?: boolean }) {
+  return (
+    <>
       {m.image && (
         <img
           className={styles.image}

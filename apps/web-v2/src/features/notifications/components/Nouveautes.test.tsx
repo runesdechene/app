@@ -41,7 +41,11 @@ beforeEach(() => {
       },
     ],
   })
-  api.fetchCoeursDeMiseAJour.mockResolvedValue({ total: 12, miens: 0, gens: [{ ...kelpie, nombre: 12 }] })
+  api.fetchCoeursDeMiseAJour.mockResolvedValue({
+    total: 12,
+    miens: 0,
+    gens: [{ ...kelpie, nombre: 12 }],
+  })
   api.ecrireSousMiseAJour.mockResolvedValue(undefined)
   api.basculerCoeurMotDeMiseAJour.mockResolvedValue(undefined)
   api.aimerMiseAJour.mockResolvedValue(undefined)
@@ -96,6 +100,16 @@ test('la dernière en entier, sa liste mise en forme ; les précédentes dessous
   expect(precedentes.querySelector('img')).toBeNull()
 })
 
+test('les précédentes sont repliées : leur titre, puis tout le reste d’un toucher', async () => {
+  afficher()
+  const precedentes = await screen.findByRole('region', { name: 'Précédentes' })
+  const titre = within(precedentes).getByRole('heading', { name: 'Ajouter à distance' })
+  const pli = titre.closest('details')
+  expect(pli).not.toHaveAttribute('open')
+  await userEvent.click(titre)
+  expect(pli).toHaveAttribute('open')
+})
+
 test('aucune mise à jour : on le dit', async () => {
   api.fetchMisesAJour.mockResolvedValue([])
   afficher()
@@ -115,7 +129,10 @@ test('sous la dernière : ses cœurs à volonté et son carnet, ouverts', async 
   await waitFor(() => {
     expect(api.basculerCoeurMotDeMiseAJour.mock.calls[0]?.[0]).toBe(9)
   })
-  await userEvent.type(within(carnet).getByRole('textbox', { name: 'Dis ce que tu en penses…' }), 'Bravo')
+  await userEvent.type(
+    within(carnet).getByRole('textbox', { name: 'Dis ce que tu en penses…' }),
+    'Bravo',
+  )
   await userEvent.click(within(carnet).getByRole('button', { name: 'Envoyer' }))
   await waitFor(() => {
     expect(api.ecrireSousMiseAJour).toHaveBeenCalledWith(2, 'Bravo', [], null)
@@ -137,7 +154,18 @@ test('une précédente : ses comptes, et son carnet ne se charge qu’ouvert', a
 
 test('sa propre note : on lit ses cœurs sans s’en envoyer', async () => {
   api.fetchMisesAJour.mockResolvedValue([
-    { id: 5, titre: 'Ma note', texte: 'Texte.', quand: '2026-10-11T10:00:00Z', image: null, version: null, coeurs: 12, miens: 0, mots: 0, aMoi: true },
+    {
+      id: 5,
+      titre: 'Ma note',
+      texte: 'Texte.',
+      quand: '2026-10-11T10:00:00Z',
+      image: null,
+      version: null,
+      coeurs: 12,
+      miens: 0,
+      mots: 0,
+      aMoi: true,
+    },
   ])
   afficher()
   expect(await screen.findByRole('button', { name: 'Voir les cœurs (12)' })).toBeInTheDocument()
@@ -149,7 +177,19 @@ test('l’équipe efface le mot d’un autre (mig 479)', async () => {
   api.fetchCarnetDeMiseAJour.mockResolvedValue({
     total: 1,
     mots: [
-      { id: 9, quand: '2026-10-11T10:00:00Z', texte: 'Un mot déplacé.', qui: kelpie, venu: false, photos: [], coeurs: 0, miens: 0, aMoi: false, peutEffacer: true, reponses: [] },
+      {
+        id: 9,
+        quand: '2026-10-11T10:00:00Z',
+        texte: 'Un mot déplacé.',
+        qui: kelpie,
+        venu: false,
+        photos: [],
+        coeurs: 0,
+        miens: 0,
+        aMoi: false,
+        peutEffacer: true,
+        reponses: [],
+      },
     ],
   })
   afficher()
