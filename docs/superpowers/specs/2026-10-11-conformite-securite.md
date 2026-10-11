@@ -12,23 +12,21 @@
   `public` avec `true`) ; `Public can create user accounts` permettait de se fabriquer un admin
   via `handle_new_user`. Écriture réservée à `_is_admin()`. Test : `supabase/tests/securite/489_*`.
 - **Mig 490** — deux comptes perdent le rôle admin (Uriel). Restent : Tugdual, Uriel, Mathéo, Gautier.
+- **Mig 491** — colonnes privées de `users` fermées à la lecture des rôles publics ; TRUNCATE retiré.
+- **Mig 492** — `tag-icons`, `app-assets`, `faction-patterns` : écriture réservée à l'équipe.
+- **Mig 493** — les 2 460 empreintes de mots de passe de la V1 effacées (colonne au registre de purge).
+- **Mig 494** — sans compte, 20 fonctions publiques au lieu de 250 ; les fonctions à venir naissent fermées à anon.
+- **Mig 495** — `search_path` figé sur les 112 SECURITY DEFINER qui n'en avaient pas.
+- Règles : `.claude/rules/supabase.md` ; tests : `supabase/tests/securite/`.
 
 ## 1. Sécurité — à faire
 
-1. **Colonnes privées de `users`** : un joueur connecté lit `location_zip`, `shopify_customer_id`,
-   `role`, `muted_user_ids`, `last_device_os` de tous les comptes. Retirer ces colonnes de la
-   lecture `authenticated` (vérifier d'abord ce que l'appli et le Hub lisent en direct).
-2. **Stockage** : `faction-patterns` s'écrit, se remplace et s'efface sans compte ; les seaux de
-   l'équipe (`tag-icons`, `app-assets`, `app-ads`, `app-fragments`, `home-banners`,
-   `announcement-covers`) s'écrivent par tout joueur connecté. Équipe seulement pour ceux-là ;
-   chacun son dossier pour les seaux des joueurs.
-3. **Anciens mots de passe** : `users.password` (2 460 empreintes de la V1, plus lues). Effacer
-   la colonne (vérifiée à la main).
-4. **Fonctions appelables sans compte** (250 SECURITY DEFINER) : retirer `EXECUTE` à `anon`
-   sauf la liste blanche de ce qui sert déconnecté (vitrine, carte publique, onboarding, scan,
-   thème Shopify, seo-pages par la clé serveur).
-5. **`search_path`** non figé sur 112 fonctions : `SET search_path = public, extensions`.
-6. **Réglages Auth** (tableau de bord, Uriel) : protection des mots de passe divulgués, limites
+1–5. Faits (migs 491-495, ci-dessus).
+6. **`get_community_photos_by_product`** (thème Shopify, sans compte) rend le code postal de
+   ceux qui envoient une photo : vérifier ce que le mur affiche, ne rendre que le nécessaire.
+7. **Le Hub** : « Changer le rôle » et « Réinitialiser le tutoriel » écrivent `users` en direct,
+   que la RLS refuse sans erreur — rien ne se passe. À faire passer par une RPC d'équipe.
+8. **Réglages Auth** (tableau de bord, Uriel) : protection des mots de passe divulgués, limites
    de débit, durée des sessions.
 
 ## 2. RGPD — dans l'appli
