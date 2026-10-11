@@ -40,28 +40,22 @@ apps/seo-pages/
 │   ├── build.ts               ← orchestrateur batch
 │   ├── lib/
 │   │   ├── supabase.ts        ← client (process.env + dotenv)
-│   │   ├── places.ts          ← data layer (types, queries)
-│   │   ├── slugify.ts         ← normalisation unicode → slug
-│   │   └── color.ts           ← hex → HSL, thème dynamique
+│   │   ├── places.ts          ← la liste des lieux, leurs voisins (Haversine)
+│   │   ├── fiche.ts           ← la fiche d'un lieu par la RPC fiche_lieu (celle de l'appli)
+│   │   ├── texte.ts           ← échapper, dates, « Ain (01) », images à la taille
+│   │   └── slugify.ts         ← normalisation unicode → slug
 │   ├── templates/
-│   │   ├── page.ts            ← assemblage complet (le cœur)
-│   │   ├── header.ts          ← nav transparente
-│   │   ├── gallery.ts         ← hero + thumbs + lightbox + JS
-│   │   ├── place-content.ts   ← description + contributions
-│   │   ├── contribution-card.ts
-│   │   ├── nearby-places.ts   ← grille 4 lieux proches
-│   │   ├── footer.ts
+│   │   ├── page.ts            ← assemblage, <head>, schema.org
+│   │   ├── photo.ts           ← la photo, le logo, « Ouvrir Explore » / partager
+│   │   ├── fiche.ts           ← la fiche (une ou deux colonnes), le bouton vers l'aperçu
+│   │   ├── proximite.ts       ← les 4 lieux les plus proches
+│   │   ├── pied.ts            ← le bas de page de la marque (celui de la vitrine)
+│   │   ├── movement-page.ts   ← /mouvement
 │   │   └── sitemap.ts
-│   └── styles/
-│       └── global.css         ← 760 lignes, inliné dans le HTML
-├── scripts/
-│   ├── generate-slugs.ts
-│   ├── generate-seo.ts
-│   └── process-place.ts       ← pipeline unitaire
-├── public/                    ← assets statiques
-├── package.json
-├── netlify.toml
-└── tsconfig.json
+│   └── styles/global.css      ← inliné dans chaque page
+├── public/lieu/_static/       ← images servies sous /lieu/_static/ (le domaine de l'appli relaie /lieu/*)
+├── scripts/                   ← generate-slugs, generate-seo, process-place
+└── netlify.toml
 ```
 
 ## Colonnes DB (migration 091)
@@ -72,36 +66,13 @@ apps/seo-pages/
 | `places.seo_description` | TEXT | Description Haiku |
 | `places.seo_generated_at` | TIMESTAMPTZ | Date génération |
 
-## Data layer (`src/lib/places.ts`)
+## Design — la V2 (11/10/2026)
 
-- `getPlaceBySlug(slug)` — fetch un lieu avec tags, auteur
-- `getAllPlacesWithSlugs()` — pagination 1000 rows, tags batch 300, résolution auteurs
-- `getPlaceContributions(placeId)` — type `carnet`, triées par votes_up
-- `getNearbyPlaces(lat, lon, excludeId)` — Haversine, 4 lieux + primary tag
-- `getTotalPlaceCount()` — tous les lieux publics
-- `deriveTheme(hex)` dans `color.ts` — hex → HSL → dark/deep/accent/glow
-
-## Design
-
-### Visuel
-- **Hero** : image fullscreen (88vh), fade-in depuis parchemin, nav transparente glass, tag pill colorée, titre Bebas Neue
-- **Thumbs** : bande scrollable pleine largeur, swipe tactile, lightbox clavier
-- **CTA** : icône app + compteur dynamique "2600+ lieux"
-- **Contenu** : fond parchemin, description SEO justifiée, contributions en carte carnet
-- **Nearby** : cartes portrait 3:4 avec overlay sombre
-- **Footer** : logo + texte mouvement + legal Lahoussaye EI
-
-### SEO technique
-- Schema.org : TouristAttraction + BreadcrumbList + Review
-- Open Graph + Twitter Cards
-- robots.txt, llms.txt, sitemap XML, canonical URLs
-- Preconnect Supabase CDN, fetchpriority hero
-
-### Palette
-- Parchemin : `#f7ede1` (body), `#E8D5BE` (dark)
-- Encre : `#4A3728` (text), `#7D5A3C` (light)
-- Accent : `#833434`
-- Fonts : Bebas Neue (titres), Cabin Condensed (accent), Cabin (body 18px)
+Maquettes Figma 566:614 (téléphone) et 566:752 (ordinateur), validées par Uriel : la fiche de
+l'appli, sans lisière sous la photo, un seul bouton « Découvrir ce lieu sur la carte » vers
+`/bienvenue/carte/lieu/<id>` (l'aperçu sans compte, retenu jusqu'à l'inscription), les infos
+pratiques de la V2, les lieux à proximité, le bas de page de la vitrine. Ordinateur : deux
+colonnes sur la gravure du site. Les données viennent de `fiche_lieu` : une seule source.
 
 ## Gotcha déploiement
 
@@ -119,12 +90,3 @@ apps/seo-pages/
 ## Env vars locales
 
 `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `ANTHROPIC_API_KEY` (via `.env`).
-
-## État (21 avril 2026)
-
-- ✅ 2612 pages en prod, build 26s
-- ✅ Migration Astro → Node.js terminée (8 min → 26s)
-- ✅ CSS inliné + fade-in parchemin (pas de CLS)
-- ✅ GitHub Actions nightly configuré
-- ✅ Bouton Partager en prod (PlacePanel + SEO Page header + footer) — texte éditable depuis Hub via `app_settings.share_text_template`
-- ⚠️ Sitemap pas encore soumis à Google Search Console

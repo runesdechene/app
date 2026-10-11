@@ -1,168 +1,103 @@
+/**
+ * QUOI     — la page publique d'un lieu (maquettes Figma 566:614 téléphone, 566:752 ordinateur,
+ *            validées par Uriel le 11/10) : la photo, la fiche telle que l'appli la lit, les lieux
+ *            à proximité, le bas de page de la marque. Puis tout ce que Google lit : titre,
+ *            description, Open Graph, schema.org.
+ * POURQUOI — la page d'arrivée depuis Google : elle dit le lieu et mène à son aperçu sur la
+ *            carte d'Explore, sans compte (le lieu est retenu jusqu'à l'inscription).
+ */
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Place, Contribution, NearbyPlace } from '../lib/places';
-import { deriveTheme } from '../lib/color';
-import { renderHeader } from './header';
-import { renderGallery } from './gallery';
-import { renderPlaceContent } from './place-content';
-import { renderNearbyPlaces } from './nearby-places';
-import { renderFooter } from './footer';
+import type { Place, NearbyPlace } from '../lib/places';
+import type { Fiche } from '../lib/fiche';
 import { selectBodyDescription } from '../lib/seo';
+import { echapper } from '../lib/texte';
+import { renderPhoto } from './photo';
+import { renderFiche } from './fiche';
+import { renderProximite } from './proximite';
+import { renderPied } from './pied';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const globalCss = readFileSync(join(__dirname, '..', 'styles', 'global.css'), 'utf-8');
+const css = readFileSync(join(__dirname, '..', 'styles', 'global.css'), 'utf-8');
 
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
+const SITE = 'https://app.runesdechene.com';
 
 interface RenderPageInput {
   place: Place;
-  contributions: Contribution[];
+  fiche: Fiche;
   nearby: NearbyPlace[];
-  placeCount: number;
-  shareTextTemplate: string;
+  numeros: Map<string, string>;
+  nombreDeLieux: number;
+  texteDePartage: string;
 }
 
 export function renderPage(input: RenderPageInput): string {
-  const { place, contributions, nearby, placeCount, shareTextTemplate } = input;
+  const { place, fiche, nearby, numeros, nombreDeLieux, texteDePartage } = input;
 
-  const firstImageUrl = place.images?.[0]?.url ?? null;
-  const { description: bodyDescription, isUserAuthored } = selectBodyDescription(place.text, place.seo_description);
-  const metaDescription = (bodyDescription || '').slice(0, 155);
-  const canonicalUrl = `https://app.runesdechene.com/lieu/${place.slug}`;
-  const tagLabel = place.primaryTag?.title ?? 'Lieu';
-  const title = `${place.title} — Runes de Chêne`;
-  const ogImage = firstImageUrl || '/og-default.png';
-
-  const color = place.primaryTag?.color || '#C19A6B';
-  const bg = place.primaryTag?.background || '#F5E6D3';
-  const theme = deriveTheme(color);
-
-  const reviews = contributions
-    .filter(c => c.content && c.content.length > 20)
-    .map(c => ({
-      '@type': 'Review',
-      author: { '@type': 'Person', name: c.user_name },
-      datePublished: c.created_at.slice(0, 10),
-      reviewBody: c.content.slice(0, 300),
-    }));
+  const { description: recit } = selectBodyDescription(fiche.recit || place.text, place.seo_description);
+  const metaDescription = (recit ?? '').replace(/\s+/g, ' ').slice(0, 155);
+  const url = `${SITE}/lieu/${place.slug}`;
+  const ou = place.departement ?? place.pays;
+  const title = `${place.title}${ou ? `, ${ou}` : ''} — Runes de Chêne Explore`;
+  const image = fiche.photos[0]?.url ?? place.images[0]?.url ?? null;
 
   const schemaOrg = {
     '@context': 'https://schema.org',
     '@type': 'TouristAttraction',
     name: place.title,
     description: metaDescription,
-    address: place.address || undefined,
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: place.latitude,
-      longitude: place.longitude,
-    },
-    image: place.images?.map(img => img.url).filter(Boolean) || undefined,
-    url: canonicalUrl,
+    address: fiche.adresse ?? undefined,
+    geo: { '@type': 'GeoCoordinates', latitude: place.latitude, longitude: place.longitude },
+    image: fiche.photos.map((p) => p.url),
+    url,
     isAccessibleForFree: true,
-    touristType: 'Nature & Heritage',
-    ...(reviews.length > 0 && { review: reviews }),
-    ...(place.author_name && { creator: { '@type': 'Person', name: place.author_name } }),
+    ...(fiche.auteur && { creator: { '@type': 'Person', name: fiche.auteur.nom } }),
   };
-
-  const breadcrumbSchema = {
+  const filAriane = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Runes de Chêne', item: 'https://app.runesdechene.com' },
-      { '@type': 'ListItem', position: 2, name: tagLabel, item: `https://app.runesdechene.com/lieu?tag=${encodeURIComponent(tagLabel.toLowerCase())}` },
-      { '@type': 'ListItem', position: 3, name: place.title },
+      { '@type': 'ListItem', position: 1, name: 'Runes de Chêne Explore', item: `${SITE}/bienvenue` },
+      { '@type': 'ListItem', position: 2, name: place.title },
     ],
   };
-
-  const sectionLabel = bodyDescription
-    ? `<div class="section-label">À propos de ${escapeHtml(place.title)}</div>`
-    : '';
 
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#f7ede1" />
-  <meta name="author" content="Runes de Chêne" />
+  <meta name="theme-color" content="#fcf3e4" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin+Condensed:wght@400;500;600;700&family=Cabin:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin:ital,wght@0,400;0,600;0,700;1,400&display=swap" />
   <link rel="preconnect" href="https://ukpapqssgsxirsgmcvof.supabase.co" />
-  <link rel="dns-prefetch" href="https://ukpapqssgsxirsgmcvof.supabase.co" />
   <link rel="icon" type="image/png" href="https://rdc-seo-pages.netlify.app/app-icon.png" />
-  <title>${escapeHtml(title)}</title>
-  <meta name="description" content="${escapeHtml(metaDescription)}" />
-  <link rel="canonical" href="${canonicalUrl}" />
-
-  <meta property="og:title" content="${escapeHtml(title)}" />
-  <meta property="og:description" content="${escapeHtml(metaDescription)}" />
-  <meta property="og:image" content="${escapeHtml(ogImage)}" />
-  <meta property="og:url" content="${canonicalUrl}" />
+  <title>${echapper(title)}</title>
+  <meta name="description" content="${echapper(metaDescription)}" />
+  <link rel="canonical" href="${url}" />
+  <meta property="og:title" content="${echapper(title)}" />
+  <meta property="og:description" content="${echapper(metaDescription)}" />
+  ${image ? `<meta property="og:image" content="${echapper(image)}" />` : ''}
+  <meta property="og:url" content="${url}" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="fr_FR" />
   <meta property="og:site_name" content="Runes de Chêne" />
-
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="${escapeHtml(title)}" />
-  <meta name="twitter:description" content="${escapeHtml(metaDescription)}" />
-  <meta name="twitter:image" content="${escapeHtml(ogImage)}" />
-
   <script type="application/ld+json">${JSON.stringify(schemaOrg)}</script>
-  <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
-
+  <script type="application/ld+json">${JSON.stringify(filAriane)}</script>
   <style>
-${globalCss}
-    :root {
-      --tag-color: ${color};
-      --tag-bg: ${bg};
-      --tag-dark: ${theme.tagDark};
-      --tag-deep: ${theme.tagDeep};
-      --tag-accent: ${theme.tagAccent};
-      --tag-glow: ${theme.tagGlow};
-      --tag-border: ${theme.tagBorder};
-    }
+${css}
   </style>
 </head>
 <body>
-  ${renderHeader({ placeName: place.title, placeSlug: place.slug, shareTextTemplate })}
-  ${renderGallery({
-    images: place.images,
-    title: place.title,
-    address: place.address,
-    authorName: place.author_name,
-    primaryTag: place.primaryTag,
-    placeCount,
-    breadcrumbTag: tagLabel,
-  })}
-
-  <div class="body-tint">
-    <div class="content">
-      ${sectionLabel}
-      ${renderPlaceContent({
-        description: bodyDescription,
-        descriptionByAuthor: isUserAuthored,
-        authorName: place.author_name,
-        authorAvatar: place.author_avatar,
-        accessibility: place.accessibility,
-        contributions,
-        placeName: place.title,
-        placeSlug: place.slug,
-        shareTextTemplate,
-      })}
-    </div>
-
-    ${renderNearbyPlaces(nearby)}
-    ${renderFooter()}
-  </div>
+  ${renderPhoto({ nom: place.title, photos: fiche.photos, texteDePartage, url })}
+  <main class="contenu">
+    ${renderFiche({ place, fiche, recit, numeros, nombreDeLieux })}
+    ${renderProximite(nearby, numeros)}
+  </main>
+  ${renderPied()}
 </body>
 </html>`;
 }

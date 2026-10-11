@@ -39,6 +39,8 @@ export interface Place {
   author_avatar: string | null;
   tags: PlaceTag[];
   primaryTag: PlaceTag | null;
+  departement: string | null;
+  pays: string | null;
 }
 
 export interface Contribution {
@@ -61,7 +63,7 @@ export async function getPlaceBySlug(slug: string): Promise<Place | null> {
   const { data, error } = await supabase
     .from('places')
     .select(`
-      id, title, text, slug, address, latitude, longitude,
+      id, title, text, slug, address, latitude, longitude, departement, pays,
       images, accessibility, sensible, seo_description, author_id,
       place_types!inner ( id, title, color, images )
     `)
@@ -125,6 +127,8 @@ export async function getPlaceBySlug(slug: string): Promise<Place | null> {
     author_avatar: authorAvatar,
     tags,
     primaryTag: primary,
+    departement: data.departement ?? null,
+    pays: data.pays ?? null,
   };
 }
 
@@ -148,7 +152,7 @@ export async function getAllPlacesWithSlugs(): Promise<Place[]> {
     const { data, error } = await supabase
       .from('places')
       .select(`
-        id, title, text, slug, address, latitude, longitude,
+        id, title, text, slug, address, latitude, longitude, departement, pays,
         images, accessibility, sensible, seo_description, author_id,
         place_types!inner ( id, title, color, images )
       `)
@@ -228,6 +232,8 @@ export async function getAllPlacesWithSlugs(): Promise<Place[]> {
       author_avatar: authorMap.get(row.author_id)?.avatar ?? null,
       tags,
       primaryTag: primary,
+      departement: row.departement ?? null,
+      pays: row.pays ?? null,
     };
   });
 }
@@ -267,6 +273,8 @@ export interface NearbyPlace {
   slug: string;
   images: PlaceImage[];
   primaryTag: PlaceTag | null;
+  region: string | null;
+  distanceKm: number;
 }
 
 export async function getNearbyPlaces(
@@ -278,7 +286,7 @@ export async function getNearbyPlaces(
   const { data, error } = await supabase
     .from('places')
     .select(`
-      id, title, slug, images, latitude, longitude
+      id, title, slug, images, latitude, longitude, departement, pays
     `)
     .not('slug', 'is', null)
     .neq('id', excludeId)
@@ -331,6 +339,8 @@ export async function getNearbyPlaces(
     slug: row.slug,
     images: row.images ?? [],
     primaryTag: tagMap.get(row.id) ?? null,
+    region: row.departement || row.pays || null,
+    distanceKm: row.distance,
   }));
 }
 

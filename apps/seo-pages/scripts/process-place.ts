@@ -5,7 +5,8 @@ import { createClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
 
-import { getPlaceBySlug, getPlaceContributions, getNearbyPlaces, getTotalPlaceCount } from '../src/lib/places';
+import { getPlaceBySlug, getNearbyPlaces, getTotalPlaceCount } from '../src/lib/places';
+import { getFiche, getNumerosDepartements } from '../src/lib/fiche';
 import { getShareTextTemplate } from '../src/lib/appSettings';
 import { slugify } from '../src/lib/slugify';
 import { renderPage } from '../src/templates/page';
@@ -138,15 +139,15 @@ export async function processPlace(placeId: string): Promise<string> {
   const place = await getPlaceBySlug(slug);
   if (!place) throw new Error(`Place with slug ${slug} not found after processing`);
 
-  const [contributions, nearby, totalCount, shareTextTemplate] = await Promise.all([
-    getPlaceContributions(place.id),
+  const [fiche, nearby, nombreDeLieux, texteDePartage, numeros] = await Promise.all([
+    getFiche(place.id),
     getNearbyPlaces(place.latitude, place.longitude, place.id),
     getTotalPlaceCount(),
     getShareTextTemplate(),
+    getNumerosDepartements(),
   ]);
 
-  const placeCount = Math.floor(totalCount / 100) * 100;
-  const html = renderPage({ place, contributions, nearby, placeCount, shareTextTemplate });
+  const html = renderPage({ place, fiche, nearby, numeros, nombreDeLieux, texteDePartage });
 
   const dir = join(DIST, 'lieu', slug);
   await mkdir(dir, { recursive: true });

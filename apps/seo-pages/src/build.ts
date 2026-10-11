@@ -1,7 +1,8 @@
 import { mkdir, writeFile, cp, rm } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getAllPlacesWithSlugs, getPlaceContributions, getNearbyPlaces, getTotalPlaceCount } from './lib/places';
+import { getAllPlacesWithSlugs, getNearbyPlaces, getTotalPlaceCount } from './lib/places';
+import { getFiche, getNumerosDepartements } from './lib/fiche';
 import { getShareTextTemplate, getLandingImageUrl } from './lib/appSettings';
 import { renderPage } from './templates/page';
 import { renderSitemap } from './templates/sitemap';
@@ -19,12 +20,12 @@ async function build() {
 
   console.log('Fetching places...');
 
-  const [places, totalCount, shareTextTemplate] = await Promise.all([
+  const [places, nombreDeLieux, texteDePartage, numeros] = await Promise.all([
     getAllPlacesWithSlugs(),
     getTotalPlaceCount(),
     getShareTextTemplate(),
+    getNumerosDepartements(),
   ]);
-  const placeCount = Math.floor(totalCount / 100) * 100;
 
   console.log(`${places.length} places loaded. Generating HTML...`);
 
@@ -38,12 +39,12 @@ async function build() {
   for (let i = 0; i < places.length; i += BATCH) {
     const batch = places.slice(i, i + BATCH);
     await Promise.all(batch.map(async (place) => {
-      const [contributions, nearby] = await Promise.all([
-        getPlaceContributions(place.id),
+      const [fiche, nearby] = await Promise.all([
+        getFiche(place.id),
         getNearbyPlaces(place.latitude, place.longitude, place.id),
       ]);
 
-      const html = renderPage({ place, contributions, nearby, placeCount, shareTextTemplate });
+      const html = renderPage({ place, fiche, nearby, numeros, nombreDeLieux, texteDePartage });
       const dir = join(DIST, 'lieu', place.slug);
       await mkdir(dir, { recursive: true });
       await writeFile(join(dir, 'index.html'), html, 'utf-8');
