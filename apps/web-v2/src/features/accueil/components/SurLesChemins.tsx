@@ -7,7 +7,8 @@
  *            un lieu sa fiche — dans l'Accueil, qui reste derrière. Cinq lignes ; « Voir toute
  *            l'activité » ouvre le fil entier dans le tiroir (Uriel, 29/09) ; sans salut, le cœur est seul (un « 0 » découragerait). Le cœur plutôt
  *            que la feuille de chêne : compris de tous (Uriel, 28/09). On salue à volonté : chaque
- *            toucher fait s'envoler un petit cœur, pour qu'une rafale devienne une armée.
+ *            toucher fait s'envoler un petit cœur, pour qu'une rafale devienne une armée. Sous le
+ *            titre, le filtre Lieux · Gens · Énigmes (Uriel, 11/10).
  */
 import { Link } from 'react-router'
 import cheminArrivee from '@/assets/ui/chemin-arrivee.svg'
@@ -21,7 +22,10 @@ import sectionChemins from '@/assets/ui/section-chemins.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import type { Chemin } from '../api/lireAccueil'
 import { useChemins } from '../hooks/useAccueil'
+import { useFamilles } from '../hooks/useFamilles'
 import { useSaluer } from '../hooks/useSaluer'
+import { filtrerChemins } from '../lib/familles'
+import { FiltreDesChemins } from './FiltreDesChemins'
 import { ilYA } from '@/shared/lib/ilYA'
 import { BilleType } from '@/shared/ui/BilleType'
 import { useEnvols } from '@/shared/hooks/useEnvols'
@@ -55,15 +59,18 @@ const D_ABORD = 5
 
 export function SurLesChemins() {
   const { chemins } = useChemins()
+  const { allumees, basculer } = useFamilles()
   if (!chemins || chemins.length === 0) return null
+  const montres = filtrerChemins(chemins, allumees)
   return (
     <section className={styles.chemins} aria-label="Sur les chemins">
       <h2 className={styles.rubrique}>
         <img className={styles.icone} src={sectionChemins} alt="" />
         Sur les chemins
       </h2>
-      <FilDesChemins chemins={chemins.slice(0, D_ABORD)} />
-      {chemins.length > D_ABORD && (
+      <FiltreDesChemins allumees={allumees} onBasculer={basculer} />
+      <FilDesChemins chemins={montres.slice(0, D_ABORD)} />
+      {montres.length > D_ABORD && (
         <Link className={styles.tout} to="/accueil/chemins">
           Voir toute l’activité
         </Link>

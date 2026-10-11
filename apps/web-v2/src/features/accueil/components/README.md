@@ -6,3 +6,4 @@ Supabase (ESLint le refuse) : les données arrivent par `../hooks/`, qui passe p
 - `AccueilScreen` — la page : Nouvelles de la marque (vers la boutique), Ajoutés récemment
   (les cartes de lieu partagées, dans un carrousel).
 - `SurLesChemins` — le fil de la communauté et ses saluts (feuille de chêne).
+- `FiltreDesChemins` — Lieux · Gens · Énigmes, à allumer ou éteindre, sous le titre du fil.

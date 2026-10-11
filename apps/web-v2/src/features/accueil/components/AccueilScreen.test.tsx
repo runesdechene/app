@@ -37,6 +37,7 @@ const VISITE = {
 }
 
 beforeEach(() => {
+  window.localStorage.clear()
   api.fetchBanniere.mockResolvedValue({
     image: 'celtes.jpg',
     titre: 'Les Mystères Celtes',
@@ -335,4 +336,22 @@ test('l’emplacement de la nouveauté se pose sous la bannière, avant les lieu
   const carte = screen.getByText('La carte des Nouveautés')
   const ajoutes = await screen.findByRole('region', { name: 'Ajoutés récemment' })
   expect(carte.compareDocumentPosition(ajoutes) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+})
+
+test('le filtre du fil : on éteint les énigmes, elles partent ; le choix est gardé', async () => {
+  const romaine = { id: 'romaine', nom: 'Romaine', couleur: '#a94842', icone: null }
+  api.fetchChemins.mockResolvedValue([
+    VISITE,
+    { ...VISITE, id: 'enigme:u7:a', type: 'enigme', lieu: null, culture: romaine, nombre: 1, qui: { ...LUNA, id: 'u7', nom: 'Aelis' } },
+  ])
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  expect(within(fil).getByText(/a percé une énigme/)).toBeInTheDocument()
+  const enigmes = screen.getByRole('button', { name: 'Énigmes' })
+  expect(enigmes).toHaveAttribute('aria-pressed', 'true')
+  await userEvent.click(enigmes)
+  expect(screen.getByRole('button', { name: 'Énigmes' })).toHaveAttribute('aria-pressed', 'false')
+  expect(within(fil).queryByText(/a percé une énigme/)).not.toBeInTheDocument()
+  expect(within(fil).getByText(/a visité/)).toBeInTheDocument()
+  expect(window.localStorage.getItem('explore-v2:chemins:familles')).toBe('["lieux","gens"]')
 })

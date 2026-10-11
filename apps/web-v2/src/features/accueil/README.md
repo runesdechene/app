@@ -11,7 +11,10 @@ cœur, à volonté —, puis les Grands Explorateurs du mois (mig 377).
 
 - `api/` — `accueil.ts` (les appels) et `lireAccueil.ts` (la forme de leurs réponses).
 - `hooks/` — `useAccueil` (les lectures, sous la clé `['accueil']`) et `useSaluer` (un cœur de
-  plus à chaque toucher ; le fil se relit à la fin de la rafale).
-- `lib/` — `romain` (le rang en chiffres romains).
+  plus à chaque toucher ; le fil se relit à la fin de la rafale) ; `useFamilles` (le filtre du fil,
+  gardé sur l'appareil).
+- `lib/` — `romain` (le rang en chiffres romains), `familles` (Lieux · Gens · Énigmes : la famille de
+  chaque ligne du fil, une famille au moins allumée).
 - `components/` — `AccueilScreen` (la page et la rangée des Ajoutés), `Banniere`,
-  `PresDeToi`, `SurLesChemins` (le fil et ses saluts) et `GrandsExplorateurs`.
+  `PresDeToi`, `SurLesChemins` (le fil et ses saluts), `FiltreDesChemins` (ses trois pastilles) et
+  `GrandsExplorateurs`.
