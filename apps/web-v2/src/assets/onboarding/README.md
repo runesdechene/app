@@ -6,7 +6,6 @@ et passées en WebP. Pour remplacer une image : écraser le fichier **sous le m�
 | Fichier                     | Où il s'affiche                                                       |
 | --------------------------- | --------------------------------------------------------------------- |
 | `photo-accueil.webp`        | premier écran : les deux voyageurs face aux montagnes (cadrée à 66 %) |
-| `bord-dechire.webp`         | premier écran : la lisière déchirée du parchemin, sur le bas de photo |
 | `logo-clair.webp`           | premier écran : le logo Runes de Chêne en clair, sur la photo         |
 | `embleme.webp`              | Préambule : l'emblème, au-dessus du titre                             |
 | `charte.webp`               | Charte : le voyageur encapuchonné                                     |
