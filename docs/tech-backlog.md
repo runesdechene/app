@@ -135,3 +135,7 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 - [ ] **Sous une note** : pas de rangée de visages (seul l'auteur ouvre la liste des cœurs) ; la feuille des cœurs s'ouvre sans adresse (le retour quitte la page) ; un carnet qui ne se charge pas ne dit rien.
 - [ ] **Sur un lieu** : l'équipe n'y voit toujours « Effacer » que sur ses mots (`_mot` ne rend pas `peutEffacer`), alors que `effacer_mot` l'autorise.
 - [ ] **Essai** : pas encore vu en largeur téléphone ni avec un vrai mot écrit en prod (pour ne pas notifier les admins) — le premier commentaire réel fera foi.
+
+## Test instable (11/10/2026)
+
+- [ ] `features/scan/hooks/useAnalyse.test.tsx` « une analyse qui échoue en cours de route (contexte GPU perdu) » a échoué une fois sur la suite complète, puis passé seul trois fois et sur la suite suivante : une course de minuterie sous charge à rendre déterministe.
