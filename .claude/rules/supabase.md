@@ -316,3 +316,21 @@ sans bruit, pendant des semaines.
 un second chemin. Avant de la créer, chercher les `select` imbriqués entre ces deux tables
 (appli, Hub, seo-pages) ; dans le code, toujours nommer la clé :
 `users!place_contributions_user_id_fkey ( … )`.
+
+## Sécurité — les règles posées par l'audit du 11/10/2026 (migs 489-495)
+
+**Le piège** : des politiques « Service role can manage … » écrites `FOR ALL TO public USING
+(true)` ouvraient l'écriture de 8 tables à la clé anon (le service_role passe outre la RLS : il
+n'en a jamais besoin) ; `Public can create user accounts` laissait fabriquer un admin ; 250
+fonctions SECURITY DEFINER s'appelaient sans compte par le EXECUTE que Postgres donne à PUBLIC.
+
+**How to apply :**
+- Jamais de politique `true` en écriture pour `public`, `anon` ou `authenticated` : l'équipe,
+  c'est `public._is_admin()` ; un joueur, c'est sa ligne (`auth.uid()`).
+- Une fonction naît fermée à anon (droits par défaut, mig 494) : une fonction qui doit servir
+  sans compte (vitrine, carte des visiteurs, thème Shopify) se déclare `GRANT EXECUTE … TO anon`.
+- Toute SECURITY DEFINER porte `SET search_path TO 'public'` (ou `public, extensions`).
+- Une colonne privée de `users` (code postal, Shopify, appareil, connexions) ne se rouvre pas à
+  la lecture des rôles publics : passer par une RPC qui ne rend que ce qui est dû.
+- Les tests de sécurité vivent dans `supabase/tests/securite/` : les rejouer après toute
+  migration qui touche aux politiques ou aux droits.
