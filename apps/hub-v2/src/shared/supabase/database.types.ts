@@ -7904,6 +7904,10 @@ export type Database = {
       }
       herald_grade_promotions: { Args: never; Returns: undefined }
       histoire_du_lieu: { Args: { p_id: string }; Returns: Json }
+      hub_activer_enigme: {
+        Args: { p_active: boolean; p_id: number }
+        Returns: undefined
+      }
       hub_compagnie: { Args: { p_id: string }; Returns: Json }
       hub_compagnies: { Args: never; Returns: Json }
       hub_compte: { Args: { p_id: string }; Returns: Json }
@@ -7918,6 +7922,34 @@ export type Database = {
           p_tri?: string
         }
         Returns: Json
+      }
+      hub_enigme: { Args: { p_id: number }; Returns: Json }
+      hub_enigmes: {
+        Args: {
+          p_actives?: string
+          p_culture?: string
+          p_decalage?: number
+          p_difficulte?: string
+          p_limite?: number
+          p_recherche?: string
+        }
+        Returns: Json
+      }
+      hub_enregistrer_enigme: {
+        Args: {
+          p_active: boolean
+          p_choix: Json
+          p_culture: string
+          p_difficulte: string
+          p_explication: string
+          p_format: string
+          p_id: number
+          p_question: string
+          p_recit: string
+          p_reponse: string
+          p_variantes: string[]
+        }
+        Returns: number
       }
       hub_est_admin: { Args: never; Returns: boolean }
       hub_lieux: {
