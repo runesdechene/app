@@ -1,0 +1,67 @@
+/*
+ * QUOI     — la liste des cultures, l'icône teintée, la carte des cercles et ses lignes.
+ */
+.ligne {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--duree-douce) var(--courbe-douce);
+}
+.ligne:hover { background: var(--color-surface); }
+
+.icone {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background-color: var(--couleur, var(--color-texte-pale));
+  mask-image: var(--icone, none);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
+.nom {
+  display: grid;
+  color: var(--color-encre);
+}
+
+.nom span {
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.apercu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.carte {
+  height: 360px;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-petit);
+}
+
+.cercles {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.unCercle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.unCercle input[type='range'] {
+  flex: 1;
+  min-width: 120px;
+}
