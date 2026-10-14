@@ -84,7 +84,7 @@ Le mot "expédition" dans le code de veille est une scorie de cette falsificatio
 
 ## Tout écran du Hub se conçoit, il ne se copie pas
 
-Tout nouvel écran du Hub (`apps/hub`) se conçoit, il ne se copie pas. Charger
+Tout nouvel écran du Hub (`apps/hub-v2`) se conçoit, il ne se copie pas. Charger
 `frontend-design` avant d'écrire le composant, au même titre que pour la boutique.
 
 **Why :** j'ai livré l'écran « Fragments audio » en copiant `ShopifyUnlocks.tsx` —
