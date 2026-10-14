@@ -3,7 +3,7 @@
  * POURQUOI — MapLibre dessine des polygones, pas des cercles en kilomètres : on les approche à la main
  *            (1° de latitude = 111,32 km ; la longitude se resserre avec la latitude).
  */
-export type Cercle = { lat: number; lng: number; rayon_km: number }
+import type { Cercle } from '@/shared/cultures/api'
 
 const POINTS = 64
 export const KM_PAR_DEGRE = 111.32

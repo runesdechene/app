@@ -12,6 +12,16 @@ import { lireFragments, synchroniserFragments } from '../api/fragments'
 import { recalculerEmpreintes } from '../api/scan'
 import { lireIllustrations } from '../api/shopify'
 
+type Echec = { nom: string; cause: string }
+
+const message = (e: unknown) => (e instanceof Error ? e.message : String(e))
+
+// « Hoplite, Loup (image refusée) » : les Fragments qui partagent une cause la disent une seule fois.
+function echecsEnPhrase(echecs: Echec[]): string {
+  const causes = [...new Set(echecs.map((e) => e.cause))]
+  return causes.map((cause) => `${echecs.filter((e) => e.cause === cause).map((e) => e.nom).join(', ')} (${cause})`).join(' ; ')
+}
+
 export function useSynchroFragments() {
   const client = useQueryClient()
   const [enCours, setEnCours] = useState(false)
@@ -23,29 +33,45 @@ export function useSynchroFragments() {
     setErreur(null)
     setCompteRendu(null)
     try {
-      const mis = await synchroniserFragments(await lireIllustrations())
+      let illustrations
+      try {
+        illustrations = await lireIllustrations()
+      } catch (e) {
+        setErreur(`Shopify ne répond pas : ${message(e)}`)
+        return
+      }
+      const mis = await synchroniserFragments(illustrations)
       void client.invalidateQueries({ queryKey: ['hub-illustrations'] })
-      // Relus à neuf : la synchro a pu changer les images à calculer (et rafraîchit la liste affichée).
-      const fragments = await client.query({ queryKey: ['hub-fragments'], queryFn: lireFragments, staleTime: 0 })
+      // La base est à jour : la liste affichée se rafraîchit, même si la relecture ci-dessous échoue.
+      void client.invalidateQueries({ queryKey: ['hub-fragments'] })
       const debut = `${String(mis)} ${pluriel(mis, 'Fragment')} mis à jour depuis Shopify`
+      setCompteRendu(debut)
+      let fragments
+      try {
+        // Relus à neuf : la synchro a pu changer les images à calculer.
+        fragments = await client.query({ queryKey: ['hub-fragments'], queryFn: lireFragments, staleTime: 0 })
+      } catch (e) {
+        setErreur(`Les Fragments sont synchronisés, mais la liste n’a pas pu être relue : ${message(e)}`)
+        return
+      }
       const visibles = fragments.filter((f) => f.visible)
-      const echecs: string[] = []
+      const echecs: Echec[] = []
       for (const [i, fragment] of visibles.entries()) {
         setCompteRendu(`${debut} · empreintes de scan : ${String(i)} / ${String(visibles.length)}…`)
         try {
           await recalculerEmpreintes(fragment)
-        } catch {
-          echecs.push(fragment.name)
+        } catch (e) {
+          echecs.push({ nom: fragment.name, cause: message(e) })
         }
       }
       setCompteRendu(
         echecs.length === 0
           ? `${debut} · empreintes de scan recalculées`
-          : `${debut} · empreintes de scan : ${String(visibles.length - echecs.length)} / ${String(visibles.length)}, échec pour ${echecs.join(', ')}`,
+          : `${debut} · empreintes de scan : ${String(visibles.length - echecs.length)} / ${String(visibles.length)}, échec pour ${echecsEnPhrase(echecs)}`,
       )
       void client.invalidateQueries({ queryKey: ['hub-scans'] })
     } catch (e) {
-      setErreur(e instanceof Error ? e.message : String(e))
+      setErreur(message(e))
     } finally {
       setEnCours(false)
     }

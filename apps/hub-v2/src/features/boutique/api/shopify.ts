@@ -109,6 +109,9 @@ export async function lireIllustrations(): Promise<Illustration[]> {
   if (metaobjects.pageInfo.hasNextPage) {
     throw new Error('Plus de 100 Illustrations dans Shopify : la synchro ne lit que les 100 premières')
   }
+  if (metaobjects.nodes.length === 0) {
+    throw new InventaireVide(`Aucune Illustration retournée par Shopify (type « ${TYPE_ILLUSTRATION} ») : le type a-t-il changé ?`)
+  }
   return metaobjects.nodes.map(({ handle, displayName, fields }) => ({
     handle,
     nom: lire(fields, 'nom') || displayName,

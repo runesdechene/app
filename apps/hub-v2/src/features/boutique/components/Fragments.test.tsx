@@ -90,7 +90,7 @@ test('un échec de calcul n’arrête pas les autres et nomme le Fragment', asyn
   api.recalculerEmpreintes.mockImplementation((f: Fragment) => (f.id === 1 ? Promise.reject(new Error('image refusée')) : Promise.resolve(4)))
   afficher()
   await userEvent.click(await screen.findByRole('button', { name: 'Synchroniser depuis Shopify' }))
-  expect(await screen.findByText('2 Fragments mis à jour depuis Shopify · empreintes de scan : 1 / 2, échec pour Hoplite')).toBeInTheDocument()
+  expect(await screen.findByText('2 Fragments mis à jour depuis Shopify · empreintes de scan : 1 / 2, échec pour Hoplite (image refusée)')).toBeInTheDocument()
   expect(api.recalculerEmpreintes).toHaveBeenCalledTimes(2)
 })
 
@@ -120,4 +120,25 @@ test('tout est trié quand chaque motif est un Fragment', async () => {
   api.lireIllustrations.mockResolvedValue([motif('hoplite', '')])
   afficher()
   expect(await screen.findByText('Tout est trié : chaque Illustration de Shopify est un Fragment.')).toBeInTheDocument()
+})
+
+test('un inventaire Shopify vide est une panne lisible, pas « 0 mis à jour »', async () => {
+  const { InventaireVide } = await vi.importActual<typeof import('../api/shopify')>('../api/shopify')
+  api.lireIllustrations.mockRejectedValue(new InventaireVide('Aucune Illustration retournée par Shopify'))
+  afficher()
+  await userEvent.click(await screen.findByRole('button', { name: 'Synchroniser depuis Shopify' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Aucune Illustration retournée par Shopify')
+  expect(api.synchroniserFragments).not.toHaveBeenCalled()
+})
+
+test('synchro réussie mais relecture en échec : dit ce qui est fait, ce n’est pas une panne Shopify', async () => {
+  api.synchroniserFragments.mockResolvedValue(2)
+  afficher()
+  await userEvent.click(await screen.findByRole('button', { name: 'Synchroniser depuis Shopify' }))
+  await screen.findByRole('button', { name: 'Synchroniser depuis Shopify' })
+  api.lireFragments.mockRejectedValue(new Error('base HS'))
+  await userEvent.click(screen.getByRole('button', { name: 'Synchroniser depuis Shopify' }))
+  const alerte = await screen.findByText(/n’a pas pu être relue : base HS/)
+  expect(alerte).toHaveTextContent('Les Fragments sont synchronisés')
+  expect(alerte).not.toHaveTextContent('Shopify ne répond pas')
 })

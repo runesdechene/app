@@ -6,7 +6,8 @@
  */
 import { useEffect, useRef } from 'react'
 import { maplibregl, STYLE_DE_CARTE } from '@/shared/lib/maplibre'
-import { cercleEnPolygone, KM_PAR_DEGRE, type Cercle } from '../lib/cercle'
+import type { Cercle } from '@/shared/cultures/api'
+import { cercleEnPolygone, KM_PAR_DEGRE } from '../lib/cercle'
 import styles from './Cultures.module.css'
 
 type Eveil = { lat: number; lng: number }

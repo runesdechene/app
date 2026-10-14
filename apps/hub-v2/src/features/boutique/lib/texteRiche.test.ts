@@ -7,3 +7,7 @@ test('un texte simple passe tel quel, rien donne rien', () => {
   expect(texteRiche('Déjà simple')).toBe('Déjà simple')
   expect(texteRiche(null)).toBe('')
 })
+test('un JSON qui n’est pas du texte riche passe tel quel', () => {
+  expect(texteRiche('2026')).toBe('2026')
+  expect(texteRiche('null')).toBe('null')
+})

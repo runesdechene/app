@@ -65,7 +65,7 @@ export function Fragments() {
       />
       <OngletsFragments />
       {synchro.compteRendu && <p className={styles.calme} role="status">{synchro.compteRendu}</p>}
-      {synchro.erreur && <p className={styles.erreur} role="alert">{`Shopify ne répond pas : ${synchro.erreur}`}</p>}
+      {synchro.erreur && <p className={styles.erreur} role="alert">{synchro.erreur}</p>}
       {isError && <p className={styles.erreur} role="alert">La base ne répond pas.</p>}
       {fragments && <Bloc>{fragments.map((f) => <LigneDeFragment key={f.id} fragment={f} aFilmer={aFilmer(f)} />)}</Bloc>}
       <MotifsSansFragment />
