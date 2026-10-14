@@ -1,7 +1,7 @@
 /**
  * QUOI     — l'écran d'ouverture du Hub (maquettes 587:761, 597:1365) : en-tête, pouls, ce qui
  *            t'attend, la santé, le fil d'activité.
- * POURQUOI — la période est dans l'adresse (?periode=30) : tout état navigable est une URL.
+ * POURQUOI — la période est dans l'adresse (?periode=mois) : tout état navigable est une URL.
  */
 import { useSearchParams } from 'react-router'
 import type { Periode } from '../api/ouverture'
@@ -13,12 +13,12 @@ import { Pouls } from './Pouls'
 import { Sante } from './Sante'
 import styles from './Ouverture.module.css'
 
-const VALIDES: Periode[] = ['1', '7', '30', '90']
+const VALIDES: Periode[] = ['jour', 'semaine', 'mois', 'toujours']
 
 export function Ouverture() {
   const [params, setParams] = useSearchParams()
   const brute = params.get('periode')
-  const periode: Periode = VALIDES.find((p) => p === brute) ?? '7'
+  const periode: Periode = VALIDES.find((p) => p === brute) ?? 'semaine'
   const { data, isError, refetch } = useOuverture(periode)
   const maintenant = new Date()
 

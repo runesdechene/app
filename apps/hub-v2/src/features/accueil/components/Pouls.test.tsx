@@ -17,3 +17,8 @@ test('« Actifs » n’a pas d’écart : la période d’avant n’est pas comp
   if (!actifs) throw new Error('tuile absente')
   expect(within(actifs).queryByTestId('ecart')).not.toBeInTheDocument()
 })
+
+test('sans période d’avant (depuis toujours), aucune tuile n’a d’écart', () => {
+  render(<Pouls pouls={pouls} avant={null} />)
+  expect(screen.queryByTestId('ecart')).not.toBeInTheDocument()
+})
