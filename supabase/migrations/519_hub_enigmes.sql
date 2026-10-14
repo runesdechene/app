@@ -94,8 +94,9 @@ GRANT EXECUTE ON FUNCTION public.hub_enigme(integer) TO authenticated;
 
 -- Création (p_id null) ou mise à jour. Mêmes règles que l'ancien formulaire.
 CREATE OR REPLACE FUNCTION public.hub_enregistrer_enigme(
-  p_id integer, p_culture text, p_difficulte text, p_recit text, p_question text, p_format text,
-  p_choix jsonb, p_reponse text, p_variantes text[], p_explication text, p_active boolean)
+  p_difficulte text, p_recit text, p_question text, p_format text, p_choix jsonb, p_reponse text,
+  p_variantes text[], p_explication text, p_active boolean,
+  p_id integer DEFAULT NULL, p_culture text DEFAULT NULL)
  RETURNS integer
  LANGUAGE plpgsql
  SECURITY DEFINER
@@ -168,8 +169,8 @@ BEGIN
 END;
 $function$;
 
-REVOKE ALL ON FUNCTION public.hub_enregistrer_enigme(integer, text, text, text, text, text, jsonb, text, text[], text, boolean) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.hub_enregistrer_enigme(integer, text, text, text, text, text, jsonb, text, text[], text, boolean) TO authenticated;
+REVOKE ALL ON FUNCTION public.hub_enregistrer_enigme(text, text, text, text, jsonb, text, text[], text, boolean, integer, text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.hub_enregistrer_enigme(text, text, text, text, jsonb, text, text[], text, boolean, integer, text) TO authenticated;
 
 -- Activer / désactiver (une énigme ne se supprime pas).
 CREATE OR REPLACE FUNCTION public.hub_activer_enigme(p_id integer, p_active boolean)

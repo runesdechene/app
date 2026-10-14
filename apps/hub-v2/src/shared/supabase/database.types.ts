@@ -7939,11 +7939,11 @@ export type Database = {
         Args: {
           p_active: boolean
           p_choix: Json
-          p_culture: string
+          p_culture?: string
           p_difficulte: string
           p_explication: string
           p_format: string
-          p_id: number
+          p_id?: number
           p_question: string
           p_recit: string
           p_reponse: string
