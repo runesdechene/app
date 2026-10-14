@@ -1,0 +1,1 @@
+Le Jeu du Hub (spec §12) : api/ (hub_enigmes, hub_enigme, hub_enregistrer_enigme, hub_activer_enigme — mig 519 — et la lecture des cultures), hooks/, lib/ (enigme : règles et envoi), components/ (un écran et son tiroir par menu : Enigmes, TiroirEnigme).

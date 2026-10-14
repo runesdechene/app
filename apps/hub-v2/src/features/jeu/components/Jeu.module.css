@@ -1,0 +1,117 @@
+/*
+ * QUOI     — la mise en page des écrans du Jeu : la liste des énigmes et l'éditeur en tiroir.
+ */
+.ecran {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.tuiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.barre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+.air { flex: 1; }
+
+.calme {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-texte-doux);
+}
+
+.choixDeFiltre, .boutonContour {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  background: none;
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--sous-titre-size);
+  color: var(--color-texte);
+  text-decoration: none;
+}
+
+.ligneEnigme {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--duree-douce) var(--courbe-douce);
+}
+.ligneEnigme:hover { background: var(--color-surface); }
+
+.numero {
+  font-size: var(--legende-size);
+  color: var(--color-texte-pale);
+}
+
+.question {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-encre);
+}
+
+.etiquettes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+/* L'éditeur */
+.formulaire {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.champ {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.champ input, .champ select, .champ textarea, .unChoix input {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-petit);
+  background: var(--color-fond);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  color: var(--color-encre);
+}
+
+.choix {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.unChoix {
+  display: flex;
+  gap: var(--space-2);
+}
+.unChoix input { flex: 1; }
+
+.case { color: var(--color-texte); }
+
+@container app (width >= 900px) {
+  .tuiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
