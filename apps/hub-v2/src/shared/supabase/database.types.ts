@@ -7904,6 +7904,8 @@ export type Database = {
       }
       herald_grade_promotions: { Args: never; Returns: undefined }
       histoire_du_lieu: { Args: { p_id: string }; Returns: Json }
+      hub_compagnie: { Args: { p_id: string }; Returns: Json }
+      hub_compagnies: { Args: never; Returns: Json }
       hub_compte: { Args: { p_id: string }; Returns: Json }
       hub_comptes: {
         Args: {
@@ -7918,6 +7920,16 @@ export type Database = {
         Returns: Json
       }
       hub_est_admin: { Args: never; Returns: boolean }
+      hub_modifier_compagnie: {
+        Args: {
+          p_couleur: string
+          p_devise: string
+          p_id: string
+          p_mission: string
+          p_nom: string
+        }
+        Returns: undefined
+      }
       hub_ouverture: { Args: { p_periode: string }; Returns: Json }
       increment_community_quest: {
         Args: {

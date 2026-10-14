@@ -5,7 +5,9 @@
  */
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { Ouverture } from '@/features/accueil/components/Ouverture'
+import { Compagnies } from '@/features/communaute/components/Compagnies'
 import { Comptes } from '@/features/communaute/components/Comptes'
+import { TiroirCompagnie } from '@/features/communaute/components/TiroirCompagnie'
 import { TiroirCompte } from '@/features/communaute/components/TiroirCompte'
 import { BientotIci } from './coquille/BientotIci'
 import { Coquille } from './coquille/Coquille'
@@ -13,7 +15,7 @@ import { MENU } from './coquille/menu'
 import { PorteDEntree } from './entree/PorteDEntree'
 
 // Les écrans faits quittent « bientôt » ; chaque tâche suivante ajoute le sien.
-const ECRANS_FAITS = new Set(['/communaute/comptes'])
+const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies'])
 
 const autres = MENU.flatMap((d) => d.liens)
   .filter((l) => l.chemin !== '/' && !ECRANS_FAITS.has(l.chemin))
@@ -30,6 +32,7 @@ export const routes: RouteObject[] = [
     children: [
       { index: true, Component: Ouverture },
       { path: 'communaute/comptes', Component: Comptes, children: [{ path: ':id', Component: TiroirCompte }] },
+      { path: 'communaute/compagnies', Component: Compagnies, children: [{ path: ':id', Component: TiroirCompagnie }] },
       ...autres,
     ],
   },
