@@ -1,8 +1,10 @@
 /**
  * QUOI     — la fiche d'un compte (maquette 595:1140) : identité, parcours, rôle, compteurs,
  *            Fragments, achats, dernières traces.
- * POURQUOI — le rôle se change ici, d'un choix : c'est le seul geste d'écriture de la fiche.
+ * POURQUOI — le rôle se change ici : c'est le seul geste d'écriture de la fiche. Le choix ne part qu'au
+ *            bouton « Changer » (une flèche du clavier dans la liste n'écrit rien), et faire un admin se confirme.
  */
+import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { dateCourte } from '@/shared/lib/dates'
 import { depuis, heureDuFil } from '@/shared/lib/quand'
@@ -33,10 +35,38 @@ function phrase(t: FicheDeCompte['traces'][number]): string {
   return enigme ? `${TRACES[t.type]} l’${t.texte.charAt(0).toLowerCase()}${t.texte.slice(1)}` : `${TRACES[t.type]} ${t.texte}`
 }
 
+function ChoixDuRole({ fiche }: { fiche: FicheDeCompte }) {
+  const changer = useChangerRole(fiche.id)
+  const [roleChoisi, setRoleChoisi] = useState(fiche.role)
+  const [confirmer, setConfirmer] = useState(false)
+
+  if (confirmer) {
+    return (
+      <span>
+        Faire de {fiche.nom} un admin ?{' '}
+        <button type="button" className={styles.boutonContour} disabled={changer.isPending}
+          onClick={() => { setConfirmer(false); changer.mutate(roleChoisi) }}>Confirmer</button>{' '}
+        <button type="button" className={styles.boutonContour} onClick={() => { setConfirmer(false) }}>Annuler</button>
+      </span>
+    )
+  }
+
+  return (
+    <span>
+      <select aria-label="Rôle" value={roleChoisi} disabled={changer.isPending}
+        onChange={(e) => { setRoleChoisi(e.target.value); changer.reset() }}>
+        {Object.entries(ROLES).map(([valeur, libelle]) => <option key={valeur} value={valeur}>{libelle}</option>)}
+      </select>{' '}
+      <button type="button" className={styles.boutonContour} disabled={roleChoisi === fiche.role || changer.isPending}
+        onClick={() => { if (roleChoisi === 'admin') setConfirmer(true); else changer.mutate(roleChoisi) }}>Changer</button>
+      {changer.isError && <span role="alert"> {changer.error.message}</span>}
+    </span>
+  )
+}
+
 export function TiroirCompte() {
   const { id = '' } = useParams()
   const { data, isPending, isError, refetch } = useCompte(id)
-  const changer = useChangerRole(id)
 
   if (isPending) {
     return (
@@ -92,19 +122,8 @@ export function TiroirCompte() {
         <span>E-mail</span>
         <span>{data.email ?? '—'}</span>
         <span>Rôle</span>
-        <span>
-          <select
-            aria-label="Rôle"
-            value={data.role}
-            disabled={changer.isPending}
-            onChange={(e) => {
-              changer.mutate(e.target.value)
-            }}
-          >
-            {Object.entries(ROLES).map(([valeur, libelle]) => <option key={valeur} value={valeur}>{libelle}</option>)}
-          </select>
-          {changer.isError && <span role="alert"> Le rôle n’a pas changé.</span>}
-        </span>
+        {/* La clé remet le choix à zéro quand la fiche change (autre compte, rôle enregistré). */}
+        <ChoixDuRole key={`${data.id}:${data.role}`} fiche={data} />
       </Bloc>
 
       <TitreDeSection titre="Ce qu’il a fait" />

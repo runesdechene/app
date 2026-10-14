@@ -40,12 +40,35 @@ test('un compte inconnu : « Compte introuvable » et un lien vers la liste', ()
   expect(screen.getByRole('link', { name: 'Retour à la liste' })).toHaveAttribute('href', '/communaute/comptes')
 })
 
-test('changer le rôle appelle changer_role', async () => {
+test('choisir un rôle au clavier n’écrit rien : seul « Changer » appelle changer_role', async () => {
   mockUseCompte.mockReturnValue({ data: { ...fiche, fragments: [], achats: [], traces: [] }, isPending: false })
   mockChanger.mockResolvedValue(undefined)
   monter()
-  await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Rôle' }), 'moderator')
+  expect(screen.getByRole('button', { name: 'Changer' })).toBeDisabled()
+  const choix = screen.getByRole('combobox', { name: 'Rôle' })
+  choix.focus()
+  await userEvent.keyboard('{ArrowDown}')
+  await userEvent.selectOptions(choix, 'ambassador')
+  await userEvent.selectOptions(choix, 'moderator')
+  expect(mockChanger).not.toHaveBeenCalled()
+  await userEvent.click(screen.getByRole('button', { name: 'Changer' }))
   expect(mockChanger).toHaveBeenCalledWith('u1', 'moderator')
+})
+
+test('faire un admin demande une confirmation, et Annuler n’écrit rien', async () => {
+  mockUseCompte.mockReturnValue({ data: { ...fiche, fragments: [], achats: [], traces: [] }, isPending: false })
+  mockChanger.mockResolvedValue(undefined)
+  monter()
+  await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Rôle' }), 'admin')
+  await userEvent.click(screen.getByRole('button', { name: 'Changer' }))
+  expect(screen.getByText('Faire de Kelpie un admin ?')).toBeInTheDocument()
+  expect(mockChanger).not.toHaveBeenCalled()
+  await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
+  expect(screen.queryByText('Faire de Kelpie un admin ?')).not.toBeInTheDocument()
+  expect(mockChanger).not.toHaveBeenCalled()
+  await userEvent.click(screen.getByRole('button', { name: 'Changer' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Confirmer' }))
+  expect(mockChanger).toHaveBeenCalledWith('u1', 'admin')
 })
 
 test('une lecture en échec : message, Réessayer, retour — pas « introuvable »', async () => {
@@ -59,13 +82,13 @@ test('une lecture en échec : message, Réessayer, retour — pas « introuvable
   expect(refetch).toHaveBeenCalled()
 })
 
-test('un changement de rôle refusé : l’alerte s’affiche, le choix reste l’ancien', async () => {
+test('un changement de rôle refusé : le message de la base s’affiche', async () => {
   mockUseCompte.mockReturnValue({ data: { ...fiche, fragments: [], achats: [], traces: [] }, isPending: false })
-  mockChanger.mockRejectedValue(new Error('refus'))
+  mockChanger.mockRejectedValue(new Error('Tu ne peux pas changer ton propre rôle'))
   monter()
   await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Rôle' }), 'moderator')
-  expect(await screen.findByRole('alert')).toHaveTextContent('Le rôle n’a pas changé.')
-  expect(screen.getByRole('combobox', { name: 'Rôle' })).toHaveValue('user')
+  await userEvent.click(screen.getByRole('button', { name: 'Changer' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Tu ne peux pas changer ton propre rôle')
 })
 
 test('une trace d’énigme se lit « a percé l’énigme n° 295 »', () => {
