@@ -8,7 +8,7 @@ import { TiroirEnigme } from './TiroirEnigme'
 const mockUseEnigmes = vi.hoisted(() => vi.fn())
 vi.mock('../hooks/useEnigmes', () => ({
   useEnigmes: mockUseEnigmes,
-  useCultures: () => ({ data: [{ id: 'nordique', label: 'Nordique', active: true }, { id: 'grec', label: 'Grecque', active: true }] }),
+  useNomsDeCultures: () => ({ data: [{ id: 'nordique', label: 'Nordique', active: true }, { id: 'grec', label: 'Grecque', active: true }] }),
   useEnigme: () => ({ data: null, isPending: false }),
   useEcritureEnigme: vi.fn(),
 }))

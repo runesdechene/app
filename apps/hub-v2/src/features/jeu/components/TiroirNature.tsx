@@ -4,13 +4,14 @@
  * POURQUOI — pas de suppression : une nature porte des lieux. Une nouvelle icône est envoyée tout de suite, mais
  *            l'ancienne n'est retirée du bucket qu'une fois l'enregistrement réussi.
  */
-import { useState, type ChangeEvent, type SyntheticEvent } from 'react'
+import { useState, type SyntheticEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router'
-import { envoyerFichier, retirerFichier, verifierFichier } from '@/shared/lib/envoi'
+import { couleurValide } from '@/shared/lib/couleur'
 import { Tiroir } from '@/shared/ui/Tiroir'
 import type { Nature } from '../api/natures'
+import { useIconeEnvoyee } from '../hooks/useIconeEnvoyee'
 import { useEcritureNature, useNatures } from '../hooks/useNatures'
-import { COULEUR, COULEURS_PAR_DEFAUT, slugDe } from '../lib/nature'
+import { COULEURS_PAR_DEFAUT, IDENTIFIANTS_RESERVES, slugDe } from '../lib/nature'
 import styles from './Jeu.module.css'
 import natures from './Natures.module.css'
 import { PastilleDeNature } from './PastilleDeNature'
@@ -27,10 +28,10 @@ function Formulaire({ fiche, toutes }: { fiche: Nature | null; toutes: Nature[] 
   const [identifiantSaisi, setIdentifiantSaisi] = useState<string | null>(null)
   const [couleur, setCouleur] = useState(fiche?.color ?? COULEURS_PAR_DEFAUT.texte)
   const [fond, setFond] = useState(fiche?.background ?? COULEURS_PAR_DEFAUT.fond)
-  const [icone, setIcone] = useState(fiche?.icon ?? '')
   const [ordre, setOrdre] = useState(String(fiche?.order ?? Math.max(0, ...toutes.map((n) => n.order)) + 1))
   const [horsEpoque, setHorsEpoque] = useState(fiche?.hors_epoque ?? false)
   const [refus, setRefus] = useState<string | null>(null)
+  const { icone, envoiEnCours, refus: refusIcone, choisir, apresEnregistrement } = useIconeEnvoyee(BUCKET, fiche?.icon ?? null)
   const identifiant = fiche?.id ?? identifiantSaisi ?? slugDe(titre)
 
   // Tout champ modifié efface « Enregistré. » et les messages.
@@ -39,39 +40,23 @@ function Formulaire({ fiche, toutes }: { fiche: Nature | null; toutes: Nature[] 
     setRefus(null)
   }
 
-  async function choisirIcone(e: ChangeEvent<HTMLInputElement>) {
-    const fichier = e.target.files?.[0]
-    if (!fichier) return
-    const erreur = verifierFichier(fichier, { types: ['image/svg+xml'] }) ?? (identifiant ? null : 'Donne d’abord un nom à la nature.')
-    setRefus(erreur)
-    if (erreur) return
-    try {
-      const adresse = await envoyerFichier(BUCKET, `${identifiant}-${String(Date.now())}.svg`, fichier)
-      // Une icône envoyée puis remplacée avant d'enregistrer n'est référencée par personne : on la retire.
-      if (icone && icone !== fiche?.icon) await retirerFichier(BUCKET, icone).catch(() => undefined)
-      setIcone(adresse)
-      ecriture.reset()
-    } catch (err) {
-      setRefus(err instanceof Error ? err.message : 'L’envoi a échoué.')
-    }
-  }
-
   function enregistrer(e: SyntheticEvent) {
     e.preventDefault()
     const rang = Number(ordre)
     const erreur = !titre.trim() ? 'Une nature a un nom.'
       : !fiche && !identifiant ? 'L’identifiant ne peut pas être vide.'
-        : !fiche && toutes.some((n) => n.id === identifiant) ? 'Cet identifiant est déjà pris.'
-          : !COULEUR.test(couleur) || !COULEUR.test(fond) ? 'Les couleurs s’écrivent #RRGGBB.'
-            : ordre.trim() === '' || !Number.isInteger(rang) ? 'L’ordre est un nombre entier.'
-              : null
+        : !fiche && IDENTIFIANTS_RESERVES.includes(identifiant) ? 'Cet identifiant est réservé.'
+          : !fiche && toutes.some((n) => n.id === identifiant) ? 'Cet identifiant est déjà pris.'
+            : !couleurValide(couleur) || !couleurValide(fond) ? 'Les couleurs s’écrivent #RRGGBB.'
+              : ordre.trim() === '' || !Number.isInteger(rang) ? 'L’ordre est un nombre entier.'
+                : null
     setRefus(erreur)
     if (erreur) return
     ecriture.mutate(
       { id: identifiant, creation: !fiche, nature: { title: titre.trim(), color: couleur, background: fond, icon: icone || null, order: rang, hors_epoque: horsEpoque } },
       {
         onSuccess: () => {
-          if (fiche?.icon && fiche.icon !== icone) void retirerFichier(BUCKET, fiche.icon).catch(() => undefined)
+          apresEnregistrement()
           if (!fiche) void naviguer({ pathname: `${LISTE}/${identifiant}`, search })
         },
       },
@@ -79,10 +64,7 @@ function Formulaire({ fiche, toutes }: { fiche: Nature | null; toutes: Nature[] 
   }
 
   return (
-    <form className={styles.formulaire} onSubmit={enregistrer} onChange={(e) => {
-      // Le refus d'un fichier vient du champ lui-même : l'événement qui remonte ne l'efface pas.
-      if (!(e.target instanceof HTMLInputElement && e.target.type === 'file')) modifie()
-    }}>
+    <form className={styles.formulaire} onSubmit={enregistrer} onChange={modifie}>
       <label className={styles.champ}>Nom
         <input value={titre} onChange={(e) => { setTitre(e.target.value) }} />
       </label>
@@ -100,7 +82,11 @@ function Formulaire({ fiche, toutes }: { fiche: Nature | null; toutes: Nature[] 
       <label className={styles.champ}>Icône SVG
         <span className={natures.apercu}>
           <PastilleDeNature icone={icone || null} couleur={couleur} fond={fond} />
-          <input type="file" accept="image/svg+xml" onChange={(e) => void choisirIcone(e)} />
+          {/* Le nom de fichier vient de l'identifiant : sans nom, pas d'envoi. */}
+          <input
+            type="file" accept="image/svg+xml" disabled={envoiEnCours || !identifiant}
+            onChange={(e) => void choisir(e, { types: ['image/svg+xml'] }, () => `${identifiant}-${String(Date.now())}.svg`)}
+          />
         </span>
       </label>
       <label className={styles.champ}>Ordre
@@ -113,7 +99,7 @@ function Formulaire({ fiche, toutes }: { fiche: Nature | null; toutes: Nature[] 
       <div>
         <button type="submit" className={styles.boutonContour} disabled={ecriture.isPending}>Enregistrer</button>
         {ecriture.isSuccess && fiche && <span role="status"> Enregistré.</span>}
-        {refus && <p role="alert">{refus}</p>}
+        {(refus ?? refusIcone) && <p role="alert">{refus ?? refusIcone}</p>}
         {ecriture.isError && <p role="alert">{ecriture.error.message}</p>}
       </div>
     </form>

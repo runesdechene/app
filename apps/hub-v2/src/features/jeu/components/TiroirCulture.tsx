@@ -5,12 +5,13 @@
  *            est envoyée tout de suite, mais l'ancienne n'est retirée du bucket qu'une fois l'enregistrement
  *            réussi (sinon la culture pointerait vers un fichier disparu).
  */
-import { useState, type CSSProperties, type ChangeEvent, type SyntheticEvent } from 'react'
+import { useState, type CSSProperties, type SyntheticEvent } from 'react'
 import { Link, useLocation, useParams } from 'react-router'
-import { envoyerFichier, retirerFichier, verifierFichier } from '@/shared/lib/envoi'
+import { couleurValide } from '@/shared/lib/couleur'
 import { Tiroir } from '@/shared/ui/Tiroir'
 import type { CultureDuHub } from '../api/cultures'
 import { useCulturesDuHub, useEcritureCulture } from '../hooks/useCultures'
+import { useIconeEnvoyee } from '../hooks/useIconeEnvoyee'
 import type { Cercle } from '../lib/cercle'
 import { CarteDesCercles } from './CarteDesCercles'
 import styles from './Jeu.module.css'
@@ -21,7 +22,6 @@ const LISTE = '/jeu/cultures'
 const BUCKET = 'tag-icons'
 const TYPES_D_ICONE = ['image/svg+xml', 'image/png', 'image/webp']
 const EXTENSIONS: Record<string, string> = { 'image/svg+xml': 'svg', 'image/png': 'png', 'image/webp': 'webp' }
-const COULEUR = /^#[0-9a-fA-F]{6}$/
 
 function Formulaire({ fiche }: { fiche: CultureDuHub }) {
   const ecriture = useEcritureCulture()
@@ -30,10 +30,11 @@ function Formulaire({ fiche }: { fiche: CultureDuHub }) {
   const [zone, setZone] = useState(fiche.zone ?? '')
   const [presentation, setPresentation] = useState(fiche.presentation ?? '')
   const [couleur, setCouleur] = useState(fiche.couleur ?? '')
-  const [icone, setIcone] = useState(fiche.icone ?? '')
   const [active, setActive] = useState(fiche.active)
   const [cercles, setCercles] = useState<Cercle[]>(fiche.cercles)
   const [refus, setRefus] = useState<string | null>(null)
+  const { icone, envoiEnCours, refus: refusIcone, choisir, apresEnregistrement } = useIconeEnvoyee(BUCKET, fiche.icone)
+  const couleurChoisie = couleurValide(couleur) ? couleur : null
 
   // Tout champ modifié efface « Enregistré. » et les messages.
   function modifie() {
@@ -41,42 +42,22 @@ function Formulaire({ fiche }: { fiche: CultureDuHub }) {
     setRefus(null)
   }
 
-  async function choisirIcone(e: ChangeEvent<HTMLInputElement>) {
-    const fichier = e.target.files?.[0]
-    if (!fichier) return
-    const erreur = verifierFichier(fichier, { types: TYPES_D_ICONE })
-    setRefus(erreur)
-    if (erreur) return
-    try {
-      const adresse = await envoyerFichier(BUCKET, `cultures/${fiche.id}-${String(Date.now())}.${EXTENSIONS[fichier.type] ?? 'png'}`, fichier)
-      // Une icône envoyée puis remplacée avant d'enregistrer n'est référencée par personne : on la retire.
-      if (icone && icone !== fiche.icone) await retirerFichier(BUCKET, icone).catch(() => undefined)
-      setIcone(adresse)
-      ecriture.reset()
-    } catch (err) {
-      setRefus(err instanceof Error ? err.message : 'L’envoi a échoué.')
-    }
-  }
-
   function enregistrer(e: SyntheticEvent) {
     e.preventDefault()
     const erreur = !label.trim() ? 'Une culture a un nom.'
-      : couleur !== (fiche.couleur ?? '') && couleur && !COULEUR.test(couleur) ? 'La couleur s’écrit #RRGGBB.'
+      : couleur !== (fiche.couleur ?? '') && couleur && !couleurValide(couleur) ? 'La couleur s’écrit #RRGGBB.'
         : active && cercles.length === 0 ? 'Une culture active doit s’éveiller quelque part : ajoute au moins un cercle.'
           : null
     setRefus(erreur)
     if (erreur) return
     ecriture.mutate(
       { id: fiche.id, label, couleur, icone, complement, zone, presentation, cercles, active, ordre: fiche.ordre },
-      { onSuccess: () => { if (fiche.icone && fiche.icone !== icone) void retirerFichier(BUCKET, fiche.icone).catch(() => undefined) } },
+      { onSuccess: apresEnregistrement },
     )
   }
 
   return (
-    <form className={styles.formulaire} onSubmit={enregistrer} onChange={(e) => {
-      // Le refus d'un fichier vient du champ lui-même : l'événement qui remonte ne l'efface pas.
-      if (!(e.target instanceof HTMLInputElement && e.target.type === 'file')) modifie()
-    }}>
+    <form className={styles.formulaire} onSubmit={enregistrer} onChange={modifie}>
       <label className={styles.champ}>Nom
         <input value={label} onChange={(e) => { setLabel(e.target.value) }} />
       </label>
@@ -92,25 +73,28 @@ function Formulaire({ fiche }: { fiche: CultureDuHub }) {
       <label className={styles.champ}>Couleur
         <span className={cultures.apercu}>
           <input value={couleur} placeholder="#RRGGBB" onChange={(e) => { setCouleur(e.target.value) }} />
-          <span className={cultures.icone} style={{ '--couleur': COULEUR.test(couleur) ? couleur : 'transparent' } as CSSProperties} />
+          <span className={cultures.icone} style={{ '--couleur': couleurChoisie ?? 'transparent' } as CSSProperties} />
         </span>
       </label>
       <label className={styles.champ}>Icône
         <span className={cultures.apercu}>
-          <IconeDeCulture icone={icone || null} couleur={COULEUR.test(couleur) ? couleur : null} />
-          <input type="file" accept={TYPES_D_ICONE.join(',')} onChange={(e) => void choisirIcone(e)} />
+          <IconeDeCulture icone={icone || null} couleur={couleurChoisie} />
+          <input
+            type="file" accept={TYPES_D_ICONE.join(',')} disabled={envoiEnCours}
+            onChange={(e) => void choisir(e, { types: TYPES_D_ICONE }, (f) => `cultures/${fiche.id}-${String(Date.now())}.${EXTENSIONS[f.type] ?? 'png'}`)}
+          />
         </span>
       </label>
       <label className={styles.case}>
         <input type="checkbox" checked={active} onChange={(e) => { setActive(e.target.checked) }} /> Active
       </label>
 
-      <CarteDesCercles couleur={COULEUR.test(couleur) ? couleur : null} cercles={cercles} eveils={fiche.eveils} onChange={(suivants) => { setCercles(suivants); modifie() }} />
+      <CarteDesCercles couleur={couleurChoisie} cercles={cercles} eveils={fiche.eveils} onChange={(suivants) => { setCercles(suivants); modifie() }} />
 
       <div>
         <button type="submit" className={styles.boutonContour} disabled={ecriture.isPending}>Enregistrer</button>
         {ecriture.isSuccess && <span role="status"> Enregistré.</span>}
-        {refus && <p role="alert">{refus}</p>}
+        {(refus ?? refusIcone) && <p role="alert">{refus ?? refusIcone}</p>}
         {ecriture.isError && <p role="alert">{ecriture.error.message}</p>}
       </div>
     </form>

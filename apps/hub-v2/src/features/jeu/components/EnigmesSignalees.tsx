@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { dateCourte } from '@/shared/lib/dates'
 import { depuis } from '@/shared/lib/quand'
-import { texteEnClair } from '@/shared/lib/texte'
+import { pluriel, texteEnClair } from '@/shared/lib/texte'
 import { Balise } from '@/shared/ui/Balise'
 import { Bloc } from '@/shared/ui/Bloc'
 import { EnTeteDePage } from '@/shared/ui/EnTeteDePage'
@@ -25,7 +25,7 @@ const RAISONS: Record<string, string> = {
 }
 const raison = (code: string) => RAISONS[code] ?? code
 
-const pointsRendus = (n: number) => `${String(n)} point${n > 1 ? 's' : ''} rendu${n > 1 ? 's' : ''}`
+const pointsRendus = (n: number) => `${String(n)} ${pluriel(n, 'point')} ${pluriel(n, 'rendu')}`
 
 function Lecture({ signalement, onTraite }: { signalement: SignalementEnigme; onTraite: (message: string) => void }) {
   const { enigme, reponseDonnee } = signalement

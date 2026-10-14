@@ -75,3 +75,12 @@ test('une nature inconnue : introuvable', async () => {
   monter('/jeu/natures/autre')
   expect(await screen.findByText('Nature introuvable.')).toBeInTheDocument()
 })
+
+test('l’identifiant « nouvelle » est réservé : il porte la route de création', async () => {
+  monter('/jeu/natures/nouvelle')
+  await userEvent.type(await screen.findByLabelText('Nom'), 'Nouvelle')
+  expect(screen.getByLabelText('Identifiant')).toHaveValue('nouvelle')
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Cet identifiant est réservé.')
+  expect(mockInsert).not.toHaveBeenCalled()
+})

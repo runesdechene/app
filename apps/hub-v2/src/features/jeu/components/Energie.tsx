@@ -5,6 +5,7 @@
  *            moins de 10 minutes par point) : le message dit laquelle. La base relit ces réglages à chaque calcul.
  */
 import { useState, type SyntheticEvent } from 'react'
+import { pluriel } from '@/shared/lib/texte'
 import { Bloc } from '@/shared/ui/Bloc'
 import { EnTeteDePage } from '@/shared/ui/EnTeteDePage'
 import { TitreDeSection } from '@/shared/ui/TitreDeSection'
@@ -47,7 +48,7 @@ const enNombres = (s: Saisie): Reglages => ({
   cout1: nombre(s.cout1), cout2: nombre(s.cout2), cout3: nombre(s.cout3), cout4: nombre(s.cout4),
 })
 
-const prix = (n: number) => (n === 0 ? 'Gratuit' : `${String(n)} point${n > 1 ? 's' : ''}`)
+const prix = (n: number) => (n === 0 ? 'Gratuit' : `${String(n)} ${pluriel(n, 'point')}`)
 
 function RegleRedessinee({ r }: { r: Reglages }) {
   const segments = [
@@ -129,7 +130,11 @@ function Formulaire({ depart }: { depart: Reglages }) {
 
 export function Energie() {
   const { data, isError } = useReglagesEnergie()
-  if (isError) return <p className={styles.calme}>La base ne répond pas.</p>
-  if (!data) return null
-  return <Formulaire depart={depuisLignes(data)} />
+  if (data) return <Formulaire depart={depuisLignes(data)} />
+  return (
+    <div className={styles.ecran}>
+      <EnTeteDePage surtitre="Le jeu" titre="L’Énergie" />
+      {isError && <p className={styles.calme}>La base ne répond pas.</p>}
+    </div>
+  )
 }

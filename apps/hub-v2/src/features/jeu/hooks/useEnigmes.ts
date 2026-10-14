@@ -14,7 +14,7 @@ export function useEnigme(id: number) {
   return useQuery({ queryKey: ['hub-enigme', id], queryFn: () => lireEnigme(id) })
 }
 
-export function useCultures() {
+export function useNomsDeCultures() {
   return useQuery({ queryKey: ['hub-cultures'], queryFn: lireCultures, staleTime: Infinity })
 }
 

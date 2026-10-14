@@ -68,3 +68,9 @@ test('le résumé dit la règle, au pluriel quand il faut', () => {
     + '4 points au-delà. Sans position, un lieu coûte le prix « Au-delà ».',
   )
 })
+
+test('un cycle ancien qui ne tombe pas sur une minute entière est arrondi, pour ne pas bloquer l’enregistrement', () => {
+  const reglages = depuisLignes([{ key: 'energy_base_cycle', value: '5430' }])
+  expect(Number.isInteger(reglages.minutesParPoint)).toBe(true)
+  expect(erreurReglages(reglages)).toBeNull()
+})

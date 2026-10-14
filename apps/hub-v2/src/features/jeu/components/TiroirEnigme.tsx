@@ -6,19 +6,19 @@
  */
 import { useState, type SyntheticEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router'
+import { pluriel } from '@/shared/lib/texte'
 import { Tiroir } from '@/shared/ui/Tiroir'
 import type { FicheEnigme } from '../api/enigmes'
-import { useCultures, useEcritureEnigme, useEnigme } from '../hooks/useEnigmes'
+import { useNomsDeCultures, useEcritureEnigme, useEnigme } from '../hooks/useEnigmes'
 import { DIFFICULTES, erreurDEnigme, type Brouillon, type Difficulte } from '../lib/enigme'
 import styles from './Jeu.module.css'
 
 const LISTE = '/jeu/enigmes'
-const s = (n: number) => (n > 1 ? 's' : '')
 
 function Formulaire({ fiche }: { fiche: FicheEnigme | null }) {
   const { search } = useLocation()
   const naviguer = useNavigate()
-  const { data: cultures = [] } = useCultures()
+  const { data: cultures = [] } = useNomsDeCultures()
   const ecriture = useEcritureEnigme(fiche?.id ?? null)
   const [culture, setCulture] = useState(fiche?.culture ?? '')
   const [difficulte, setDifficulte] = useState<Difficulte>(fiche?.difficulte ?? 'easy')
@@ -116,7 +116,7 @@ function Formulaire({ fiche }: { fiche: FicheEnigme | null }) {
 
       {fiche && (
         <p className={styles.calme}>
-          {`${String(fiche.reponses)} réponse${s(fiche.reponses)} · ${String(fiche.percees)} percée${s(fiche.percees)} · ${String(fiche.signalements)} signalement${s(fiche.signalements)}`}
+          {`${String(fiche.reponses)} ${pluriel(fiche.reponses, 'réponse')} · ${String(fiche.percees)} ${pluriel(fiche.percees, 'percée')} · ${String(fiche.signalements)} ${pluriel(fiche.signalements, 'signalement')}`}
         </p>
       )}
     </form>

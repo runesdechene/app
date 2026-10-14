@@ -5,6 +5,8 @@
  *            minutes. Les règles et leurs messages viennent de l'ancien Hub, plus des bornes hautes (une faute de
  *            frappe ferait déborder value::INT en base) ; la phrase de resume suit le plan.
  */
+import { pluriel } from '@/shared/lib/texte'
+
 export type Reglages = {
   maxSansFragment: number
   minutesParPoint: number
@@ -48,13 +50,13 @@ export const DEFAUTS: Reglages = {
 
 const CHAMPS = Object.keys(CLES) as (keyof Reglages)[]
 
-// Une clé absente ou illisible reprend sa valeur par défaut.
+// Une clé absente ou illisible reprend sa valeur par défaut ; un cycle ancien est arrondi à la minute.
 export function depuisLignes(lignes: LigneDeReglage[]): Reglages {
   const reglages = { ...DEFAUTS }
   for (const champ of CHAMPS) {
     const ligne = lignes.find((l) => l.key === CLES[champ])
     const nombre = ligne === undefined || ligne.value.trim() === '' ? Number.NaN : Number(ligne.value)
-    if (Number.isFinite(nombre)) reglages[champ] = champ === 'minutesParPoint' ? nombre / 60 : nombre
+    if (Number.isFinite(nombre)) reglages[champ] = champ === 'minutesParPoint' ? Math.round(nombre / 60) : nombre
   }
   return reglages
 }
@@ -82,7 +84,7 @@ export function erreurReglages(r: Reglages): string | null {
   return null
 }
 
-const points = (n: number) => `${String(n)} point${n > 1 ? 's' : ''}`
+const points = (n: number) => `${String(n)} ${pluriel(n, 'point')}`
 
 export function resume(r: Reglages): string {
   return `Gratuit jusqu’à ${String(r.gratuitKm)} km, puis ${points(r.cout1)} jusqu’à ${String(r.palier1Km)} km, `

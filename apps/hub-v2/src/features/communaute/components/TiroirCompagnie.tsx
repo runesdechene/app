@@ -12,7 +12,7 @@ import { Tiroir } from '@/shared/ui/Tiroir'
 import { TitreDeSection } from '@/shared/ui/TitreDeSection'
 import type { FicheDeCompagnie, Membre } from '../api/compagnies'
 import { useCompagnie, useModifierCompagnie } from '../hooks/useCompagnie'
-import { couleurValide } from '../lib/couleur'
+import { couleurValide } from '@/shared/lib/couleur'
 import communaute from './Communaute.module.css'
 import styles from './Compagnies.module.css'
 

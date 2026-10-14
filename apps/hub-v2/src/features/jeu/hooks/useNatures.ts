@@ -4,8 +4,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { creerNature, lireNatures, modifierNature, type NatureAEcrire } from '../api/natures'
 
+// La clé « jeu » est distincte de celle des Lieux (['hub-natures'], autre forme de données) ; l'écriture
+// invalide le préfixe ['hub-natures'], donc les deux lectures se rafraîchissent.
 export function useNatures() {
-  return useQuery({ queryKey: ['hub-natures'], queryFn: lireNatures })
+  return useQuery({ queryKey: ['hub-natures', 'jeu'], queryFn: lireNatures })
 }
 
 // Sans identifiant : on crée la nature (l'identifiant est donné à l'envoi) ; avec : on la modifie.

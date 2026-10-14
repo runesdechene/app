@@ -15,7 +15,7 @@ import { EnTeteDePage } from '@/shared/ui/EnTeteDePage'
 import { Pages } from '@/shared/ui/Pages'
 import { Tuile } from '@/shared/ui/Tuile'
 import type { Actives, Criteres, LigneEnigme } from '../api/enigmes'
-import { useCultures, useEnigmes } from '../hooks/useEnigmes'
+import { useNomsDeCultures, useEnigmes } from '../hooks/useEnigmes'
 import { DIFFICULTES, type Difficulte } from '../lib/enigme'
 import styles from './Jeu.module.css'
 
@@ -47,7 +47,7 @@ function LigneDEnigme({ enigme, culture }: { enigme: LigneEnigme; culture: strin
 export function Enigmes() {
   const [params, setParams] = useSearchParams()
   const { search } = useLocation()
-  const { data: cultures = [] } = useCultures()
+  const { data: cultures = [] } = useNomsDeCultures()
   const criteres: Criteres = {
     culture: params.get('culture'),
     difficulte: (Object.keys(DIFFICULTES) as Difficulte[]).find((d) => d === params.get('difficulte')) ?? null,

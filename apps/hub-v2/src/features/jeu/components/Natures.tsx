@@ -5,6 +5,7 @@
  */
 import { Link, Outlet, useLocation } from 'react-router'
 import { Balise } from '@/shared/ui/Balise'
+import { pluriel } from '@/shared/lib/texte'
 import { Bloc } from '@/shared/ui/Bloc'
 import { EnTeteDePage } from '@/shared/ui/EnTeteDePage'
 import type { Nature } from '../api/natures'
@@ -20,7 +21,7 @@ function LigneDeNature({ nature }: { nature: Nature }) {
       <PastilleDeNature icone={nature.icon} couleur={nature.color} fond={nature.background} />
       <span className={natures.nom}>
         <strong>{nature.title}</strong>
-        <span>{`${String(nature.lieux)} lieux`}</span>
+        <span>{`${String(nature.lieux)} ${pluriel(nature.lieux, 'lieu', 'lieux')}`}</span>
       </span>
       {nature.hors_epoque && <Balise texte="Hors époque" teinte="lieu" />}
     </Link>

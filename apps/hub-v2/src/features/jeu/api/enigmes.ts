@@ -29,13 +29,13 @@ export async function lireEnigmes(c: Criteres): Promise<ListeEnigmes> {
     p_actives: c.actives, p_recherche: c.recherche, p_limite: c.limite, p_decalage: c.decalage,
     ...(c.culture && { p_culture: c.culture }), ...(c.difficulte && { p_difficulte: c.difficulte }),
   })
-  if (error) throw error
+  if (error) throw new Error(error.message)
   return data as ListeEnigmes
 }
 
 export async function lireEnigme(id: number): Promise<FicheEnigme | null> {
   const { data, error } = await supabase.rpc('hub_enigme', { p_id: id })
-  if (error) throw error
+  if (error) throw new Error(error.message)
   return data as FicheEnigme | null
 }
 
@@ -49,6 +49,6 @@ export async function enregistrerEnigme(id: number | null, brouillon: Brouillon)
 // Lecture publique des cultures (enigma_themes), dans l'ordre du jeu.
 export async function lireCultures(): Promise<Culture[]> {
   const { data, error } = await supabase.from('enigma_themes').select('id, label, active').order('sort_order')
-  if (error) throw error
+  if (error) throw new Error(error.message)
   return data
 }

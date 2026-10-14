@@ -25,8 +25,8 @@ beforeEach(() => { upsert.mockReset() })
 
 test('l’écran montre les réglages et la phrase qui dit la règle', async () => {
   monter()
-  expect(await screen.findByRole('heading', { name: 'L’Énergie' })).toBeInTheDocument()
-  expect(screen.getByRole('heading', { name: 'La jauge' })).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name: 'La jauge' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'L’Énergie' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Le prix d’une découverte' })).toBeInTheDocument()
   expect(screen.getByLabelText('Minutes par point')).toHaveValue(120)
   expect(screen.getByText(/Gratuit jusqu’à 50 km, puis 1 point jusqu’à 150 km/)).toBeInTheDocument()
@@ -65,4 +65,12 @@ test('une erreur de la base s’affiche telle quelle', async () => {
   upsert.mockResolvedValue({ error: { message: 'new row violates row-level security policy' } })
   await userEvent.click(await screen.findByRole('button', { name: 'Enregistrer' }))
   expect(await screen.findByRole('alert')).toHaveTextContent('new row violates row-level security policy')
+})
+
+test('en erreur, l’en-tête de l’écran reste affiché', async () => {
+  mockFrom.mockReturnValue({ select: () => ({ in: () => Promise.resolve({ data: null, error: { message: 'boum' } }) }) })
+  const router = createMemoryRouter([{ path: '/jeu/energie', Component: Energie }], { initialEntries: ['/jeu/energie'] })
+  render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><RouterProvider router={router} /></QueryClientProvider>)
+  expect(await screen.findByText('La base ne répond pas.')).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'L’Énergie' })).toBeInTheDocument()
 })
