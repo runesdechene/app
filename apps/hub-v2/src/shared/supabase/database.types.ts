@@ -7884,7 +7884,7 @@ export type Database = {
       herald_grade_promotions: { Args: never; Returns: undefined }
       histoire_du_lieu: { Args: { p_id: string }; Returns: Json }
       hub_est_admin: { Args: never; Returns: boolean }
-      hub_ouverture: { Args: { p_jours: number }; Returns: Json }
+      hub_ouverture: { Args: { p_periode: string }; Returns: Json }
       increment_community_quest: {
         Args: {
           p_amount?: number
