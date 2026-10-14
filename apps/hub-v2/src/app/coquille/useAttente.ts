@@ -1,7 +1,8 @@
 /**
  * QUOI     — les nombres des files qui attendent, pour les pastilles du menu.
- * POURQUOI — lus dans la même réponse que l'ouverture (la semaine, la période par défaut de l'ouverture : même clé, un seul appel ; l'attente ne dépend pas de la
- *            période) ; rien tant qu'elle n'est pas arrivée.
+ * POURQUOI — lus dans la même réponse que l'ouverture, sur la semaine (sa période par défaut :
+ *            même clé, un seul appel ; l'attente ne dépend pas de la période). Rien tant
+ *            qu'elle n'est pas arrivée.
  */
 import { useOuverture } from '@/features/accueil/hooks/useOuverture'
 import type { CleAttente } from './menu'
