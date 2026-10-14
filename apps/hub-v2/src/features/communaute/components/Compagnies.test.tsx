@@ -63,3 +63,18 @@ test('ouvrir une fiche garde l’adresse de la liste, la fermer y ramène', asyn
   expect(router.state.location.pathname).toBe('/communaute/compagnies')
   expect(router.state.location.search).toBe('?filtre=porteurs&page=3')
 })
+
+test('une couleur invalide après un refus de la base : seul le message de la couleur reste', async () => {
+  api.lireCompagnies.mockResolvedValue([cairns])
+  api.lireCompagnie.mockResolvedValue({ ...cairns, mission: '', avatar: null, membres: [] })
+  api.modifierCompagnie.mockRejectedValue(new Error('Ce nom est déjà pris'))
+  monter('/communaute/compagnies/cairns')
+  await userEvent.click(await screen.findByRole('button', { name: 'Enregistrer' }))
+  expect(await screen.findByText('Ce nom est déjà pris')).toBeInTheDocument()
+  const couleur = screen.getByRole('textbox', { name: 'Couleur' })
+  await userEvent.clear(couleur)
+  await userEvent.type(couleur, 'rouge')
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+  expect(screen.getByText('La couleur est un code #RRGGBB')).toBeInTheDocument()
+  expect(screen.queryByText('Ce nom est déjà pris')).not.toBeInTheDocument()
+})

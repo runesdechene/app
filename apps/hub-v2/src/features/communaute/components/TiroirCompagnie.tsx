@@ -40,6 +40,7 @@ function FormulaireIdentite({ fiche }: { fiche: FicheDeCompagnie }) {
 
   function enregistrer() {
     setEnregistre(false)
+    modifier.reset()
     if (!couleurValide(couleur)) {
       setRefus('La couleur est un code #RRGGBB')
       return
