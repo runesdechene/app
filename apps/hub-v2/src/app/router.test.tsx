@@ -15,6 +15,10 @@ vi.mock('@/features/accueil/hooks/useOuverture', () => ({
   useOuverture: () => ({ data: undefined, isError: false, refetch: vi.fn() }),
 }))
 
+vi.mock('@/features/accueil/hooks/useFil', () => ({
+  useFil: () => ({ activites: [], voirPlus: vi.fn(), aDAutres: false, isError: false }),
+}))
+
 test('une adresse inconnue renvoie à l’accueil', async () => {
   const router = createMemoryRouter(routes, { initialEntries: ['/nulle-part'] })
   render(<RouterProvider router={router} />)

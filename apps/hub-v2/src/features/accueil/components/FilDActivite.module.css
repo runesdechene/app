@@ -1,0 +1,124 @@
+/*
+ * QUOI     — le fil : une grille par ligne sur PC (heure, type, portrait, texte, département),
+ *            une pile compacte au téléphone (type et heure, puis le texte).
+ */
+.fil {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.direct {
+  font-size: var(--flux-size);
+  color: var(--color-texte-doux);
+}
+
+.direct::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: var(--space-2);
+  border-radius: var(--radius-rond);
+  background: var(--color-vert);
+}
+
+.filtres {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ligne {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  grid-template-areas:
+    'type heure heure'
+    'texte texte texte';
+  gap: var(--space-1) var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  animation: apparait var(--duree-douce) var(--courbe-douce);
+}
+
+.heure {
+  grid-area: heure;
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--meta-size);
+  color: var(--color-texte-pale);
+}
+
+.type {
+  grid-area: type;
+}
+
+.portrait,
+.ou {
+  display: none;
+}
+
+.texte {
+  grid-area: texte;
+  display: grid;
+}
+
+.titre {
+  font-weight: var(--weight-semi);
+  color: var(--color-encre);
+}
+
+.detail {
+  font-size: var(--flux-size);
+  color: var(--color-texte-doux);
+}
+
+.plus {
+  padding: var(--space-3);
+  border: 0;
+  background: none;
+  font-weight: var(--weight-semi);
+  font-size: var(--flux-size);
+  color: var(--color-accent);
+}
+
+.vide {
+  margin: 0;
+  color: var(--color-texte-doux);
+}
+
+@container app (width >= 900px) {
+  .ligne {
+    grid-template-columns: 40px 104px 28px minmax(0, 1fr) 170px;
+    grid-template-areas: 'heure type portrait texte ou';
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .portrait {
+    display: block;
+    grid-area: portrait;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-rond);
+    background: var(--color-vignette);
+    object-fit: cover;
+  }
+
+  .ou {
+    display: block;
+    grid-area: ou;
+    text-align: right;
+    font-size: var(--flux-size);
+    color: var(--color-texte-pale);
+  }
+}
+
+@keyframes apparait {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ligne {
+    animation: none;
+  }
+}

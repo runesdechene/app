@@ -8,6 +8,7 @@ import type { Periode } from '../api/ouverture'
 import { useOuverture } from '../hooks/useOuverture'
 import { Attente } from './Attente'
 import { EnTete } from './EnTete'
+import { FilDActivite } from './FilDActivite'
 import { Pouls } from './Pouls'
 import { Sante } from './Sante'
 import styles from './Ouverture.module.css'
@@ -38,6 +39,7 @@ export function Ouverture() {
           </div>
         </>
       )}
+      <FilDActivite />
     </div>
   )
 }

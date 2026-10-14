@@ -7445,6 +7445,10 @@ export type Database = {
       epoques: { Args: never; Returns: Json }
       explorateurs_du_lieu: { Args: { p_id: string }; Returns: Json }
       fiche_lieu: { Args: { p_id: string }; Returns: Json }
+      fil_du_hub: {
+        Args: { p_avant: string; p_limite?: number; p_types: string[] }
+        Returns: Json
+      }
       filtres_de_carte: { Args: never; Returns: Json }
       find_nearby_places: {
         Args: { p_lat: number; p_lng: number; p_radius_m?: number }
