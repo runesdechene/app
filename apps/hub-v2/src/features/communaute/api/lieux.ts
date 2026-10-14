@@ -24,7 +24,9 @@ export type FicheDeLieu = Omit<LigneDeLieu, 'tags'> & {
 }
 export type Champs = { titre: string; texte: string; sensible: boolean }
 
-const MESSAGES: Record<string, string> = { not_staff: 'Réservé à l’équipe', place_not_found: 'Lieu introuvable' }
+const MESSAGES: Record<string, string> = { not_staff: 'Réservé à l’équipe', place_not_found: 'Lieu introuvable',
+  no_tags: 'Choisis au moins une nature.', invalid_tag: 'Nature inconnue.', too_many_tags: 'Trois natures au plus.',
+}
 
 function relever(reponse: unknown): void {
   if (typeof reponse === 'object' && reponse !== null && 'error' in reponse && typeof reponse.error === 'string') {

@@ -34,7 +34,7 @@ test('par défaut : à modérer', async () => {
 })
 
 test('masquer un lieu rafraîchit la liste et la pastille', async () => {
-  api.lireLieux.mockResolvedValue({ total: 1, rows: [ligne] })
+  api.lireLieux.mockResolvedValueOnce({ total: 1, rows: [ligne] }).mockResolvedValue({ total: 0, rows: [] })
   api.lireNatures.mockResolvedValue([{ id: 'dolmens', title: 'Dolmens et mégalithes', color: '#fff', background: '#a94842' }])
   api.lireLieu.mockResolvedValue({ ...ligne, text: 'Un dolmen.', images: [], visit_count: 0, discovered_count: 2, author_places_count: 31 })
   api.masquerLieu.mockResolvedValue(undefined)
@@ -44,6 +44,19 @@ test('masquer un lieu rafraîchit la liste et la pastille', async () => {
   expect(api.masquerLieu).toHaveBeenCalledWith('p1', true)
   expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-lieux'] })
   expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-ouverture'] })
+  expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-lieu', 'p1'] })
+  expect(await screen.findByText('Aucun lieu ne correspond.')).toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: /Dolmen de la Pierre Levée/ })).not.toBeInTheDocument()
+})
+
+test('un nom vide : pas d’enregistrement', async () => {
+  api.lireLieux.mockResolvedValue({ total: 1, rows: [ligne] })
+  api.lireNatures.mockResolvedValue([])
+  api.lireLieu.mockResolvedValue({ ...ligne, text: 'Un dolmen.', images: [], discovered_count: 2, author_places_count: 31 })
+  monter('/communaute/lieux/p1')
+  await userEvent.clear(await screen.findByRole('textbox', { name: 'Nom' }))
+  expect(screen.getByText('Le nom ne peut pas être vide.')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Enregistrer le texte' })).toBeDisabled()
 })
 
 test('un lieu inconnu : le tiroir le dit', async () => {

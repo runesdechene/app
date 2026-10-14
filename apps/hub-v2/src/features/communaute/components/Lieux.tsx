@@ -65,7 +65,7 @@ export function Lieux() {
     limite: PAR_PAGE,
     decalage: (numeroDePage(params.get('page')) - 1) * PAR_PAGE,
   }
-  const { data, isError } = useLieux(criteres)
+  const { data, error } = useLieux(criteres)
   const natures = useNatures()
   const maintenant = new Date()
 
@@ -99,7 +99,7 @@ export function Lieux() {
         <span className={communaute.air} />
         <ChampDeRecherche valeur={criteres.recherche} onChange={(q) => { changer('q', q) }} etiquette="Un nom de lieu…" />
       </div>
-      {isError && <p className={communaute.calme}>La base ne répond pas.</p>}
+      {error && <p className={communaute.calme}>{error.message || 'La base ne répond pas.'}</p>}
       {data && (
         <Bloc>
           {data.rows.map((l) => <LigneDeLieuListe key={l.id} lieu={l} maintenant={maintenant} />)}

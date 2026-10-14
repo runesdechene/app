@@ -26,19 +26,20 @@ function Texte({ fiche }: { fiche: FicheDeLieu }) {
     <Bloc className={styles.formulaire ?? ''}>
       <label className={styles.champ}>
         Nom
-        <input type="text" value={titre} onChange={(e) => { setTitre(e.target.value) }} />
+        <input type="text" value={titre} onChange={(e) => { setTitre(e.target.value); texte.reset() }} />
       </label>
       <label className={styles.champ}>
         Récit
-        <textarea rows={6} value={recit} onChange={(e) => { setRecit(e.target.value) }} />
+        <textarea rows={6} value={recit} onChange={(e) => { setRecit(e.target.value); texte.reset() }} />
       </label>
       <label className={styles.case}>
-        <input type="checkbox" checked={sensible} onChange={(e) => { setSensible(e.target.checked) }} />
+        <input type="checkbox" checked={sensible} onChange={(e) => { setSensible(e.target.checked); texte.reset() }} />
         Lieu sensible
       </label>
       <div className={styles.actions}>
-        <button type="button" className={communaute.boutonContour} disabled={texte.isPending}
+        <button type="button" className={communaute.boutonContour} disabled={texte.isPending || titre.trim() === ''}
           onClick={() => { texte.mutate({ titre, texte: recit, sensible }) }}>Enregistrer le texte</button>
+        {titre.trim() === '' && <p role="alert">Le nom ne peut pas être vide.</p>}
         {texte.isError && <p role="alert">{texte.error.message}</p>}
         {texte.isSuccess && <p role="status">Enregistré.</p>}
       </div>
@@ -52,6 +53,7 @@ function Natures({ fiche }: { fiche: FicheDeLieu }) {
   const [choisies, setChoisies] = useState(fiche.tags.map((t) => t.id))
 
   function cocher(id: string, oui: boolean) {
+    natures.reset()
     setChoisies((avant) => (oui ? [...avant, id] : avant.filter((n) => n !== id)))
   }
 
