@@ -100,6 +100,5 @@ dans `packages/da` (`tokens.css`), et les briques de `apps/hub-v2/src/shared/ui/
 compare à sa maquette Figma (section « Hub V2 — maquette (14/10) ») à 1440 et 390 px avant d'être
 dit fini. L'ancien `apps/hub` (parchemin `#f5edd8`, Cinzel) ne reçoit plus d'écran neuf : il
 disparaît à la bascule (plan 5).
-`display:block` ne s'affichait pas du tout.
 
 Voir aussi [[sonde-avant-hypotheses]].
