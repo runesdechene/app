@@ -11,6 +11,7 @@ import { Lieux } from '@/features/communaute/components/Lieux'
 import { Signalements } from '@/features/communaute/components/Signalements'
 import { TiroirCompagnie } from '@/features/communaute/components/TiroirCompagnie'
 import { TiroirCompte } from '@/features/communaute/components/TiroirCompte'
+import { TiroirCompteDuStand } from '@/features/communaute/components/TiroirCompteDuStand'
 import { TiroirLieu } from '@/features/communaute/components/TiroirLieu'
 import { TiroirFragment } from '@/features/boutique/components/TiroirFragment'
 import { Achats } from '@/features/boutique/components/Achats'
@@ -50,7 +51,7 @@ export const routes: RouteObject[] = [
     ),
     children: [
       { index: true, Component: Ouverture },
-      { path: 'communaute/comptes', Component: Comptes, children: [{ path: ':id', Component: TiroirCompte }] },
+      { path: 'communaute/comptes', Component: Comptes, children: [{ path: 'nouveau', Component: TiroirCompteDuStand }, { path: ':id', Component: TiroirCompte }] },
       { path: 'communaute/compagnies', Component: Compagnies, children: [{ path: ':id', Component: TiroirCompagnie }] },
       { path: 'communaute/lieux', Component: Lieux, children: [{ path: ':id', Component: TiroirLieu }] },
       { path: 'communaute/signalements', Component: Signalements },

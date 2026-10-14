@@ -17,6 +17,7 @@ import type { FicheDeCompte } from '../api/comptes'
 import { useChangerRole, useCompte } from '../hooks/useCompte'
 import { balisesDuCompte } from '../lib/balises'
 import { PROVENANCES } from '../lib/provenances'
+import { AssocierFragment } from './AssocierFragment'
 import styles from './Communaute.module.css'
 
 const LISTE = '/communaute/comptes'
@@ -136,20 +137,7 @@ export function TiroirCompte() {
         <Tuile libelle="Énigmes" valeur={String(data.compteurs.enigmes)} />
       </div>
 
-      <TitreDeSection titre="Ses Fragments" />
-      <Bloc>
-        {data.fragments.length === 0 && <p className={styles.calme}>Aucun Fragment.</p>}
-        {data.fragments.map((f) => (
-          <div key={f.id} className={styles.ligneFiche}>
-            {f.image ? <img className={styles.vignette} src={f.image} alt="" /> : <span className={styles.vignette} />}
-            <span>{f.nom ?? 'Fragment'}</span>
-            <span className={styles.detail}>
-              {f.source === 'shopify' ? 'débloqué par une commande' : f.source === 'manual' ? 'associé à la main' : ''}
-              {f.quand ? ` ${dateCourte(f.quand)}` : ''}
-            </span>
-          </div>
-        ))}
-      </Bloc>
+      <AssocierFragment compte={data.id} fragments={data.fragments} />
 
       <TitreDeSection titre="Ses achats" />
       <Bloc>

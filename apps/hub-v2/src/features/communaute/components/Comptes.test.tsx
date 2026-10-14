@@ -79,3 +79,9 @@ test('ouvrir une fiche garde le filtre et la page, la fermer y ramène', async (
   expect(router.state.location.pathname).toBe('/communaute/comptes')
   expect(router.state.location.search).toBe('?filtre=porteurs&page=3')
 })
+
+test('« + Compte du stand » mène à /nouveau en gardant les critères de la liste', () => {
+  mockUseComptes.mockReturnValue({ data: liste, isError: false })
+  monter('/communaute/comptes?filtre=porteurs')
+  expect(screen.getByRole('link', { name: '+ Compte du stand' })).toHaveAttribute('href', '/communaute/comptes/nouveau?filtre=porteurs')
+})

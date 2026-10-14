@@ -10,6 +10,8 @@ const mockChanger = vi.hoisted(() => vi.fn())
 vi.mock('../hooks/useCompte', async (orig) => ({ ...(await orig<typeof import('../hooks/useCompte')>()), useCompte: mockUseCompte }))
 vi.mock('../api/comptes', async (orig) => ({ ...(await orig<typeof import('../api/comptes')>()), changerRole: mockChanger }))
 
+vi.mock('../api/fragmentsDuCompte', () => ({ lireFragmentsAssociables: () => Promise.resolve([]), associerFragment: vi.fn(), retirerFragment: vi.fn() }))
+
 const fiche = {
   id: 'u1', nom: 'Kelpie', email: 'k@x.fr', avatar: null, role: 'user', provenance: 'flyer', inscrit: '2026-10-14T09:00:00Z',
   derniere_visite: '2026-10-14T11:00:00Z', entree_v2: '2026-10-14T09:00:00Z', client: true, departement: 'Seine-et-Marne', code: '77', fragments: 2,
