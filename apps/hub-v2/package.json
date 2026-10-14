@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b",
-    "lint": "eslint . --max-warnings 0 && stylelint --allow-empty-input \"src/**/*.css\"",
+    "lint": "eslint . --max-warnings 0 && stylelint \"src/**/*.css\"",
     "test": "vitest run",
     "gen:types": "pnpm dlx supabase gen types typescript --linked --schema public > src/shared/supabase/database.types.ts"
   },

@@ -9,6 +9,7 @@ export const COLOR_TOKENS = [
   '--color-barre',
   '--color-sable',
   '--color-bord',
+  '--color-bloc',
   '--color-encre',
   '--color-texte',
   '--color-texte-doux',

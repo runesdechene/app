@@ -13,6 +13,7 @@
   --color-barre: #f6e7cf;
   --color-sable: #e7dcca;
   --color-bord: #c9bcbc;
+  --color-bloc: #fef6eb; /* le fond des blocs clairs du Hub (Figma 587:761) */
 
   /* Texte, du plus fort au plus pâle */
   --color-encre: #494841;
