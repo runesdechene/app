@@ -146,4 +146,10 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 - **Hub V2 — santé** : Synchro Shopify et fiches publiques dans « La santé » (plan 4, avec les
   fonctions Netlify) ; la reconstruction nocturne des fiches n'écrit son résultat nulle part de
   lisible (spec Hub V2 §13.4).
+- **Hub V2 — fil et santé, reste de la spec §9/§10** : recherche par Explorateur ou lieu ; lien de
+  chaque ligne du fil vers sa page ; « Porteur » dans le détail d'un compte ; nature du lieu et
+  nombre de photos ; nombre de photos d'une contribution ; lignes `purchase_log` sous Boutique ;
+  version d'Explore dans « La santé » ; libellés lisibles pour les canaux de chat (nom de la
+  Compagnie) et les types de notification (plus d'identifiants bruts) ; déconnexion depuis la
+  coquille ; fenêtre de comparaison de « Aujourd'hui » (en attente de la décision d'Uriel).
 - **Hub V2 — image de fond** : une grande image de parchemin (≥ 2 880 px) pour le PC (spec §13.5).

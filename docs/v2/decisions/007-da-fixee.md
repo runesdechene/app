@@ -8,7 +8,7 @@ la V1, chaque composant choisissait sa taille, sa couleur et son espacement ; l'
 diluait écran par écran. Le Figma de la V2 n'a aucune variable : aucune échelle n'existe encore.
 
 ## Décision
-- Toutes les valeurs visuelles vivent dans `shared/styles/tokens.css`, et nulle part ailleurs.
+- Toutes les valeurs visuelles vivent dans `packages/da/tokens.css`, et nulle part ailleurs.
 - Des styles de texte nommés (Titre d'écran, Titre de section, Sous-titre, Corps, Légende,
   Libellé, Bouton), portés par la brique `Text`.
 - Les briques d'interface vivent dans `shared/ui/`.

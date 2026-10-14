@@ -440,7 +440,7 @@ seraient des listes d'inconnus. Alors :
 ### DA — source de vérité
 
 > **Remplacé le 27/09/2026 par la DA fixée de la V2.** Uriel a tranché : **la maquette Figma
-> « App v2 » fait foi**, pas la boutique. Valeurs gravées dans `apps/web-v2/src/shared/styles/tokens.css`
+> « App v2 » fait foi**, pas la boutique. Valeurs gravées dans `packages/da/tokens.css`
 > et montrées sur `/v2/da` (décision `docs/v2/decisions/007-da-fixee.md`). Écarts retenus : fond
 > `#fcf3e4`, encre `#494841`, accent `#a94842`, ocre `#a89369` ; **trois polices** (Bebas Neue,
 > Cabin, **Cabin Condensed**) ; le texte tient en 4 niveaux. L'écran « Connexion » du Figma est une

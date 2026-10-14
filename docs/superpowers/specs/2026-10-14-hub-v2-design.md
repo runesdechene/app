@@ -51,8 +51,8 @@ L'ancien Hub tourne jusqu'à la bascule, puis il est supprimé.
 - **Les règles de la V2 s'appliquent** (`.claude/rules/v2.md`) : simplicité d'abord, tout est
   animé avec les deux mouvements des jetons, tout état navigable est une URL (une fiche en tiroir
   a son adresse), en-tête `QUOI / POURQUOI` sur chaque fichier, `README.md` par dossier.
-- **Les données passent par des fonctions serveur** (`SECURITY DEFINER`, réservées à l'équipe par
-  `_is_staff()`), comme dans la V2, pas par des lectures directes de tables. Les RPC du Hub
+- **Les données passent par des fonctions serveur** (`SECURITY DEFINER`, réservées aux admins par
+  `_is_admin()` ; les modérateurs viennent avec le chantier C), comme dans la V2, pas par des lectures directes de tables. Les RPC du Hub
   actuel qui servent encore sont reprises ; les nouvelles se nomment en français
   (`hub_ouverture`, `fil_du_hub`, …).
 - **Netlify** : un nouveau site pour `hub-v2` pendant la construction, déployé à la main
