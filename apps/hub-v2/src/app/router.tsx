@@ -13,6 +13,7 @@ import { TiroirCompagnie } from '@/features/communaute/components/TiroirCompagni
 import { TiroirCompte } from '@/features/communaute/components/TiroirCompte'
 import { TiroirLieu } from '@/features/communaute/components/TiroirLieu'
 import { Enigmes } from '@/features/jeu/components/Enigmes'
+import { EnigmesSignalees } from '@/features/jeu/components/EnigmesSignalees'
 import { TiroirEnigme } from '@/features/jeu/components/TiroirEnigme'
 import { BientotIci } from './coquille/BientotIci'
 import { Coquille } from './coquille/Coquille'
@@ -20,7 +21,7 @@ import { MENU } from './coquille/menu'
 import { PorteDEntree } from './entree/PorteDEntree'
 
 // Les écrans faits quittent « bientôt » ; chaque tâche suivante ajoute le sien.
-const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes'])
+const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees'])
 
 const autres = MENU.flatMap((d) => d.liens)
   .filter((l) => l.chemin !== '/' && !ECRANS_FAITS.has(l.chemin))
@@ -41,6 +42,7 @@ export const routes: RouteObject[] = [
       { path: 'communaute/lieux', Component: Lieux, children: [{ path: ':id', Component: TiroirLieu }] },
       { path: 'communaute/signalements', Component: Signalements },
       { path: 'jeu/enigmes', Component: Enigmes, children: [{ path: 'nouvelle', Component: TiroirEnigme }, { path: ':id', Component: TiroirEnigme }] },
+      { path: 'jeu/enigmes-signalees', Component: EnigmesSignalees },
       ...autres,
     ],
   },
