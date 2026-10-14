@@ -48,6 +48,19 @@ test('un lien sans http:// ni https:// est refusé, rien n’est écrit', async 
   expect(mockUpdate).not.toHaveBeenCalled()
 })
 
+test('inactive, un brouillon sans lien s’enregistre ; active, sans lien, il est refusé', async () => {
+  monter('/jeu/bannieres/1')
+  const lien = await screen.findByLabelText('Lien')
+  await userEvent.clear(lien)
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Le lien doit commencer par http:// ou https://')
+  expect(mockUpdate).not.toHaveBeenCalled()
+  await userEvent.click(screen.getByLabelText('Active'))
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+  expect(await screen.findByText('Enregistré.')).toBeInTheDocument()
+  expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ link_url: '', active: false }))
+})
+
 test('enregistrer : update de tous les champs, puis « Enregistré. »', async () => {
   monter('/jeu/bannieres/1')
   await userEvent.type(await screen.findByLabelText('Sous-titre'), 'Nouvelle collection')
@@ -72,14 +85,14 @@ test('un fichier de 6 Mo est refusé, le message reste, rien n’est envoyé', a
   monter('/jeu/bannieres/1')
   const gros = new File(['x'], 'g.png', { type: 'image/png' })
   Object.defineProperty(gros, 'size', { value: 6 * 1024 * 1024 })
-  await userEvent.upload(await screen.findByLabelText("Changer l'image"), gros)
+  await userEvent.upload(await screen.findByLabelText('Changer l’image'), gros)
   expect(await screen.findByRole('alert')).toHaveTextContent('Le fichier dépasse 5 Mo.')
   expect(mockEnvoyer).not.toHaveBeenCalled()
 })
 
 test('changer l’image : update, puis retrait de l’ancien fichier', async () => {
   monter('/jeu/bannieres/1')
-  await userEvent.upload(await screen.findByLabelText("Changer l'image"), new File(['x'], 'a.png', { type: 'image/png' }))
+  await userEvent.upload(await screen.findByLabelText('Changer l’image'), new File(['x'], 'a.png', { type: 'image/png' }))
   await vi.waitFor(() => { expect(mockRetirer).toHaveBeenCalledWith('home-banners', equinoxe.image_url) })
   expect(mockUpdate).toHaveBeenCalledWith({ image_url: 'https://x/storage/v1/object/public/home-banners/banner-2.png' })
 })

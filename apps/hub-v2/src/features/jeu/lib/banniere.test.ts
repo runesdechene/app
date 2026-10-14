@@ -24,4 +24,6 @@ test('un lien valide commence par http:// ou https://', () => {
   expect(lienValide('runesdechene.com')).toBe(false)
   expect(lienValide('javascript:alert(1)')).toBe(false)
   expect(lienValide('')).toBe(false)
+  expect(lienValide('https://')).toBe(false)
+  expect(lienValide('https://runesdechene.com')).toBe(true)
 })

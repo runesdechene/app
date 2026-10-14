@@ -64,7 +64,9 @@ function Formulaire({ fiche }: { fiche: Banniere }) {
     e.preventDefault()
     const opaciteVoile = entreZeroEtUn(opacite)
     const forceOmbre = entreZeroEtUn(force)
-    const erreur = !lienValide(lien) ? 'Le lien doit commencer par http:// ou https://'
+    // Un brouillon (inactive) peut n'avoir pas encore de lien.
+    const lienAVerifier = active || lien !== ''
+    const erreur = lienAVerifier && !lienValide(lien) ? 'Le lien doit commencer par http:// ou https://'
       : Number.isNaN(opaciteVoile) ? 'L’opacité du voile est un nombre de 0 à 1.'
         : Number.isNaN(forceOmbre) ? 'La force de l’ombre est un nombre de 0 à 1.'
           : null
@@ -100,7 +102,7 @@ function Formulaire({ fiche }: { fiche: Banniere }) {
         titre, sousTitre, voile, opacite: Number(opacite), tag, couleurTitre, couleurSousTitre, ombre, force: Number(force),
       }} />
       <label className={[styles.boutonContour, bannieres.envoi].join(' ')}>
-        Changer l'image
+        Changer l’image
         <input type="file" accept={REGLE_IMAGE.types.join(',')} disabled={changerImage.isPending} onChange={choisirImage} />
       </label>
       {changerImage.isError && <p role="alert">{changerImage.error.message}</p>}

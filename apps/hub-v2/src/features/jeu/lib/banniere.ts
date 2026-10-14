@@ -3,8 +3,8 @@
  * POURQUOI — degradeDeVoile et ombreDeTexte reprennent tels quels buildOverlayGradient et buildTextShadow de
  *            l'ancien Hub (apps/hub/src/components/Banners.tsx), qui devaient rester alignés sur l'Accueil : la V2
  *            (apps/web-v2/src/features/accueil/components/Banniere.module.css) fait le même calcul en CSS
- *            (force, puis 58,8 % et 23,5 % d'elle ; ombre « 0 1px 3px »). Un lien qui ne commence pas par http(s)
- *            n'est pas affiché par la V2.
+ *            (force, puis 58,8 % et 23,5 % d'elle ; ombre « 0 1px 3px »). Le lien se vérifie comme la V2 (lireAccueil.ts,
+ *            estHttp) : une adresse lisible en http(s), sinon la V2 n'affiche pas la bannière.
  */
 function canaux(couleur: string): string {
   const r = parseInt(couleur.slice(1, 3), 16) || 0
@@ -28,7 +28,7 @@ export function ombreDeTexte(couleur: string, force: number): string {
 }
 
 export function lienValide(url: string): boolean {
-  return /^https?:\/\//.test(url)
+  return URL.canParse(url) && ['http:', 'https:'].includes(new URL(url).protocol)
 }
 
 // L'image d'une bannière : jpeg, png ou webp, 5 Mo au plus (règle du bucket home-banners).
