@@ -1,0 +1,38 @@
+/*
+ * QUOI     — l'en-tête des écrans : surtitre en Bebas pâle, grand titre, phrase.
+ */
+.entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.textes {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.surtitre {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--rangee-size);
+  letter-spacing: var(--bandeau-titre-tracking);
+  text-transform: uppercase;
+  color: var(--color-texte-doux);
+}
+
+.titre {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--vitrine-lieux-titre-pc-size);
+  font-weight: var(--weight-normal);
+  line-height: 1;
+  color: var(--color-encre);
+}
+
+.phrase {
+  margin: 0;
+  color: var(--color-texte);
+}

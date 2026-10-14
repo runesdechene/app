@@ -1,0 +1,33 @@
+.champ {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 220px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-rond);
+  background: var(--color-bloc);
+}
+
+.champ img {
+  width: 14px;
+  opacity: 0.5;
+}
+
+.champ input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--flux-size);
+  color: var(--color-encre);
+}
+
+.champ input:focus {
+  outline: none;
+}
+
+.champ:focus-within {
+  border-color: var(--color-accent);
+}

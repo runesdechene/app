@@ -1,0 +1,61 @@
+/*
+ * QUOI     — le tiroir : pleine page au téléphone ; sur PC, un panneau qui glisse depuis la droite
+ *            sur un voile léger.
+ */
+.cadre {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+
+.voile {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-ombre) 12%, transparent);
+  animation: apparait var(--duree-douce) var(--courbe-douce);
+}
+
+.tiroir {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: start;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-4) var(--space-8);
+  overflow-y: auto;
+  background: var(--color-fond);
+  animation: glisse var(--duree-douce) var(--courbe-douce);
+}
+
+.fermer {
+  justify-self: start;
+  font-weight: var(--weight-semi);
+  font-size: var(--flux-size);
+  color: var(--color-texte-doux);
+  text-decoration: none;
+}
+
+@container app (width >= 900px) {
+  .tiroir {
+    inset: 0 0 0 auto;
+    width: calc(var(--tiroir) + var(--space-8));
+    padding: var(--space-6) var(--space-8) var(--space-8);
+    border-left: 1px solid var(--color-sable);
+    box-shadow: -8px 0 32px color-mix(in srgb, var(--color-ombre) 18%, transparent);
+  }
+}
+
+@keyframes apparait {
+  from { opacity: 0; }
+}
+
+@keyframes glisse {
+  from { translate: 100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voile,
+  .tiroir {
+    animation: none;
+  }
+}
