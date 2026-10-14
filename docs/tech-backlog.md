@@ -157,3 +157,7 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 - **Hub V2 — communauté** : Membres d'une Compagnie : pas de retrait ni de changement de rôle par l'équipe (YAGNI, à demander).
 - **Hub V2 — communauté** : Signalements → fiche de modération : fermer la fiche ramène aux Lieux, pas à la file (passer un retour).
 - **Hub V2 — communauté** : Export CSV des comptes limité à 10 000 lignes.
+- **Hub V2 — jeu** : Énigmes : pas de suppression (on désactive) ; pas de filtre « Universelle » (`hub_enigmes` ne filtre pas sur une culture nulle).
+- **Hub V2 — jeu** : Cultures et natures : ni création de culture ni suppression de nature.
+- **Hub V2 — jeu** : Titres de Compagnie V1 masqués, à purger avec `docs/v2/purge-back.md`.
+- **Hub V2 — jeu** : Une icône ou une image envoyée puis abandonnée sans enregistrer reste dans son bucket.
