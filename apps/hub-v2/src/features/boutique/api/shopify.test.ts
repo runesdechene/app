@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { AccesShopifyRefuse, chercherProduits, graphqlShopify, lireIllustrations, lireInventaireAudio, lireProduitsSansIllustration, pousserImage, retirerImage } from './shopify'
+import { AccesShopifyRefuse, chercherProduits, graphqlShopify, lireClientsShopify, lireIllustrations, lireInventaireAudio, lireProduitsSansIllustration, pageSuivante, pousserImage, retirerImage } from './shopify'
 
 const appel = vi.hoisted(() => ({ appelerFonction: vi.fn(), lireReponse: vi.fn() }))
 vi.mock('@/shared/lib/fonctions', () => appel)
@@ -135,4 +135,26 @@ test('les produits sans Illustration : actifs seulement, métachamp vide', async
   const noeud = (handle: string, status: string, value: string | null) => ({ node: { handle, title: handle.toUpperCase(), status, metafield: value === null ? null : { value } } })
   repond({ data: { products: { pageInfo: { hasNextPage: false }, edges: [noeud('a', 'ACTIVE', null), noeud('b', 'ACTIVE', 'gid://m/1'), noeud('c', 'DRAFT', null)] } } })
   expect(await lireProduitsSansIllustration()).toEqual({ produits: [{ handle: 'a', titre: 'A' }], tronque: false })
+})
+
+test('la page suivante de Shopify', () => {
+  expect(pageSuivante('<https://s.myshopify.com/admin/api/2026-01/customers.json?page_info=abc&limit=250>; rel="next"')).toBe('customers.json?page_info=abc&limit=250')
+  expect(pageSuivante('<https://s/admin/api/2026-01/customers.json?page_info=z>; rel="previous"')).toBeNull()
+  expect(pageSuivante(null)).toBeNull()
+})
+
+test('les clients Shopify : toutes les pages, jusqu’à la dernière', async () => {
+  const page = (lien: string | null) => new Response('{}', { headers: lien ? { Link: lien } : {} })
+  appel.appelerFonction
+    .mockResolvedValueOnce(page('<https://s/admin/api/2026-01/customers.json?page_info=p2>; rel="next"'))
+    .mockResolvedValueOnce(page(null))
+  appel.lireReponse
+    .mockResolvedValueOnce({ customers: [{ id: 1, email: 'a@b.fr', tags: '', created_at: '' }] })
+    .mockResolvedValueOnce({ customers: [{ id: 2, email: null, tags: 'x', created_at: '' }] })
+  const clients = await lireClientsShopify()
+  expect(clients.map((c) => c.id)).toEqual([1, 2])
+  expect(appel.appelerFonction).toHaveBeenNthCalledWith(1, 'shopify-proxy', {
+    parametres: { endpoint: 'customers.json?limit=250&fields=id,email,tags,created_at' },
+  })
+  expect(appel.appelerFonction).toHaveBeenNthCalledWith(2, 'shopify-proxy', { parametres: { endpoint: 'customers.json?page_info=p2' } })
 })

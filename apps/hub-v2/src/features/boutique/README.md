@@ -5,3 +5,5 @@ Photos et avis (spec §12) : api/contributions (hub_contributions et les écritu
 Par photo (Task 8) : canaux, produit Shopify (api/shopify : recherche, poser et retirer une image), téléchargement (lib/archive, jszip chargé au premier usage, hooks/useTelechargement) et suppression propre dans l'ordre Shopify, stockage (shared/lib/envoi : retirerFichiers vérifie), base — ChoixDuProduit pour relier.
 
 Écoutes audio (Task 9) : api/ecoutes (get_fragment_audio_stats), api/shopify (lireInventaireAudio, lireProduitsSansIllustration), hooks/useEcoutes (trois lectures indépendantes), lib/ecoutes (résumé, seuil de décision) et components/Ecoutes (tuiles, verdict, par Fragment) avec CouvertureAudio (les trois relevés de couverture).
+
+Synchro Shopify (Task 10) : api/synchro (shopify-sync, hub_comptes_clients, shopify-batch-tags), api/shopify (lireClientsShopify, pageSuivante), lib/provenance (étiquettes de provenance, lots de 25, envoi avec compte rendu), hooks/useSynchro et components/Synchro (liaison, puis étiquettes ; jamais les deux ensemble).

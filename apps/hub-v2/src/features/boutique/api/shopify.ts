@@ -191,6 +191,28 @@ export async function retirerImage(produitId: string, mediaId: string): Promise<
   }
 }
 
+/** Un client de la boutique, tel que la synchro des étiquettes en a besoin. */
+export type ClientShopify = { id: number; email: string | null; tags: string; created_at: string }
+
+/** Le chemin de la page suivante dans l'en-tête `Link` de Shopify, relatif à l'API ; null s'il n'y en a pas. */
+export function pageSuivante(lien: string | null): string | null {
+  return lien?.match(/<https?:\/\/[^>]*\/admin\/api\/[^/>]+\/([^>]+)>;\s*rel="next"/)?.[1] ?? null
+}
+
+/** Tous les clients de la boutique : 250 par page, les pages suivantes tant que Shopify en annonce une. */
+export async function lireClientsShopify(): Promise<ClientShopify[]> {
+  const clients: ClientShopify[] = []
+  let chemin: string | null = 'customers.json?limit=250&fields=id,email,tags,created_at'
+  while (chemin !== null) {
+    const reponse = await appelerFonction('shopify-proxy', { parametres: { endpoint: chemin } })
+    const suivante = pageSuivante(reponse.headers.get('Link'))
+    const { customers } = await lireReponse<{ customers?: ClientShopify[] }>(reponse)
+    clients.push(...(customers ?? []))
+    chemin = suivante
+  }
+  return clients
+}
+
 /** Une Illustration de l'inventaire audio : son nom, et si elle porte un fichier de voix off. */
 export type IllustrationAudio = { handle: string; nom: string; aAudio: boolean }
 
