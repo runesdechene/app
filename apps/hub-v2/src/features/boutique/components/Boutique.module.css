@@ -19,6 +19,7 @@
 }
 
 .boutonContour {
+  justify-self: start;
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--color-bord);
   border-radius: var(--radius-rond);
@@ -38,7 +39,7 @@
 .onglets {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-5);
+  gap: var(--space-6);
 }
 
 .onglet {
@@ -107,13 +108,13 @@ a.ligne:hover { background: var(--color-surface); }
 .section {
   display: grid;
   gap: var(--space-3);
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-6);
 }
 
 .formulaire {
   display: grid;
   gap: var(--space-4);
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-6);
 }
 
 .champ {
