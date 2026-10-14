@@ -93,7 +93,7 @@ export function Photos() {
     <div className={boutique.ecran}>
       <EnTeteDePage surtitre="Fragments et boutique" titre="Photos et avis" phrase={phrase} />
       {compteurs && (
-        <div className={styles.tuiles}>
+        <div className={styles.tuiles} role="group" aria-label="Les chiffres">
           <Tuile libelle="À valider" valeur={nombre.format(compteurs.a_valider)} />
           <Tuile libelle="Publiées" valeur={nombre.format(compteurs.publiees)} />
           <Tuile libelle="Archivées" valeur={nombre.format(compteurs.archivees)} />

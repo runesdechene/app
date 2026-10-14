@@ -20,8 +20,10 @@ export function useEtiquettesDePhoto() {
 /** Les écritures d'une contribution, chacune avec sa propre erreur. */
 export function useEcritureContribution() {
   const client = useQueryClient()
-  const apres = async () => {
-    await Promise.all(['hub-contributions', 'hub-ouverture'].map((k) => client.invalidateQueries({ queryKey: [k] })))
+  // Pas d'attente : la contribution décidée peut quitter la liste au rafraîchissement, et l'écran
+  // doit avoir choisi la suivante avant que sa lecture disparaisse.
+  const apres = () => {
+    for (const k of ['hub-contributions', 'hub-ouverture']) void client.invalidateQueries({ queryKey: [k] })
   }
   return {
     moderer: useMutation({
@@ -44,8 +46,9 @@ export function useEcritureContribution() {
       mutationFn: async ({ id, nom }: { id: string; nom: string }) => {
         await ajouterEtiquette(id, await creerEtiquette(nom))
       },
-      onSuccess: async () => {
-        await Promise.all([apres(), client.invalidateQueries({ queryKey: ['hub-etiquettes-photo'] })])
+      onSuccess: () => {
+        apres()
+        void client.invalidateQueries({ queryKey: ['hub-etiquettes-photo'] })
       },
     }),
   }

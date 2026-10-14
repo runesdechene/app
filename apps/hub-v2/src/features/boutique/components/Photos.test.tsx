@@ -68,7 +68,7 @@ test('les quatre tuiles et la phrase de l’en-tête', async () => {
   afficher([contribution('c1', 'Brune')])
   expect(await screen.findByText('12 contributions attendent ; la plus ancienne est arrivée il y a', { exact: false })).toBeInTheDocument()
   for (const [libelle, valeur] of [['À valider', '12'], ['Publiées', '340'], ['Archivées', '8'], ['Photos au mur', '57']] as const) {
-    expect(screen.getByText(valeur).parentElement?.parentElement).toHaveTextContent(libelle)
+    expect(screen.getByRole('group', { name: 'Les chiffres' })).toHaveTextContent(`${libelle}${valeur}`)
   }
 })
 
@@ -177,4 +177,50 @@ test('les étiquettes : poser, retirer, créer', async () => {
 test('file vide', async () => {
   afficher([])
   expect(await screen.findByText('Aucune contribution ici.')).toBeInTheDocument()
+})
+
+test('la contribution de l’adresse (?c=) est choisie', async () => {
+  afficher([contribution('c1', 'Brune'), contribution('c2', 'Corentin')], '/boutique/photos?c=c2')
+  expect(await screen.findByRole('heading', { name: 'Corentin' })).toBeInTheDocument()
+})
+
+describe('après une décision', () => {
+  const trois = () => [contribution('c1', 'Brune'), contribution('c2', 'Corentin'), contribution('c3', 'Dana')]
+
+  test('celle du milieu : la suivante, même si la relecture l’a retirée', async () => {
+    afficher(trois(), '/boutique/photos?c=c2')
+    await screen.findByRole('heading', { name: 'Corentin' })
+    api.lireContributions.mockResolvedValue(liste([contribution('c1', 'Brune'), contribution('c3', 'Dana')]))
+    await userEvent.click(screen.getByRole('button', { name: 'Valider et publier' }))
+    expect(await screen.findByRole('heading', { name: 'Dana' })).toBeInTheDocument()
+    expect(screen.getByTestId('adresse')).toHaveTextContent('c=c3')
+  })
+
+  test('la dernière : celle d’avant', async () => {
+    afficher(trois(), '/boutique/photos?c=c3')
+    await screen.findByRole('heading', { name: 'Dana' })
+    api.lireContributions.mockResolvedValue(liste([contribution('c1', 'Brune'), contribution('c2', 'Corentin')]))
+    await userEvent.click(screen.getByRole('button', { name: 'Valider et publier' }))
+    expect(await screen.findByRole('heading', { name: 'Corentin' })).toBeInTheDocument()
+    expect(screen.getByTestId('adresse')).toHaveTextContent('c=c2')
+  })
+
+  test('« Archiver » passe aussi à la suivante', async () => {
+    afficher(trois(), '/boutique/photos?c=c2')
+    await screen.findByRole('heading', { name: 'Corentin' })
+    api.lireContributions.mockResolvedValue(liste([contribution('c1', 'Brune'), contribution('c3', 'Dana')]))
+    await userEvent.click(screen.getByRole('button', { name: 'Archiver' }))
+    expect(await screen.findByRole('heading', { name: 'Dana' })).toBeInTheDocument()
+    expect(screen.getByTestId('adresse')).toHaveTextContent('c=c3')
+  })
+})
+
+test('un nouvel essai efface l’erreur du précédent', async () => {
+  api.modererContribution.mockRejectedValueOnce(new Error('Réservé à l’équipe'))
+  afficher([contribution('c1', 'Brune')])
+  await userEvent.click(await screen.findByRole('button', { name: 'Archiver' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Réservé à l’équipe')
+  await userEvent.click(screen.getByRole('button', { name: 'Archiver' }))
+  await waitFor(() => { expect(screen.queryByRole('alert')).not.toBeInTheDocument() })
+  expect(api.modererContribution).toHaveBeenCalledTimes(2)
 })
