@@ -45,6 +45,7 @@ test('masquer un lieu rafraîchit la liste et la pastille', async () => {
   expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-lieux'] })
   expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-ouverture'] })
   expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-lieu', 'p1'] })
+  expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-signalements'] })
   expect(await screen.findByText('Aucun lieu ne correspond.')).toBeInTheDocument()
   expect(screen.queryByRole('link', { name: /Dolmen de la Pierre Levée/ })).not.toBeInTheDocument()
 })
