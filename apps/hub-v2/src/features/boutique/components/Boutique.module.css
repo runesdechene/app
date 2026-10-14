@@ -1,0 +1,104 @@
+/*
+ * QUOI     — la mise en page des écrans de la Boutique : l'écran, les onglets des Fragments, la liste des
+ *            Fragments et celle des motifs Shopify sans Fragment.
+ */
+.ecran {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.calme {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-texte-doux);
+}
+
+.erreur {
+  margin: 0;
+  color: var(--color-accent);
+}
+
+.boutonContour {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  background: none;
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--sous-titre-size);
+  color: var(--color-texte);
+  text-decoration: none;
+}
+
+.boutonContour:disabled {
+  opacity: 0.5;
+}
+
+/* Les onglets des Fragments */
+.onglets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+}
+
+.onglet {
+  padding-bottom: var(--space-1);
+  border-bottom: 2px solid transparent;
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--sous-titre-size);
+  color: var(--color-texte-doux);
+  text-decoration: none;
+}
+
+.onglet[aria-current='page'] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* Les lignes : un Fragment, un motif */
+.ligne {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--duree-douce) var(--courbe-douce);
+}
+
+a.ligne:hover { background: var(--color-surface); }
+
+.vignette {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-rond);
+  background: var(--color-vignette);
+  object-fit: cover;
+}
+
+.nom {
+  display: grid;
+  justify-items: start;
+  min-width: 0;
+  color: var(--color-encre);
+}
+
+.nom span {
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.actions {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-1);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.intro {
+  margin: 0;
+  color: var(--color-texte-doux);
+}
