@@ -6,6 +6,7 @@
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { Ouverture } from '@/features/accueil/components/Ouverture'
 import { Comptes } from '@/features/communaute/components/Comptes'
+import { TiroirCompte } from '@/features/communaute/components/TiroirCompte'
 import { BientotIci } from './coquille/BientotIci'
 import { Coquille } from './coquille/Coquille'
 import { MENU } from './coquille/menu'
@@ -28,7 +29,7 @@ export const routes: RouteObject[] = [
     ),
     children: [
       { index: true, Component: Ouverture },
-      { path: 'communaute/comptes', Component: Comptes, children: [] },
+      { path: 'communaute/comptes', Component: Comptes, children: [{ path: ':id', Component: TiroirCompte }] },
       ...autres,
     ],
   },

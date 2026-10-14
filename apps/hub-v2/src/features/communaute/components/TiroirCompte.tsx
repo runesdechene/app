@@ -1,0 +1,141 @@
+/**
+ * QUOI     — la fiche d'un compte (maquette 595:1140) : identité, parcours, rôle, compteurs,
+ *            Fragments, achats, dernières traces.
+ * POURQUOI — le rôle se change ici, d'un choix : c'est le seul geste d'écriture de la fiche.
+ */
+import { Link, useParams } from 'react-router'
+import { dateCourte } from '@/shared/lib/dates'
+import { depuis, heureDuFil } from '@/shared/lib/quand'
+import { Balise } from '@/shared/ui/Balise'
+import { Bloc } from '@/shared/ui/Bloc'
+import { Tiroir } from '@/shared/ui/Tiroir'
+import { TitreDeSection } from '@/shared/ui/TitreDeSection'
+import { Tuile } from '@/shared/ui/Tuile'
+import type { FicheDeCompte } from '../api/comptes'
+import { useChangerRole, useCompte } from '../hooks/useCompte'
+import { balisesDuCompte } from '../lib/balises'
+import { PROVENANCES } from '../lib/provenances'
+import styles from './Communaute.module.css'
+
+const LISTE = '/communaute/comptes'
+const ROLES = { user: 'Explorateur', ambassador: 'Ambassadeur', moderator: 'Modérateur', admin: 'Admin' }
+const TRACES: Record<FicheDeCompte['traces'][number]['type'], string> = {
+  visite: 'a posé sa marque à',
+  decouverte: 'a découvert',
+  ajout: 'a ajouté',
+  enigme: 'a percé l’',
+  enigme_manquee: 'a manqué l’',
+}
+
+export function TiroirCompte() {
+  const { id = '' } = useParams()
+  const { data, isPending } = useCompte(id)
+  const changer = useChangerRole(id)
+
+  if (isPending) {
+    return (
+      <Tiroir titre="Compte" retour={LISTE}>
+        <p className={styles.calme}>Lecture…</p>
+      </Tiroir>
+    )
+  }
+  if (!data) {
+    return (
+      <Tiroir titre="Compte introuvable" retour={LISTE}>
+        <p>Compte introuvable.</p>
+        <Link to={LISTE}>Retour à la liste</Link>
+      </Tiroir>
+    )
+  }
+
+  const maintenant = new Date()
+  const balises = balisesDuCompte({ ...data, fragments: data.fragments.length }, maintenant)
+  const departement = data.departement ? `${data.departement}${data.code ? ` (${data.code})` : ''}` : '—'
+  const boutique = data.client ? `Client validé · ${String(data.achats.length)} commande${data.achats.length > 1 ? 's' : ''}` : '—'
+
+  return (
+    <Tiroir titre={data.nom} retour={LISTE}>
+      <div className={styles.identite}>
+        {data.avatar ? <img className={styles.grandPortrait} src={data.avatar} alt="" /> : <span className={styles.grandPortrait} />}
+        <div>
+          <h1 className={styles.nomFiche}>{data.nom}</h1>
+          <div className={styles.nomEtBalises}>{balises.map((b) => <Balise key={b.texte} {...b} />)}</div>
+          <p className={styles.detail}>
+            Inscrit le {dateCourte(data.inscrit)} · vu {data.derniere_visite ? depuis(data.derniere_visite, maintenant) : 'jamais'}
+          </p>
+        </div>
+      </div>
+
+      <TitreDeSection titre="Son parcours" />
+      <Bloc className={styles.parcours ?? ''}>
+        <span>Arrivé par</span>
+        <span>{data.provenance ? (PROVENANCES[data.provenance] ?? data.provenance) : '—'}</span>
+        <span>Département</span>
+        <span>{departement}</span>
+        <span>Boutique</span>
+        <span>{boutique}</span>
+        <span>E-mail</span>
+        <span>{data.email ?? '—'}</span>
+        <span>Rôle</span>
+        <span>
+          <select
+            aria-label="Rôle"
+            value={data.role}
+            disabled={changer.isPending}
+            onChange={(e) => {
+              changer.mutate(e.target.value)
+            }}
+          >
+            {Object.entries(ROLES).map(([valeur, libelle]) => <option key={valeur} value={valeur}>{libelle}</option>)}
+          </select>
+          {changer.isError && <span role="alert"> Le rôle n’a pas changé.</span>}
+        </span>
+      </Bloc>
+
+      <TitreDeSection titre="Ce qu’il a fait" />
+      <div className={styles.quatre}>
+        <Tuile libelle="Découverts" valeur={String(data.compteurs.decouverts)} />
+        <Tuile libelle="Visites" valeur={String(data.compteurs.visites)} />
+        <Tuile libelle="Ajoutés" valeur={String(data.compteurs.ajoutes)} />
+        <Tuile libelle="Énigmes" valeur={String(data.compteurs.enigmes)} />
+      </div>
+
+      <TitreDeSection titre="Ses Fragments" />
+      <Bloc>
+        {data.fragments.length === 0 && <p className={styles.calme}>Aucun Fragment.</p>}
+        {data.fragments.map((f) => (
+          <div key={f.id} className={styles.ligneFiche}>
+            {f.image ? <img className={styles.vignette} src={f.image} alt="" /> : <span className={styles.vignette} />}
+            <span>{f.nom ?? 'Fragment'}</span>
+            <span className={styles.detail}>
+              {f.source === 'shopify' ? 'débloqué par une commande' : f.source === 'manual' ? 'associé à la main' : ''}
+              {f.quand ? ` ${dateCourte(f.quand)}` : ''}
+            </span>
+          </div>
+        ))}
+      </Bloc>
+
+      <TitreDeSection titre="Ses achats" />
+      <Bloc>
+        {data.achats.length === 0 && <p className={styles.calme}>Aucun achat.</p>}
+        {data.achats.map((a, i) => (
+          <div key={a.commande ?? i} className={styles.ligneFiche}>
+            <span>Commande n° {a.commande ?? '—'}</span>
+            <span className={styles.detail}>{dateCourte(a.quand)}</span>
+            {a.statut === 'unlocked' ? <Balise texte="Débloqué" teinte="visite" /> : <Balise texte={a.statut} teinte="boutique" />}
+          </div>
+        ))}
+      </Bloc>
+
+      <TitreDeSection titre="Ses dernières traces" />
+      <Bloc>
+        {data.traces.length === 0 && <p className={styles.calme}>Aucune trace.</p>}
+        {data.traces.map((t, i) => (
+          <p key={i} className={styles.ligneFiche}>
+            {heureDuFil(t.quand, maintenant)} · {TRACES[t.type]} {t.texte}
+          </p>
+        ))}
+      </Bloc>
+    </Tiroir>
+  )
+}

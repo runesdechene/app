@@ -9,9 +9,9 @@ import { moisAnnee } from '@/shared/lib/dates'
 import { Balise } from '@/shared/ui/Balise'
 import type { Compte } from '../api/comptes'
 import { balisesDuCompte } from '../lib/balises'
+import { PROVENANCES } from '../lib/provenances'
 import styles from './Communaute.module.css'
 
-const PROVENANCES: Record<string, string> = { app: 'Appli', shopify: 'Boutique en ligne', stand: 'Stand', flyer: 'Flyer' }
 
 export function LigneDeCompte({ compte, maintenant }: { compte: Compte; maintenant: Date }) {
   const detail = [compte.client ? 'client validé' : '', compte.email ?? ''].filter(Boolean).join(' · ')
