@@ -129,8 +129,8 @@ Les sources ont été relevées dans les migrations le 14/10.
 | Nom | Définition | Source |
 |---|---|---|
 | Nouveaux comptes | comptes créés pendant la période | `users.created_at` |
-| Comptes réactivés | anciens comptes entrés pour la première fois dans la V2 pendant la période ; un compte ne se réactive qu'une fois | `users.charte_signee_le` (posée une seule fois, à la première entrée), quand elle est postérieure de plus d'un jour à `created_at` |
-| En sommeil | comptes créés avant la bascule (07/10/2026) qui ne sont jamais entrés dans la V2 | `users.created_at` < 07/10/2026 et `charte_signee_le` vide |
+| Comptes réactivés | anciens comptes entrés pour la première fois dans la V2 pendant la période ; un compte ne se réactive qu'une fois | `users.entree_v2_le` (première connexion à la V2, posée une seule fois par `touch_last_login` ; passé rempli le 14/10 depuis la Charte ou la dernière connexion après la bascule, mig 515), quand elle est postérieure de plus d'un jour à `created_at` |
+| En sommeil | comptes créés avant la bascule (07/10/2026) qui ne sont jamais entrés dans la V2 | `users.created_at` < 07/10/2026 (minuit, heure de Paris) et `entree_v2_le` vide |
 | Actifs | comptes qui ont ouvert l'appli pendant la période | `users.last_login_at` (écrit à chaque ouverture par `touch_last_login`) |
 | Lieux ajoutés | lieux créés pendant la période | `places.created_at` |
 | Visites sur place | marques posées sur place pendant la période | `places_discovered`, `method = 'gps'`, `discovered_at` |
@@ -179,7 +179,7 @@ rassemble ce que la base garde déjà, trié par date :
 
 | Type | Source | Détail montré |
 |---|---|---|
-| Compte | `users.created_at`, `charte_signee_le` (réactivation) | provenance (`account_source`), Porteur, client validé (`shopify_customer_id`) |
+| Compte | `users.created_at`, `entree_v2_le` (réactivation) | provenance (`account_source`), Porteur, client validé (`shopify_customer_id`) |
 | Lieu | `places` (ajout), `versions_lieu` (modification) | nature, nombre de photos, vérifié ou non |
 | Visite | `places_discovered` (`gps`) | première visite de ce lieu ou non |
 | Énigme | `enigma_responses` | culture, juste ou faux, rang de l'essai (nombre de réponses à cette énigme) |

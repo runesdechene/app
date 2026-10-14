@@ -16,7 +16,7 @@
 - Travail dans un dossier git **hors du dépôt** (un worktree sous `Desktop/DEVs/`, jamais sous le dépôt : Node y charge un second React) et toujours avec la casse exacte du chemin.
 - Migrations à partir de **514**, `-- WHY:` + `-- SCHEMA CHECKED (date, live) :`, appliquées par `npx supabase db push --linked` après `--dry-run`, vérifiées en prod. Tout `CREATE OR REPLACE` d'une fonction existante part de sa définition live.
 - Fonctions du Hub : `SECURITY DEFINER`, `SET search_path TO 'public'`, `IF NOT _is_admin() THEN PERFORM _refus('Réservé à l’équipe', 'role'); END IF;`, `REVOKE ALL … FROM PUBLIC, anon; GRANT EXECUTE … TO authenticated;` (`.claude/rules/supabase.md`).
-- Balises (spec §8, décisions du 14/10) : **Nouveau** = créé il y a moins de 15 jours ; **Réactivé** = `charte_signee_le` il y a moins de 15 jours et plus d'un jour après `created_at` ; **En sommeil** = créé avant le 07/10/2026 et `charte_signee_le` vide ; **Porteur** = au moins un Fragment ; **Admin** = `role = 'admin'`. Vocabulaire : « Porteur », « client validé », jamais « client relié » ; « Compagnie », jamais « faction ».
+- Balises (spec §8, décisions du 14/10) : **Nouveau** = créé il y a moins de 15 jours ; **Réactivé** = `entree_v2_le` (première connexion à la V2, mig 515) il y a moins de 15 jours et plus d'un jour après `created_at` ; **En sommeil** = créé avant le 07/10/2026 minuit Paris et `entree_v2_le` vide ; **Porteur** = au moins un Fragment ; **Admin** = `role = 'admin'`. Vocabulaire : « Porteur », « client validé », jamais « client relié » ; « Compagnie », jamais « faction ».
 - « Lieux à modérer » = lieux non masqués, jamais vérifiés, ajoutés depuis la bascule (07/10/2026) — la même définition que la pastille du menu (`hub_ouverture`, mig 506).
 - Hors de ce plan : associer un Fragment à la main (plan 4, avec l'écran Fragments) ; changer l'identifiant d'une Compagnie (jamais : `rename_faction` est fermée, mig 512) ; retirer un membre d'une Compagnie.
 
@@ -67,7 +67,7 @@ apps/hub-v2/src/
   "departements": ["Ain","Aisne"],
   "lignes": [ { "id": "…", "nom": "Kelpie", "email": "k@…", "avatar": "https://…", "role": "user",
                 "provenance": "flyer", "inscrit": "2026-10-14T…", "derniere_visite": "2026-10-14T…",
-                "charte": "2026-10-14T…", "client": true, "departement": "Seine-et-Marne", "code": "77",
+                "entree_v2": "2026-10-14T…", "client": true, "departement": "Seine-et-Marne", "code": "77",
                 "fragments": 2 } ] }
 ```
 
@@ -75,7 +75,7 @@ apps/hub-v2/src/
 
 ```json
 { "id": "…", "nom": "Kelpie", "email": "…", "avatar": null, "role": "user", "provenance": "flyer",
-  "inscrit": "…", "derniere_visite": "…", "charte": "…", "client": true, "departement": "…", "code": "77",
+  "inscrit": "…", "derniere_visite": "…", "entree_v2": "…", "client": true, "departement": "…", "code": "77",
   "compteurs": { "decouverts": 12, "visites": 4, "ajoutes": 0, "enigmes": 3 },
   "fragments": [ { "id": 7, "nom": "Hoplite", "image": "https://…", "source": "shopify", "quand": "…" } ],
   "achats": [ { "commande": "1042", "quand": "…", "statut": "unlocked", "tag": "hoplite" } ],
@@ -701,7 +701,7 @@ import { balisesDuCompte } from './balises'
 const maintenant = new Date('2026-10-14T12:00:00Z')
 const base: Compte = {
   id: 'u1', nom: 'Kelpie', email: 'k@exemple.fr', avatar: null, role: 'user', provenance: 'flyer',
-  inscrit: '2026-10-14T09:00:00Z', derniere_visite: '2026-10-14T11:00:00Z', charte: '2026-10-14T09:01:00Z',
+  inscrit: '2026-10-14T09:00:00Z', derniere_visite: '2026-10-14T11:00:00Z', entree_v2: '2026-10-14T09:01:00Z',
   client: true, departement: 'Seine-et-Marne', code: '77', fragments: 2,
 }
 const textes = (c: Compte) => balisesDuCompte(c, maintenant).map((b) => b.texte)
@@ -709,20 +709,20 @@ const textes = (c: Compte) => balisesDuCompte(c, maintenant).map((b) => b.texte)
 test('nouveau et porteur', () => {
   expect(textes(base)).toEqual(['Nouveau', 'Porteur'])
 })
-test('réactivé : charte signée il y a moins de 15 jours, plus d’un jour après l’inscription', () => {
-  expect(textes({ ...base, inscrit: '2025-03-01T00:00:00Z', charte: '2026-10-10T00:00:00Z', fragments: 0 })).toEqual(['Réactivé'])
+test('réactivé : entré dans la V2 il y a moins de 15 jours, plus d’un jour après l’inscription', () => {
+  expect(textes({ ...base, inscrit: '2025-03-01T00:00:00Z', entree_v2: '2026-10-10T00:00:00Z', fragments: 0 })).toEqual(['Réactivé'])
 })
 test('réactivé il y a plus de 15 jours : plus de balise', () => {
-  expect(textes({ ...base, inscrit: '2025-03-01T00:00:00Z', charte: '2026-09-01T00:00:00Z', fragments: 0 })).toEqual([])
+  expect(textes({ ...base, inscrit: '2025-03-01T00:00:00Z', entree_v2: '2026-09-01T00:00:00Z', fragments: 0 })).toEqual([])
 })
 test('en sommeil : créé avant la bascule, jamais entré dans la V2', () => {
-  expect(textes({ ...base, inscrit: '2024-02-01T00:00:00Z', charte: null, fragments: 1 })).toEqual(['En sommeil', 'Porteur'])
+  expect(textes({ ...base, inscrit: '2024-02-01T00:00:00Z', entree_v2: null, fragments: 1 })).toEqual(['En sommeil', 'Porteur'])
 })
 test('un compte créé après la bascule sans être entré n’est pas en sommeil', () => {
-  expect(textes({ ...base, inscrit: '2026-10-08T00:00:00Z', charte: null, fragments: 0 })).toEqual(['Nouveau'])
+  expect(textes({ ...base, inscrit: '2026-10-08T00:00:00Z', entree_v2: null, fragments: 0 })).toEqual(['Nouveau'])
 })
 test('admin', () => {
-  expect(textes({ ...base, inscrit: '2024-01-01T00:00:00Z', charte: '2024-01-01T00:00:00Z', role: 'admin', fragments: 22 })).toEqual(['Admin', 'Porteur'])
+  expect(textes({ ...base, inscrit: '2024-01-01T00:00:00Z', entree_v2: '2024-01-01T00:00:00Z', role: 'admin', fragments: 22 })).toEqual(['Admin', 'Porteur'])
 })
 ```
 
@@ -734,7 +734,7 @@ import { versCsv } from './csv'
 
 const c: Compte = {
   id: 'u1', nom: 'Jean; « le » Bon', email: 'j@x.fr', avatar: null, role: 'user', provenance: 'app',
-  inscrit: '2026-10-14T09:00:00Z', derniere_visite: null, charte: null, client: false,
+  inscrit: '2026-10-14T09:00:00Z', derniere_visite: null, entree_v2: null, client: false,
   departement: null, code: null, fragments: 0,
 }
 
@@ -765,7 +765,7 @@ export type Filtre = 'tous' | 'nouveaux' | 'reactives' | 'sommeil' | 'porteurs' 
 export type Tri = 'visite' | 'inscription' | 'nom'
 export type Compte = {
   id: string; nom: string; email: string | null; avatar: string | null; role: string
-  provenance: string | null; inscrit: string; derniere_visite: string | null; charte: string | null
+  provenance: string | null; inscrit: string; derniere_visite: string | null; entree_v2: string | null
   client: boolean; departement: string | null; code: string | null; fragments: number
 }
 export type ListeDeComptes = {
@@ -809,12 +809,12 @@ const BASCULE = Date.parse('2026-10-07T00:00:00+02:00')
 export function balisesDuCompte(c: Compte, maintenant: Date): { texte: string; teinte: Teinte }[] {
   const t = maintenant.getTime()
   const inscrit = Date.parse(c.inscrit)
-  const charte = c.charte ? Date.parse(c.charte) : null
+  const entree = c.entree_v2 ? Date.parse(c.entree_v2) : null
   const balises: { texte: string; teinte: Teinte }[] = []
   if (c.role === 'admin') balises.push({ texte: 'Admin', teinte: 'admin' })
   if (t - inscrit < QUINZE_JOURS) balises.push({ texte: 'Nouveau', teinte: 'nouveau' })
-  else if (charte !== null && t - charte < QUINZE_JOURS && charte - inscrit > JOUR) balises.push({ texte: 'Réactivé', teinte: 'reactive' })
-  else if (charte === null && inscrit < BASCULE) balises.push({ texte: 'En sommeil', teinte: 'sommeil' })
+  else if (entree !== null && t - entree < QUINZE_JOURS && entree - inscrit > JOUR) balises.push({ texte: 'Réactivé', teinte: 'reactive' })
+  else if (entree === null && inscrit < BASCULE) balises.push({ texte: 'En sommeil', teinte: 'sommeil' })
   if (c.fragments > 0) balises.push({ texte: 'Porteur', teinte: 'porteur' })
   return balises
 }
@@ -876,9 +876,9 @@ const liste = {
   provenances: ['app', 'flyer'], departements: ['Aude'],
   lignes: [
     { id: 'u1', nom: 'Kelpie', email: 'k@x.fr', avatar: null, role: 'user', provenance: 'flyer', inscrit: '2026-10-14T09:00:00Z',
-      derniere_visite: '2026-10-14T11:00:00Z', charte: '2026-10-14T09:00:00Z', client: true, departement: 'Seine-et-Marne', code: '77', fragments: 2 },
+      derniere_visite: '2026-10-14T11:00:00Z', entree_v2: '2026-10-14T09:00:00Z', client: true, departement: 'Seine-et-Marne', code: '77', fragments: 2 },
     { id: 'u2', nom: 'Un Voyageur', email: null, avatar: null, role: 'user', provenance: null, inscrit: '2024-02-01T00:00:00Z',
-      derniere_visite: null, charte: null, client: false, departement: null, code: null, fragments: 0 },
+      derniere_visite: null, entree_v2: null, client: false, departement: null, code: null, fragments: 0 },
   ],
 }
 
@@ -1180,7 +1180,7 @@ vi.mock('../api/comptes', async (orig) => ({ ...(await orig<typeof import('../ap
 
 const fiche = {
   id: 'u1', nom: 'Kelpie', email: 'k@x.fr', avatar: null, role: 'user', provenance: 'flyer', inscrit: '2026-10-14T09:00:00Z',
-  derniere_visite: '2026-10-14T11:00:00Z', charte: '2026-10-14T09:00:00Z', client: true, departement: 'Seine-et-Marne', code: '77', fragments: 2,
+  derniere_visite: '2026-10-14T11:00:00Z', entree_v2: '2026-10-14T09:00:00Z', client: true, departement: 'Seine-et-Marne', code: '77', fragments: 2,
   compteurs: { decouverts: 12, visites: 4, ajoutes: 0, enigmes: 3 },
 }
 
