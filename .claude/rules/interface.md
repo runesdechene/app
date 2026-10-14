@@ -251,3 +251,15 @@ se calcule dans Chrome comme `100%` tout court. L'écart disparaît et le curseu
 
 **How to apply :** distribuer le produit, `calc(var(--rang) * 100% + var(--rang) * var(--space-1))`.
 Vérifier une animation dans un onglet visible : un onglet en arrière-plan fige les transitions.
+
+## Figma : une image se recopie avec sa peinture entière, jamais par son seul `imageHash`
+
+**Le piège** (14/10/2026, maquette du Hub) : en reposant le fond parchemin par
+`{type:'IMAGE', imageHash}`, l'image ressortait jaunie, verdie — Uriel l'avait déjà vu plusieurs fois.
+La peinture d'origine porte des réglages (`filters` : saturation +0,12, teinte +0,12 pour le parchemin)
+qui disparaissent avec le seul hash. Une même image peut aussi avoir des réglages différents selon
+l'écran (le logo de la vitrine est passé en blanc par `exposure: 1`).
+
+**How to apply :** copier la peinture du calque source exact (`JSON.parse(JSON.stringify(node.fills[i]))`),
+ne changer que `scaleMode` si besoin, opacité 1, sans fond coloré dessous. Comparer à l'œil avec l'écran
+d'origine avant de rendre la main.
