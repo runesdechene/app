@@ -13,17 +13,21 @@ import { TiroirCompagnie } from '@/features/communaute/components/TiroirCompagni
 import { TiroirCompte } from '@/features/communaute/components/TiroirCompte'
 import { TiroirLieu } from '@/features/communaute/components/TiroirLieu'
 import { Cultures } from '@/features/jeu/components/Cultures'
+import { Natures } from '@/features/jeu/components/Natures'
+import { Titres } from '@/features/jeu/components/Titres'
 import { Enigmes } from '@/features/jeu/components/Enigmes'
 import { EnigmesSignalees } from '@/features/jeu/components/EnigmesSignalees'
 import { TiroirCulture } from '@/features/jeu/components/TiroirCulture'
 import { TiroirEnigme } from '@/features/jeu/components/TiroirEnigme'
+import { TiroirNature } from '@/features/jeu/components/TiroirNature'
+import { TiroirTitre } from '@/features/jeu/components/TiroirTitre'
 import { BientotIci } from './coquille/BientotIci'
 import { Coquille } from './coquille/Coquille'
 import { MENU } from './coquille/menu'
 import { PorteDEntree } from './entree/PorteDEntree'
 
 // Les écrans faits quittent « bientôt » ; chaque tâche suivante ajoute le sien.
-const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures'])
+const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures', '/jeu/natures', '/jeu/titres'])
 
 const autres = MENU.flatMap((d) => d.liens)
   .filter((l) => l.chemin !== '/' && !ECRANS_FAITS.has(l.chemin))
@@ -45,6 +49,8 @@ export const routes: RouteObject[] = [
       { path: 'communaute/signalements', Component: Signalements },
       { path: 'jeu/enigmes', Component: Enigmes, children: [{ path: 'nouvelle', Component: TiroirEnigme }, { path: ':id', Component: TiroirEnigme }] },
       { path: 'jeu/cultures', Component: Cultures, children: [{ path: ':id', Component: TiroirCulture }] },
+      { path: 'jeu/natures', Component: Natures, children: [{ path: 'nouvelle', Component: TiroirNature }, { path: ':id', Component: TiroirNature }] },
+      { path: 'jeu/titres', Component: Titres, children: [{ path: 'nouveau', Component: TiroirTitre }, { path: ':id', Component: TiroirTitre }] },
       { path: 'jeu/enigmes-signalees', Component: EnigmesSignalees },
       ...autres,
     ],

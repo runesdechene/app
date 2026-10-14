@@ -1,0 +1,27 @@
+/*
+ * QUOI     — la liste des titres : une ligne par titre, un intertitre par chemin ou par culture.
+ */
+.ligne {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--duree-douce) var(--courbe-douce);
+}
+.ligne:hover { background: var(--color-surface); }
+
+.detail {
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.groupe {
+  margin: 0;
+  padding: var(--space-3) var(--space-4) 0;
+  font-size: var(--legende-size);
+  text-transform: uppercase;
+  color: var(--color-texte-pale);
+}
