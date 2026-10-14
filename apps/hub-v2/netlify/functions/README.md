@@ -1,6 +1,6 @@
 Les fonctions Netlify du Hub V2 : celles de l'ancien Hub, déménagées. Code serveur repris tel quel,
 sauf les trous de sécurité refermés dans les copies (plan 4, R2). Hors du lint et du `tsc` du Hub.
-`securite.test.ts` teste les garde-fous (`fetch` simulé). En local elles ne tournent pas : tester
+`../securite.test.ts` (hors de ce dossier, qui est déployé) teste les garde-fous (`fetch` simulé). En local elles ne tournent pas : tester
 sur le site de préparation. L'appel côté client passe par `appelerFonction` (`src/shared/lib/fonctions.ts`).
 
 | Fonction | Rôle · qui l'appelle | Garde |

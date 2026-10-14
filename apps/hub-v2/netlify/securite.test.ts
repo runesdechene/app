@@ -12,11 +12,13 @@ const BOUTIQUE = 'runes-de-chene.myshopify.com'
 const SECRET = 'secret-de-test'
 
 // Un compte admin ou joueur pour la garde ; tout le reste (Shopify) échoue proprement.
-function simulerReseau(role: 'admin' | 'player') {
+function simulerReseau(role: 'admin' | 'player', sessionValide = true) {
   const appels: string[] = []
   const f = vi.fn((url: string) => {
     appels.push(url)
-    if (url.includes('/auth/v1/user')) return Promise.resolve(Response.json({ id: 'u1' }))
+    if (url.includes('/auth/v1/user')) {
+      return Promise.resolve(sessionValide ? Response.json({ id: 'u1' }) : new Response('{}', { status: 401 }))
+    }
     if (url.includes('/rest/v1/users?select=role')) return Promise.resolve(Response.json([{ role }]))
     return Promise.resolve(new Response('{}', { status: 500 }))
   })
@@ -26,7 +28,7 @@ function simulerReseau(role: 'admin' | 'player') {
 
 async function charger(nom: string): Promise<Fonction> {
   vi.resetModules()
-  const module = (await import(`./${nom}.ts`)) as { default: Fonction }
+  const module = (await import(`./functions/${nom}.ts`)) as { default: Fonction }
   return module.default
 }
 
@@ -85,19 +87,33 @@ describe('shopify-order-webhook', () => {
   })
 })
 
-describe.each(['shopify-batch-tags', 'shopify-sync-tags'])('%s : réservé aux admins', (nom) => {
+// Une fois la garde passée, chaque fonction réagit à sa façon à un corps vide : ce statut prouve qu'on est entré.
+const APRES_LA_GARDE: [string, string, number][] = [
+  ['shopify-batch-tags', '{"items":[]}', 200],
+  ['shopify-sync-tags', '{}', 400],
+]
+
+describe.each(APRES_LA_GARDE)('%s : réservé aux admins', (nom, corps, statutAdmin) => {
   test('sans jeton : 401, rien n’est appelé', async () => {
     const appels = simulerReseau('admin')
     const handler = await charger(nom)
-    const r = await handler(post('{"items":[],"email":"a@b.fr"}'))
+    const r = await handler(post(corps))
     expect(r.status).toBe(401)
     expect(appels).toEqual([])
+  })
+
+  test('session invalide : 401', async () => {
+    simulerReseau('admin', false)
+    const handler = await charger(nom)
+    const r = await handler(post(corps, { Authorization: 'Bearer perime' }))
+    expect(r.status).toBe(401)
+    expect(await r.json()).toEqual({ error: 'Invalid session' })
   })
 
   test('un joueur : 403', async () => {
     simulerReseau('player')
     const handler = await charger(nom)
-    const r = await handler(post('{"items":[],"email":"a@b.fr"}', { Authorization: 'Bearer jwt' }))
+    const r = await handler(post(corps, { Authorization: 'Bearer jwt' }))
     expect(r.status).toBe(403)
     expect(await r.json()).toEqual({ error: 'Forbidden — admin only' })
   })
@@ -105,9 +121,8 @@ describe.each(['shopify-batch-tags', 'shopify-sync-tags'])('%s : réservé aux a
   test('un admin passe la garde', async () => {
     simulerReseau('admin')
     const handler = await charger(nom)
-    const r = await handler(post('{"items":[]}', { Authorization: 'Bearer jwt' }))
-    expect(r.status).not.toBe(401)
-    expect(r.status).not.toBe(403)
+    const r = await handler(post(corps, { Authorization: 'Bearer jwt' }))
+    expect(r.status).toBe(statutAdmin)
   })
 
   test('la pré-requête autorise l’en-tête Authorization', async () => {
