@@ -95,12 +95,11 @@ travaille sur le hub ». Le raisonnement fautif était « un back-office n'a pas
 besoin d'être beau » — or c'est l'écran qu'il consulte tous les jours, et sa marque
 a une identité forte qu'il remarque quand elle manque.
 
-**How to apply :** le Hub a DÉJÀ un système de tokens dans `apps/hub/src/index.css`
-— parchemin `#f5edd8`, surface `#faf3e0`, brun `#3a2e1e`, rouge sang `#801c1c`,
-Cinzel pour les titres, `--radius: 8px`. Ne pas inventer une identité : rejoindre
-celle-là. Un fichier `<Composant>.css` à côté du `.tsx` est la convention du repo
-(voir `FlyerLinks.css`, `StudioSubmit.css`). Vérifier le rendu réellement, avec
-`claude-in-chrome` — c'est ainsi que j'ai vu qu'une jauge en `<span>` sans
+**How to apply :** le Hub V2 (`apps/hub-v2`) n'a pas de DA à lui : il prend celle de l'appli,
+dans `packages/da` (`tokens.css`), et les briques de `apps/hub-v2/src/shared/ui/`. Un écran se
+compare à sa maquette Figma (section « Hub V2 — maquette (14/10) ») à 1440 et 390 px avant d'être
+dit fini. L'ancien `apps/hub` (parchemin `#f5edd8`, Cinzel) ne reçoit plus d'écran neuf : il
+disparaît à la bascule (plan 5).
 `display:block` ne s'affichait pas du tout.
 
 Voir aussi [[sonde-avant-hypotheses]].

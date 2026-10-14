@@ -140,3 +140,10 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 ## Test instable (11/10/2026)
 
 - [ ] `features/scan/hooks/useAnalyse.test.tsx` « une analyse qui échoue en cours de route (contexte GPU perdu) » a échoué une fois sur la suite complète, puis passé seul trois fois et sur la suite suivante : une course de minuterie sous charge à rendre déterministe.
+
+## Hub V2 (14/10/2026)
+
+- **Hub V2 — santé** : Synchro Shopify et fiches publiques dans « La santé » (plan 4, avec les
+  fonctions Netlify) ; la reconstruction nocturne des fiches n'écrit son résultat nulle part de
+  lisible (spec Hub V2 §13.4).
+- **Hub V2 — image de fond** : une grande image de parchemin (≥ 2 880 px) pour le PC (spec §13.5).

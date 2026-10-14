@@ -1,5 +1,5 @@
 /**
- * QUOI     — lit le fil d'activité (fil_du_hub, mig 507), page par page.
+ * QUOI     — lit le fil d'activité (fil_du_hub, migs 507-508), page par page.
  * POURQUOI — la page suivante commence avant la dernière ligne reçue (p_avant).
  */
 import { supabase } from '@/shared/supabase/client'
