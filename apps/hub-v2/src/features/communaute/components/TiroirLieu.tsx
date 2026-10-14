@@ -7,6 +7,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { dateCourte } from '@/shared/lib/dates'
+import { ficheDansLAppli } from '@/shared/lib/liens'
 import { Bloc } from '@/shared/ui/Bloc'
 import { Tiroir } from '@/shared/ui/Tiroir'
 import { TitreDeSection } from '@/shared/ui/TitreDeSection'
@@ -86,7 +87,7 @@ function Decision({ fiche }: { fiche: FicheDeLieu }) {
           onClick={() => { verifier.mutate(!verifie) }}>{verifie ? 'Retirer la vérification' : 'Vérifier le lieu'}</button>
         <button type="button" className={communaute.boutonContour} disabled={masquer.isPending}
           onClick={() => { masquer.mutate(!fiche.masked) }}>{fiche.masked ? 'Démasquer' : 'Masquer le lieu'}</button>
-        <a href={`https://app.runesdechene.com/carte/lieu/${fiche.id}`} target="_blank" rel="noreferrer">Voir dans l’appli</a>
+        <a href={ficheDansLAppli(fiche.id)} target="_blank" rel="noreferrer">Voir dans l’appli</a>
       </div>
       {verifier.isError && <p role="alert">{verifier.error.message}</p>}
       {masquer.isError && <p role="alert">{masquer.error.message}</p>}

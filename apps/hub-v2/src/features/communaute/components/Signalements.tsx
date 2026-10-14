@@ -4,8 +4,9 @@
  * POURQUOI — le signalement choisi est dans l'adresse (?s=41, le premier par défaut). Une fois
  *            traité, on passe au suivant, sinon à celui d'avant.
  */
-import { useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { dateCourte } from '@/shared/lib/dates'
+import { ficheDansLAppli } from '@/shared/lib/liens'
 import { depuis } from '@/shared/lib/quand'
 import { Balise } from '@/shared/ui/Balise'
 import { Bloc } from '@/shared/ui/Bloc'
@@ -29,6 +30,9 @@ function Lecture({ signalement, onTraite }: { signalement: Signalement; onTraite
       <h2 className={communaute.nomFiche}>{lieu.nom}</h2>
       <div><Balise texte={raison(signalement.raison)} teinte="moderation" /></div>
       {signalement.precision && <p className={styles.precision}>« {signalement.precision} »</p>}
+      {fiche.isError && (
+        <p role="alert">Photos indisponibles. <button type="button" className={communaute.boutonContour} onClick={() => void fiche.refetch()}>Réessayer</button></p>
+      )}
       {fiche.data && fiche.data.images.length > 0 && (
         <div className={styles.photos}>
           {fiche.data.images.map((image) => (
@@ -40,8 +44,8 @@ function Lecture({ signalement, onTraite }: { signalement: Signalement; onTraite
       )}
       <p className={communaute.calme}>Signalé par {qui.nom} le {dateCourte(signalement.quand)}</p>
       <div className={styles.liens}>
-        <a href={`https://app.runesdechene.com/carte/lieu/${lieu.id}`} target="_blank" rel="noreferrer">Voir dans l’appli</a>
-        <a href={`/communaute/lieux/${lieu.id}`}>Ouvrir la fiche de modération</a>
+        <a href={ficheDansLAppli(lieu.id)} target="_blank" rel="noreferrer">Voir dans l’appli</a>
+        <Link to={`/communaute/lieux/${lieu.id}`}>Ouvrir la fiche de modération</Link>
       </div>
       <div className={styles.decisions}>
         {!lieu.masque && (

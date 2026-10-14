@@ -14,6 +14,7 @@ export function useTraitement() {
   const client = useQueryClient()
   function rafraichir() {
     void client.invalidateQueries({ queryKey: ['hub-signalements'] })
+    void client.invalidateQueries({ queryKey: ['hub-lieu'] })
     void client.invalidateQueries({ queryKey: ['hub-ouverture'] })
     void client.invalidateQueries({ queryKey: ['hub-lieux'] })
   }
