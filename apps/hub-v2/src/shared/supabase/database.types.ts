@@ -7920,6 +7920,16 @@ export type Database = {
         Returns: Json
       }
       hub_est_admin: { Args: never; Returns: boolean }
+      hub_lieux: {
+        Args: {
+          p_decalage?: number
+          p_filtre?: string
+          p_limite?: number
+          p_nature?: string
+          p_recherche?: string
+        }
+        Returns: Json
+      }
       hub_modifier_compagnie: {
         Args: {
           p_couleur: string
