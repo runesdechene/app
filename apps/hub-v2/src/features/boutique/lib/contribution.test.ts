@@ -1,4 +1,4 @@
-import { estUneVideo, nomDeFichier, texteAlternatif } from './contribution'
+import { adresseDeTelechargement, estUneVideo, nomDeFichier, texteAlternatif } from './contribution'
 
 test('le texte alternatif de Shopify, comme l’ancien Hub', () => {
   expect(texteAlternatif('Pierre', 183, 'M')).toBe('Pierre mesure 1m83 et porte du M')
@@ -13,4 +13,9 @@ test('le nom d’un fichier téléchargé', () => {
 test('une vidéo se reconnaît à son extension', () => {
   expect(estUneVideo('https://x/a.MOV')).toBe(true)
   expect(estUneVideo('https://x/a.webp')).toBe(false)
+})
+
+test('l’adresse de téléchargement : ?download= puis & quand l’adresse a déjà une requête', () => {
+  expect(adresseDeTelechargement('https://x/a.webp', 'Brune - 1.webp')).toBe('https://x/a.webp?download=Brune+-+1.webp')
+  expect(adresseDeTelechargement('https://x/a.webp?t=1', 'a.webp')).toBe('https://x/a.webp?t=1&download=a.webp')
 })

@@ -1,9 +1,18 @@
 /**
  * QUOI     — lit les contributions (hub_contributions, mig 521), les étiquettes de photo, et écrit : décider
- *            (valider, archiver), corriger le message, poser et retirer une étiquette.
+ *            (valider, archiver), corriger le message, poser et retirer une étiquette, régler les canaux et le
+ *            produit de chaque photo, supprimer une photo ou une contribution.
  * POURQUOI — la base décide (garde de l'équipe, couronnes versées une seule fois) : son message remonte tel quel.
+ *            Supprimer va de l'extérieur vers l'intérieur : Shopify, puis le bucket, puis la base. Chaque étape
+ *            s'arrête à sa première erreur ; en cas d'échec le bout déjà fait se refait sans dommage
+ *            (Shopify 404 toléré, un fichier absent n'est pas une erreur), donc réessayer suffit.
  */
+import { retirerFichiers } from '@/shared/lib/envoi'
 import { supabase } from '@/shared/supabase/client'
+import { texteAlternatif } from '../lib/contribution'
+import { pousserImage, retirerImage, type ProduitShopify } from './shopify'
+
+const BUCKET = 'community-photos'
 
 export type StatutContribution = 'pending' | 'approved' | 'archived'
 export type Filtre = StatutContribution | 'toutes'
@@ -70,4 +79,56 @@ export async function creerEtiquette(nom: string): Promise<string> {
   const { data, error } = await supabase.rpc('create_photo_tag', { p_name: nom })
   if (error) throw new Error(error.message)
   return data
+}
+
+async function ecrire(requete: PromiseLike<{ error: { message: string } | null }>): Promise<void> {
+  const { error } = await requete
+  if (error) throw new Error(error.message)
+}
+
+export const montrerAuMur = (photoId: string, oui: boolean) =>
+  ecrire(supabase.rpc('set_submission_image_wall', { p_image_id: photoId, p_show: oui }))
+
+export const montrerDansCommunaute = (photoId: string, oui: boolean) =>
+  ecrire(supabase.rpc('set_submission_image_community', { p_image_id: photoId, p_show: oui }))
+
+export const relierProduit = (photoId: string, p: ProduitShopify) =>
+  ecrire(supabase.rpc('set_submission_image_shopify_product', {
+    p_image_id: photoId, p_product_id: p.id, p_handle: p.handle, p_title: p.titre,
+  }))
+
+/** Retire d'abord l'image de la fiche Shopify (la base la remet aussi hors de la communauté). */
+export async function delierProduit(photo: PhotoDeContribution): Promise<void> {
+  if (photo.produit_id && photo.media) await retirerImage(photo.produit_id, photo.media)
+  await ecrire(supabase.rpc('clear_submission_image_shopify_product', { p_image_id: photo.id }))
+}
+
+/** Oui : la photo entre dans la galerie du produit ; non : elle en sort. Le média garde l'identifiant Shopify. */
+export async function mettreSurLaFiche(c: Contribution, photo: PhotoDeContribution, oui: boolean): Promise<void> {
+  if (!photo.produit_id) throw new Error('Relie d’abord un produit')
+  if (oui) {
+    const media = await pousserImage(photo.produit_id, photo.url, texteAlternatif(c.nom, c.hauteur, photo.taille))
+    await ecrire(supabase.rpc('set_submission_image_media', { p_image_id: photo.id, p_media_id: media }))
+    return
+  }
+  if (photo.media) await retirerImage(photo.produit_id, photo.media)
+  await ecrire(supabase.rpc('set_submission_image_media', { p_image_id: photo.id, p_media_id: '' }))
+}
+
+/** Shopify d'abord (s'il refuse, rien n'est supprimé), puis le bucket, puis la base. */
+async function nettoyer(photos: PhotoDeContribution[]): Promise<void> {
+  for (const photo of photos) {
+    if (photo.produit_id && photo.media) await retirerImage(photo.produit_id, photo.media)
+  }
+  await retirerFichiers(BUCKET, photos.flatMap((p) => (p.chemin ? [p.chemin] : [])))
+}
+
+export async function supprimerPhoto(photo: PhotoDeContribution): Promise<void> {
+  await nettoyer([photo])
+  await ecrire(supabase.rpc('delete_submission_image', { p_image_id: photo.id }))
+}
+
+export async function supprimerContribution(c: Contribution): Promise<void> {
+  await nettoyer(c.images)
+  await ecrire(supabase.rpc('delete_photo_submission', { p_submission_id: c.id }))
 }

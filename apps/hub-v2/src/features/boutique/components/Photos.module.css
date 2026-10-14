@@ -8,6 +8,21 @@
   gap: var(--space-3);
 }
 
+.telechargement {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.telechargement label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
 .barre {
   display: flex;
   flex-wrap: wrap;
@@ -127,7 +142,64 @@
   gap: var(--space-3);
   overflow-x: auto;
 }
-.photo { margin: 0; }
+
+.photo {
+  display: grid;
+  flex: none;
+  gap: var(--space-2);
+  width: 200px;
+  margin: 0;
+  align-content: start;
+  font-size: var(--legende-size);
+}
+
+.canaux {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.canal {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-texte);
+}
+.canal input { accent-color: var(--color-accent); }
+
+.choixDuProduit {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.produitTrouve {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-petit);
+  background: none;
+  font: inherit;
+  color: var(--color-texte);
+  text-align: left;
+  cursor: pointer;
+}
+.produitTrouve:hover { background: var(--color-surface); }
+
+.produitTrouve > :first-child {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-petit);
+  background: var(--color-vignette);
+  object-fit: cover;
+}
+
+.progres {
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
 
 .photo img, .photo video {
   display: block;

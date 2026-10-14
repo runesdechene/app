@@ -1,5 +1,5 @@
 /**
- * QUOI     — l'envoi d'un fichier vers un bucket Supabase : vérification avant l'envoi, envoi, retrait.
+ * QUOI     — l'envoi d'un fichier vers un bucket Supabase : vérification avant l'envoi, envoi, retrait vérifié.
  * POURQUOI — bannières, icônes de natures et de cultures passent toutes par là : un fichier refusé
  *            l'est avant de partir (aucun orphelin), et le retrait se déduit de l'adresse publique.
  */
@@ -29,12 +29,33 @@ export async function envoyerFichier(bucket: string, chemin: string, f: File): P
   return stockage.getPublicUrl(chemin).data.publicUrl
 }
 
+/**
+ * Retire des fichiers et vérifie qu'ils ont disparu : quand la RLS filtre, `remove()` rend [] sans erreur.
+ * Un fichier déjà absent n'est pas une erreur ; un fichier encore là, si.
+ */
+export async function retirerFichiers(bucket: string, chemins: string[]): Promise<void> {
+  if (chemins.length === 0) return
+  const stockage = supabase.storage.from(bucket)
+  const { data, error } = await stockage.remove(chemins)
+  if (error) throw error
+  if (data.length >= chemins.length) return
+
+  for (const chemin of chemins) {
+    const rang = chemin.lastIndexOf('/')
+    const dossier = rang === -1 ? '' : chemin.slice(0, rang)
+    const nom = chemin.slice(rang + 1)
+    const { data: restants, error: erreurDeListe } = await stockage.list(dossier, { search: nom })
+    if (erreurDeListe) throw erreurDeListe
+    if (restants.some((f) => f.name === nom)) {
+      throw new Error(`Le fichier n’a pas pu être retiré du stockage (droits ?) : ${chemin}`)
+    }
+  }
+}
+
 // Le chemin dans le bucket est ce qui suit « /storage/v1/object/public/{bucket}/ » dans l'adresse.
 export async function retirerFichier(bucket: string, adresse: string): Promise<void> {
   const debut = `/storage/v1/object/public/${bucket}/`
   const position = adresse.indexOf(debut)
   if (position === -1) return
-  const chemin = decodeURIComponent(adresse.slice(position + debut.length))
-  const { error } = await supabase.storage.from(bucket).remove([chemin])
-  if (error) throw error
+  await retirerFichiers(bucket, [decodeURIComponent(adresse.slice(position + debut.length))])
 }

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router'
 import { vi } from 'vitest'
@@ -14,6 +14,13 @@ const api = vi.hoisted(() => ({
   ajouterEtiquette: vi.fn(),
   retirerEtiquette: vi.fn(),
   creerEtiquette: vi.fn(),
+  supprimerContribution: vi.fn(),
+  supprimerPhoto: vi.fn(),
+  montrerAuMur: vi.fn(),
+  montrerDansCommunaute: vi.fn(),
+  relierProduit: vi.fn(),
+  delierProduit: vi.fn(),
+  mettreSurLaFiche: vi.fn(),
 }))
 vi.mock('../api/contributions', () => api)
 
@@ -36,7 +43,7 @@ const liste = (lignes: Contribution[]): ListeContributions => ({
 beforeEach(() => {
   vi.clearAllMocks()
   api.lireEtiquettes.mockResolvedValue([{ id: 't1', nom: 'veste' }, { id: 't2', nom: 'hiver' }])
-  for (const f of [api.modererContribution, api.modifierMessage, api.ajouterEtiquette, api.retirerEtiquette]) f.mockResolvedValue(undefined)
+  for (const f of [api.modererContribution, api.modifierMessage, api.ajouterEtiquette, api.retirerEtiquette, api.supprimerContribution]) f.mockResolvedValue(undefined)
   api.creerEtiquette.mockResolvedValue('t3')
 })
 
@@ -223,4 +230,52 @@ test('un nouvel essai efface l’erreur du précédent', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Archiver' }))
   await waitFor(() => { expect(screen.queryByRole('alert')).not.toBeInTheDocument() })
   expect(api.modererContribution).toHaveBeenCalledTimes(2)
+})
+
+describe('supprimer une contribution', () => {
+  test('la confirmation compte les photos, puis « Confirmer » supprime et passe à la suivante', async () => {
+    afficher([contribution('c1', 'Brune'), contribution('c2', 'Corentin')])
+    await screen.findByRole('heading', { name: 'Brune' })
+    await userEvent.click(screen.getByRole('button', { name: 'Supprimer' }))
+    expect(screen.getByText('Supprimer cette contribution et ses 2 photos ?')).toBeInTheDocument()
+    expect(api.supprimerContribution).not.toHaveBeenCalled()
+    api.lireContributions.mockResolvedValue(liste([contribution('c2', 'Corentin')]))
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmer' }))
+    await waitFor(() => { expect(api.supprimerContribution).toHaveBeenCalledWith(expect.objectContaining({ id: 'c1' })) })
+    expect(await screen.findByRole('heading', { name: 'Corentin' })).toBeInTheDocument()
+    expect(screen.getByTestId('adresse')).toHaveTextContent('c=c2')
+  })
+
+  test('« Annuler » referme la confirmation sans rien supprimer', async () => {
+    afficher([contribution('c1', 'Brune')])
+    await userEvent.click(await screen.findByRole('button', { name: 'Supprimer' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
+    expect(screen.queryByText(/Supprimer cette contribution/)).not.toBeInTheDocument()
+    expect(api.supprimerContribution).not.toHaveBeenCalled()
+  })
+
+  test('si la suppression échoue, le message s’affiche et la contribution reste', async () => {
+    api.supprimerContribution.mockRejectedValue(new Error('Suppression image: HTTP 500'))
+    afficher([contribution('c1', 'Brune'), contribution('c2', 'Corentin')])
+    await userEvent.click(await screen.findByRole('button', { name: 'Supprimer' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmer' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Suppression image: HTTP 500')
+    expect(screen.getByRole('heading', { name: 'Brune' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Corentin/ })).toBeInTheDocument()
+    expect(screen.getByTestId('adresse')).not.toHaveTextContent('c=c2')
+  })
+})
+
+describe('télécharger depuis une date', () => {
+  test('les contributions de la page créées depuis la date, comptées', async () => {
+    afficher([
+      contribution('c1', 'Brune', { quand: '2026-10-10T10:00:00Z' }),
+      contribution('c2', 'Corentin', { quand: '2026-09-01T10:00:00Z' }),
+    ])
+    await screen.findByRole('heading', { name: 'Brune' })
+    expect(screen.getByRole('button', { name: /Télécharger \(\.zip\)/ })).toBeDisabled()
+    fireEvent.change(screen.getByLabelText('Télécharger depuis le'), { target: { value: '2026-10-01' } })
+    expect(screen.getByRole('button', { name: /Télécharger \(\.zip\)/ })).toBeEnabled()
+    expect(screen.getByText('1 contribution · 2 fichiers')).toBeInTheDocument()
+  })
 })

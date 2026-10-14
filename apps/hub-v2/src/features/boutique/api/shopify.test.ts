@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { AccesShopifyRefuse, graphqlShopify, lireIllustrations } from './shopify'
+import { AccesShopifyRefuse, chercherProduits, graphqlShopify, lireIllustrations, pousserImage, retirerImage } from './shopify'
 
 const appel = vi.hoisted(() => ({ appelerFonction: vi.fn(), lireReponse: vi.fn() }))
 vi.mock('@/shared/lib/fonctions', () => appel)
@@ -42,4 +42,55 @@ test('aucune Illustration : inventaire vide', async () => {
 test('une Illustration lue', async () => {
   repond({ data: { metaobjects: { pageInfo: { hasNextPage: false }, nodes: [{ handle: 'hoplite', displayName: 'Hoplite', fields: [{ key: 'collection', value: null, reference: { handle: 'hoplite' } }] }] } } })
   expect(await lireIllustrations()).toEqual([expect.objectContaining({ handle: 'hoplite', nom: 'Hoplite', collection: 'hoplite', audio_url: '' })])
+})
+
+describe('retirerImage', () => {
+  test('un 404 est une réussite : l’image n’y est déjà plus', async () => {
+    appel.appelerFonction.mockResolvedValue({ status: 404 })
+    await expect(retirerImage('12', '34')).resolves.toBeUndefined()
+    expect(appel.lireReponse).not.toHaveBeenCalled()
+    expect(appel.appelerFonction).toHaveBeenCalledWith('shopify-proxy', {
+      methode: 'DELETE', parametres: { endpoint: 'products/12/images/34.json' },
+    })
+  })
+
+  test('un 500 « Not Found » est une erreur', async () => {
+    appel.appelerFonction.mockResolvedValue({ status: 500 })
+    appel.lireReponse.mockRejectedValue(new Error('Not Found'))
+    await expect(retirerImage('12', '34')).rejects.toThrow('Not Found')
+  })
+})
+
+describe('pousserImage', () => {
+  test('rend l’identifiant de l’image', async () => {
+    repond({ image: { id: 99 } })
+    expect(await pousserImage('12', 'https://x/a.jpg', 'Brune porte du M')).toBe('99')
+    expect(appel.appelerFonction).toHaveBeenCalledWith('shopify-proxy', {
+      methode: 'POST', parametres: { endpoint: 'products/12/images.json' },
+      corps: { image: { src: 'https://x/a.jpg', alt: 'Brune porte du M' } },
+    })
+  })
+
+  test('une réponse sans image est une erreur', async () => {
+    repond({})
+    await expect(pousserImage('12', 'https://x/a.jpg', '')).rejects.toThrow('Shopify n’a pas rendu l’identifiant')
+  })
+})
+
+describe('chercherProduits', () => {
+  test('moins de deux caractères : rien à chercher', async () => {
+    expect(await chercherProduits(' v ')).toEqual([])
+    expect(appel.appelerFonction).not.toHaveBeenCalled()
+  })
+
+  test('le titre est échappé et le prix écrit sans décimales', async () => {
+    repond({ data: { products: { edges: [{ node: {
+      legacyResourceId: '7', title: 'Veste', handle: 'veste', featuredImage: { url: 'https://x/v.jpg' },
+      priceRangeV2: { minVariantPrice: { amount: '49.00', currencyCode: 'EUR' } },
+    } }] } } })
+    const produits = await chercherProduits('ve"ste')
+    expect(produits).toEqual([{ id: '7', titre: 'Veste', handle: 'veste', image: 'https://x/v.jpg', prix: expect.stringMatching(/^49\s€$/) as string }])
+    const corps = (appel.appelerFonction.mock.calls[0] as [string, { corps: { query: string } }])[1].corps
+    expect(corps.query).toContain('title:*ve\\"ste*')
+  })
 })

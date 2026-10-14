@@ -2,9 +2,10 @@
  * QUOI     — « Photos et avis » (maquette 596:1319) : quatre chiffres, filtres, recherche, la file des
  *            contributions à gauche, celle qu'on lit à droite avec ses décisions.
  * POURQUOI — filtre, recherche, page et contribution choisie (?c=) sont dans l'adresse. Une fois la
- *            contribution traitée, on passe à la suivante, sinon à celle d'avant.
+ *            contribution traitée, on passe à la suivante, sinon à celle d'avant. L'en-tête télécharge en archive
+ *            les photos de la page affichée arrivées depuis une date.
  */
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { dateCourte } from '@/shared/lib/dates'
 import { depuis } from '@/shared/lib/quand'
@@ -18,6 +19,8 @@ import { Pages } from '@/shared/ui/Pages'
 import { Tuile } from '@/shared/ui/Tuile'
 import type { Contribution, Filtre } from '../api/contributions'
 import { useContributions } from '../hooks/useContributions'
+import { useTelechargement } from '../hooks/useTelechargement'
+import { fichiersDeContributions } from '../lib/archive'
 import { estUneVideo, STATUTS } from '../lib/contribution'
 import { LectureContribution } from './LectureContribution'
 import boutique from './Boutique.module.css'
@@ -45,6 +48,8 @@ function Vignette({ contribution }: { contribution: Contribution }) {
 
 export function Photos() {
   const [params, setParams] = useSearchParams()
+  const [depuisLe, setDepuisLe] = useState('')
+  const telechargement = useTelechargement()
   const filtre = FILTRES.find((f) => f.valeur === params.get('filtre'))?.valeur ?? 'pending'
   const recherche = params.get('q') ?? ''
   const decalage = (numeroDePage(params.get('page')) - 1) * PAR_PAGE
@@ -84,6 +89,10 @@ export function Photos() {
     choisir((lignes[rang + 1] ?? lignes[rang - 1])?.id)
   }
 
+  // « depuis le » est une date du jour (AAAA-MM-JJ) : la comparaison de textes ISO suffit.
+  const recentes = depuisLe === '' ? [] : (lignes ?? []).filter((c) => c.quand !== null && c.quand.slice(0, 10) >= depuisLe)
+  const fichiers = fichiersDeContributions(recentes)
+
   const compteurs = data?.compteurs
   const phrase = !compteurs ? '' : compteurs.a_valider > 0 && compteurs.plus_ancienne
     ? `${String(compteurs.a_valider)} ${pluriel(compteurs.a_valider, 'contribution')} ${compteurs.a_valider > 1 ? 'attendent' : 'attend'} ; la plus ancienne est arrivée ${depuis(compteurs.plus_ancienne)}.`
@@ -91,7 +100,21 @@ export function Photos() {
 
   return (
     <div className={boutique.ecran}>
-      <EnTeteDePage surtitre="Fragments et boutique" titre="Photos et avis" phrase={phrase} />
+      <EnTeteDePage surtitre="Fragments et boutique" titre="Photos et avis" phrase={phrase} aDroite={
+        <div className={styles.telechargement}>
+          <label>
+            Télécharger depuis le
+            <input type="date" value={depuisLe} onChange={(e) => { setDepuisLe(e.target.value) }} />
+          </label>
+          <button type="button" className={styles.contour} disabled={fichiers.length === 0 || telechargement.enCours}
+            onClick={() => { void telechargement.telecharger(fichiers, `photos-communaute-depuis-${depuisLe.replaceAll('-', '')}.zip`) }}>
+            Télécharger (.zip)
+          </button>
+          {depuisLe !== '' && <span className={styles.progres}>{`${String(recentes.length)} ${pluriel(recentes.length, 'contribution')} · ${String(fichiers.length)} ${pluriel(fichiers.length, 'fichier')}`}</span>}
+          {telechargement.message && <span className={styles.progres}>{telechargement.message}</span>}
+          {telechargement.erreur && <span role="alert" className={styles.erreur}>{telechargement.erreur}</span>}
+        </div>
+      } />
       {compteurs && (
         <div className={styles.tuiles} role="group" aria-label="Les chiffres">
           <Tuile libelle="À valider" valeur={nombre.format(compteurs.a_valider)} />

@@ -39,3 +39,10 @@ export function nomDeFichier(nom: string, instagram: string | null, rang: number
   const morceaux = [nettoyer(nom), instagram ? nettoyer(instagram) : '', String(rang + 1)].filter(Boolean)
   return `${morceaux.join(' - ')}.${extension}`
 }
+
+/** L'adresse publique avec `?download=` : Supabase la sert alors en pièce jointe, sous ce nom. */
+export function adresseDeTelechargement(url: string, nom: string): string {
+  const adresse = new URL(url)
+  adresse.searchParams.set('download', nom)
+  return adresse.toString()
+}

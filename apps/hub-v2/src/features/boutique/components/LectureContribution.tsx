@@ -65,7 +65,7 @@ export function LectureContribution({ contribution, onDecide }: { contribution: 
       </div>
 
       <EtiquettesDeContribution contribution={c} ecriture={ecriture} />
-      <DecisionsDeContribution contribution={c} ecriture={ecriture.moderer} onDecide={onDecide} />
+      <DecisionsDeContribution contribution={c} ecriture={ecriture.moderer} suppression={ecriture.supprimer} onDecide={onDecide} />
     </Bloc>
   )
 }

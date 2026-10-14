@@ -1,5 +1,6 @@
 /**
- * QUOI     — la lecture de Shopify par le proxy Netlify : l'inventaire des Illustrations (métaobjets).
+ * QUOI     — Shopify par le proxy Netlify : l'inventaire des Illustrations (métaobjets), la recherche d'un
+ *            produit, et l'image d'une photo dans la galerie d'un produit (poser, retirer).
  * POURQUOI — le jeton Shopify reste côté serveur ; la boutique y est fixée, le client ne la nomme pas.
  *            Le type de métaobjet est `illustrations`, au PLURIEL (confirmé par sondage le 16/08) : le
  *            singulier rend une liste vide sans erreur. Une portée manquante (ACCESS_DENIED) et un
@@ -126,4 +127,56 @@ export async function lireIllustrations(): Promise<Illustration[]> {
     narrateur: lire(fields, 'narrateur_audio'),
     heritage: lire(fields, 'collection_d_heritage'),
   }))
+}
+
+export type ProduitShopify = { id: string; titre: string; handle: string; image: string | null; prix: string | null }
+
+type NoeudProduit = {
+  legacyResourceId: string; title: string; handle: string
+  featuredImage: { url: string } | null
+  priceRangeV2: { minVariantPrice: { amount: string; currencyCode: string } } | null
+}
+type Produits = { products: { edges: { node: NoeudProduit }[] } }
+
+function prix(p: NoeudProduit['priceRangeV2']): string | null {
+  if (!p) return null
+  const montant = Number(p.minVariantPrice.amount)
+  if (!Number.isFinite(montant)) return null
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: p.minVariantPrice.currencyCode || 'EUR', maximumFractionDigits: 0 }).format(montant)
+}
+
+/** Les produits dont le titre contient `terme` (8 au plus) ; en dessous de 2 caractères, rien à chercher. */
+export async function chercherProduits(terme: string): Promise<ProduitShopify[]> {
+  const propre = terme.trim()
+  if (propre.length < 2) return []
+  const titre = propre.replaceAll('\\', '\\\\').replaceAll('"', '\\"')
+  const { products } = await graphqlShopify<Produits>(
+    `{ products(first: 8, query: "title:*${titre}*") { edges { node { legacyResourceId title handle featuredImage { url } priceRangeV2 { minVariantPrice { amount currencyCode } } } } } }`,
+  )
+  return products.edges.map(({ node }) => ({
+    id: node.legacyResourceId, titre: node.title, handle: node.handle,
+    image: node.featuredImage?.url ?? null, prix: prix(node.priceRangeV2),
+  }))
+}
+
+/** Pose l'image (adresse publique) dans la galerie du produit ; rend l'identifiant que Shopify lui donne. */
+export async function pousserImage(produitId: string, url: string, alt: string): Promise<string> {
+  const reponse = await appelerFonction('shopify-proxy', {
+    methode: 'POST',
+    parametres: { endpoint: `products/${produitId}/images.json` },
+    corps: { image: { src: url, alt } },
+  })
+  const { image } = await lireReponse<{ image?: { id?: number } }>(reponse)
+  if (!image?.id) throw new Error('Shopify n’a pas rendu l’identifiant de l’image')
+  return String(image.id)
+}
+
+/** Retire l'image de la galerie. Un 404 est une réussite : elle n'y est déjà plus (on peut réessayer). */
+export async function retirerImage(produitId: string, mediaId: string): Promise<void> {
+  const reponse = await appelerFonction('shopify-proxy', {
+    methode: 'DELETE',
+    parametres: { endpoint: `products/${produitId}/images/${mediaId}.json` },
+  })
+  if (reponse.status === 404) return
+  await lireReponse<unknown>(reponse)
 }

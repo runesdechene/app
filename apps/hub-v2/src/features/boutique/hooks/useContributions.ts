@@ -2,12 +2,14 @@
  * QUOI     — la liste des contributions pour des critères donnés (gardée pendant qu'on change de page), les
  *            étiquettes, et les écritures d'une contribution.
  * POURQUOI — chaque écriture réussie rafraîchit la liste et la pastille « Photos et avis » de l'ouverture.
+ *            Les écritures d'une photo passent toutes par une seule mutation : une écriture à la fois.
  */
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   ajouterEtiquette, creerEtiquette, lireContributions, lireEtiquettes, modererContribution, modifierMessage,
-  retirerEtiquette, type Criteres, type StatutContribution,
+  retirerEtiquette, supprimerContribution, type Contribution, type Criteres, type StatutContribution,
 } from '../api/contributions'
+import { chercherProduits } from '../api/shopify'
 
 export function useContributions(criteres: Criteres) {
   return useQuery({ queryKey: ['hub-contributions', criteres], queryFn: () => lireContributions(criteres), placeholderData: keepPreviousData })
@@ -17,15 +19,30 @@ export function useEtiquettesDePhoto() {
   return useQuery({ queryKey: ['hub-etiquettes-photo'], queryFn: lireEtiquettes })
 }
 
+export function useProduitsShopify(terme: string) {
+  return useQuery({ queryKey: ['hub-produits-shopify', terme], queryFn: () => chercherProduits(terme), enabled: terme.trim().length >= 2 })
+}
+
+// Pas d'attente : la contribution décidée peut quitter la liste au rafraîchissement, et l'écran
+// doit avoir choisi la suivante avant que sa lecture disparaisse.
+function useRafraichir() {
+  const client = useQueryClient()
+  return () => {
+    for (const k of ['hub-contributions', 'hub-ouverture']) void client.invalidateQueries({ queryKey: [k] })
+  }
+}
+
+/** Une écriture sur une photo (canal, produit, suppression) : l'action est donnée au moment du clic. */
+export function useEcritureDePhoto() {
+  return useMutation({ mutationFn: (action: () => Promise<void>) => action(), onSuccess: useRafraichir() })
+}
+
 /** Les écritures d'une contribution, chacune avec sa propre erreur. */
 export function useEcritureContribution() {
   const client = useQueryClient()
-  // Pas d'attente : la contribution décidée peut quitter la liste au rafraîchissement, et l'écran
-  // doit avoir choisi la suivante avant que sa lecture disparaisse.
-  const apres = () => {
-    for (const k of ['hub-contributions', 'hub-ouverture']) void client.invalidateQueries({ queryKey: [k] })
-  }
+  const apres = useRafraichir()
   return {
+    supprimer: useMutation({ mutationFn: (c: Contribution) => supprimerContribution(c), onSuccess: apres }),
     moderer: useMutation({
       mutationFn: ({ id, statut, couronnes }: { id: string; statut: StatutContribution; couronnes?: number }) => (couronnes === undefined ? modererContribution(id, statut) : modererContribution(id, statut, couronnes)),
       onSuccess: apres,
