@@ -28,7 +28,7 @@ vi.mock('./CarteDOrigine', () => ({
 
 const fragment = (surcharge: Partial<Fragment> = {}): Fragment => ({
   id: 7, name: 'Hoplite', link_url: null, visible: true, shopify_handle: null, resume: null, histoire: null,
-  illustration_url: null, illustration_sombre_url: null, audio_url: null, artiste: null, narrateur: null,
+  illustration_url: null, image_url: null, illustration_sombre_url: null, audio_url: null, artiste: null, narrateur: null,
   heritage: null, synchronise_le: null, origine_lat: null, origine_lng: null, origine_nom: null, theme: null,
   ...surcharge,
 })
@@ -71,6 +71,14 @@ test('poser un point puis Enregistrer', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
   await waitFor(() => { expect(api.enregistrerFragment).toHaveBeenCalledWith({ id: 7, origine_lat: 43.1, origine_lng: 5.9, origine_nom: 'Sparte', visible: true, theme: null }) })
   expect(await screen.findByText(/Enregistré\./)).toBeInTheDocument()
+})
+
+test('modifier un champ après l’enregistrement efface « Enregistré. »', async () => {
+  afficher()
+  await userEvent.click(await screen.findByRole('button', { name: 'Enregistrer' }))
+  expect(await screen.findByText(/Enregistré\./)).toBeInTheDocument()
+  await userEvent.type(screen.getByLabelText('Lieu d’origine'), 'S')
+  expect(screen.queryByText(/Enregistré\./)).not.toBeInTheDocument()
 })
 
 test('Retirer le point puis Enregistrer part sans coordonnées', async () => {

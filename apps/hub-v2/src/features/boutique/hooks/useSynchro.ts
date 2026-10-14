@@ -1,6 +1,6 @@
 /**
  * QUOI     — la liaison comptes-clients et la pose des étiquettes de provenance, avec leur progression.
- * POURQUOI — la liaison change les comptes : la liste des comptes se relit. La pose lit tout (comptes reliés,
+ * POURQUOI — la liaison change les comptes : la liste des comptes et l'ouverture se relisent. La pose lit tout (comptes reliés,
  *            clients Shopify), prépare les lots puis les envoie en montrant « fait / total » ; une erreur
  *            avant l'envoi arrête tout sans rien poser.
  */
@@ -16,7 +16,7 @@ export function useLiaison() {
   const client = useQueryClient()
   return useMutation({
     mutationFn: relierComptesEtClients,
-    onSuccess: () => client.invalidateQueries({ queryKey: ['hub-comptes'] }),
+    onSuccess: () => Promise.all(['hub-comptes', 'hub-ouverture'].map((k) => client.invalidateQueries({ queryKey: [k] }))),
   })
 }
 

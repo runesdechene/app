@@ -6,6 +6,7 @@
  *            singulier rend une liste vide sans erreur. Une portée manquante (ACCESS_DENIED) et un
  *            inventaire vide sont des pannes lisibles, jamais « 0 ».
  */
+import { messageDErreur } from '@/shared/lib/erreur'
 import { appelerFonction, lireReponse } from '@/shared/lib/fonctions'
 
 export const SHOP = 'runes-de-chene.myshopify.com'
@@ -185,7 +186,7 @@ export async function retirerImage(produitId: string, mediaId: string): Promise<
   try {
     await lireReponse<unknown>(reponse)
   } catch (e) {
-    const message = e instanceof Error ? e.message : String(e)
+    const message = messageDErreur(e)
     if (reponse.status === 404 && message === 'Not Found') return
     throw new Error(`Fiche produit Shopify : ${message}`, { cause: e })
   }

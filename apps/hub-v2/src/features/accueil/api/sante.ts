@@ -7,13 +7,12 @@
 import { appelerFonction, lireReponse } from '@/shared/lib/fonctions'
 import { supabase } from '@/shared/supabase/client'
 
-export type SanteShopify = { ok: boolean; latence: number; erreur: string | null }
+export type SanteShopify = { latence: number }
 
-type ReponseSante = { ok: boolean; latency_ms: number; error?: string }
-
+// Une boutique qui ne répond pas arrive en `{ ok: false, error }` : lireReponse en fait une erreur.
 export async function lireSanteShopify(): Promise<SanteShopify> {
-  const reponse = await lireReponse<ReponseSante>(await appelerFonction('shopify-health-check'))
-  return { ok: reponse.ok, latence: reponse.latency_ms, erreur: reponse.error ?? null }
+  const reponse = await lireReponse<{ latency_ms: number }>(await appelerFonction('shopify-health-check'))
+  return { latence: reponse.latency_ms }
 }
 
 export async function lireFichesPubliques(): Promise<string | null> {

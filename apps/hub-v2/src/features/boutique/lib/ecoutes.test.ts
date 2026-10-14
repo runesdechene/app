@@ -15,3 +15,7 @@ test('la progression pèse chaque Fragment par ses écoutes mesurées', () => {
 test('la dernière écoute est la plus récente', () => {
   expect(resumeDesEcoutes([ligne(1, 0, null, 0, '2026-10-01T00:00:00Z'), ligne(1, 0, null, 0, '2026-10-12T00:00:00Z')]).derniere).toBe('2026-10-12T00:00:00Z')
 })
+test('de quoi trancher à partir de 20 écoutes : 19 ne suffit pas', () => {
+  expect(resumeDesEcoutes([ligne(19, 19, null, 0, null)]).assez).toBe(false)
+  expect(resumeDesEcoutes([ligne(20, 20, null, 0, null)]).assez).toBe(true)
+})

@@ -26,7 +26,8 @@ export function useAjouterFragment() {
   const client = useQueryClient()
   return useMutation({
     mutationFn: (motif: Illustration) => ajouterFragment(motif),
-    onSuccess: async () => {
+    // onSettled : si l'ajout a réussi mais pas la synchro de son motif, la liste se rafraîchit quand même.
+    onSettled: async () => {
       await Promise.all([
         client.invalidateQueries({ queryKey: ['hub-fragments'] }),
         client.invalidateQueries({ queryKey: ['hub-scans'] }),

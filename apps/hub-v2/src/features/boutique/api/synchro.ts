@@ -28,6 +28,6 @@ export async function lireComptesClients(): Promise<CompteClient[]> {
 
 export async function envoyerEtiquettes(lot: Etiquetage[]): Promise<ReponseEtiquetage[]> {
   const reponse = await appelerFonction('shopify-batch-tags', { methode: 'POST', corps: { items: lot } })
-  const { results } = await lireReponse<{ results: ReponseEtiquetage[] }>(reponse)
-  return results
+  const { results } = await lireReponse<{ results?: ReponseEtiquetage[] }>(reponse)
+  return results ?? []
 }

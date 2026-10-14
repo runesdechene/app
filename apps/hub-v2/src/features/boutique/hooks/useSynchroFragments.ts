@@ -7,14 +7,13 @@
  */
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { messageDErreur } from '@/shared/lib/erreur'
 import { pluriel } from '@/shared/lib/texte'
 import { lireFragments, synchroniserFragments } from '../api/fragments'
 import { recalculerEmpreintes } from '../api/scan'
 import { lireIllustrations } from '../api/shopify'
 
 type Echec = { nom: string; cause: string }
-
-const message = (e: unknown) => (e instanceof Error ? e.message : String(e))
 
 // « Hoplite, Loup (image refusée) » : les Fragments qui partagent une cause la disent une seule fois.
 function echecsEnPhrase(echecs: Echec[]): string {
@@ -37,7 +36,7 @@ export function useSynchroFragments() {
       try {
         illustrations = await lireIllustrations()
       } catch (e) {
-        setErreur(`Shopify ne répond pas : ${message(e)}`)
+        setErreur(`Shopify ne répond pas : ${messageDErreur(e)}`)
         return
       }
       const mis = await synchroniserFragments(illustrations)
@@ -51,7 +50,7 @@ export function useSynchroFragments() {
         // Relus à neuf : la synchro a pu changer les images à calculer.
         fragments = await client.query({ queryKey: ['hub-fragments'], queryFn: lireFragments, staleTime: 0 })
       } catch (e) {
-        setErreur(`Les Fragments sont synchronisés, mais la liste n’a pas pu être relue : ${message(e)}`)
+        setErreur(`Les Fragments sont synchronisés, mais la liste n’a pas pu être relue : ${messageDErreur(e)}`)
         return
       }
       const visibles = fragments.filter((f) => f.visible)
@@ -61,7 +60,7 @@ export function useSynchroFragments() {
         try {
           await recalculerEmpreintes(fragment)
         } catch (e) {
-          echecs.push({ nom: fragment.name, cause: message(e) })
+          echecs.push({ nom: fragment.name, cause: messageDErreur(e) })
         }
       }
       setCompteRendu(
@@ -71,7 +70,7 @@ export function useSynchroFragments() {
       )
       void client.invalidateQueries({ queryKey: ['hub-scans'] })
     } catch (e) {
-      setErreur(message(e))
+      setErreur(messageDErreur(e))
     } finally {
       setEnCours(false)
     }

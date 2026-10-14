@@ -24,7 +24,6 @@ function ligneShopify({ shopify, shopifyErreur }: Boutique): Ligne[] {
   const titre = 'Synchro Shopify'
   if (shopifyErreur) return [{ ok: false, titre, detail: shopifyErreur }]
   if (!shopify) return []
-  if (!shopify.ok) return [{ ok: false, titre, detail: shopify.erreur ?? 'Shopify ne répond pas' }]
   return [{ ok: true, titre, detail: `Boutique joignable · ${String(shopify.latence)} ms` }]
 }
 

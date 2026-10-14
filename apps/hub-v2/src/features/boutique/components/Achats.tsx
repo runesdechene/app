@@ -33,6 +33,19 @@ function LigneDAchat({ achat }: { achat: Achat }) {
   const etiquettes = tagsDuJournal(achat.tag)
   const erreur = associer.error ?? classer.error
 
+  // Une décision à la fois : l'erreur de la précédente ne reste pas affichée.
+  function associerLAchat() {
+    associer.reset()
+    classer.reset()
+    associer.mutate({ id: achat.id, fragment: Number(fragmentId) })
+  }
+
+  function classerLAchat() {
+    associer.reset()
+    classer.reset()
+    classer.mutate(achat.id)
+  }
+
   return (
     <div className={styles.achat}>
       <div className={styles.achatEntete}>
@@ -55,13 +68,13 @@ function LigneDAchat({ achat }: { achat: Achat }) {
               <button
                 type="button" className={styles.boutonContour}
                 disabled={!fragmentId || associer.isPending}
-                onClick={() => { associer.mutate({ id: achat.id, fragment: Number(fragmentId) }) }}
+                onClick={associerLAchat}
               >
                 Associer un Fragment
               </button>
             </>
           )}
-          <button type="button" className={styles.boutonContour} disabled={classer.isPending} onClick={() => { classer.mutate(achat.id) }}>
+          <button type="button" className={styles.boutonContour} disabled={classer.isPending} onClick={classerLAchat}>
             Rien à débloquer
           </button>
         </div>

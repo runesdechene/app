@@ -5,6 +5,7 @@
  *            Un client qui a déjà une source n'est pas touché. Un lot qui échoue est compté et nommé, les
  *            suivants partent quand même : aucun succès partiel n'est silencieux.
  */
+import { messageDErreur } from '@/shared/lib/erreur'
 import type { ClientShopify } from '../api/shopify'
 
 export type CompteClient = { email: string; client: number; provenance: string | null }
@@ -67,7 +68,7 @@ export async function envoyerParLots(
         progres.erreursCompte += 1
       }
     } catch (e) {
-      progres.erreurs.push(`Lot ${String(i + 1)} — erreur réseau : ${e instanceof Error ? e.message : String(e)}`)
+      progres.erreurs.push(`Lot ${String(i + 1)} — erreur réseau : ${messageDErreur(e)}`)
       progres.erreursCompte += lot.length
     }
     progres.fait += lot.length

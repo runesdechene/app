@@ -6,7 +6,7 @@ const sante = { derniere_commande: '2026-10-14T10:00:00Z', notifications: 10, no
 const il_y_a = (heures: number) => new Date(maintenant.getTime() - heures * 3600_000).toISOString()
 
 type Boutique = Parameters<typeof Sante>[0]['boutique']
-const arrivee: Boutique = { shopify: { ok: true, latence: 182, erreur: null }, shopifyErreur: null, fiches: il_y_a(5) }
+const arrivee: Boutique = { shopify: { latence: 182 }, shopifyErreur: null, fiches: il_y_a(5) }
 
 function afficher(boutique: Boutique) {
   render(<Sante sante={sante} boutique={boutique} maintenant={maintenant} />)
@@ -24,7 +24,7 @@ test('Shopify joignable : point vert et la latence', () => {
 })
 
 test('Shopify en panne : point orange et le message', () => {
-  afficher({ ...arrivee, shopify: { ok: false, latence: 90, erreur: 'Shopify 401: Unauthorized' } })
+  afficher({ ...arrivee, shopify: undefined, shopifyErreur: 'Shopify 401: Unauthorized' })
   expect(screen.getByText('Shopify 401: Unauthorized')).toBeInTheDocument()
   expect(point('Synchro Shopify')).toBe('false')
 })

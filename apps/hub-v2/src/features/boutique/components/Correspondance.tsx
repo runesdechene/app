@@ -17,17 +17,18 @@ import { useFragments } from '../hooks/useFragments'
 import styles from './Boutique.module.css'
 import { OngletsFragments } from './OngletsFragments'
 
-type Illustre = Pick<Fragment, 'id' | 'name' | 'illustration_url'>
+type Illustre = Pick<Fragment, 'id' | 'name' | 'illustration_url' | 'image_url'>
 
 function LigneDeCorrespondance({ correspondance, fragment, onRetirer }: {
   correspondance: UneCorrespondance; fragment: Illustre | undefined; onRetirer: (id: number) => void
 }) {
   const [confirme, setConfirme] = useState(false)
+  const image = fragment?.illustration_url ?? fragment?.image_url
   return (
     <div className={styles.correspondance}>
       <Balise texte={correspondance.shopify_tag} teinte="boutique" />
       <span className={styles.debloque}>débloque</span>
-      {fragment?.illustration_url ? <img className={styles.vignette} src={fragment.illustration_url} alt="" /> : <span className={styles.vignette} />}
+      {image ? <img className={styles.vignette} src={image} alt="" /> : <span className={styles.vignette} />}
       <span className={styles.nom}><strong>{fragment?.name ?? `Fragment n° ${String(correspondance.unlock_ref_id)}`}</strong></span>
       {confirme ? (
         <span className={styles.confirmation}>
@@ -54,8 +55,17 @@ export function Correspondance() {
   const nombreAAssocier = achats?.filter((a) => a.statut === 'no_match').length
   const erreur = ajouter.error ?? retirer.error
 
+  // Une écriture à la fois : l'erreur de la précédente ne reste pas affichée.
   function ajouterLaCorrespondance() {
+    ajouter.reset()
+    retirer.reset()
     ajouter.mutate({ tag, fragmentId: Number(fragmentId) }, { onSuccess: () => { setTag(''); setFragmentId('') } })
+  }
+
+  function retirerLaCorrespondance(id: number) {
+    ajouter.reset()
+    retirer.reset()
+    retirer.mutate(id)
   }
 
   return (
@@ -80,14 +90,15 @@ export function Correspondance() {
         </label>
         <button type="submit" className={styles.boutonContour} disabled={!tag.trim() || !fragmentId || ajouter.isPending}>+ Ajouter</button>
       </form>
-      {correspondances && (
+      {correspondances?.length === 0 && <p className={styles.calme}>Aucune correspondance.</p>}
+      {correspondances && correspondances.length > 0 && (
         <Bloc>
           {correspondances.map((c) => (
             <LigneDeCorrespondance
               key={c.id}
               correspondance={c}
               fragment={fragments?.find((f) => f.id === c.unlock_ref_id)}
-              onRetirer={(id) => { retirer.mutate(id) }}
+              onRetirer={retirerLaCorrespondance}
             />
           ))}
         </Bloc>

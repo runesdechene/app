@@ -63,6 +63,13 @@ describe('supprimerContribution', () => {
     expect(mocks.rpc).not.toHaveBeenCalled()
   })
 
+  test('le fichier est retiré là où son adresse le met, même si le chemin enregistré diffère', async () => {
+    await supprimerContribution(contribution([photo('a', {
+      chemin: 'c1/ancien.webp', url: 'https://x/storage/v1/object/public/community-photos/c1/a.webp',
+    })]))
+    expect(mocks.retirerFichiers).toHaveBeenCalledWith('community-photos', ['c1/a.webp'])
+  })
+
   test('une adresse hors du bucket n’a rien à y retirer', async () => {
     await supprimerContribution(contribution([photo('a', { chemin: null, url: 'https://ailleurs/a.webp' })]))
     expect(mocks.retirerFichiers).toHaveBeenCalledWith('community-photos', [])

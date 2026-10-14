@@ -5,6 +5,7 @@
  *            vit ici, le travail dans lib/archive.
  */
 import { useState } from 'react'
+import { pluriel } from '@/shared/lib/texte'
 import { telechargerArchive, type Fichier } from '../lib/archive'
 
 export function useTelechargement() {
@@ -20,7 +21,7 @@ export function useTelechargement() {
       const { manques } = await telechargerArchive(fichiers, nomDArchive, (fait, total) => {
         setMessage(`Téléchargement ${String(fait)}/${String(total)}…`)
       })
-      setMessage(manques > 0 ? `${String(manques)} ${manques > 1 ? 'fichiers n’ont' : 'fichier n’a'} pas pu être lu${manques > 1 ? 's' : ''}.` : null)
+      setMessage(manques > 0 ? `${String(manques)} ${pluriel(manques, 'fichier')} ${pluriel(manques, 'n’a', 'n’ont')} pas pu être ${pluriel(manques, 'lu')}.` : null)
     } catch (e) {
       setMessage(null)
       setErreur(e instanceof Error ? e.message : 'Le téléchargement a échoué.')

@@ -1,7 +1,7 @@
 /**
  * QUOI     — la file des achats à associer et les deux décisions sur une ligne.
- * POURQUOI — une décision rafraîchit la file, la pastille de l'ouverture et les fiches de compte
- *            (le Fragment associé y apparaît).
+ * POURQUOI — une décision rafraîchit la file, la pastille de l'ouverture, les fiches de compte
+ *            (le Fragment associé y apparaît) et la liste des comptes.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { associerAchat, classerAchat, lireAchats } from '../api/achats'
@@ -15,7 +15,7 @@ function useDecision<T>(decider: (v: T) => Promise<void>) {
   return useMutation({
     mutationFn: decider,
     onSuccess: async () => {
-      await Promise.all(['hub-achats', 'hub-ouverture', 'hub-compte'].map((k) => client.invalidateQueries({ queryKey: [k] })))
+      await Promise.all(['hub-achats', 'hub-ouverture', 'hub-compte', 'hub-comptes'].map((k) => client.invalidateQueries({ queryKey: [k] })))
     },
   })
 }

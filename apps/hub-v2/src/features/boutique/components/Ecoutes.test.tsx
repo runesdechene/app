@@ -108,3 +108,16 @@ test('progression absente ou partielle', async () => {
   expect(await screen.findByText('pas encore mesurée')).toBeInTheDocument()
   expect(screen.getByText('40 % du récit · 3/5 mesurées')).toBeInTheDocument()
 })
+
+test('tant que les écoutes ne sont pas lues, les quatre tuiles montrent « … », jamais 0', async () => {
+  api.lireEcoutes.mockImplementation(jamais)
+  afficher()
+  expect(await screen.findAllByText('…')).toHaveLength(4)
+  expect(screen.queryByText('0')).not.toBeInTheDocument()
+})
+
+test('un inventaire tronqué le dit dans chaque relevé qui en vient', async () => {
+  api.lireInventaireAudio.mockResolvedValue({ ...inventaire, tronque: true })
+  afficher()
+  expect(await screen.findAllByText('liste tronquée')).toHaveLength(2)
+})

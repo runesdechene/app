@@ -18,11 +18,14 @@ vi.mock('../api/synchro', () => ({
 vi.mock('../api/shopify', () => ({ lireClientsShopify: api.lireClientsShopify }))
 
 function afficher() {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const invalider = vi.spyOn(client, 'invalidateQueries')
   render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+    <QueryClientProvider client={client}>
       <Synchro />
     </QueryClientProvider>,
   )
+  return invalider
 }
 
 beforeEach(() => { vi.clearAllMocks() })
@@ -37,6 +40,17 @@ test('« Lancer la liaison » dit ce qui a été relié, avec les journaux', asy
   await userEvent.click(screen.getByRole('button', { name: 'Lancer la liaison' }))
   expect(await screen.findByText('412 clients lus — 3 reliés, 1 compte créé, 408 déjà à jour.')).toBeInTheDocument()
   expect(screen.getByText('Croisement: 3 à lier')).toBeInTheDocument()
+})
+
+test('la liaison rafraîchit la liste des comptes et l’ouverture', async () => {
+  api.relierComptesEtClients.mockResolvedValue({
+    success: true, shopifyTotal: 1, supabaseTotal: 1, updated: 1, created: 0, skipped: 0, toCreateCount: 0, toUpdateCount: 1, logs: [],
+  })
+  const invalider = afficher()
+  await userEvent.click(screen.getByRole('button', { name: 'Lancer la liaison' }))
+  await screen.findByRole('status')
+  expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-comptes'] })
+  expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-ouverture'] })
 })
 
 test('une liaison en échec montre le message reçu', async () => {

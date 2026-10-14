@@ -20,7 +20,7 @@ vi.mock('../api/correspondance', () => ({
 vi.mock('../api/fragments', () => ({ lireFragments: api.lireFragments }))
 vi.mock('../api/achats', () => ({ lireAchats: api.lireAchats }))
 
-const fragment = (id: number, name: string) => ({ id, name, illustration_url: `https://cdn/${name}.png` })
+const fragment = (id: number, name: string) => ({ id, name, illustration_url: `https://cdn/${name}.png`, image_url: null })
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -32,7 +32,7 @@ beforeEach(() => {
 })
 
 function afficher() {
-  render(
+  return render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <MemoryRouter><Correspondance /></MemoryRouter>
     </QueryClientProvider>,
@@ -43,6 +43,13 @@ test('une ligne dit quelle étiquette débloque quel Fragment', async () => {
   afficher()
   expect(await screen.findByText('fragment:loup')).toBeInTheDocument()
   expect(screen.getAllByText('Loup').length).toBeGreaterThan(0)
+})
+
+test('un Fragment sans illustration montre son image de repli', async () => {
+  api.lireFragments.mockResolvedValue([{ id: 8, name: 'Loup', illustration_url: null, image_url: 'https://cdn/loup-repli.png' }])
+  const { container } = afficher()
+  await screen.findByText('fragment:loup')
+  await waitFor(() => { expect(container.querySelector('img')).toHaveAttribute('src', 'https://cdn/loup-repli.png') })
 })
 
 test('« + Ajouter » attend l’étiquette et le Fragment', async () => {
@@ -92,4 +99,25 @@ test('« Annuler » ne retire rien', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
   expect(api.retirerCorrespondance).not.toHaveBeenCalled()
   expect(screen.getByRole('button', { name: 'Retirer' })).toBeInTheDocument()
+})
+
+test('aucune correspondance : on le dit', async () => {
+  api.lireCorrespondances.mockResolvedValue([])
+  afficher()
+  expect(await screen.findByText('Aucune correspondance.')).toBeInTheDocument()
+})
+
+test('un retrait qui réussit efface l’erreur de l’ajout précédent', async () => {
+  api.ajouterCorrespondance.mockRejectedValue(new Error('Cette correspondance existe déjà.'))
+  afficher()
+  await screen.findByText('fragment:loup')
+  await screen.findByRole('option', { name: 'Loup' })
+  await userEvent.type(screen.getByLabelText('Étiquette Shopify'), 'fragment:loup')
+  await userEvent.selectOptions(screen.getByLabelText('Fragment'), 'Loup')
+  await userEvent.click(screen.getByRole('button', { name: '+ Ajouter' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('existe déjà')
+  await userEvent.click(screen.getByRole('button', { name: 'Retirer' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Confirmer' }))
+  await waitFor(() => { expect(api.retirerCorrespondance).toHaveBeenCalled() })
+  await waitFor(() => { expect(screen.queryByRole('alert')).not.toBeInTheDocument() })
 })

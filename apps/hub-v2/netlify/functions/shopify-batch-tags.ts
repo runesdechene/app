@@ -93,7 +93,7 @@ export default async function handler(request: Request) {
   // Construire une mutation GraphQL avec aliases : 25 updates en 1 requête
   const mutations = items.map((item, i) => {
     const tagsArray = item.tags.split(',').map(t => t.trim()).filter(Boolean)
-    const tagsGraphQL = tagsArray.map(t => `"${t}"`).join(', ')
+    const tagsGraphQL = tagsArray.map(t => JSON.stringify(t)).join(', ')
     return `c${i}: customerUpdate(input: {id: "gid://shopify/Customer/${item.customerId}", tags: [${tagsGraphQL}]}) {
       customer { id }
       userErrors { field message }
@@ -136,6 +136,9 @@ export default async function handler(request: Request) {
       continue
     }
 
+    if (!body.data) {
+      return json({ error: `Shopify GraphQL: ${JSON.stringify(body.errors ?? body).slice(0, 300)}` }, 500)
+    }
     responseData = body.data
     break
   }

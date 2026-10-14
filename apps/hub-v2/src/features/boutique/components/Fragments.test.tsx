@@ -27,7 +27,7 @@ vi.mock('../api/scan', () => ({ lireScans: api.lireScans, recalculerEmpreintes: 
 
 const fragment = (id: number, name: string, surcharge: Partial<Fragment> = {}): Fragment => ({
   id, name, link_url: null, visible: true, shopify_handle: name.toLowerCase(), resume: null, histoire: null,
-  illustration_url: `https://cdn/${name}.png`, illustration_sombre_url: null, audio_url: null, artiste: null,
+  illustration_url: `https://cdn/${name}.png`, image_url: null, illustration_sombre_url: null, audio_url: null, artiste: null,
   narrateur: null, heritage: null, synchronise_le: null, origine_lat: null, origine_lng: null,
   origine_nom: null, theme: null, ...surcharge,
 })
@@ -116,6 +116,15 @@ test('un motif sans collection ne peut pas devenir un Fragment ; un autre, si', 
   await userEvent.click(boutons[1] as HTMLElement)
   await waitFor(() => { expect(router.state.location.pathname).toBe('/boutique/fragments/7') })
   expect(api.ajouterFragment).toHaveBeenCalledWith(expect.objectContaining({ handle: 'corbeau' }))
+})
+
+test('un ajout dont la synchro échoue rafraîchit quand même la liste', async () => {
+  api.lireIllustrations.mockResolvedValue([motif('corbeau', 'corbeau')])
+  api.ajouterFragment.mockRejectedValue(new Error('Synchro du motif refusée'))
+  afficher()
+  await userEvent.click(await screen.findByRole('button', { name: 'En faire un Fragment' }))
+  expect(await screen.findByText('Synchro du motif refusée')).toBeInTheDocument()
+  await waitFor(() => { expect(api.lireFragments).toHaveBeenCalledTimes(2) })
 })
 
 test('tout est trié quand chaque motif est un Fragment', async () => {

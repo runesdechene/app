@@ -197,3 +197,35 @@ describe('shopify-sync : liaison des clients existants', () => {
     expect(((await r.json()) as { error: string }).error).toContain('JWT expired')
   })
 })
+
+describe('shopify-batch-tags : la requête GraphQL', () => {
+  const item = { customerId: 5, email: 'a@b.fr', tags: 'source:app, il a dit "oui"' }
+
+  // Admin valide ; Shopify répond `graphql` et on garde la requête reçue.
+  function simuler(graphql: unknown) {
+    const requetes: string[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
+      if (url.includes('/auth/v1/user')) return Promise.resolve(Response.json({ id: 'u0' }))
+      if (url.includes('/rest/v1/users?select=role')) return Promise.resolve(Response.json([{ role: 'admin' }]))
+      requetes.push(String(init?.body))
+      return Promise.resolve(Response.json(graphql))
+    }))
+    return requetes
+  }
+
+  test('une étiquette avec un guillemet reste une chaîne valide', async () => {
+    const requetes = simuler({ data: { c0: { customer: { id: 'x' }, userErrors: [] } } })
+    const handler = await charger('shopify-batch-tags')
+    await handler(post(JSON.stringify({ items: [item] }), { Authorization: 'Bearer jwt' }))
+    const { query } = JSON.parse(requetes[0] ?? '{}') as { query: string }
+    expect(query).toContain('tags: ["source:app", "il a dit \\"oui\\""]')
+  })
+
+  test('Shopify répond sans data : ses erreurs remontent, pas « Throttled »', async () => {
+    simuler({ errors: [{ message: 'Access denied for customerUpdate field' }] })
+    const handler = await charger('shopify-batch-tags')
+    const r = await handler(post(JSON.stringify({ items: [item] }), { Authorization: 'Bearer jwt' }))
+    expect(r.status).toBe(500)
+    expect(((await r.json()) as { error: string }).error).toContain('Access denied')
+  })
+})

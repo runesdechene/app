@@ -129,7 +129,8 @@ async function nettoyer(photos: PhotoDeContribution[]): Promise<void> {
     if (photo.produit_id && photo.media) await retirerImage(photo.produit_id, photo.media)
   }
   const chemins = photos.flatMap((p) => {
-    const chemin = p.chemin ?? cheminDepuisAdresse(BUCKET, p.url)
+    // Là où le fichier est vraiment : son adresse d'abord, le chemin enregistré à défaut.
+    const chemin = cheminDepuisAdresse(BUCKET, p.url) ?? p.chemin
     return chemin ? [chemin] : []
   })
   await retirerFichiers(BUCKET, chemins)

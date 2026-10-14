@@ -54,6 +54,7 @@ test('« Rien à débloquer » classe l’achat et rafraîchit la file, l’ouve
     expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-achats'] })
     expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-ouverture'] })
     expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-compte'] })
+    expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-comptes'] })
   })
 })
 
@@ -91,4 +92,21 @@ test('l’erreur de la base s’affiche telle quelle', async () => {
 test('rien à traiter : on le dit', async () => {
   afficher([])
   expect(await screen.findByText('Aucun achat n’attend.')).toBeInTheDocument()
+})
+
+test('l’onglet ne compte que les achats sans Fragment', async () => {
+  afficher([achat(41), achat(42), achat(43, { statut: 'pending' })])
+  expect(await screen.findByRole('link', { name: 'Achats à associer · 2' })).toBeInTheDocument()
+})
+
+test('une décision qui réussit efface l’erreur de la précédente', async () => {
+  api.classerAchat.mockRejectedValueOnce(new Error('Cet achat n’attend pas d’association'))
+  afficher([achat(41)])
+  await userEvent.click(await screen.findByRole('button', { name: 'Rien à débloquer' }))
+  expect(await screen.findByRole('alert')).toBeInTheDocument()
+  await screen.findByRole('option', { name: 'Loup' })
+  await userEvent.selectOptions(screen.getByLabelText('Fragment à associer'), 'Loup')
+  await userEvent.click(screen.getByRole('button', { name: 'Associer un Fragment' }))
+  await waitFor(() => { expect(api.associerAchat).toHaveBeenCalled() })
+  await waitFor(() => { expect(screen.queryByRole('alert')).not.toBeInTheDocument() })
 })

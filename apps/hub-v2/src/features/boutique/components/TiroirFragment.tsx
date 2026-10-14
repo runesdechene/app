@@ -4,7 +4,7 @@
  * POURQUOI — le contenu vient de Shopify et s'y corrige ; le Hub n'écrit que l'origine, la culture et la
  *            visibilité. Sans origine posée, la latitude et la longitude partent vides (la base lit « aucune »).
  */
-import { useState, type CSSProperties, type SyntheticEvent } from 'react'
+import { useMemo, useState, type CSSProperties, type SyntheticEvent } from 'react'
 import { Link, useLocation, useParams } from 'react-router'
 import { useCulturesDuHub } from '@/shared/cultures/useCulturesDuHub'
 import { Tiroir } from '@/shared/ui/Tiroir'
@@ -70,10 +70,10 @@ function Formulaire({ fragment, tous }: { fragment: Fragment; tous: Fragment[] }
   const modifie = () => { ecriture.reset() }
 
   // Les autres Fragments posés, et celui-ci à l'endroit où l'on est en train de le poser.
-  const points = tous.flatMap((f) => {
+  const points = useMemo(() => tous.flatMap((f) => {
     const lieu = f.id === fragment.id ? position : f.origine_lat !== null && f.origine_lng !== null ? { lat: f.origine_lat, lng: f.origine_lng } : null
     return lieu ? [{ id: f.id, ...lieu, image: f.illustration_url, nom: f.name }] : []
-  })
+  }), [tous, position, fragment.id])
   const couleur = cultures.find((c) => c.id === theme)?.couleur ?? null
 
   function enregistrer(e: SyntheticEvent) {
@@ -120,7 +120,7 @@ function Fiche({ fragment, tous, retour }: { fragment: Fragment; tous: Fragment[
   return (
     <Tiroir titre={fragment.name} retour={retour}>
       <DansShopify fragment={fragment} />
-      <Formulaire key={fragment.id} fragment={fragment} tous={tous} />
+      <Formulaire fragment={fragment} tous={tous} />
       <section className={styles.section}>
         <h3>Le scan</h3>
         <ScanDuFragment fragment={fragment} />

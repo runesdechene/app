@@ -17,3 +17,8 @@ test('rien n’attend : on le dit', () => {
   render(<MemoryRouter><Attente attente={vide} maintenant={new Date()} /></MemoryRouter>)
   expect(screen.getByText('Rien ne t’attend. Belle journée.')).toBeInTheDocument()
 })
+
+test('la ligne des achats mène à la file des achats à associer', () => {
+  render(<MemoryRouter><Attente attente={attente} maintenant={new Date('2026-10-14T12:00:00Z')} /></MemoryRouter>)
+  expect(screen.getByRole('link', { name: /Achats à associer à la main/ })).toHaveAttribute('href', '/boutique/fragments/achats')
+})

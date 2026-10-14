@@ -163,6 +163,7 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 - **Hub V2 — fonctions Netlify** : un `netlify/tsconfig.json` + `tsc --noEmit -p netlify` une fois que les copies pourront diverger de l'ancien Hub (après la bascule).
 - **Hub V2 — fonctions Netlify** : `shopify-callback` ne vérifie ni `state` ni le `hmac` de Shopify (déjà le cas dans l'ancien Hub) ; son HTML renvoie encore vers l'ancienne route `/shopify/sync`.
 - **Hub V2 — boutique** : Photos et avis : filtres par rôle et par étiquette, suppression d'une étiquette, Missions V1 non repris (R7).
+- **Hub V2 — boutique** : les gardes de la base sont mêlées (`_is_staff` sur les écritures de photo, `_is_admin` sur `hub_contributions` et sur la policy DELETE du stockage) : sans conséquence tant que le Hub est réservé aux admins ; à aligner à l’arrivée des modérateurs (chantier C).
 - **Hub V2 — boutique** : Fragments en attente pour un e-mail sans compte non repris (le compte du stand le remplace).
 - **Hub V2 — bascule (plan 5)** : repointer le webhook `orders/paid` vers le nouveau site et vérifier `SHOPIFY_WEBHOOK_SECRET` (la copie refuse toute requête sans signature, 500 sans secret).
 - **Hub V2 — bascule (plan 5)** : déménager `flyer-create-account` avec la page `/flyercadeau` (R2b).

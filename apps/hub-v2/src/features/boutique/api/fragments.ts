@@ -9,13 +9,13 @@ import type { Illustration } from './shopify'
 
 export type Fragment = {
   id: number; name: string; link_url: string | null; visible: boolean; shopify_handle: string | null
-  resume: string | null; histoire: string | null; illustration_url: string | null
+  resume: string | null; histoire: string | null; illustration_url: string | null; image_url: string | null
   illustration_sombre_url: string | null; audio_url: string | null; artiste: string | null
   narrateur: string | null; heritage: string | null; synchronise_le: string | null
   origine_lat: number | null; origine_lng: number | null; origine_nom: string | null; theme: string | null
 }
 
-const COLONNES = 'id, name, link_url, visible, shopify_handle, resume, histoire, illustration_url, illustration_sombre_url, audio_url, artiste, narrateur, heritage, synchronise_le, origine_lat, origine_lng, origine_nom, theme'
+const COLONNES = 'id, name, link_url, visible, shopify_handle, resume, histoire, illustration_url, image_url, illustration_sombre_url, audio_url, artiste, narrateur, heritage, synchronise_le, origine_lat, origine_lng, origine_nom, theme'
 
 export async function lireFragments(): Promise<Fragment[]> {
   const { data, error } = await supabase.from('title_fragments').select(COLONNES).order('name')

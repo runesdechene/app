@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router'
 import { dateCourte } from '@/shared/lib/dates'
 import { depuis, heureDuFil } from '@/shared/lib/quand'
+import { pluriel } from '@/shared/lib/texte'
 import { Balise } from '@/shared/ui/Balise'
 import { Bloc } from '@/shared/ui/Bloc'
 import { Tiroir } from '@/shared/ui/Tiroir'
@@ -99,7 +100,7 @@ export function TiroirCompte() {
   const maintenant = new Date()
   const balises = balisesDuCompte({ ...data, fragments: data.fragments.length }, maintenant)
   const departement = data.departement ? `${data.departement}${data.code ? ` (${data.code})` : ''}` : '—'
-  const boutique = data.client ? `Client validé · ${String(data.achats.length)} commande${data.achats.length > 1 ? 's' : ''}` : '—'
+  const boutique = data.client ? `Client validé · ${String(data.achats.length)} ${pluriel(data.achats.length, 'commande')}` : '—'
 
   return (
     <Tiroir titre={data.nom} retour={retour}>
