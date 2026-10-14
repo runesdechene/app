@@ -334,3 +334,15 @@ fonctions SECURITY DEFINER s'appelaient sans compte par le EXECUTE que Postgres 
   la lecture des rôles publics : passer par une RPC qui ne rend que ce qui est dû.
 - Les tests de sécurité vivent dans `supabase/tests/securite/` : les rejouer après toute
   migration qui touche aux politiques ou aux droits.
+
+## Une fonction d'administration sans garde est ouverte à tout compte connecté
+
+**Le piège** (14/10/2026, mig 512) : `rename_faction` — une fonction du Hub, donc pensée « pour
+l'équipe » — tournait en `SECURITY DEFINER` avec EXECUTE pour `authenticated` et aucune garde : tout
+joueur pouvait renommer une Compagnie (et lui faire perdre ses colonnes V2). Le chantier de conformité
+du 11/10 l'avait manquée parce qu'elle ne reçoit pas de `p_user_id`.
+
+**How to apply :** toute fonction appelée seulement par le Hub commence par
+`IF NOT _is_admin() THEN PERFORM _refus('Réservé à l’équipe', 'role'); END IF;` (ou `_is_staff()`
+pour la modération). Pour en auditer une : `prosecdef` + `has_function_privilege('authenticated', …)`
++ chercher `_is_admin`/`_is_staff` dans `prosrc`.
