@@ -32,3 +32,9 @@
 .bouton:hover {
   background: var(--color-pastille);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .bouton {
+    transition: none;
+  }
+}
