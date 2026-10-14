@@ -2,7 +2,8 @@
  * QUOI     — les réglages de l'Énergie : la jauge et le prix d'une découverte selon la distance. Passage des lignes
  *            d'app_settings aux nombres (et retour), règles de validité, phrase qui dit la règle.
  * POURQUOI — la base relit ces dix clés à chaque calcul (_reglage) ; le cycle y est en secondes, l'écran parle en
- *            minutes. Mêmes règles et mêmes messages que l'ancien Hub.
+ *            minutes. Les règles et leurs messages viennent de l'ancien Hub, plus des bornes hautes (une faute de
+ *            frappe ferait déborder value::INT en base) ; la phrase de resume suit le plan.
  */
 export type Reglages = {
   maxSansFragment: number
@@ -34,7 +35,7 @@ export const CLES: Record<keyof Reglages, string> = {
 
 export const DEFAUTS: Reglages = {
   maxSansFragment: 10,
-  minutesParPoint: 60,
+  minutesParPoint: 120,
   gratuitKm: 50,
   palier1Km: 150,
   palier2Km: 500,
@@ -70,6 +71,10 @@ export function erreurReglages(r: Reglages): string | null {
   if (Object.values(r).some((v) => !Number.isInteger(v) || v < 0)) return 'Chaque valeur doit être un nombre entier positif.'
   if (r.maxSansFragment < 1) return 'La jauge doit compter au moins 1 point.'
   if (r.minutesParPoint < 10) return 'Un point ne peut pas revenir en moins de 10 minutes.'
+  if (r.maxSansFragment > 1000) return 'La jauge ne dépasse pas 1000 points.'
+  if (r.minutesParPoint > 1440) return 'Un point se recharge en 24 h au plus.'
+  if ([r.gratuitKm, r.palier1Km, r.palier2Km, r.palier3Km].some((km) => km > 20000)) return 'Une distance ne dépasse pas 20 000 km.'
+  if ([r.cout1, r.cout2, r.cout3, r.cout4].some((cout) => cout > 1000)) return 'Un coût ne dépasse pas 1000 points.'
   if (!(r.gratuitKm < r.palier1Km && r.palier1Km < r.palier2Km && r.palier2Km < r.palier3Km)) {
     return 'Les distances doivent aller croissant : zone gratuite, puis palier 1, 2, 3.'
   }

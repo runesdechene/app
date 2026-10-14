@@ -28,7 +28,7 @@ test('l’écran montre les réglages et la phrase qui dit la règle', async () 
   expect(await screen.findByRole('heading', { name: 'L’Énergie' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'La jauge' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Le prix d’une découverte' })).toBeInTheDocument()
-  expect(screen.getByLabelText('Minutes par point')).toHaveValue(60)
+  expect(screen.getByLabelText('Minutes par point')).toHaveValue(120)
   expect(screen.getByText(/Gratuit jusqu’à 50 km, puis 1 point jusqu’à 150 km/)).toBeInTheDocument()
 })
 

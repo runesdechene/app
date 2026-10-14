@@ -22,6 +22,17 @@ test('un point met au moins dix minutes à revenir', () => {
   expect(erreurReglages(avec({ minutesParPoint: 10 }))).toBeNull()
 })
 
+test('les bornes hautes : acceptées pile, refusées au-dessus', () => {
+  expect(erreurReglages(avec({ maxSansFragment: 1000 }))).toBeNull()
+  expect(erreurReglages(avec({ maxSansFragment: 1001 }))).toBe('La jauge ne dépasse pas 1000 points.')
+  expect(erreurReglages(avec({ minutesParPoint: 1440 }))).toBeNull()
+  expect(erreurReglages(avec({ minutesParPoint: 1441 }))).toBe('Un point se recharge en 24 h au plus.')
+  expect(erreurReglages(avec({ palier3Km: 20000 }))).toBeNull()
+  expect(erreurReglages(avec({ palier3Km: 20001 }))).toBe('Une distance ne dépasse pas 20 000 km.')
+  expect(erreurReglages(avec({ cout4: 1000 }))).toBeNull()
+  expect(erreurReglages(avec({ cout4: 1001 }))).toBe('Un coût ne dépasse pas 1000 points.')
+})
+
 test('les distances vont croissant', () => {
   const message = 'Les distances doivent aller croissant : zone gratuite, puis palier 1, 2, 3.'
   expect(erreurReglages(avec({ gratuitKm: 150 }))).toBe(message)
