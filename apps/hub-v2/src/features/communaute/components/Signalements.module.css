@@ -1,0 +1,84 @@
+/*
+ * QUOI     — la file à deux volets : les deux blocs l'un sous l'autre au téléphone, 380 px + la lecture sur PC.
+ */
+.volets {
+  display: grid;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.ligne {
+  display: grid;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+  font-size: var(--flux-size);
+  color: var(--color-texte);
+  cursor: pointer;
+  transition: background var(--duree-douce) var(--courbe-douce);
+}
+.ligne:hover { background: var(--color-surface); }
+.ligne[aria-current='true'] { background: var(--color-pastille); }
+
+.nom {
+  font-weight: var(--weight-gras);
+  color: var(--color-encre);
+}
+
+.detail {
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.lecture {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.precision {
+  margin: 0;
+  font-size: var(--flux-size);
+  color: var(--color-encre);
+}
+
+.photos {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+}
+
+.photos img {
+  display: block;
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-petit);
+  background: var(--color-vignette);
+  object-fit: cover;
+}
+
+.liens, .decisions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.traite {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-accent-bord);
+  border-radius: var(--radius-rond);
+  background: var(--color-accent);
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--sous-titre-size);
+  color: var(--color-fond);
+  cursor: pointer;
+}
+
+@container app (width >= 900px) {
+  .volets { grid-template-columns: 380px minmax(0, 1fr); }
+}

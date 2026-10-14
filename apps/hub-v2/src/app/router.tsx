@@ -8,6 +8,7 @@ import { Ouverture } from '@/features/accueil/components/Ouverture'
 import { Compagnies } from '@/features/communaute/components/Compagnies'
 import { Comptes } from '@/features/communaute/components/Comptes'
 import { Lieux } from '@/features/communaute/components/Lieux'
+import { Signalements } from '@/features/communaute/components/Signalements'
 import { TiroirCompagnie } from '@/features/communaute/components/TiroirCompagnie'
 import { TiroirCompte } from '@/features/communaute/components/TiroirCompte'
 import { TiroirLieu } from '@/features/communaute/components/TiroirLieu'
@@ -17,7 +18,7 @@ import { MENU } from './coquille/menu'
 import { PorteDEntree } from './entree/PorteDEntree'
 
 // Les écrans faits quittent « bientôt » ; chaque tâche suivante ajoute le sien.
-const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux'])
+const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements'])
 
 const autres = MENU.flatMap((d) => d.liens)
   .filter((l) => l.chemin !== '/' && !ECRANS_FAITS.has(l.chemin))
@@ -36,6 +37,7 @@ export const routes: RouteObject[] = [
       { path: 'communaute/comptes', Component: Comptes, children: [{ path: ':id', Component: TiroirCompte }] },
       { path: 'communaute/compagnies', Component: Compagnies, children: [{ path: ':id', Component: TiroirCompagnie }] },
       { path: 'communaute/lieux', Component: Lieux, children: [{ path: ':id', Component: TiroirLieu }] },
+      { path: 'communaute/signalements', Component: Signalements },
       ...autres,
     ],
   },
