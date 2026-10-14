@@ -1,0 +1,9 @@
+# QUOI     — le site Netlify du Hub V2 (préparation, puis hub.runesdechene.com à la bascule).
+# POURQUOI — une appli d'une page : toute adresse sert index.html, le routeur fait le reste.
+[build]
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
