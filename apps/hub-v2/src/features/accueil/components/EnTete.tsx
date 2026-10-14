@@ -25,7 +25,8 @@ export function EnTete({ periode, onPeriode, pouls, maintenant }: {
         <h1 className={styles.bonjour}>Bonjour Uriel</h1>
         {pouls && (
           <p className={styles.phrase}>
-            {pouls.nouveaux} nouveaux Explorateurs, {pouls.visites} visites sur place.
+            {pouls.nouveaux} {pouls.nouveaux === 1 ? 'nouvel Explorateur' : 'nouveaux Explorateurs'}, {pouls.visites}{' '}
+            {pouls.visites === 1 ? 'visite' : 'visites'} sur place.
           </p>
         )}
       </div>

@@ -86,7 +86,7 @@
 
 @container app (width >= 900px) {
   .ligne {
-    grid-template-columns: 40px 104px 28px minmax(0, 1fr) 170px;
+    grid-template-columns: 96px 104px 28px minmax(0, 1fr) 170px;
     grid-template-areas: 'heure type portrait texte ou';
     align-items: center;
     gap: var(--space-4);

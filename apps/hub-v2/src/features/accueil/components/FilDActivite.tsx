@@ -1,11 +1,12 @@
 /**
  * QUOI     — « Le fil d'activité » (maquette 592:852) : filtres par type, une ligne par geste
- *            (heure, type, portrait, qui et quoi, détail réservé à l'équipe, département), et
+ *            (quand, type, portrait, qui et quoi, détail réservé à l'équipe, département), et
  *            « Voir tout le fil ».
  * POURQUOI — le filtre est dans l'adresse (?fil=lieu) : tout état navigable est une URL.
  */
 import { useSearchParams } from 'react-router'
 import sectionChemins from '@/assets/ui/section-chemins.svg'
+import { heureDuFil } from '@/shared/lib/quand'
 import { Balise } from '@/shared/ui/Balise'
 import { Bloc } from '@/shared/ui/Bloc'
 import { ChoixSegmente } from '@/shared/ui/ChoixSegmente'
@@ -26,7 +27,6 @@ const LIBELLES: Record<TypeActivite, string> = {
   compte: 'Compte', lieu: 'Lieu', visite: 'Visite', enigme: 'Énigme', boutique: 'Boutique',
   photo: 'Photo', message: 'Message', moderation: 'Modération', notification: 'Notification',
 }
-const heure = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' })
 
 export function FilDActivite() {
   const [params, setParams] = useSearchParams()
@@ -53,7 +53,7 @@ export function FilDActivite() {
           const { titre, detail } = phraseDuFil(a)
           return (
             <div key={a.cle} className={styles.ligne}>
-              <span className={styles.heure}>{heure.format(new Date(a.quand))}</span>
+              <span className={styles.heure}>{heureDuFil(a.quand)}</span>
               <span className={styles.type}><Balise texte={LIBELLES[a.type]} teinte={a.type} /></span>
               {a.qui?.avatar ? <img className={styles.portrait} src={a.qui.avatar} alt="" loading="lazy" /> : <span className={styles.portrait} />}
               <span className={styles.texte}>

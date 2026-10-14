@@ -1,6 +1,7 @@
 /**
  * QUOI     — lit le fil d'activité (fil_du_hub, migs 507-508), page par page.
- * POURQUOI — la page suivante commence avant la dernière ligne reçue (p_avant).
+ * POURQUOI — le curseur est inclusif : la page n+1 commence à la dernière ligne reçue (p_avant),
+ *            et les doublons sont retirés par `cle` côté hook.
  */
 import { supabase } from '@/shared/supabase/client'
 

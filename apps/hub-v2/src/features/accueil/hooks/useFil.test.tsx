@@ -38,3 +38,16 @@ test('une ligne reprise à la frontière de deux pages ne s’affiche qu’une f
   await waitFor(() => { expect(result.current.activites).toHaveLength(PAGE + 1) })
   expect(new Set(result.current.activites.map((a) => a.cle)).size).toBe(PAGE + 1)
 })
+
+test('une page qui n’apporte aucune nouvelle ligne arrête « Voir tout le fil »', async () => {
+  lire.mockReset()
+  const premiere = Array.from({ length: PAGE }, (_, i) => ligne(i))
+  lire.mockResolvedValueOnce(premiere)
+  lire.mockResolvedValueOnce(premiere)
+  const { result } = renderHook(() => useFil([]), { wrapper: enveloppe })
+  await waitFor(() => { expect(result.current.aDAutres).toBe(true) })
+  act(() => { result.current.voirPlus() })
+  await waitFor(() => { expect(lire).toHaveBeenCalledTimes(2) })
+  await waitFor(() => { expect(result.current.aDAutres).toBe(false) })
+  expect(result.current.activites).toHaveLength(PAGE)
+})

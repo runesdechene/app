@@ -1,7 +1,8 @@
 /**
  * QUOI     — « La santé » : un point vert ou orange par service (spec §9).
- * ATTENTION — Synchro Shopify et fiches publiques arrivent avec le plan 4 (fonctions Netlify) ;
- *            ici, ce que la base sait : les commandes reçues, les notifications, la version d'Explore.
+ * ATTENTION — ici, ce que la base sait : les commandes reçues et les notifications. Synchro Shopify
+ *            et fiches publiques arrivent avec le plan 4 (fonctions Netlify) ; la version d'Explore
+ *            et le reste sont au backlog (docs/tech-backlog.md, « Hub V2 »).
  */
 import sectionAjoutes from '@/assets/ui/section-ajoutes.svg'
 import { depuis } from '@/shared/lib/quand'
