@@ -155,3 +155,5 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 - **Hub V2 — image de fond** : une grande image de parchemin (≥ 2 880 px) pour le PC (spec §13.5).
 - **Hub V2 — communauté** : Associer un Fragment à la main depuis la fiche d'un compte (plan 4).
 - **Hub V2 — communauté** : Membres d'une Compagnie : pas de retrait ni de changement de rôle par l'équipe (YAGNI, à demander).
+- **Hub V2 — communauté** : Signalements → fiche de modération : fermer la fiche ramène aux Lieux, pas à la file (passer un retour).
+- **Hub V2 — communauté** : Export CSV des comptes limité à 10 000 lignes.
