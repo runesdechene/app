@@ -18,7 +18,8 @@ function enregistrer(contenu: Blob, nom: string) {
   lien.href = URL.createObjectURL(contenu)
   lien.download = nom
   lien.click()
-  URL.revokeObjectURL(lien.href)
+  // Le navigateur lit l'adresse après le clic : on la libère un peu plus tard.
+  setTimeout(() => { URL.revokeObjectURL(lien.href) }, 10_000)
 }
 
 async function lire(fichier: Fichier): Promise<Blob | null> {

@@ -52,10 +52,16 @@ export async function retirerFichiers(bucket: string, chemins: string[]): Promis
   }
 }
 
-// Le chemin dans le bucket est ce qui suit « /storage/v1/object/public/{bucket}/ » dans l'adresse.
-export async function retirerFichier(bucket: string, adresse: string): Promise<void> {
+/** Le chemin dans le bucket : ce qui suit « /storage/v1/object/public/{bucket}/ » dans l'adresse, sans requête ; null hors de ce bucket. */
+export function cheminDepuisAdresse(bucket: string, adresse: string): string | null {
   const debut = `/storage/v1/object/public/${bucket}/`
   const position = adresse.indexOf(debut)
-  if (position === -1) return
-  await retirerFichiers(bucket, [decodeURIComponent(adresse.slice(position + debut.length))])
+  if (position === -1) return null
+  const chemin = adresse.slice(position + debut.length).split(/[?#]/)[0] ?? ''
+  return decodeURIComponent(chemin)
+}
+
+export async function retirerFichier(bucket: string, adresse: string): Promise<void> {
+  const chemin = cheminDepuisAdresse(bucket, adresse)
+  if (chemin !== null) await retirerFichiers(bucket, [chemin])
 }

@@ -12,6 +12,7 @@ import { dateCourte } from '@/shared/lib/dates'
 import type { Contribution, StatutContribution } from '../api/contributions'
 import { useTelechargement } from '../hooks/useTelechargement'
 import { fichiersDeContributions } from '../lib/archive'
+import { nettoyer } from '../lib/contribution'
 import styles from './Photos.module.css'
 
 type Ecriture = UseMutationResult<void, Error, { id: string; statut: StatutContribution; couronnes?: number }>
@@ -58,7 +59,7 @@ export function DecisionsDeContribution({ contribution, ecriture, suppression, o
         </>
       )}
       <button type="button" className={styles.contour} disabled={telechargement.enCours}
-        onClick={() => { void telechargement.telecharger(fichiersDeContributions([contribution]), `${contribution.nom}.zip`) }}>Télécharger</button>
+        onClick={() => { void telechargement.telecharger(fichiersDeContributions([contribution]), `${nettoyer(contribution.nom)}.zip`) }}>Télécharger</button>
       {confirme ? (
         <>
           <span>{`Supprimer cette contribution et ses ${String(contribution.images.length)} photos ?`}</span>

@@ -45,19 +45,39 @@ test('une Illustration lue', async () => {
 })
 
 describe('retirerImage', () => {
-  test('un 404 est une réussite : l’image n’y est déjà plus', async () => {
-    appel.appelerFonction.mockResolvedValue({ status: 404 })
+  const NETLIFY = 'Les fonctions Netlify ne répondent pas (HTTP 404). En local elles ne tournent pas : tester sur le site de préparation.'
+
+  test('le 404 JSON de Shopify (« Not Found ») est une réussite : l’image n’y est déjà plus', async () => {
+    appel.appelerFonction.mockResolvedValue(new Response('{"errors":"Not Found"}', { status: 404 }))
+    appel.lireReponse.mockRejectedValue(new Error('Not Found'))
     await expect(retirerImage('12', '34')).resolves.toBeUndefined()
-    expect(appel.lireReponse).not.toHaveBeenCalled()
     expect(appel.appelerFonction).toHaveBeenCalledWith('shopify-proxy', {
       methode: 'DELETE', parametres: { endpoint: 'products/12/images/34.json' },
     })
   })
 
-  test('un 500 « Not Found » est une erreur', async () => {
-    appel.appelerFonction.mockResolvedValue({ status: 500 })
+  test('un 404 qui n’a pas atteint Shopify (fonction absente) est une erreur', async () => {
+    appel.appelerFonction.mockResolvedValue(new Response('<html>Not found</html>', { status: 404 }))
+    appel.lireReponse.mockRejectedValue(new Error(NETLIFY))
+    await expect(retirerImage('12', '34')).rejects.toThrow(`Fiche produit Shopify : ${NETLIFY}`)
+  })
+
+  test('un 500 « Not Found » est une erreur nommée', async () => {
+    appel.appelerFonction.mockResolvedValue(new Response('{"errors":"Not Found"}', { status: 500 }))
     appel.lireReponse.mockRejectedValue(new Error('Not Found'))
-    await expect(retirerImage('12', '34')).rejects.toThrow('Not Found')
+    await expect(retirerImage('12', '34')).rejects.toThrow('Fiche produit Shopify : Not Found')
+  })
+
+  test('une réponse 200 au corps vide est une réussite', async () => {
+    appel.appelerFonction.mockResolvedValue(new Response('', { status: 200 }))
+    await expect(retirerImage('12', '34')).resolves.toBeUndefined()
+    expect(appel.lireReponse).not.toHaveBeenCalled()
+  })
+
+  test('un 200 qui répond du HTML n’est pas une réussite', async () => {
+    appel.appelerFonction.mockResolvedValue(new Response('<html></html>', { status: 200 }))
+    appel.lireReponse.mockRejectedValue(new Error(NETLIFY))
+    await expect(retirerImage('12', '34')).rejects.toThrow('Fiche produit Shopify')
   })
 })
 

@@ -5,7 +5,9 @@ import { delierProduit, mettreSurLaFiche, relierProduit, supprimerContribution, 
 const mocks = vi.hoisted(() => ({ rpc: vi.fn(), retirerImage: vi.fn(), pousserImage: vi.fn(), retirerFichiers: vi.fn() }))
 vi.mock('@/shared/supabase/client', () => ({ supabase: { rpc: mocks.rpc } }))
 vi.mock('./shopify', () => ({ retirerImage: mocks.retirerImage, pousserImage: mocks.pousserImage }))
-vi.mock('@/shared/lib/envoi', () => ({ retirerFichiers: mocks.retirerFichiers }))
+vi.mock('@/shared/lib/envoi', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/shared/lib/envoi')>()), retirerFichiers: mocks.retirerFichiers,
+}))
 
 const photo = (id: string, surcharge: Partial<PhotoDeContribution> = {}): PhotoDeContribution => ({
   id, url: `https://x/${id}.webp`, chemin: `c1/${id}.webp`, taille: 'M', produit_id: '12', produit_handle: 'veste',
@@ -41,14 +43,28 @@ describe('supprimerContribution', () => {
     expect(mocks.rpc).not.toHaveBeenCalled()
   })
 
+  test('Netlify ne répond pas (404 HTML) : rien d’autre n’est supprimé', async () => {
+    mocks.retirerImage.mockRejectedValue(new Error('Fiche produit Shopify : Les fonctions Netlify ne répondent pas (HTTP 404)'))
+    await expect(supprimerContribution(c)).rejects.toThrow('Fiche produit Shopify')
+    expect(mocks.retirerFichiers).not.toHaveBeenCalled()
+    expect(mocks.rpc).not.toHaveBeenCalled()
+  })
+
+  test('une photo sans chemin : il se déduit de son adresse publique', async () => {
+    await supprimerContribution(contribution([photo('a', {
+      chemin: null, url: 'https://x/storage/v1/object/public/community-photos/c1/a%20b.webp?t=1',
+    })]))
+    expect(mocks.retirerFichiers).toHaveBeenCalledWith('community-photos', ['c1/a b.webp'])
+  })
+
   test('le bucket refuse : la base n’est pas touchée', async () => {
     mocks.retirerFichiers.mockRejectedValue(new Error('Le fichier n’a pas pu être retiré du stockage (droits ?) : c1/a.webp'))
     await expect(supprimerContribution(c)).rejects.toThrow('droits')
     expect(mocks.rpc).not.toHaveBeenCalled()
   })
 
-  test('une photo sans chemin connu n’est pas cherchée dans le bucket', async () => {
-    await supprimerContribution(contribution([photo('a', { chemin: null })]))
+  test('une adresse hors du bucket n’a rien à y retirer', async () => {
+    await supprimerContribution(contribution([photo('a', { chemin: null, url: 'https://ailleurs/a.webp' })]))
     expect(mocks.retirerFichiers).toHaveBeenCalledWith('community-photos', [])
   })
 

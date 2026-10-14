@@ -171,12 +171,22 @@ export async function pousserImage(produitId: string, url: string, alt: string):
   return String(image.id)
 }
 
-/** Retire l'image de la galerie. Un 404 est une réussite : elle n'y est déjà plus (on peut réessayer). */
+/**
+ * Retire l'image de la galerie. Seul le 404 JSON de Shopify (« Not Found », relayé par le proxy) dit qu'elle
+ * n'y est déjà plus : un 404 de Netlify (fonction absente) n'a rien dit à Shopify et reste une erreur.
+ * Un 200 au corps vide est la réponse normale de Shopify à un retrait.
+ */
 export async function retirerImage(produitId: string, mediaId: string): Promise<void> {
   const reponse = await appelerFonction('shopify-proxy', {
     methode: 'DELETE',
     parametres: { endpoint: `products/${produitId}/images/${mediaId}.json` },
   })
-  if (reponse.status === 404) return
-  await lireReponse<unknown>(reponse)
+  if (reponse.ok && (await reponse.clone().text()).trim() === '') return
+  try {
+    await lireReponse<unknown>(reponse)
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e)
+    if (reponse.status === 404 && message === 'Not Found') return
+    throw new Error(`Fiche produit Shopify : ${message}`, { cause: e })
+  }
 }

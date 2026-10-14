@@ -31,7 +31,7 @@ export function texteAlternatif(nom: string | null, hauteurCm: number | null, ta
   return prenom
 }
 
-const nettoyer = (texte: string) => texte.replace(/[<>:"/\\|?*]/g, '').replace(/\s+/g, ' ').trim()
+export const nettoyer = (texte: string) => texte.replace(/[<>:"/\\|?*]/g, '').replace(/\s+/g, ' ').trim()
 
 /** « Brune K. - @brune - 1.jpg » : le rang commence à 0, l'extension est celle du fichier (webp à défaut). */
 export function nomDeFichier(nom: string, instagram: string | null, rang: number, url: string): string {
@@ -42,7 +42,11 @@ export function nomDeFichier(nom: string, instagram: string | null, rang: number
 
 /** L'adresse publique avec `?download=` : Supabase la sert alors en pièce jointe, sous ce nom. */
 export function adresseDeTelechargement(url: string, nom: string): string {
-  const adresse = new URL(url)
-  adresse.searchParams.set('download', nom)
-  return adresse.toString()
+  try {
+    const adresse = new URL(url)
+    adresse.searchParams.set('download', nom)
+    return adresse.toString()
+  } catch {
+    return url
+  }
 }

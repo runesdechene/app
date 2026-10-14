@@ -89,8 +89,9 @@ export function Photos() {
     choisir((lignes[rang + 1] ?? lignes[rang - 1])?.id)
   }
 
-  // « depuis le » est une date du jour (AAAA-MM-JJ) : la comparaison de textes ISO suffit.
-  const recentes = depuisLe === '' ? [] : (lignes ?? []).filter((c) => c.quand !== null && c.quand.slice(0, 10) >= depuisLe)
+  // « depuis le » est un jour du calendrier de l'écran : on compare avec le début de ce jour, à l'heure locale.
+  const debut = depuisLe === '' ? null : new Date(`${depuisLe}T00:00:00`)
+  const recentes = debut === null ? [] : (lignes ?? []).filter((c) => c.quand !== null && new Date(c.quand) >= debut)
   const fichiers = fichiersDeContributions(recentes)
 
   const compteurs = data?.compteurs

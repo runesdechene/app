@@ -19,3 +19,7 @@ test('l’adresse de téléchargement : ?download= puis & quand l’adresse a d�
   expect(adresseDeTelechargement('https://x/a.webp', 'Brune - 1.webp')).toBe('https://x/a.webp?download=Brune+-+1.webp')
   expect(adresseDeTelechargement('https://x/a.webp?t=1', 'a.webp')).toBe('https://x/a.webp?t=1&download=a.webp')
 })
+
+test('une adresse illisible reste telle quelle', () => {
+  expect(adresseDeTelechargement('/relative.webp', 'a.webp')).toBe('/relative.webp')
+})

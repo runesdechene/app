@@ -5,9 +5,11 @@
  * POURQUOI — la base décide (garde de l'équipe, couronnes versées une seule fois) : son message remonte tel quel.
  *            Supprimer va de l'extérieur vers l'intérieur : Shopify, puis le bucket, puis la base. Chaque étape
  *            s'arrête à sa première erreur ; en cas d'échec le bout déjà fait se refait sans dommage
- *            (Shopify 404 toléré, un fichier absent n'est pas une erreur), donc réessayer suffit.
+ *            (Shopify « Not Found » toléré, un fichier absent n'est pas une erreur), donc réessayer suffit.
+ *            Une suppression de plusieurs photos interrompue laisse le `media` des premières périmé jusqu'au
+ *            nouvel essai : la tolérance du « Not Found » l'absorbe.
  */
-import { retirerFichiers } from '@/shared/lib/envoi'
+import { cheminDepuisAdresse, retirerFichiers } from '@/shared/lib/envoi'
 import { supabase } from '@/shared/supabase/client'
 import { texteAlternatif } from '../lib/contribution'
 import { pousserImage, retirerImage, type ProduitShopify } from './shopify'
@@ -120,7 +122,11 @@ async function nettoyer(photos: PhotoDeContribution[]): Promise<void> {
   for (const photo of photos) {
     if (photo.produit_id && photo.media) await retirerImage(photo.produit_id, photo.media)
   }
-  await retirerFichiers(BUCKET, photos.flatMap((p) => (p.chemin ? [p.chemin] : [])))
+  const chemins = photos.flatMap((p) => {
+    const chemin = p.chemin ?? cheminDepuisAdresse(BUCKET, p.url)
+    return chemin ? [chemin] : []
+  })
+  await retirerFichiers(BUCKET, chemins)
 }
 
 export async function supprimerPhoto(photo: PhotoDeContribution): Promise<void> {
