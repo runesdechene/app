@@ -14,8 +14,10 @@ export function useFil(types: TypeActivite[]) {
     getNextPageParam: (derniere: Activite[]) => (derniere.length < PAGE ? undefined : derniere[derniere.length - 1]?.quand),
     refetchInterval: 60_000,
   })
+  // La page suivante reprend la dernière ligne de la précédente (curseur inclusif) : on garde la première.
+  const activites = [...new Map((requete.data?.pages.flat() ?? []).map((a) => [a.cle, a])).values()]
   return {
-    activites: requete.data?.pages.flat() ?? [],
+    activites,
     voirPlus: () => void requete.fetchNextPage(),
     aDAutres: requete.hasNextPage,
     isError: requete.isError,

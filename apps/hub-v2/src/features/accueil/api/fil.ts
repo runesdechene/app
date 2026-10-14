@@ -9,6 +9,7 @@ export type TypeActivite = 'compte' | 'lieu' | 'visite' | 'enigme' | 'boutique' 
 export type Activite = {
   type: TypeActivite
   sorte: string
+  cle: string
   quand: string
   qui: { id: string; nom: string; avatar: string | null } | null
   lieu: { id: string; nom: string; departement: string | null } | null
@@ -17,11 +18,11 @@ export type Activite = {
 
 export const PAGE = 30
 
-// Le générateur type p_avant comme `string` obligatoire : sans repère, on part de « l'infini ».
-const MAINTENANT = 'infinity'
+// Le générateur type p_avant comme `string` obligatoire : sans repère, pas de borne haute (« l'infini »).
+const SANS_LIMITE = 'infinity'
 
 export async function lireFil(types: TypeActivite[], avant: string | null): Promise<Activite[]> {
-  const { data, error } = await supabase.rpc('fil_du_hub', { p_types: types, p_avant: avant ?? MAINTENANT, p_limite: PAGE })
+  const { data, error } = await supabase.rpc('fil_du_hub', { p_types: types, p_avant: avant ?? SANS_LIMITE, p_limite: PAGE })
   if (error) throw error
   return data as Activite[]
 }

@@ -3,7 +3,7 @@ import { phraseDuFil } from './phraseDuFil'
 
 const luna = { id: 'u1', nom: 'Luna', avatar: null }
 const dolmen = { id: 'p1', nom: 'Dolmen de la Pierre Levée', departement: 'Aude' }
-const base = { quand: '2026-10-14T09:02:00Z', qui: luna, lieu: null, donnees: {} }
+const base = { cle: 'k1', quand: '2026-10-14T09:02:00Z', qui: luna, lieu: null, donnees: {} }
 
 test('un lieu ajouté, pas encore vérifié', () => {
   const a: Activite = { ...base, type: 'lieu', sorte: 'ajout', lieu: dolmen, donnees: { verifie: false, masque: false } }

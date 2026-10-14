@@ -22,9 +22,15 @@ export function Ouverture() {
   const { data, isError, refetch } = useOuverture(periode)
   const maintenant = new Date()
 
+  function choisirPeriode(p: Periode) {
+    const suivants = new URLSearchParams(params)
+    suivants.set('periode', p)
+    setParams(suivants)
+  }
+
   return (
     <div className={styles.ouverture}>
-      <EnTete periode={periode} onPeriode={(p) => { setParams({ periode: p }) }} pouls={data?.pouls} maintenant={maintenant} />
+      <EnTete periode={periode} onPeriode={choisirPeriode} pouls={data?.pouls} maintenant={maintenant} />
       {isError && (
         <p className={styles.calme}>
           La base ne répond pas. <button type="button" onClick={() => void refetch()}>Réessayer</button>

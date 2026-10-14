@@ -52,7 +52,7 @@ export function FilDActivite() {
         {activites.map((a) => {
           const { titre, detail } = phraseDuFil(a)
           return (
-            <div key={`${a.type}-${a.sorte}-${a.quand}-${a.qui?.id ?? ''}-${a.lieu?.id ?? ''}`} className={styles.ligne}>
+            <div key={a.cle} className={styles.ligne}>
               <span className={styles.heure}>{heure.format(new Date(a.quand))}</span>
               <span className={styles.type}><Balise texte={LIBELLES[a.type]} teinte={a.type} /></span>
               {a.qui?.avatar ? <img className={styles.portrait} src={a.qui.avatar} alt="" loading="lazy" /> : <span className={styles.portrait} />}
