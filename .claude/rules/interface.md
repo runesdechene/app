@@ -263,3 +263,10 @@ l'écran (le logo de la vitrine est passé en blanc par `exposure: 1`).
 **How to apply :** copier la peinture du calque source exact (`JSON.parse(JSON.stringify(node.fills[i]))`),
 ne changer que `scaleMode` si besoin, opacité 1, sans fond coloré dessous. Comparer à l'œil avec l'écran
 d'origine avant de rendre la main.
+
+## Un jeton CSS qui n'existe pas ne fait aucun bruit (14/10/2026)
+
+`var(--space-5)` n'existe pas dans `packages/da/tokens.css` (les espaces sont 1, 2, 3, 4, 6, 8) : le navigateur
+l'ignore, stylelint et les tests ne disent rien, et les onglets des Fragments se sont collés en prod de
+préparation. **How to apply :** n'écrire un `var(--…)` qu'après l'avoir vu dans `tokens.css` ; un écran
+neuf se regarde dans le navigateur avant d'être dit fini.
