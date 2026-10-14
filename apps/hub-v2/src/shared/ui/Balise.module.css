@@ -1,0 +1,65 @@
+.balise {
+  display: inline-block;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-rond);
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--micro-size);
+  letter-spacing: var(--pilule-tracking);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.balise[data-teinte='nouveau'],
+.balise[data-teinte='visite'] {
+  background: var(--color-succes-fond);
+  color: var(--color-succes);
+}
+
+.balise[data-teinte='reactive'],
+.balise[data-teinte='enigme'] {
+  background: var(--color-canal-activite);
+  color: var(--color-canal-activite-texte);
+}
+
+.balise[data-teinte='sommeil'] {
+  background: var(--color-sommeil);
+  color: var(--color-sommeil-texte);
+}
+
+.balise[data-teinte='porteur'],
+.balise[data-teinte='photo'] {
+  background: var(--color-choisie);
+  color: var(--color-brun);
+}
+
+.balise[data-teinte='admin'],
+.balise[data-teinte='compte'] {
+  background: var(--color-rose);
+  color: var(--color-accent);
+}
+
+.balise[data-teinte='lieu'] {
+  background: var(--color-pilule);
+  color: var(--color-pilule-texte);
+}
+
+.balise[data-teinte='boutique'] {
+  background: var(--color-sable);
+  color: var(--color-encre);
+}
+
+.balise[data-teinte='message'] {
+  background: var(--color-canal-bugs);
+  color: var(--color-canal-bugs-texte);
+}
+
+.balise[data-teinte='moderation'] {
+  background: var(--color-moderation);
+  color: var(--color-fiche-badge);
+}
+
+.balise[data-teinte='notification'] {
+  background: var(--color-carte-eau);
+  color: var(--color-kaki);
+}

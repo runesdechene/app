@@ -1,0 +1,14 @@
+/*
+ * QUOI     — fond clair, filet sable, coins de 15 px ; chaque enfant direct séparé d'un filet.
+ */
+.bloc {
+  display: grid;
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-bloc);
+  overflow: clip;
+}
+
+.bloc > * + * {
+  border-top: 1px solid var(--color-sable);
+}

@@ -1,0 +1,51 @@
+.ligne {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--duree-douce) var(--courbe-douce);
+}
+
+.ligne:hover {
+  background: var(--color-surface);
+}
+
+.nombre {
+  flex: 0 0 34px;
+  padding: 2px 0;
+  border-radius: var(--radius-rond);
+  background: var(--color-accent);
+  text-align: center;
+  font-weight: var(--weight-gras);
+  font-size: var(--flux-size);
+  color: var(--color-sur-accent);
+}
+
+.texte {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.titre {
+  font-weight: var(--weight-semi);
+  color: var(--color-encre);
+}
+
+.detail {
+  font-size: var(--flux-size);
+  color: var(--color-texte-doux);
+}
+
+.chevron {
+  width: 16px;
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ligne {
+    transition: none;
+  }
+}

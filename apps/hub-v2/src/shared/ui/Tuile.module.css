@@ -1,0 +1,39 @@
+.tuile {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+}
+
+.libelle {
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--libelle-size);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+  color: var(--color-encre);
+}
+
+.ligne {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.valeur {
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  line-height: 1;
+  color: var(--color-encre);
+}
+
+.ecart {
+  font-weight: var(--weight-semi);
+  font-size: var(--sous-titre-size);
+  color: var(--color-texte-pale);
+}
+
+.ecart[data-sens='hausse'] {
+  color: var(--color-succes);
+}

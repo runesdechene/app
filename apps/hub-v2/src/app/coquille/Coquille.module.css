@@ -1,0 +1,44 @@
+.coquille {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.menu {
+  display: none;
+}
+
+.contenu {
+  min-width: 0;
+  padding: var(--space-4) var(--space-4) calc(var(--tabbar-height) + var(--space-6));
+}
+
+.onglets {
+  position: fixed;
+  inset: auto 0 0;
+}
+
+@container app (width >= 900px) {
+  .coquille {
+    grid-template-columns: 232px minmax(0, 1fr);
+  }
+
+  .menu {
+    display: block;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+  }
+
+  .menu > nav {
+    height: 100%;
+  }
+
+  .contenu {
+    padding: var(--space-8) 56px 120px;
+  }
+
+  .onglets {
+    display: none;
+  }
+}

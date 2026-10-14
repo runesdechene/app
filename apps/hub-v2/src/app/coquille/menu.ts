@@ -1,0 +1,61 @@
+/**
+ * QUOI     — le menu du Hub, par domaines (spec Hub V2 §5), et les onglets du téléphone.
+ * POURQUOI — une seule liste : le menu du PC, les onglets, les routes et les pastilles en
+ *            découlent. Les domaines préparent les droits des modérateurs (chantier C).
+ */
+export type CleAttente = 'photos' | 'lieux' | 'signalementsLieu' | 'signalementsEnigme' | 'achats'
+export type Lien = { libelle: string; chemin: string; file?: CleAttente }
+export type Domaine = { titre: string | null; liens: Lien[] }
+
+export const MENU: Domaine[] = [
+  { titre: null, liens: [{ libelle: 'Accueil', chemin: '/' }] },
+  {
+    titre: 'Communauté',
+    liens: [
+      { libelle: 'Comptes', chemin: '/communaute/comptes' },
+      { libelle: 'Compagnies', chemin: '/communaute/compagnies' },
+      { libelle: 'Lieux à modérer', chemin: '/communaute/lieux', file: 'lieux' },
+      { libelle: 'Signalements', chemin: '/communaute/signalements', file: 'signalementsLieu' },
+    ],
+  },
+  {
+    titre: 'Le jeu',
+    liens: [
+      { libelle: 'Énigmes', chemin: '/jeu/enigmes' },
+      { libelle: 'Énigmes signalées', chemin: '/jeu/enigmes-signalees', file: 'signalementsEnigme' },
+      { libelle: 'Cultures', chemin: '/jeu/cultures' },
+      { libelle: 'Natures', chemin: '/jeu/natures' },
+      { libelle: 'Titres', chemin: '/jeu/titres' },
+      { libelle: 'Bannières', chemin: '/jeu/bannieres' },
+      { libelle: 'Énergie', chemin: '/jeu/energie' },
+    ],
+  },
+  {
+    titre: 'Fragments et boutique',
+    liens: [
+      { libelle: 'Fragments', chemin: '/boutique/fragments', file: 'achats' },
+      { libelle: 'Photos et avis', chemin: '/boutique/photos', file: 'photos' },
+      { libelle: 'Synchro Shopify', chemin: '/boutique/synchro' },
+      { libelle: 'Écoutes audio', chemin: '/boutique/audio' },
+    ],
+  },
+  {
+    titre: 'Parler aux joueurs',
+    liens: [
+      { libelle: 'Mises à jour', chemin: '/joueurs/mises-a-jour' },
+      { libelle: 'Notifications', chemin: '/joueurs/notifications' },
+      { libelle: 'Blog de la boutique', chemin: '/joueurs/blog' },
+    ],
+  },
+  { titre: 'Réglages', liens: [{ libelle: 'Réglages', chemin: '/reglages' }] },
+]
+
+export type Onglet = { libelle: string; chemin: string; icone: 'accueil' | 'communaute' | 'jeu' | 'boutique' | 'plus' }
+
+export const ONGLETS: Onglet[] = [
+  { libelle: 'Accueil', chemin: '/', icone: 'accueil' },
+  { libelle: 'Communauté', chemin: '/communaute/comptes', icone: 'communaute' },
+  { libelle: 'Le jeu', chemin: '/jeu/enigmes', icone: 'jeu' },
+  { libelle: 'Boutique', chemin: '/boutique/photos', icone: 'boutique' },
+  { libelle: 'Plus', chemin: '/reglages', icone: 'plus' },
+]

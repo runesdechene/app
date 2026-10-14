@@ -76,6 +76,9 @@ export const COLOR_TOKENS = [
   '--color-canal-activite-texte',
   '--color-ajoute',
   '--color-retire',
+  '--color-sommeil',
+  '--color-sommeil-texte',
+  '--color-moderation',
 ] as const
 
 export const DA_SHOWCASED = [

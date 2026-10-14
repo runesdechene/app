@@ -99,6 +99,11 @@
   --color-ajoute: #38733f; /* ce qu'une version de fiche ajoute (05/10) */
   --color-retire: #b8736b; /* ce qu'elle retire */
 
+  /* Le Hub (Figma 594:961, 592:852) : les balises qui n'ont pas d'équivalent dans l'appli */
+  --color-sommeil: #e2dfe8; /* « En sommeil » : un ancien compte jamais revenu */
+  --color-sommeil-texte: #6b6680;
+  --color-moderation: #f3c9c4; /* le type « Modération » du fil */
+
   /* Polices */
   --font-titre: 'Bebas Neue', sans-serif;
   --font-corps: 'Cabin', sans-serif;
