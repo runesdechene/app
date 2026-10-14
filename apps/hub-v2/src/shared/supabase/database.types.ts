@@ -5501,6 +5501,7 @@ export type Database = {
           email_address: string
           energy_points: number
           energy_reset_at: string
+          entree_v2_le: string | null
           erudition_points: number
           exploration_points: number
           faction_change_count: number
@@ -5572,6 +5573,7 @@ export type Database = {
           email_address: string
           energy_points?: number
           energy_reset_at?: string
+          entree_v2_le?: string | null
           erudition_points?: number
           exploration_points?: number
           faction_change_count?: number
@@ -5643,6 +5645,7 @@ export type Database = {
           email_address?: string
           energy_points?: number
           energy_reset_at?: string
+          entree_v2_le?: string | null
           erudition_points?: number
           exploration_points?: number
           faction_change_count?: number
@@ -6777,12 +6780,12 @@ export type Database = {
         Args: never
         Returns: {
           avatar: string
-          charte: string
           client: boolean
           code: string
           departement: string
           derniere_visite: string
           email: string
+          entree_v2: string
           fragments: number
           id: string
           inscrit: string
