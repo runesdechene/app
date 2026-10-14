@@ -5,7 +5,7 @@
  *            sans rien perdre de ce qui a été tapé.
  */
 import { useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { Link, useLocation, useParams } from 'react-router'
 import { dateCourte } from '@/shared/lib/dates'
 import { ficheDansLAppli } from '@/shared/lib/liens'
 import { Bloc } from '@/shared/ui/Bloc'
@@ -98,34 +98,36 @@ function Decision({ fiche }: { fiche: FicheDeLieu }) {
 export function TiroirLieu() {
   const { id = '' } = useParams()
   const { data, isPending, isError, refetch } = useLieu(id)
+  // La fiche est une route enfant : l'adresse garde les critères de la liste, on y revient avec.
+  const retour = LISTE + useLocation().search
 
   if (isPending) {
     return (
-      <Tiroir titre="Lieu" retour={LISTE}>
+      <Tiroir titre="Lieu" retour={retour}>
         <p className={communaute.calme}>Lecture…</p>
       </Tiroir>
     )
   }
   if (isError) {
     return (
-      <Tiroir titre="Lieu" retour={LISTE}>
+      <Tiroir titre="Lieu" retour={retour}>
         <p>La fiche n’a pas pu être lue.</p>
         <button type="button" className={communaute.boutonContour} onClick={() => void refetch()}>Réessayer</button>
-        <Link to={LISTE}>Retour à la liste</Link>
+        <Link to={retour}>Retour à la liste</Link>
       </Tiroir>
     )
   }
   if (data === null) {
     return (
-      <Tiroir titre="Lieu introuvable" retour={LISTE}>
+      <Tiroir titre="Lieu introuvable" retour={retour}>
         <p>Lieu introuvable.</p>
-        <Link to={LISTE}>Retour à la liste</Link>
+        <Link to={retour}>Retour à la liste</Link>
       </Tiroir>
     )
   }
 
   return (
-    <Tiroir titre={data.title} retour={LISTE}>
+    <Tiroir titre={data.title} retour={retour}>
       <h1 className={communaute.nomFiche}>{data.title}</h1>
       {data.images.length > 0 && (
         <div className={styles.photos}>

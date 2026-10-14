@@ -5,7 +5,7 @@
  * POURQUOI — filtre, nature, recherche et page sont dans l'adresse.
  */
 import { useEffect } from 'react'
-import { Link, Outlet, useSearchParams } from 'react-router'
+import { Link, Outlet, useLocation, useSearchParams } from 'react-router'
 import chevron from '@/assets/ui/chevron.svg'
 import { depuis } from '@/shared/lib/quand'
 import { Balise } from '@/shared/ui/Balise'
@@ -32,10 +32,11 @@ function numeroDePage(texte: string | null): number {
 const nombre = new Intl.NumberFormat('fr-FR')
 
 function LigneDeLieuListe({ lieu, maintenant }: { lieu: LigneDeLieu; maintenant: Date }) {
+  const { search } = useLocation()
   const nature = lieu.tags.find((t) => t.is_primary) ?? lieu.tags[0]
   const detail = [`par ${lieu.author_name ?? 'Un Voyageur'}`, depuis(lieu.created_at, maintenant), lieu.address].filter(Boolean).join(' · ')
   return (
-    <Link className={styles.ligne} to={`/communaute/lieux/${lieu.id}`}>
+    <Link className={styles.ligne} to={{ pathname: lieu.id, search }}>
       {lieu.thumb_url ? <img className={styles.vignette} src={lieu.thumb_url} alt="" loading="lazy" /> : <span className={styles.vignette} />}
       <span className={styles.qui}>
         <span className={styles.nomEtBalises}>

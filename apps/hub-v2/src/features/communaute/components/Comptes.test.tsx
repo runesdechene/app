@@ -4,9 +4,11 @@ import { createMemoryRouter, RouterProvider } from 'react-router'
 import { vi } from 'vitest'
 import { exporterComptes } from '../hooks/useComptes'
 import { Comptes } from './Comptes'
+import { TiroirCompte } from './TiroirCompte'
 
 const mockUseComptes = vi.hoisted(() => vi.fn())
 vi.mock('../hooks/useComptes', () => ({ useComptes: mockUseComptes, exporterComptes: vi.fn() }))
+vi.mock('../hooks/useCompte', () => ({ useCompte: () => ({ data: null, isPending: false }), useChangerRole: vi.fn() }))
 
 const liste = {
   total: 2,
@@ -21,7 +23,10 @@ const liste = {
 }
 
 function monter(adresse = '/communaute/comptes') {
-  const router = createMemoryRouter([{ path: '/communaute/comptes', Component: Comptes }], { initialEntries: [adresse] })
+  const router = createMemoryRouter(
+    [{ path: '/communaute/comptes', Component: Comptes, children: [{ path: ':id', Component: TiroirCompte }] }],
+    { initialEntries: [adresse] },
+  )
   render(<RouterProvider router={router} />)
   return router
 }
@@ -62,4 +67,15 @@ test('une page non numérique vaut la première', () => {
   mockUseComptes.mockReturnValue({ data: liste, isError: false })
   monter('/communaute/comptes?page=abc')
   expect(mockUseComptes).toHaveBeenLastCalledWith(expect.objectContaining({ decalage: 0 }))
+})
+
+test('ouvrir une fiche garde le filtre et la page, la fermer y ramène', async () => {
+  mockUseComptes.mockReturnValue({ data: { ...liste, total: 500 }, isError: false })
+  const router = monter('/communaute/comptes?filtre=porteurs&page=3')
+  await userEvent.click(screen.getByRole('link', { name: /Kelpie/ }))
+  expect(router.state.location.pathname).toBe('/communaute/comptes/u1')
+  expect(router.state.location.search).toBe('?filtre=porteurs&page=3')
+  await userEvent.click(screen.getByRole('link', { name: '✕ Fermer' }))
+  expect(router.state.location.pathname).toBe('/communaute/comptes')
+  expect(router.state.location.search).toBe('?filtre=porteurs&page=3')
 })

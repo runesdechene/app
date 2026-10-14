@@ -2,7 +2,7 @@
  * QUOI     — une ligne de la liste des comptes (maquette 594:961) : portrait, nom et balises, une
  *            ligne de détail, arrivé par, département, Fragments, dernière visite, inscription.
  */
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import chevron from '@/assets/ui/chevron.svg'
 import { depuis } from '@/shared/lib/quand'
 import { moisAnnee } from '@/shared/lib/dates'
@@ -13,9 +13,10 @@ import { PROVENANCES } from '../lib/provenances'
 import styles from './Communaute.module.css'
 
 export function LigneDeCompte({ compte, maintenant }: { compte: Compte; maintenant: Date }) {
+  const { search } = useLocation()
   const detail = [compte.client ? 'client validé' : '', compte.email ?? ''].filter(Boolean).join(' · ')
   return (
-    <Link className={styles.ligneCompte} to={`/communaute/comptes/${compte.id}`}>
+    <Link className={styles.ligneCompte} to={{ pathname: compte.id, search }}>
       {compte.avatar ? <img className={styles.portrait} src={compte.avatar} alt="" loading="lazy" /> : <span className={styles.portrait} />}
       <span className={styles.qui}>
         <span className={styles.nomEtBalises}>

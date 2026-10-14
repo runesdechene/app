@@ -23,7 +23,7 @@ function monter(adresse: string) {
     { initialEntries: [adresse] },
   )
   render(<QueryClientProvider client={client}><RouterProvider router={router} /></QueryClientProvider>)
-  return client
+  return Object.assign(client, { router })
 }
 
 test('par défaut : à modérer', async () => {
@@ -75,4 +75,17 @@ test('une erreur de la base s’affiche sous son bloc', async () => {
   monter('/communaute/lieux/p1')
   await userEvent.click(await screen.findByRole('button', { name: 'Vérifier le lieu' }))
   expect(await screen.findByText('Réservé à l’équipe')).toBeInTheDocument()
+})
+
+test('ouvrir une fiche garde le filtre et la page, la fermer y ramène', async () => {
+  api.lireLieux.mockResolvedValue({ total: 500, rows: [ligne] })
+  api.lireNatures.mockResolvedValue([])
+  api.lireLieu.mockResolvedValue(null)
+  const { router } = monter('/communaute/lieux?filtre=verifies&page=3')
+  await userEvent.click(await screen.findByRole('link', { name: /Dolmen de la Pierre Levée/ }))
+  expect(router.state.location.pathname).toBe('/communaute/lieux/p1')
+  expect(router.state.location.search).toBe('?filtre=verifies&page=3')
+  await userEvent.click(await screen.findByRole('link', { name: '✕ Fermer' }))
+  expect(router.state.location.pathname).toBe('/communaute/lieux')
+  expect(router.state.location.search).toBe('?filtre=verifies&page=3')
 })

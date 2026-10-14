@@ -4,7 +4,7 @@
  * POURQUOI — l'identifiant ne se change jamais (rename_faction est fermée, mig 512) : il est seulement affiché.
  */
 import { useEffect, useState, type CSSProperties } from 'react'
-import { Link, useParams } from 'react-router'
+import { Link, useLocation, useParams } from 'react-router'
 import { dateCourte, moisAnnee } from '@/shared/lib/dates'
 import { Balise, type Teinte } from '@/shared/ui/Balise'
 import { Bloc } from '@/shared/ui/Bloc'
@@ -83,34 +83,36 @@ function FormulaireIdentite({ fiche }: { fiche: FicheDeCompagnie }) {
 export function TiroirCompagnie() {
   const { id = '' } = useParams()
   const { data, isPending, isError, refetch } = useCompagnie(id)
+  // La fiche est une route enfant : l'adresse garde les critères de la liste, on y revient avec.
+  const retour = LISTE + useLocation().search
 
   if (isPending) {
     return (
-      <Tiroir titre="Compagnie" retour={LISTE}>
+      <Tiroir titre="Compagnie" retour={retour}>
         <p className={communaute.calme}>Lecture…</p>
       </Tiroir>
     )
   }
   if (isError) {
     return (
-      <Tiroir titre="Compagnie" retour={LISTE}>
+      <Tiroir titre="Compagnie" retour={retour}>
         <p>La fiche n’a pas pu être lue.</p>
         <button type="button" className={communaute.boutonContour} onClick={() => void refetch()}>Réessayer</button>
-        <Link to={LISTE}>Retour à la liste</Link>
+        <Link to={retour}>Retour à la liste</Link>
       </Tiroir>
     )
   }
   if (data === null) {
     return (
-      <Tiroir titre="Compagnie introuvable" retour={LISTE}>
+      <Tiroir titre="Compagnie introuvable" retour={retour}>
         <p>Compagnie introuvable.</p>
-        <Link to={LISTE}>Retour à la liste</Link>
+        <Link to={retour}>Retour à la liste</Link>
       </Tiroir>
     )
   }
 
   return (
-    <Tiroir titre={data.nom} retour={LISTE}>
+    <Tiroir titre={data.nom} retour={retour}>
       <div className={communaute.identite}>
         <span className={styles.grandePastille} style={{ '--couleur': data.couleur } as CSSProperties} />
         <div>

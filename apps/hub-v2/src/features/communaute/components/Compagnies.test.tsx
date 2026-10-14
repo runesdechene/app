@@ -17,6 +17,7 @@ function monter(adresse: string) {
     { initialEntries: [adresse] },
   )
   render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
+  return router
 }
 
 test('la liste des Compagnies', async () => {
@@ -49,4 +50,16 @@ test('une couleur invalide est refusée avant d’envoyer', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
   expect(screen.getByText('La couleur est un code #RRGGBB')).toBeInTheDocument()
   expect(api.modifierCompagnie).not.toHaveBeenCalled()
+})
+
+test('ouvrir une fiche garde l’adresse de la liste, la fermer y ramène', async () => {
+  api.lireCompagnies.mockResolvedValue([cairns])
+  api.lireCompagnie.mockResolvedValue(null)
+  const router = monter('/communaute/compagnies?filtre=porteurs&page=3')
+  await userEvent.click(await screen.findByRole('link', { name: /Compagnie des Cairns/ }))
+  expect(router.state.location.pathname).toBe('/communaute/compagnies/cairns')
+  expect(router.state.location.search).toBe('?filtre=porteurs&page=3')
+  await userEvent.click(await screen.findByRole('link', { name: '✕ Fermer' }))
+  expect(router.state.location.pathname).toBe('/communaute/compagnies')
+  expect(router.state.location.search).toBe('?filtre=porteurs&page=3')
 })

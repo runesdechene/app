@@ -3,7 +3,7 @@
  *            par-dessus (route enfant).
  */
 import type { CSSProperties } from 'react'
-import { Link, Outlet } from 'react-router'
+import { Link, Outlet, useLocation } from 'react-router'
 import chevron from '@/assets/ui/chevron.svg'
 import { Balise } from '@/shared/ui/Balise'
 import { Bloc } from '@/shared/ui/Bloc'
@@ -13,6 +13,7 @@ import styles from './Compagnies.module.css'
 
 export function Compagnies() {
   const { data, isError } = useCompagnies()
+  const { search } = useLocation()
   const actives = data?.filter((c) => !c.retiree) ?? []
   const membres = actives.reduce((somme, c) => somme + c.membres, 0)
 
@@ -27,7 +28,7 @@ export function Compagnies() {
       {data && (
         <Bloc>
           {data.map((c) => (
-            <Link key={c.id} className={c.retiree ? `${styles.ligne ?? ''} ${styles.retiree ?? ''}` : styles.ligne} to={`/communaute/compagnies/${c.id}`}>
+            <Link key={c.id} className={c.retiree ? `${styles.ligne ?? ''} ${styles.retiree ?? ''}` : styles.ligne} to={{ pathname: c.id, search }}>
               <span className={styles.pastille} style={{ '--couleur': c.couleur } as CSSProperties} />
               <span className={styles.qui}>
                 <span className={styles.nom}>{c.nom}</span>

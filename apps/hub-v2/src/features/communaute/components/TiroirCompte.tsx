@@ -5,7 +5,7 @@
  *            bouton « Changer » (une flèche du clavier dans la liste n'écrit rien), et faire un admin se confirme.
  */
 import { useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { Link, useLocation, useParams } from 'react-router'
 import { dateCourte } from '@/shared/lib/dates'
 import { depuis, heureDuFil } from '@/shared/lib/quand'
 import { Balise } from '@/shared/ui/Balise'
@@ -67,28 +67,30 @@ function ChoixDuRole({ fiche }: { fiche: FicheDeCompte }) {
 export function TiroirCompte() {
   const { id = '' } = useParams()
   const { data, isPending, isError, refetch } = useCompte(id)
+  // La fiche est une route enfant : l'adresse garde les critères de la liste, on y revient avec.
+  const retour = LISTE + useLocation().search
 
   if (isPending) {
     return (
-      <Tiroir titre="Compte" retour={LISTE}>
+      <Tiroir titre="Compte" retour={retour}>
         <p className={styles.calme}>Lecture…</p>
       </Tiroir>
     )
   }
   if (isError) {
     return (
-      <Tiroir titre="Compte" retour={LISTE}>
+      <Tiroir titre="Compte" retour={retour}>
         <p>La fiche n’a pas pu être lue.</p>
         <button type="button" className={styles.boutonContour} onClick={() => void refetch()}>Réessayer</button>
-        <Link to={LISTE}>Retour à la liste</Link>
+        <Link to={retour}>Retour à la liste</Link>
       </Tiroir>
     )
   }
   if (data === null) {
     return (
-      <Tiroir titre="Compte introuvable" retour={LISTE}>
+      <Tiroir titre="Compte introuvable" retour={retour}>
         <p>Compte introuvable.</p>
-        <Link to={LISTE}>Retour à la liste</Link>
+        <Link to={retour}>Retour à la liste</Link>
       </Tiroir>
     )
   }
@@ -99,7 +101,7 @@ export function TiroirCompte() {
   const boutique = data.client ? `Client validé · ${String(data.achats.length)} commande${data.achats.length > 1 ? 's' : ''}` : '—'
 
   return (
-    <Tiroir titre={data.nom} retour={LISTE}>
+    <Tiroir titre={data.nom} retour={retour}>
       <div className={styles.identite}>
         {data.avatar ? <img className={styles.grandPortrait} src={data.avatar} alt="" /> : <span className={styles.grandPortrait} />}
         <div>
