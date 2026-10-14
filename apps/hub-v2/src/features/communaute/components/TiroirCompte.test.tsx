@@ -47,3 +47,29 @@ test('changer le rôle appelle changer_role', async () => {
   await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Rôle' }), 'moderator')
   expect(mockChanger).toHaveBeenCalledWith('u1', 'moderator')
 })
+
+test('une lecture en échec : message, Réessayer, retour — pas « introuvable »', async () => {
+  const refetch = vi.fn()
+  mockUseCompte.mockReturnValue({ data: undefined, isPending: false, isError: true, refetch })
+  monter()
+  expect(screen.getByText('La fiche n’a pas pu être lue.')).toBeInTheDocument()
+  expect(screen.queryByText('Compte introuvable.')).not.toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'Retour à la liste' })).toHaveAttribute('href', '/communaute/comptes')
+  await userEvent.click(screen.getByRole('button', { name: 'Réessayer' }))
+  expect(refetch).toHaveBeenCalled()
+})
+
+test('un changement de rôle refusé : l’alerte s’affiche, le choix reste l’ancien', async () => {
+  mockUseCompte.mockReturnValue({ data: { ...fiche, fragments: [], achats: [], traces: [] }, isPending: false })
+  mockChanger.mockRejectedValue(new Error('refus'))
+  monter()
+  await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Rôle' }), 'moderator')
+  expect(await screen.findByRole('alert')).toHaveTextContent('Le rôle n’a pas changé.')
+  expect(screen.getByRole('combobox', { name: 'Rôle' })).toHaveValue('user')
+})
+
+test('une trace d’énigme se lit « a percé l’énigme n° 295 »', () => {
+  mockUseCompte.mockReturnValue({ data: { ...fiche, fragments: [], achats: [], traces: [{ type: 'enigme', quand: '2026-10-14T10:00:00Z', texte: 'Énigme n° 295' }] }, isPending: false })
+  monter()
+  expect(screen.getByText(/a percé l’énigme n° 295/)).toBeInTheDocument()
+})

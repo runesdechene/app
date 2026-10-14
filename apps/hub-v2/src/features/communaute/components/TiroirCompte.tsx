@@ -23,13 +23,19 @@ const TRACES: Record<FicheDeCompte['traces'][number]['type'], string> = {
   visite: 'a posé sa marque à',
   decouverte: 'a découvert',
   ajout: 'a ajouté',
-  enigme: 'a percé l’',
-  enigme_manquee: 'a manqué l’',
+  enigme: 'a percé',
+  enigme_manquee: 'a manqué',
+}
+
+// « Énigme n° 295 » se lit « a percé l’énigme n° 295 » : l'article colle au nom, en minuscule.
+function phrase(t: FicheDeCompte['traces'][number]): string {
+  const enigme = t.type === 'enigme' || t.type === 'enigme_manquee'
+  return enigme ? `${TRACES[t.type]} l’${t.texte.charAt(0).toLowerCase()}${t.texte.slice(1)}` : `${TRACES[t.type]} ${t.texte}`
 }
 
 export function TiroirCompte() {
   const { id = '' } = useParams()
-  const { data, isPending } = useCompte(id)
+  const { data, isPending, isError, refetch } = useCompte(id)
   const changer = useChangerRole(id)
 
   if (isPending) {
@@ -39,7 +45,16 @@ export function TiroirCompte() {
       </Tiroir>
     )
   }
-  if (!data) {
+  if (isError) {
+    return (
+      <Tiroir titre="Compte" retour={LISTE}>
+        <p>La fiche n’a pas pu être lue.</p>
+        <button type="button" className={styles.boutonContour} onClick={() => void refetch()}>Réessayer</button>
+        <Link to={LISTE}>Retour à la liste</Link>
+      </Tiroir>
+    )
+  }
+  if (data === null) {
     return (
       <Tiroir titre="Compte introuvable" retour={LISTE}>
         <p>Compte introuvable.</p>
@@ -130,9 +145,9 @@ export function TiroirCompte() {
       <TitreDeSection titre="Ses dernières traces" />
       <Bloc>
         {data.traces.length === 0 && <p className={styles.calme}>Aucune trace.</p>}
-        {data.traces.map((t, i) => (
-          <p key={i} className={styles.ligneFiche}>
-            {heureDuFil(t.quand, maintenant)} · {TRACES[t.type]} {t.texte}
+        {data.traces.map((t) => (
+          <p key={`${t.type}-${t.quand}`} className={styles.ligneFiche}>
+            {heureDuFil(t.quand, maintenant)} · {phrase(t)}
           </p>
         ))}
       </Bloc>

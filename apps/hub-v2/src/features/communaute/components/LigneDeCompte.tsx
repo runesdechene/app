@@ -12,7 +12,6 @@ import { balisesDuCompte } from '../lib/balises'
 import { PROVENANCES } from '../lib/provenances'
 import styles from './Communaute.module.css'
 
-
 export function LigneDeCompte({ compte, maintenant }: { compte: Compte; maintenant: Date }) {
   const detail = [compte.client ? 'client validé' : '', compte.email ?? ''].filter(Boolean).join(' · ')
   return (
