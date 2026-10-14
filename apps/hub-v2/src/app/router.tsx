@@ -12,6 +12,7 @@ import { Signalements } from '@/features/communaute/components/Signalements'
 import { TiroirCompagnie } from '@/features/communaute/components/TiroirCompagnie'
 import { TiroirCompte } from '@/features/communaute/components/TiroirCompte'
 import { TiroirLieu } from '@/features/communaute/components/TiroirLieu'
+import { TiroirFragment } from '@/features/boutique/components/TiroirFragment'
 import { Fragments } from '@/features/boutique/components/Fragments'
 import { Bannieres } from '@/features/jeu/components/Bannieres'
 import { Cultures } from '@/features/jeu/components/Cultures'
@@ -58,7 +59,7 @@ export const routes: RouteObject[] = [
       { path: 'jeu/bannieres', Component: Bannieres, children: [{ path: ':id', Component: TiroirBanniere }] },
       { path: 'jeu/enigmes-signalees', Component: EnigmesSignalees },
       { path: 'jeu/energie', Component: Energie },
-      { path: 'boutique/fragments', Component: Fragments },
+      { path: 'boutique/fragments', Component: Fragments, children: [{ path: ':id', Component: TiroirFragment }] },
       ...autres,
     ],
   },

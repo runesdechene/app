@@ -1,6 +1,6 @@
 /*
  * QUOI     — la mise en page des écrans de la Boutique : l'écran, les onglets des Fragments, la liste des
- *            Fragments et celle des motifs Shopify sans Fragment.
+ *            Fragments et celle des motifs Shopify sans Fragment, la fiche d'un Fragment et sa carte d'origine.
  */
 .ecran {
   display: grid;
@@ -101,4 +101,87 @@ a.ligne:hover { background: var(--color-surface); }
 .intro {
   margin: 0;
   color: var(--color-texte-doux);
+}
+
+/* La fiche d'un Fragment */
+.section {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.formulaire {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.champ {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.champ input, .champ select {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-petit);
+  background: var(--color-fond);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  color: var(--color-encre);
+}
+
+.paragraphes {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.apercu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.pastilleDeCulture {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-rond);
+  background: var(--couleur);
+}
+
+.uneVue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+/* La carte des origines et ses marqueurs (créés par MapLibre, hors de React : classes globales) */
+.carteDOrigine {
+  height: 320px;
+  border-radius: var(--radius-petit);
+  overflow: hidden;
+}
+
+.carteDOrigine :global(.pastilleDOrigine) {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--color-fond);
+  border-radius: var(--radius-rond);
+  background: var(--color-vignette) var(--image) center / cover;
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  color: var(--color-encre);
+}
+
+.carteDOrigine :global(.pastilleDOrigineChoisie) {
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  border-color: var(--color-accent);
 }
