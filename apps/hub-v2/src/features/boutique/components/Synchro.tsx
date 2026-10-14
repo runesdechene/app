@@ -21,6 +21,10 @@ function nonCrees(r: ResultatLiaison): number {
   return Math.max(0, r.toCreateCount - r.created)
 }
 
+function nonLies(r: ResultatLiaison): number {
+  return Math.max(0, r.toUpdateCount - r.updated)
+}
+
 // Les lignes de journal que la fonction marque d'un ❌ ou d'un ⚠️ sont des échecs ou des alertes.
 const estUnEchec = (ligne: string) => ligne.startsWith('❌') || ligne.startsWith('⚠️')
 
@@ -66,6 +70,9 @@ export function Synchro() {
             <p role="status">{finDeLiaison(liaison.data)}</p>
             {nonCrees(liaison.data) > 0 && (
               <p role="alert">{`${String(nonCrees(liaison.data))} ${pluriel(nonCrees(liaison.data), 'compte n’a pas pu être créé', 'comptes n’ont pas pu être créés')} — voir les journaux.`}</p>
+            )}
+            {nonLies(liaison.data) > 0 && (
+              <p role="alert">{`${String(nonLies(liaison.data))} ${pluriel(nonLies(liaison.data), 'compte n’a pas pu être relié', 'comptes n’ont pas pu être reliés')} — voir les journaux.`}</p>
             )}
             <ul>
               {liaison.data.logs.map((ligne, i) => (

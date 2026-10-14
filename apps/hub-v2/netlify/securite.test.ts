@@ -163,3 +163,37 @@ describe('la boutique est fixe', () => {
     expect(shopify.every((u) => u.startsWith(`https://${BOUTIQUE}/`))).toBe(true)
   })
 })
+
+describe('shopify-sync : liaison des clients existants', () => {
+  const clients = [1, 2, 3].map((n) => ({ id: n, email: `c${String(n)}@x.fr`, first_name: null, last_name: null, orders_count: 0, tags: '', created_at: '2026-01-01' }))
+  const comptes = [1, 2, 3].map((n) => ({ id: `u${String(n)}`, email_address: `c${String(n)}@x.fr`, shopify_customer_id: null, account_source: 'app' }))
+
+  // Shopify donne trois clients, la base trois comptes à relier ; `pageDesComptes` et `patch` règlent les pannes.
+  function simuler(pageDesComptes: unknown, patch: (url: string) => Response) {
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
+      if (url.includes('/auth/v1/user')) return Promise.resolve(Response.json({ id: 'u0' }))
+      if (url.includes('/rest/v1/users?select=role')) return Promise.resolve(Response.json([{ role: 'admin' }]))
+      if (url.includes('/admin/api/')) return Promise.resolve(Response.json({ customers: clients }))
+      if (init?.method === 'PATCH') return Promise.resolve(patch(url))
+      return Promise.resolve(Response.json(pageDesComptes))
+    }))
+  }
+
+  test('seules les réponses ok comptent : un refus est compté en moins et nommé dans les journaux', async () => {
+    simuler(comptes, (url) => (url.endsWith('id=eq.u2') ? new Response('permission denied', { status: 403 }) : new Response(null, { status: 204 })))
+    const handler = await charger('shopify-sync')
+    const r = await handler(post('{}', { Authorization: 'Bearer jwt' }))
+    const corps = (await r.json()) as { updated: number; toUpdateCount: number; logs: string[] }
+    expect(corps.toUpdateCount).toBe(3)
+    expect(corps.updated).toBe(2)
+    expect(corps.logs.some((l) => l.startsWith('❌') && l.includes('403'))).toBe(true)
+  })
+
+  test('une page de comptes qui n’est pas une liste : 500 explicite, rien n’est lié', async () => {
+    simuler({ message: 'JWT expired' }, () => new Response(null, { status: 204 }))
+    const handler = await charger('shopify-sync')
+    const r = await handler(post('{}', { Authorization: 'Bearer jwt' }))
+    expect(r.status).toBe(500)
+    expect(((await r.json()) as { error: string }).error).toContain('JWT expired')
+  })
+})

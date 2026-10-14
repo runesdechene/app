@@ -94,3 +94,13 @@ test('des comptes non créés : une alerte, et les journaux d’échec marqués'
   expect(await screen.findByRole('alert')).toHaveTextContent('3 comptes n’ont pas pu être créés — voir les journaux.')
   expect(screen.getByText('❌ Batch 0: 400')).toHaveAttribute('data-echec', 'true')
 })
+
+test('des liens refusés : une alerte au singulier, comptés sur ceux à lier', async () => {
+  api.relierComptesEtClients.mockResolvedValue({
+    success: true, shopifyTotal: 10, supabaseTotal: 5, updated: 2, created: 0, skipped: 6, toCreateCount: 0, toUpdateCount: 3,
+    logs: ['Updates: 2 liés avec succès', '❌ Lien u2: 403'],
+  })
+  afficher()
+  await userEvent.click(screen.getByRole('button', { name: 'Lancer la liaison' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('1 compte n’a pas pu être relié — voir les journaux.')
+})

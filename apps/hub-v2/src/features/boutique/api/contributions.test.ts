@@ -107,6 +107,20 @@ describe('les canaux et le produit', () => {
     expect(mocks.rpc).toHaveBeenCalledWith('set_submission_image_media', { p_image_id: 'a', p_media_id: '77' })
   })
 
+  test('la base refuse après la poussée : l’image poussée est retirée et l’erreur d’origine remonte', async () => {
+    mocks.pousserImage.mockResolvedValue('77')
+    mocks.rpc.mockResolvedValue({ error: { message: 'Réservé à l’équipe' } })
+    await expect(mettreSurLaFiche(contribution([]), photo('a'), true)).rejects.toThrow('Réservé à l’équipe')
+    expect(mocks.retirerImage).toHaveBeenCalledWith('12', '77')
+  })
+
+  test('le retrait de secours échoue aussi : c’est quand même l’erreur d’origine qui remonte', async () => {
+    mocks.pousserImage.mockResolvedValue('77')
+    mocks.rpc.mockResolvedValue({ error: { message: 'Réservé à l’équipe' } })
+    mocks.retirerImage.mockRejectedValue(new Error('Suppression image: HTTP 500'))
+    await expect(mettreSurLaFiche(contribution([]), photo('a'), true)).rejects.toThrow('Réservé à l’équipe')
+  })
+
   test('retirer de la fiche : retire puis efface le média', async () => {
     await mettreSurLaFiche(contribution([]), photo('a', { media: '99' }), false)
     expect(ordre).toEqual(['retirerImage', 'set_submission_image_media'])

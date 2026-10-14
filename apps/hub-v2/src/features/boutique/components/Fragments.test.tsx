@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { vi } from 'vitest'
 import type { Fragment } from '../api/fragments'
-import type { Illustration } from '../api/shopify'
+import { AccesShopifyRefuse, InventaireVide, type Illustration } from '../api/shopify'
 import { Fragments } from './Fragments'
 
 const api = vi.hoisted(() => ({
@@ -20,7 +20,9 @@ vi.mock('../api/fragments', () => ({
   synchroniserFragments: api.synchroniserFragments,
   ajouterFragment: api.ajouterFragment,
 }))
-vi.mock('../api/shopify', () => ({ lireIllustrations: api.lireIllustrations }))
+vi.mock('../api/shopify', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../api/shopify')>()), lireIllustrations: api.lireIllustrations,
+}))
 vi.mock('../api/scan', () => ({ lireScans: api.lireScans, recalculerEmpreintes: api.recalculerEmpreintes }))
 
 const fragment = (id: number, name: string, surcharge: Partial<Fragment> = {}): Fragment => ({
@@ -98,7 +100,7 @@ test('Shopify qui refuse : le message reçu, rien n’est synchronisé', async (
   api.lireIllustrations.mockRejectedValue(new Error('Forbidden — admin only'))
   afficher()
   await userEvent.click(await screen.findByRole('button', { name: 'Synchroniser depuis Shopify' }))
-  expect(await screen.findByRole('alert')).toHaveTextContent('Shopify ne répond pas : Forbidden — admin only')
+  expect(await screen.findByText('Shopify ne répond pas : Forbidden — admin only')).toHaveAttribute('role', 'alert')
   expect(api.synchroniserFragments).not.toHaveBeenCalled()
 })
 
@@ -123,11 +125,10 @@ test('tout est trié quand chaque motif est un Fragment', async () => {
 })
 
 test('un inventaire Shopify vide est une panne lisible, pas « 0 mis à jour »', async () => {
-  const { InventaireVide } = await vi.importActual<typeof import('../api/shopify')>('../api/shopify')
   api.lireIllustrations.mockRejectedValue(new InventaireVide('Aucune Illustration retournée par Shopify'))
   afficher()
   await userEvent.click(await screen.findByRole('button', { name: 'Synchroniser depuis Shopify' }))
-  expect(await screen.findByRole('alert')).toHaveTextContent('Aucune Illustration retournée par Shopify')
+  expect(await screen.findByText('Shopify ne répond pas : Aucune Illustration retournée par Shopify')).toHaveAttribute('role', 'alert')
   expect(api.synchroniserFragments).not.toHaveBeenCalled()
 })
 
@@ -141,4 +142,16 @@ test('synchro réussie mais relecture en échec : dit ce qui est fait, ce n’es
   const alerte = await screen.findByText(/n’a pas pu être relue : base HS/)
   expect(alerte).toHaveTextContent('Les Fragments sont synchronisés')
   expect(alerte).not.toHaveTextContent('Shopify ne répond pas')
+})
+
+test('l’inventaire Shopify refusé : la portée manquante se lit sous les motifs', async () => {
+  api.lireIllustrations.mockRejectedValue(new AccesShopifyRefuse('Access denied: `read_metaobjects` access scope required'))
+  afficher()
+  expect(await screen.findByText('Inventaire Shopify indisponible : la portée read_metaobjects manque à l’app Shopify.')).toHaveAttribute('role', 'alert')
+})
+
+test('une autre panne de l’inventaire se lit aussi sous les motifs', async () => {
+  api.lireIllustrations.mockRejectedValue(new Error('Aucune Illustration retournée par Shopify'))
+  afficher()
+  expect(await screen.findByText('Inventaire Shopify indisponible : Aucune Illustration retournée par Shopify')).toHaveAttribute('role', 'alert')
 })

@@ -23,18 +23,28 @@ export function useProduitsShopify(terme: string) {
   return useQuery({ queryKey: ['hub-produits-shopify', terme], queryFn: () => chercherProduits(terme), enabled: terme.trim().length >= 2 })
 }
 
+const A_RAFRAICHIR = ['hub-contributions', 'hub-ouverture']
+
 // Pas d'attente : la contribution décidée peut quitter la liste au rafraîchissement, et l'écran
 // doit avoir choisi la suivante avant que sa lecture disparaisse.
 function useRafraichir() {
   const client = useQueryClient()
   return () => {
-    for (const k of ['hub-contributions', 'hub-ouverture']) void client.invalidateQueries({ queryKey: [k] })
+    for (const k of A_RAFRAICHIR) void client.invalidateQueries({ queryKey: [k] })
   }
 }
 
-/** Une écriture sur une photo (canal, produit, suppression) : l'action est donnée au moment du clic. */
+/**
+ * Une écriture sur une photo (canal, produit, suppression) : l'action est donnée au moment du clic.
+ * Ici on attend la relecture : tant que la photo affichée est périmée, un second clic referait la même
+ * écriture (une deuxième image poussée sur Shopify, la première orpheline).
+ */
 export function useEcritureDePhoto() {
-  return useMutation({ mutationFn: (action: () => Promise<void>) => action(), onSuccess: useRafraichir() })
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: (action: () => Promise<void>) => action(),
+    onSuccess: () => Promise.all(A_RAFRAICHIR.map((k) => client.invalidateQueries({ queryKey: [k] }))),
+  })
 }
 
 /** Les écritures d'une contribution, chacune avec sa propre erreur. */

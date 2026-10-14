@@ -4,8 +4,9 @@
  *            et sa suppression.
  * POURQUOI — Communauté et Fiche produit n'existent que sur un produit relié ; « Média » est l'accord de
  *            diffusion de la contribution, qu'on lit ici sans le changer. Une écriture à la fois : les
- *            cases sont désactivées pendant qu'elle part, et son erreur reste sous la photo.
+ *            cases sont désactivées pendant qu'elle part et que la liste se relit, et son erreur reste sous la photo.
  */
+import { useIsFetching } from '@tanstack/react-query'
 import { useState } from 'react'
 import {
   delierProduit, mettreSurLaFiche, montrerAuMur, montrerDansCommunaute, relierProduit, supprimerPhoto,
@@ -32,7 +33,9 @@ export function PhotoDeContribution({ contribution, photo, rang }: { contributio
   const [choixDuProduit, setChoixDuProduit] = useState(false)
   const [confirme, setConfirme] = useState(false)
   const sansProduit = photo.produit_id === null
-  const occupe = ecriture.isPending
+  // Tant que les contributions se relisent, la photo affichée est périmée : une écriture de plus la referait.
+  const relecture = useIsFetching({ queryKey: ['hub-contributions'] }) > 0
+  const occupe = ecriture.isPending || relecture
 
   function ecrire(action: () => Promise<void>, apres: () => void = () => undefined) {
     ecriture.reset()

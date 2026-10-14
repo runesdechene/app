@@ -2,22 +2,32 @@
  * QUOI     — les motifs Shopify (métaobjets Illustration) qui ne sont aucun Fragment, avec « En faire un Fragment ».
  * POURQUOI — d'anciens motifs à trier dans Shopify, ou un nouveau Fragment à ajouter. Un motif sans collection
  *            ne peut pas devenir un Fragment (la base le refuse) : le bouton le dit avant. Si l'inventaire
- *            Shopify est en panne, l'erreur est déjà dans l'en-tête de l'écran : rien ici.
+ *            Shopify est en panne (portée manquante, inventaire vide…), la panne se lit ici, jamais « rien ».
  */
 import { useLocation, useNavigate } from 'react-router'
 import { Bloc } from '@/shared/ui/Bloc'
 import { TitreDeSection } from '@/shared/ui/TitreDeSection'
+import { AccesShopifyRefuse } from '../api/shopify'
 import { useAjouterFragment, useFragments, useIllustrations } from '../hooks/useFragments'
 import { motifsSansFragment } from '../lib/motifs'
 import styles from './Boutique.module.css'
 
 export function MotifsSansFragment() {
-  const { data: motifs } = useIllustrations()
+  const { data: motifs, error } = useIllustrations()
   const { data: fragments } = useFragments()
   const ajout = useAjouterFragment()
   const navigate = useNavigate()
   const { search } = useLocation()
 
+  if (error) {
+    const cause = error instanceof AccesShopifyRefuse ? `la portée ${error.portee} manque à l’app Shopify.` : error.message
+    return (
+      <>
+        <TitreDeSection titre="Motifs Shopify sans Fragment" />
+        <p className={styles.erreur} role="alert">{`Inventaire Shopify indisponible : ${cause}`}</p>
+      </>
+    )
+  }
   if (!motifs || !fragments) return null
   const orphelins = motifsSansFragment(motifs, fragments)
 

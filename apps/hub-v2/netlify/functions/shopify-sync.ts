@@ -145,7 +145,10 @@ export default async function handler(request: Request) {
         },
       })
       const page = await resp.json()
-      if (!Array.isArray(page) || page.length === 0) break
+      if (!Array.isArray(page)) {
+        return json({ error: `Lecture des users Supabase refusée (${resp.status}) : ${JSON.stringify(page).slice(0, 200)}` }, 500)
+      }
+      if (page.length === 0) break
       existingUsers.push(...page)
       if (page.length < PAGE_SIZE) break
       offset += PAGE_SIZE
@@ -190,9 +193,10 @@ export default async function handler(request: Request) {
 
     // 4. Batch update (lier les existants) — par lots de 50
     let updated = 0
+    const updateErrors: string[] = []
     for (let i = 0; i < toUpdate.length; i += 50) {
       const batch = toUpdate.slice(i, i + 50)
-      const promises = batch.map(u =>
+      const responses = await Promise.all(batch.map(u =>
         fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${u.id}`, {
           method: 'PATCH',
           headers: {
@@ -202,9 +206,14 @@ export default async function handler(request: Request) {
           },
           body: JSON.stringify({ shopify_customer_id: u.shopify_customer_id }),
         })
-      )
-      await Promise.all(promises)
-      updated += batch.length
+      ))
+      for (const [j, resp] of responses.entries()) {
+        if (resp.ok) {
+          updated++
+        } else if (updateErrors.length < 3) {
+          updateErrors.push(`Lien ${batch[j].id}: ${resp.status} — ${(await resp.text()).slice(0, 200)}`)
+        }
+      }
     }
 
     // 5. Batch create (nouveaux profils Shopify) — par lots de 50
@@ -245,6 +254,8 @@ export default async function handler(request: Request) {
         `Supabase: ${existingUsers.length} users récupérés (${Math.ceil(existingUsers.length / PAGE_SIZE)} pages)`,
         `Croisement: ${toUpdate.length} à lier, ${toCreate.length} à créer, ${skipped} déjà à jour`,
         `Updates: ${updated} liés avec succès`,
+        toUpdate.length > updated ? `⚠️ ${toUpdate.length - updated} liens refusés sur ${toUpdate.length}` : null,
+        ...updateErrors.map(e => `❌ ${e}`),
         `Creates: ${created} profils créés`,
         toCreate.length > 0 && created === 0 ? `⚠️ Aucun profil créé sur ${toCreate.length} tentatives` : null,
         ...createErrors.map(e => `❌ ${e}`),

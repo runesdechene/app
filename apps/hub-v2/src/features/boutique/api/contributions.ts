@@ -110,7 +110,13 @@ export async function mettreSurLaFiche(c: Contribution, photo: PhotoDeContributi
   if (!photo.produit_id) throw new Error('Relie d’abord un produit')
   if (oui) {
     const media = await pousserImage(photo.produit_id, photo.url, texteAlternatif(c.nom, c.hauteur, photo.taille))
-    await ecrire(supabase.rpc('set_submission_image_media', { p_image_id: photo.id, p_media_id: media }))
+    try {
+      await ecrire(supabase.rpc('set_submission_image_media', { p_image_id: photo.id, p_media_id: media }))
+    } catch (e) {
+      // La base n'a pas noté le média : l'image poussée serait orpheline. Retrait de secours, l'erreur d'origine remonte.
+      await retirerImage(photo.produit_id, media).catch(() => undefined)
+      throw e
+    }
     return
   }
   if (photo.media) await retirerImage(photo.produit_id, photo.media)
