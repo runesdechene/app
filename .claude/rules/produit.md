@@ -188,3 +188,13 @@ UPDATE users SET display_name = first_name WHERE display_name IS NULL AND first_
 - Distinction clé : structure d'**affichage/identité** → garder neutralisé ; surface de **compétition entre camps** → supprimer.
 
 Lié à [[project_maj_1_0_refonte_identite]].
+
+## Porteur, client validé — jamais « client relié »
+
+**Le piège** (14/10/2026, maquettes du Hub) : j'avais écrit « client relié » et posé côte à côte les
+balises « Client relié » et « Explorateur » sur une joueuse qui avait deux Fragments. Uriel : « client
+relié, ça ne voulait rien dire ».
+
+**How to apply :** un compte qui a au moins un Fragment (`user_fragments`) est un **Porteur** — c'est
+la balise à montrer, dans l'appli comme dans le Hub. Pour dire qu'un compte correspond à un client
+Shopify, écrire « client validé ». « Explorateur » n'est pas une balise : c'est tout le monde.
