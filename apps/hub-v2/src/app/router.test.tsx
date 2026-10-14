@@ -24,3 +24,14 @@ test('une adresse inconnue renvoie à l’accueil', async () => {
   render(<RouterProvider router={router} />)
   expect(await screen.findByText('Bonjour Uriel')).toBeInTheDocument()
 })
+
+vi.mock('@/features/communaute/hooks/useComptes', () => ({
+  useComptes: () => ({ data: undefined, isError: false }),
+  exporterComptes: vi.fn(),
+}))
+
+test('/communaute/comptes ouvre l’écran des comptes, pas « bientôt »', async () => {
+  const router = createMemoryRouter(routes, { initialEntries: ['/communaute/comptes'] })
+  render(<RouterProvider router={router} />)
+  expect(await screen.findByRole('heading', { name: 'Les comptes' })).toBeInTheDocument()
+})
