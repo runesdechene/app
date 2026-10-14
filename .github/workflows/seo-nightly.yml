@@ -45,3 +45,14 @@ jobs:
         run: npx netlify-cli@23.15.1 deploy --prod --no-build --dir="$PWD/dist" --site=5a5b9cb9-d330-41d7-a037-6bd65ac67eb9
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+
+      # Le Hub lit cette date dans « La santé » (spec Hub V2 §9) : sans elle, une nuit ratée ne se voit nulle part.
+      - name: Note the rebuild for the Hub
+        run: |
+          curl -sf -X POST "$SUPABASE_URL/rest/v1/app_settings?on_conflict=key" \
+            -H "apikey: $SUPABASE_SERVICE_KEY" -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+            -H "Content-Type: application/json" -H "Prefer: resolution=merge-duplicates" \
+            -d "{\"key\":\"fiches_publiques_le\",\"value\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}

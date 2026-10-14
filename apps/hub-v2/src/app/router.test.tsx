@@ -15,6 +15,10 @@ vi.mock('@/features/accueil/hooks/useOuverture', () => ({
   useOuverture: () => ({ data: undefined, isError: false, refetch: vi.fn() }),
 }))
 
+vi.mock('@/features/accueil/hooks/useSanteBoutique', () => ({
+  useSanteBoutique: () => ({ shopify: undefined, shopifyErreur: null, fiches: undefined }),
+}))
+
 vi.mock('@/features/accueil/hooks/useFil', () => ({
   useFil: () => ({ activites: [], voirPlus: vi.fn(), aDAutres: false, isError: false }),
 }))

@@ -8,6 +8,9 @@ const useOuverture = vi.fn<(periode: string) => { data: undefined; isError: bool
   () => ({ data: undefined, isError: false, refetch: vi.fn() }),
 )
 vi.mock('../hooks/useOuverture', () => ({ useOuverture: (periode: string) => useOuverture(periode) }))
+vi.mock('../hooks/useSanteBoutique', () => ({
+  useSanteBoutique: () => ({ shopify: undefined, shopifyErreur: null, fiches: undefined }),
+}))
 vi.mock('../hooks/useFil', () => ({
   useFil: () => ({ activites: [], voirPlus: vi.fn(), aDAutres: false, isError: false }),
 }))
