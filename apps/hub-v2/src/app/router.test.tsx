@@ -11,8 +11,12 @@ vi.mock('./entree/PorteDEntree', () => ({
   PorteDEntree: ({ children }: { children: ReactNode }) => children,
 }))
 
+vi.mock('@/features/accueil/hooks/useOuverture', () => ({
+  useOuverture: () => ({ data: undefined, isError: false, refetch: vi.fn() }),
+}))
+
 test('une adresse inconnue renvoie à l’accueil', async () => {
   const router = createMemoryRouter(routes, { initialEntries: ['/nulle-part'] })
   render(<RouterProvider router={router} />)
-  expect(await screen.findByText('Accueil du Hub')).toBeInTheDocument()
+  expect(await screen.findByText('Bonjour Uriel')).toBeInTheDocument()
 })

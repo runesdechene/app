@@ -6773,6 +6773,7 @@ export type Database = {
         Returns: boolean
       }
       _hasard_fixe: { Args: { p_texte: string }; Returns: number }
+      _hub_pouls: { Args: { p_debut: string; p_fin: string }; Returns: Json }
       _is_admin: { Args: never; Returns: boolean }
       _is_staff:
         | { Args: never; Returns: boolean }
@@ -7879,6 +7880,7 @@ export type Database = {
       herald_grade_promotions: { Args: never; Returns: undefined }
       histoire_du_lieu: { Args: { p_id: string }; Returns: Json }
       hub_est_admin: { Args: never; Returns: boolean }
+      hub_ouverture: { Args: { p_jours: number }; Returns: Json }
       increment_community_quest: {
         Args: {
           p_amount?: number

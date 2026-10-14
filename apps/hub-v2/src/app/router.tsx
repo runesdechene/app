@@ -4,6 +4,7 @@
  *            liste des adresses, l'accueil a son écran, les autres attendent leur plan.
  */
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
+import { Ouverture } from '@/features/accueil/components/Ouverture'
 import { BientotIci } from './coquille/BientotIci'
 import { Coquille } from './coquille/Coquille'
 import { MENU } from './coquille/menu'
@@ -21,7 +22,7 @@ export const routes: RouteObject[] = [
         <Coquille />
       </PorteDEntree>
     ),
-    children: [{ index: true, element: <p>Accueil du Hub</p> }, ...autres],
+    children: [{ index: true, Component: Ouverture }, ...autres],
   },
   { path: '*', element: <Navigate to="/" replace /> },
 ]

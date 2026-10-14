@@ -1,0 +1,110 @@
+/*
+ * QUOI     — la mise en page de l'ouverture : en-tête, tuiles (6 sur PC, 2 par ligne au
+ *            téléphone), la paire « attente / santé » côte à côte sur PC.
+ */
+.ouverture {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.salut {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.date {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--rangee-size);
+  letter-spacing: var(--bandeau-titre-tracking);
+  text-transform: uppercase;
+  color: var(--color-texte-doux);
+}
+
+.bonjour {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--vitrine-lieux-titre-pc-size);
+  font-weight: var(--weight-normal);
+  line-height: 1;
+  color: var(--color-encre);
+}
+
+.phrase {
+  margin: 0;
+  color: var(--color-texte);
+}
+
+.tuiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.paire {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.calme {
+  margin: 0;
+  color: var(--color-texte-doux);
+}
+
+.etat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.point {
+  flex: 0 0 10px;
+  height: 10px;
+  border-radius: var(--radius-rond);
+  background: var(--color-vert);
+}
+
+.point[data-ok='false'] {
+  background: var(--color-confetti-or);
+}
+
+.etatTexte {
+  display: grid;
+}
+
+.etatTitre {
+  font-weight: var(--weight-semi);
+  color: var(--color-encre);
+}
+
+.etatDetail {
+  font-size: var(--flux-size);
+  color: var(--color-texte-doux);
+}
+
+@container app (width >= 900px) {
+  .tuiles {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .paire {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8);
+  }
+}
