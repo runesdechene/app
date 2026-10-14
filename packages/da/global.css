@@ -4,6 +4,7 @@
  *            Le grain du parchemin est posé sur un pseudo-élément plutôt qu'en
  *            background-attachment: fixed, qu'iOS Safari ignore ; --background-attachment
  *            choisit « le fond reste » (fixed) ou « le fond défile » (absolute).
+ * ATTENTION — partagé par la V2 et le Hub (packages/da) : toute règle ici vaut pour les deux.
  */
 *,
 *::before,
@@ -38,7 +39,7 @@ body::before {
   position: var(--background-attachment);
   inset: 0;
   z-index: -1;
-  background: url('../../assets/ui/fond-parchemin.webp') center top / cover no-repeat;
+  background: url('./fond-parchemin.webp') center top / cover no-repeat;
   pointer-events: none;
 }
 

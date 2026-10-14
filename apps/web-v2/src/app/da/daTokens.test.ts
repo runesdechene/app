@@ -9,7 +9,7 @@ import { COLOR_TOKENS } from './daTokens'
 
 test('COLOR_TOKENS reprend toutes les couleurs de tokens.css, et elles seules', () => {
   const tokens = readFileSync(
-    path.resolve(import.meta.dirname, '../../shared/styles/tokens.css'),
+    path.resolve(import.meta.dirname, '../../../../../packages/da/tokens.css'),
     'utf8',
   )
   const declared = [...tokens.matchAll(/(--color-[a-z0-9-]+)\s*:/g)].map((m) => m[1])

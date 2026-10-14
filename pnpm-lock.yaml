@@ -101,24 +101,15 @@ importers:
 
   apps/web-v2:
     dependencies:
-      '@fontsource/bebas-neue':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/cabin':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/cabin-condensed':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/im-fell-english':
-        specifier: ^5.3.0
-        version: 5.3.0
       '@mediapipe/tasks-vision':
         specifier: 1.1.0
         version: 1.1.0
       '@runes/calendrier':
         specifier: workspace:*
         version: link:../../packages/calendrier
+      '@runes/da':
+        specifier: workspace:*
+        version: link:../../packages/da
       '@supabase/supabase-js':
         specifier: 2.117.2
         version: 2.117.2
@@ -249,6 +240,21 @@ importers:
       vitest:
         specifier: 5.0.2
         version: 5.0.2(@types/node@25.2.0)(jsdom@30.1.1)(vite@8.3.1(@types/node@25.2.0)(esbuild@0.27.7)(jiti@2.6.1)(terser@5.46.0)(tsx@4.21.0))
+
+  packages/da:
+    dependencies:
+      '@fontsource/bebas-neue':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/cabin':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/cabin-condensed':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/im-fell-english':
+        specifier: ^5.3.0
+        version: 5.3.0
 
   packages/supabase-client:
     dependencies:

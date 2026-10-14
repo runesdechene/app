@@ -1,19 +1,11 @@
 /**
  * QUOI     — point d'entrée de la V2 : tient l'app à jour (et dit quand une version arrive),
  *            monte le cache de données (et ce qu'il garde sur l'appareil) et le routeur dans #root.
- *            Les polices sont servies par l'appli (@fontsource) : aucune page ne contacte Google,
- *            qui recevrait l'adresse IP des visiteurs sans leur accord (RGPD, 11/10).
+ *            Les polices et les jetons viennent de @runes/da (packages/da), partagés avec le Hub.
  */
-import '@fontsource/bebas-neue/400.css'
-import '@fontsource/cabin/400.css'
-import '@fontsource/cabin/600.css'
-import '@fontsource/cabin/700.css'
-import '@fontsource/cabin-condensed/400.css'
-import '@fontsource/cabin-condensed/700.css'
-import '@fontsource/im-fell-english/400.css'
-import '@fontsource/im-fell-english/400-italic.css'
-import './shared/styles/tokens.css'
-import './shared/styles/global.css'
+import '@runes/da/polices'
+import '@runes/da/tokens.css'
+import '@runes/da/global.css'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

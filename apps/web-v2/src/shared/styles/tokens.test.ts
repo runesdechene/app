@@ -45,7 +45,9 @@ const cssFiles = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
   .filter((file) => file.endsWith('.css'))
   .map((file) => path.join(SRC, file))
 
-const tokens = readFileSync(path.join(SRC, 'shared/styles/tokens.css'), 'utf8')
+// Les jetons vivent dans le paquet partagé @runes/da (spec Hub V2 §4) : le Hub les lit aussi.
+const TOKENS = path.resolve(SRC, '../../../packages/da/tokens.css')
+const tokens = readFileSync(TOKENS, 'utf8')
 const defined = new Set([...tokens.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]))
 
 test('les jetons sont lus', () => {

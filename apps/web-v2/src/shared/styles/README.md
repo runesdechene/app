@@ -1,10 +1,7 @@
-# styles — la DA en variables
+# styles — renvoi
 
-- `tokens.css` — toutes les couleurs, polices, tailles, espacements et formes. **Le seul endroit**
-  où une valeur visuelle s'écrit en dur ; Stylelint refuse les autres.
-- `global.css` — remise à zéro et fond commun.
+Les jetons (`tokens.css`) et la remise à zéro (`global.css`) vivent dans le paquet partagé
+`packages/da` (`@runes/da`), importé par `src/main.tsx`. Ce dossier ne garde que le test qui
+vérifie que chaque `var(--…)` de la V2 existe dans les jetons.
 
-Pour voir toute la DA d'un coup : `/v2/da`.
-
-Fond fixe ou défilant : dans `tokens.css`, `--background-attachment: fixed` (le fond reste) ou
-`absolute` (il défile avec la page).
+Pour voir toute la DA d'un coup : `/da`.
