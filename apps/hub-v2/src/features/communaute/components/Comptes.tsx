@@ -3,6 +3,7 @@
  *            pages, l'export CSV ; la fiche d'un compte s'ouvre par-dessus (route enfant).
  * POURQUOI — filtre, recherche, provenance, département, tri et page sont dans l'adresse.
  */
+import { useEffect, useState } from 'react'
 import { Outlet, useSearchParams } from 'react-router'
 import { Bloc } from '@/shared/ui/Bloc'
 import { ChampDeRecherche } from '@/shared/ui/ChampDeRecherche'
@@ -23,6 +24,10 @@ const FILTRES: { valeur: Filtre; libelle: string }[] = [
 const TRIS: { valeur: Tri; libelle: string }[] = [
   { valeur: 'visite', libelle: 'Dernière visite' }, { valeur: 'inscription', libelle: 'Inscription' }, { valeur: 'nom', libelle: 'Nom' },
 ]
+function numeroDePage(texte: string | null): number {
+  const page = Math.floor(Number(texte))
+  return page >= 1 ? page : 1
+}
 const nombre = new Intl.NumberFormat('fr-FR')
 
 export function Comptes() {
@@ -34,10 +39,21 @@ export function Comptes() {
     departement: params.get('departement'),
     tri: TRIS.find((t) => t.valeur === params.get('tri'))?.valeur ?? 'visite',
     limite: PAR_PAGE,
-    decalage: Math.max(0, Number(params.get('page') ?? '1') - 1) * PAR_PAGE,
+    decalage: (numeroDePage(params.get('page')) - 1) * PAR_PAGE,
   }
   const { data, isError } = useComptes(criteres)
   const maintenant = new Date()
+  const [exportEchoue, setExportEchoue] = useState(false)
+
+  // Une page au-delà de la dernière (liste raccourcie, adresse recopiée) : on se replace sur la dernière.
+  const total = data?.total ?? 0
+  useEffect(() => {
+    if (total > 0 && criteres.decalage >= total) {
+      const suivants = new URLSearchParams(params)
+      suivants.set('page', String(Math.ceil(total / PAR_PAGE)))
+      setParams(suivants, { replace: true })
+    }
+  }, [total, criteres.decalage, params, setParams])
 
   function changer(cle: string, valeur: string | null) {
     const suivants = new URLSearchParams(params)
@@ -48,12 +64,13 @@ export function Comptes() {
   }
 
   async function telecharger() {
+    setExportEchoue(false)
     const csv = await exporterComptes(criteres)
     const lien = document.createElement('a')
     lien.href = URL.createObjectURL(new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' }))
     lien.download = `comptes-${criteres.filtre}.csv`
     lien.click()
-    URL.revokeObjectURL(lien.href)
+    setTimeout(() => { URL.revokeObjectURL(lien.href) }, 1000)
   }
 
   return (
@@ -62,7 +79,7 @@ export function Comptes() {
         surtitre="Communauté"
         titre="Les comptes"
         phrase={data ? `${nombre.format(data.compteurs.comptes)} Explorateurs.` : ''}
-        aDroite={<button className={styles.boutonContour} type="button" onClick={() => void telecharger()}>Exporter en CSV</button>}
+        aDroite={<button className={styles.boutonContour} type="button" onClick={() => { telecharger().catch(() => { setExportEchoue(true) }) }}>Exporter en CSV</button>}
       />
       {data && (
         <div className={styles.tuiles}>
@@ -88,6 +105,7 @@ export function Comptes() {
         <span className={styles.air} />
         <ChampDeRecherche valeur={criteres.recherche} onChange={(q) => { changer('q', q) }} etiquette="Un nom, un e-mail…" />
       </div>
+      {exportEchoue && <p className={styles.calme} role="alert">L’export n’a pas pu se faire.</p>}
       {isError && <p className={styles.calme}>La base ne répond pas.</p>}
       {data && (
         <Bloc>

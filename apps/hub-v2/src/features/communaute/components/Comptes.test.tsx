@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { vi } from 'vitest'
+import { exporterComptes } from '../hooks/useComptes'
 import { Comptes } from './Comptes'
 
 const mockUseComptes = vi.hoisted(() => vi.fn())
@@ -40,4 +41,25 @@ test('le filtre va dans l’adresse et repart de la première page', async () =>
   const router = monter('/communaute/comptes?page=2')
   await userEvent.click(screen.getByRole('radio', { name: 'En sommeil' }))
   expect(router.state.location.search).toBe('?filtre=sommeil')
+})
+
+test('un export qui échoue le dit', async () => {
+  mockUseComptes.mockReturnValue({ data: liste, isError: false })
+  vi.mocked(exporterComptes).mockRejectedValueOnce(new Error('réseau'))
+  monter()
+  await userEvent.click(screen.getByRole('button', { name: 'Exporter en CSV' }))
+  expect(await screen.findByText('L’export n’a pas pu se faire.')).toBeInTheDocument()
+})
+
+test('une page hors bornes ou illisible se ramène à une page qui existe', () => {
+  mockUseComptes.mockReturnValue({ data: liste, isError: false })
+  const router = monter('/communaute/comptes?page=9')
+  expect(router.state.location.search).toBe('?page=1')
+  expect(mockUseComptes).toHaveBeenLastCalledWith(expect.objectContaining({ decalage: 0 }))
+})
+
+test('une page non numérique vaut la première', () => {
+  mockUseComptes.mockReturnValue({ data: liste, isError: false })
+  monter('/communaute/comptes?page=abc')
+  expect(mockUseComptes).toHaveBeenLastCalledWith(expect.objectContaining({ decalage: 0 }))
 })

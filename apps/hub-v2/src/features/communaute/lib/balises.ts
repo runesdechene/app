@@ -16,8 +16,8 @@ export function balisesDuCompte(c: Compte, maintenant: Date): { texte: string; t
   const balises: { texte: string; teinte: Teinte }[] = []
   if (c.role === 'admin') balises.push({ texte: 'Admin', teinte: 'admin' })
   if (t - inscrit < QUINZE_JOURS) balises.push({ texte: 'Nouveau', teinte: 'nouveau' })
-  else if (entree !== null && t - entree < QUINZE_JOURS && entree - inscrit > JOUR) balises.push({ texte: 'Réactivé', teinte: 'reactive' })
-  else if (entree === null && inscrit < BASCULE) balises.push({ texte: 'En sommeil', teinte: 'sommeil' })
+  if (entree !== null && t - entree < QUINZE_JOURS && entree - inscrit > JOUR) balises.push({ texte: 'Réactivé', teinte: 'reactive' })
+  if (entree === null && inscrit < BASCULE) balises.push({ texte: 'En sommeil', teinte: 'sommeil' })
   if (c.fragments > 0) balises.push({ texte: 'Porteur', teinte: 'porteur' })
   return balises
 }

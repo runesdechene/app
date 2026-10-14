@@ -16,3 +16,8 @@ test('une ligne d’en-tête puis une ligne par compte, séparées par des point
 test('un guillemet est doublé', () => {
   expect(versCsv([{ ...c, nom: 'Le "Grand"' }]).split('\r\n')[1]?.startsWith('"Le ""Grand"""')).toBe(true)
 })
+
+test('une cellule qui ressemble à une formule est neutralisée', () => {
+  const ligne = versCsv([{ ...c, nom: '=SOMME(1;2)', email: '-1+1' }]).split('\r\n')[1]
+  expect(ligne?.startsWith(`"'=SOMME(1;2)";'-1+1;`)).toBe(true)
+})

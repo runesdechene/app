@@ -4,9 +4,12 @@
 import type { Compte } from '../api/comptes'
 
 const COLONNES = ['nom', 'email', 'provenance', 'departement', 'fragments', 'inscrit', 'derniere_visite', 'role'] as const
+const DEBUT_DE_FORMULE = /^[=+\-@\t\r]/
 
 function cellule(v: string | number | null): string {
-  const s = v === null ? '' : String(v)
+  const texte = v === null ? '' : String(v)
+  // Un tableur lit « =… » comme une formule : on la neutralise d'une apostrophe.
+  const s = DEBUT_DE_FORMULE.test(texte) ? `'${texte}` : texte
   return /[;"\n\r]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s
 }
 

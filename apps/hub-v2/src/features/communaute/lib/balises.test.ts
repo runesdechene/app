@@ -27,3 +27,13 @@ test('un compte créé après la bascule sans être entré n’est pas en sommei
 test('admin', () => {
   expect(textes({ ...base, inscrit: '2024-01-01T00:00:00Z', entree_v2: '2024-01-01T00:00:00Z', role: 'admin', fragments: 22 })).toEqual(['Admin', 'Porteur'])
 })
+
+test('créé avant la bascule mais il y a moins de 15 jours, jamais entré : Nouveau et En sommeil', () => {
+  const proche = new Date('2026-10-10T12:00:00Z')
+  const c = { ...base, inscrit: '2026-10-05T00:00:00Z', entree_v2: null, fragments: 0 }
+  expect(balisesDuCompte(c, proche).map((b) => b.texte)).toEqual(['Nouveau', 'En sommeil'])
+})
+test('Nouveau et Réactivé ensemble : inscrit il y a 10 jours, entré 3 jours plus tard', () => {
+  const c = { ...base, inscrit: '2026-10-04T00:00:00Z', entree_v2: '2026-10-07T00:00:00Z', fragments: 0 }
+  expect(textes(c)).toEqual(['Nouveau', 'Réactivé'])
+})
