@@ -1,11 +1,15 @@
 import { render, screen, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
-import { vi } from 'vitest'
+import { afterEach, vi } from 'vitest'
 import { ChampDeRecherche } from './ChampDeRecherche'
 import { EnTeteDePage } from './EnTeteDePage'
 import { Pages } from './Pages'
 import { Tiroir } from './Tiroir'
+
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 test('l’en-tête montre surtitre, titre et phrase', () => {
   render(<EnTeteDePage surtitre="Communauté" titre="Les comptes" phrase="4 750 Explorateurs." />)
@@ -38,7 +42,24 @@ test('la recherche attend 300 ms avant de chercher', () => {
     vi.advanceTimersByTime(300)
   })
   expect(onChange).toHaveBeenCalledWith('kel')
-  vi.useRealTimers()
+})
+
+test('la recherche suit l’adresse sans relancer de recherche', () => {
+  vi.useFakeTimers()
+  const onChange = vi.fn()
+  const { rerender } = render(<ChampDeRecherche valeur="" onChange={onChange} etiquette="Chercher" />)
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'kel' } })
+  act(() => {
+    vi.advanceTimersByTime(300)
+  })
+  onChange.mockClear()
+  rerender(<ChampDeRecherche valeur="kel" onChange={onChange} etiquette="Chercher" />)
+  rerender(<ChampDeRecherche valeur="" onChange={onChange} etiquette="Chercher" />)
+  expect(screen.getByRole('searchbox')).toHaveValue('')
+  act(() => {
+    vi.advanceTimersByTime(300)
+  })
+  expect(onChange).not.toHaveBeenCalled()
 })
 
 test('le tiroir se ferme vers la liste (bouton et Échap)', async () => {
@@ -53,4 +74,28 @@ test('le tiroir se ferme vers la liste (bouton et Échap)', async () => {
   expect(screen.getByRole('dialog', { name: 'Kelpie' })).toBeInTheDocument()
   await userEvent.keyboard('{Escape}')
   expect(await screen.findByText('La liste')).toBeInTheDocument()
+})
+
+function tiroirDansUneListe() {
+  const router = createMemoryRouter(
+    [
+      { path: '/liste', element: <p>La liste</p> },
+      { path: '/liste/1', element: <Tiroir titre="Kelpie" retour="/liste"><input aria-label="Nom" /></Tiroir> },
+    ],
+    { initialEntries: ['/liste/1'] },
+  )
+  render(<RouterProvider router={router} />)
+}
+
+test('le tiroir se ferme au clic sur Fermer', async () => {
+  tiroirDansUneListe()
+  await userEvent.click(screen.getByRole('link', { name: '✕ Fermer' }))
+  expect(await screen.findByText('La liste')).toBeInTheDocument()
+})
+
+test('Échap dans un champ du tiroir ne le ferme pas', async () => {
+  tiroirDansUneListe()
+  await userEvent.click(screen.getByRole('textbox', { name: 'Nom' }))
+  await userEvent.keyboard('{Escape}')
+  expect(screen.getByRole('dialog', { name: 'Kelpie' })).toBeInTheDocument()
 })

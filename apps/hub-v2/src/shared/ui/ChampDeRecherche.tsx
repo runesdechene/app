@@ -12,6 +12,12 @@ export function ChampDeRecherche({ valeur, onChange, etiquette }: {
   valeur: string; onChange: (texte: string) => void; etiquette: string
 }) {
   const [texte, setTexte] = useState(valeur)
+  const [valeurVue, setValeurVue] = useState(valeur)
+  // L'adresse change hors de la frappe (retour arrière) : le champ la suit, sans relancer de recherche.
+  if (valeur !== valeurVue) {
+    setValeurVue(valeur)
+    setTexte(valeur)
+  }
   useEffect(() => {
     if (texte === valeur) return
     const minuteur = setTimeout(() => {
