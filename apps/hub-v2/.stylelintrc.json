@@ -29,14 +29,5 @@
         "ignoreShorthands": ["grid-template"]
       }
     ]
-  },
-  "overrides": [
-    {
-      "files": ["../../packages/da/tokens.css"],
-      "rules": {
-        "color-no-hex": null,
-        "declaration-property-value-allowed-list": null
-      }
-    }
-  ]
+  }
 }
