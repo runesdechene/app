@@ -3,3 +3,5 @@ La Boutique du Hub (spec §12) : api/ (correspondance : shopify_unlocks ; achats
 Photos et avis (spec §12) : api/contributions (hub_contributions et les écritures de modération, message, étiquettes), hooks/useContributions, lib/contribution (statuts, texte alternatif, nom de fichier), components/Photos (la file à deux volets) et sa lecture — LectureContribution, MessageDeContribution, EtiquettesDeContribution, DecisionsDeContribution, PhotoDeContribution (l'emplacement de chaque fichier).
 
 Par photo (Task 8) : canaux, produit Shopify (api/shopify : recherche, poser et retirer une image), téléchargement (lib/archive, jszip chargé au premier usage, hooks/useTelechargement) et suppression propre dans l'ordre Shopify, stockage (shared/lib/envoi : retirerFichiers vérifie), base — ChoixDuProduit pour relier.
+
+Écoutes audio (Task 9) : api/ecoutes (get_fragment_audio_stats), api/shopify (lireInventaireAudio, lireProduitsSansIllustration), hooks/useEcoutes (trois lectures indépendantes), lib/ecoutes (résumé, seuil de décision) et components/Ecoutes (tuiles, verdict, par Fragment) avec CouvertureAudio (les trois relevés de couverture).

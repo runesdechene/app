@@ -15,6 +15,7 @@ import { TiroirCompteDuStand } from '@/features/communaute/components/TiroirComp
 import { TiroirLieu } from '@/features/communaute/components/TiroirLieu'
 import { TiroirFragment } from '@/features/boutique/components/TiroirFragment'
 import { Achats } from '@/features/boutique/components/Achats'
+import { Ecoutes } from '@/features/boutique/components/Ecoutes'
 import { Correspondance } from '@/features/boutique/components/Correspondance'
 import { Fragments } from '@/features/boutique/components/Fragments'
 import { Photos } from '@/features/boutique/components/Photos'
@@ -36,7 +37,7 @@ import { MENU } from './coquille/menu'
 import { PorteDEntree } from './entree/PorteDEntree'
 
 // Les écrans faits quittent « bientôt » ; chaque tâche suivante ajoute le sien.
-const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures', '/jeu/natures', '/jeu/titres', '/jeu/bannieres', '/jeu/energie', '/boutique/fragments', '/boutique/fragments/correspondance', '/boutique/fragments/achats', '/boutique/photos'])
+const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures', '/jeu/natures', '/jeu/titres', '/jeu/bannieres', '/jeu/energie', '/boutique/fragments', '/boutique/fragments/correspondance', '/boutique/fragments/achats', '/boutique/photos', '/boutique/audio'])
 
 const autres = MENU.flatMap((d) => d.liens)
   .filter((l) => l.chemin !== '/' && !ECRANS_FAITS.has(l.chemin))
@@ -67,6 +68,7 @@ export const routes: RouteObject[] = [
       { path: 'boutique/fragments/correspondance', Component: Correspondance },
       { path: 'boutique/fragments/achats', Component: Achats },
       { path: 'boutique/photos', Component: Photos },
+      { path: 'boutique/audio', Component: Ecoutes },
       ...autres,
     ],
   },

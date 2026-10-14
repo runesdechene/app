@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import { AccesShopifyRefuse, chercherProduits, graphqlShopify, lireIllustrations, pousserImage, retirerImage } from './shopify'
+import { AccesShopifyRefuse, chercherProduits, graphqlShopify, lireIllustrations, lireInventaireAudio, lireProduitsSansIllustration, pousserImage, retirerImage } from './shopify'
 
 const appel = vi.hoisted(() => ({ appelerFonction: vi.fn(), lireReponse: vi.fn() }))
 vi.mock('@/shared/lib/fonctions', () => appel)
@@ -113,4 +113,26 @@ describe('chercherProduits', () => {
     const corps = (appel.appelerFonction.mock.calls[0] as [string, { corps: { query: string } }])[1].corps
     expect(corps.query).toContain('title:*ve\\"ste*')
   })
+})
+
+test('l’inventaire audio : le nom, la voix off présente ou non, la troncature', async () => {
+  repond({ data: { metaobjects: { pageInfo: { hasNextPage: true }, edges: [
+    { node: { handle: 'loup', displayName: 'Le Loup', fields: [{ key: 'fragment_audio', value: 'gid://f/1' }] } },
+    { node: { handle: 'muet', displayName: 'La Muette', fields: [{ key: 'fragment_audio', value: null }] } },
+  ] } } })
+  expect(await lireInventaireAudio()).toEqual({
+    illustrations: [{ handle: 'loup', nom: 'Le Loup', aAudio: true }, { handle: 'muet', nom: 'La Muette', aAudio: false }],
+    tronque: true,
+  })
+})
+
+test('l’inventaire audio vide : InventaireVide', async () => {
+  repond({ data: { metaobjects: { pageInfo: { hasNextPage: false }, edges: [] } } })
+  await expect(lireInventaireAudio()).rejects.toThrow('Aucune Illustration retournée par Shopify (type "illustrations") — le type a-t-il changé ?')
+})
+
+test('les produits sans Illustration : actifs seulement, métachamp vide', async () => {
+  const noeud = (handle: string, status: string, value: string | null) => ({ node: { handle, title: handle.toUpperCase(), status, metafield: value === null ? null : { value } } })
+  repond({ data: { products: { pageInfo: { hasNextPage: false }, edges: [noeud('a', 'ACTIVE', null), noeud('b', 'ACTIVE', 'gid://m/1'), noeud('c', 'DRAFT', null)] } } })
+  expect(await lireProduitsSansIllustration()).toEqual({ produits: [{ handle: 'a', titre: 'A' }], tronque: false })
 })

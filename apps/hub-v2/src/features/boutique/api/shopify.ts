@@ -190,3 +190,53 @@ export async function retirerImage(produitId: string, mediaId: string): Promise<
     throw new Error(`Fiche produit Shopify : ${message}`, { cause: e })
   }
 }
+
+/** Une Illustration de l'inventaire audio : son nom, et si elle porte un fichier de voix off. */
+export type IllustrationAudio = { handle: string; nom: string; aAudio: boolean }
+
+/** Toutes les Illustrations (100 au plus), avec la présence d'un fichier de voix off. */
+export async function lireInventaireAudio(): Promise<{ illustrations: IllustrationAudio[]; tronque: boolean }> {
+  const { metaobjects } = await graphqlShopify<{
+    metaobjects: {
+      pageInfo: { hasNextPage: boolean }
+      edges: { node: { handle: string; displayName: string; fields: { key: string; value: string | null }[] } }[]
+    }
+  }>(`{
+    metaobjects(type: "${TYPE_ILLUSTRATION}", first: 100) {
+      edges { node { handle displayName fields { key value } } }
+      pageInfo { hasNextPage }
+    }
+  }`)
+  if (metaobjects.edges.length === 0) {
+    throw new InventaireVide(`Aucune Illustration retournée par Shopify (type "${TYPE_ILLUSTRATION}") — le type a-t-il changé ?`)
+  }
+  return {
+    illustrations: metaobjects.edges.map(({ node }) => ({
+      handle: node.handle,
+      nom: node.displayName,
+      aAudio: node.fields.some((f) => f.key === CHAMP_AUDIO && !!f.value),
+    })),
+    tronque: metaobjects.pageInfo.hasNextPage,
+  }
+}
+
+/** Les produits actifs dont le métachamp custom.illustration_produit est vide : le lecteur y reste muet. */
+export async function lireProduitsSansIllustration(): Promise<{ produits: { handle: string; titre: string }[]; tronque: boolean }> {
+  const { products } = await graphqlShopify<{
+    products: {
+      pageInfo: { hasNextPage: boolean }
+      edges: { node: { handle: string; title: string; status: string; metafield: { value: string | null } | null } }[]
+    }
+  }>(`{
+    products(first: 250) {
+      edges { node { handle title status metafield(namespace: "custom", key: "illustration_produit") { value } } }
+      pageInfo { hasNextPage }
+    }
+  }`)
+  return {
+    produits: products.edges
+      .filter(({ node }) => node.status === 'ACTIVE' && !node.metafield?.value)
+      .map(({ node }) => ({ handle: node.handle, titre: node.title })),
+    tronque: products.pageInfo.hasNextPage,
+  }
+}
