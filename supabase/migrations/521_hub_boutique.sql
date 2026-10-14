@@ -11,6 +11,8 @@
 --         les fichiers et ne retirait rien.
 --      7. La pastille « achats » de hub_ouverture ne compte plus que les no_match (décision d'Uriel du
 --         14/10 : une pastille veut dire une action ; les pending se règlent seuls à l'inscription).
+--      8. update_submission_message range un message vidé en NULL (R16) : '' s'affichait ailleurs
+--         (mur « Ils nous portent », l'appli). Corps live (mig 513), seule la ligne SET change.
 -- SCHEMA CHECKED (14/10/2026, live) : voir le plan 4, Task 1 Step 1 ; _is_admin(), _is_staff(), _refus().
 --      pg_get_functiondef live de get_photo_submissions(text), get_photo_tags(),
 --      get_submission_images_batch(uuid[]), get_submission_tags_batch(uuid[]), hub_ouverture(text)
@@ -86,6 +88,30 @@ GRANT EXECUTE ON FUNCTION public.get_photo_submissions(text) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_photo_tags() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_submission_images_batch(uuid[]) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_submission_tags_batch(uuid[]) TO authenticated;
+
+-- 1b. Un message vidé est rangé NULL (corps live = mig 513, seule la ligne SET change)
+CREATE OR REPLACE FUNCTION public.update_submission_message(p_submission_id uuid, p_message text)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+
+BEGIN
+
+  IF NOT _is_staff() THEN PERFORM _refus('Réservé à l’équipe', 'role'); END IF;
+  UPDATE hub_photo_submissions
+
+  SET message = NULLIF(btrim(p_message), '')
+
+  WHERE id = p_submission_id;
+
+END;
+
+$function$;
+
+REVOKE ALL ON FUNCTION public.update_submission_message(uuid, text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.update_submission_message(uuid, text) TO authenticated;
 
 -- 2. Les contributions du Hub V2 : une page, le total filtré et les quatre chiffres
 CREATE OR REPLACE FUNCTION public.hub_contributions(p_statut text DEFAULT 'pending', p_recherche text DEFAULT NULL, p_limite integer DEFAULT 50, p_decalage integer DEFAULT 0)
