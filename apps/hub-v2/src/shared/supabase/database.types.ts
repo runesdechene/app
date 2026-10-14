@@ -6773,6 +6773,24 @@ export type Database = {
         Returns: boolean
       }
       _hasard_fixe: { Args: { p_texte: string }; Returns: number }
+      _hub_comptes_base: {
+        Args: never
+        Returns: {
+          avatar: string
+          charte: string
+          client: boolean
+          code: string
+          departement: string
+          derniere_visite: string
+          email: string
+          fragments: number
+          id: string
+          inscrit: string
+          nom: string
+          provenance: string
+          role: string
+        }[]
+      }
       _hub_pouls: { Args: { p_debut: string; p_fin: string }; Returns: Json }
       _is_admin: { Args: never; Returns: boolean }
       _is_staff:
@@ -7883,6 +7901,19 @@ export type Database = {
       }
       herald_grade_promotions: { Args: never; Returns: undefined }
       histoire_du_lieu: { Args: { p_id: string }; Returns: Json }
+      hub_compte: { Args: { p_id: string }; Returns: Json }
+      hub_comptes: {
+        Args: {
+          p_decalage?: number
+          p_departement?: string
+          p_filtre?: string
+          p_limite?: number
+          p_provenance?: string
+          p_recherche?: string
+          p_tri?: string
+        }
+        Returns: Json
+      }
       hub_est_admin: { Args: never; Returns: boolean }
       hub_ouverture: { Args: { p_periode: string }; Returns: Json }
       increment_community_quest: {
