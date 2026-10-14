@@ -11,7 +11,8 @@ import { SHOP } from './shopify'
 
 export type ResultatLiaison = {
   success: boolean; shopifyTotal: number; supabaseTotal: number
-  updated: number; created: number; skipped: number; logs: string[]
+  updated: number; created: number; skipped: number
+  toCreateCount: number; toUpdateCount: number; logs: string[]
 }
 
 export async function relierComptesEtClients(): Promise<ResultatLiaison> {

@@ -33,3 +33,17 @@ test('un client refusé par Shopify est nommé', async () => {
   const fin = await envoyerParLots([[{ customerId: 1, email: 'a@b.fr', tags: 'source:app' }]], envoyer, () => undefined, 0)
   expect(fin).toEqual({ fait: 1, total: 1, erreursCompte: 1, erreurs: ['a@b.fr — Customer not found'] })
 })
+
+test('deux comptes sur le même client : le second est compté parmi les ignorés', () => {
+  const comptes = [{ email: 'a@b.fr', client: 1, provenance: 'app' }, { email: 'a2@b.fr', client: 1, provenance: 'app' }]
+  const { lots, ignores } = preparerEtiquetage(comptes, [client('')])
+  expect(lots.flat()).toHaveLength(1)
+  expect(ignores).toBe(1)
+})
+
+test('un lot qui revient avec moins de réponses que d’envois : les absents sont des erreurs nommées', async () => {
+  const lot = [1, 2, 3].map((i) => ({ customerId: i, email: `${String(i)}@x.fr`, tags: 'source:app' }))
+  const envoyer = vi.fn().mockResolvedValue([{ email: '1@x.fr', success: true }])
+  const fin = await envoyerParLots([lot], envoyer, () => undefined, 0)
+  expect(fin).toEqual({ fait: 3, total: 3, erreursCompte: 2, erreurs: ['2@x.fr — Pas de réponse de Shopify', '3@x.fr — Pas de réponse de Shopify'] })
+})

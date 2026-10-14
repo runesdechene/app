@@ -26,6 +26,7 @@ function afficher() {
 }
 
 beforeEach(() => { vi.clearAllMocks() })
+afterEach(() => { vi.useRealTimers() })
 
 test('« Lancer la liaison » dit ce qui a été relié, avec les journaux', async () => {
   api.relierComptesEtClients.mockResolvedValue({
@@ -50,9 +51,13 @@ test('« Poser les étiquettes » envoie des lots sans étiquette heritage- ajou
   api.lireComptesClients.mockResolvedValue(comptes)
   api.lireClientsShopify.mockResolvedValue(comptes.slice(0, 27).map((c) => ({ id: c.client, email: c.email, tags: 'vip', created_at: '' })))
   api.envoyerEtiquettes.mockImplementation((lot: { email: string }[]) => Promise.resolve(lot.map((l) => ({ email: l.email, success: true }))))
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+  const utilisateur = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
   afficher()
-  await userEvent.click(screen.getByRole('button', { name: 'Poser les étiquettes' }))
-  expect(await screen.findByText('27 clients traités — 27 mis à jour, 0 erreur, 3 ignorés (déjà étiquetés ou absents de Shopify).', {}, { timeout: 4000 })).toBeInTheDocument()
+  await utilisateur.click(screen.getByRole('button', { name: 'Poser les étiquettes' }))
+  await vi.advanceTimersByTimeAsync(1000)
+  expect(await screen.findByText('27 clients traités — 27 mis à jour, 0 erreur, 3 ignorés (déjà étiquetés ou absents de Shopify).')).toBeInTheDocument()
+  vi.useRealTimers()
   const lots = api.envoyerEtiquettes.mock.calls.map((c) => c[0] as { tags: string }[])
   expect(lots.map((l) => l.length)).toEqual([25, 2])
   expect(lots.flat().some((e) => e.tags.includes('heritage-'))).toBe(false)
@@ -66,6 +71,7 @@ test('les erreurs d’étiquetage sont listées', async () => {
   afficher()
   await userEvent.click(screen.getByRole('button', { name: 'Poser les étiquettes' }))
   expect(await screen.findByText('a@b.fr — Customer not found')).toBeInTheDocument()
+  expect(screen.getByRole('alert')).toHaveTextContent('a@b.fr — Customer not found')
   expect(screen.getByText('1 client traité — 0 mis à jour, 1 erreur, 0 ignoré (déjà étiquetés ou absents de Shopify).')).toBeInTheDocument()
 })
 
@@ -76,4 +82,15 @@ test('une lecture qui échoue avant l’envoi est dite, rien n’est envoyé', a
   await userEvent.click(screen.getByRole('button', { name: 'Poser les étiquettes' }))
   expect(await screen.findByRole('alert')).toHaveTextContent('Les fonctions Netlify ne répondent pas')
   expect(api.envoyerEtiquettes).not.toHaveBeenCalled()
+})
+
+test('des comptes non créés : une alerte, et les journaux d’échec marqués', async () => {
+  api.relierComptesEtClients.mockResolvedValue({
+    success: true, shopifyTotal: 10, supabaseTotal: 5, updated: 0, created: 1, skipped: 6, toCreateCount: 4, toUpdateCount: 0,
+    logs: ['Creates: 1 profils créés', '❌ Batch 0: 400'],
+  })
+  afficher()
+  await userEvent.click(screen.getByRole('button', { name: 'Lancer la liaison' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('3 comptes n’ont pas pu être créés — voir les journaux.')
+  expect(screen.getByText('❌ Batch 0: 400')).toHaveAttribute('data-echec', 'true')
 })

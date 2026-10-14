@@ -17,6 +17,13 @@ function finDeLiaison(r: ResultatLiaison): string {
   return `${String(r.shopifyTotal)} ${pluriel(r.shopifyTotal, 'client')} ${pluriel(r.shopifyTotal, 'lu')} — ${String(r.updated)} ${pluriel(r.updated, 'relié')}, ${String(r.created)} ${comptes}, ${String(r.skipped)} déjà à jour.`
 }
 
+function nonCrees(r: ResultatLiaison): number {
+  return Math.max(0, r.toCreateCount - r.created)
+}
+
+// Les lignes de journal que la fonction marque d'un ❌ ou d'un ⚠️ sont des échecs ou des alertes.
+const estUnEchec = (ligne: string) => ligne.startsWith('❌') || ligne.startsWith('⚠️')
+
 function finDePose(f: FinDePose): string {
   const misAJour = f.fait - f.erreursCompte
   return `${String(f.fait)} ${pluriel(f.fait, 'client')} ${pluriel(f.fait, 'traité')} — ${String(misAJour)} mis à jour, ${String(f.erreursCompte)} ${pluriel(f.erreursCompte, 'erreur')}, ${String(f.ignores)} ${pluriel(f.ignores, 'ignoré')} (déjà étiquetés ou absents de Shopify).`
@@ -57,7 +64,14 @@ export function Synchro() {
         {liaison.data && (
           <>
             <p role="status">{finDeLiaison(liaison.data)}</p>
-            <ul>{liaison.data.logs.map((ligne, i) => <li key={i}>{ligne}</li>)}</ul>
+            {nonCrees(liaison.data) > 0 && (
+              <p role="alert">{`${String(nonCrees(liaison.data))} ${pluriel(nonCrees(liaison.data), 'compte n’a pas pu être créé', 'comptes n’ont pas pu être créés')} — voir les journaux.`}</p>
+            )}
+            <ul>
+              {liaison.data.logs.map((ligne, i) => (
+                <li key={i} data-echec={String(estUnEchec(ligne))} className={estUnEchec(ligne) ? styles.erreur : undefined}>{ligne}</li>
+              ))}
+            </ul>
           </>
         )}
         {liaison.isError && <p role="alert">{liaison.error.message}</p>}
@@ -70,7 +84,7 @@ export function Synchro() {
           {pose.isPending ? progression : 'Poser les étiquettes'}
         </button>
         {pose.data && <p role="status">{finDePose(pose.data)}</p>}
-        {erreurs.length > 0 && <ul>{erreurs.map((e, i) => <li key={i}>{e}</li>)}</ul>}
+        {erreurs.length > 0 && <ul role={pose.data ? 'alert' : undefined}>{erreurs.map((e, i) => <li key={i}>{e}</li>)}</ul>}
         {pose.isError && <p role="alert">{pose.error.message}</p>}
       </Bloc>
     </div>

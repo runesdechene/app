@@ -30,7 +30,7 @@ export function preparerEtiquetage(comptes: CompteClient[], clients: ClientShopi
   const aPoser: Etiquetage[] = []
   let ignores = 0
   for (const compte of comptes) {
-    if (vus.has(compte.client)) continue
+    if (vus.has(compte.client)) { ignores += 1; continue }
     vus.add(compte.client)
     const tags = etiquettesDeProvenance(compte, parId.get(compte.client))
     if (tags === null) ignores += 1
@@ -54,9 +54,16 @@ export async function envoyerParLots(
   for (const [i, lot] of lots.entries()) {
     if (i > 0) await pause(pauseMs)
     try {
-      for (const r of await envoyer(lot)) {
+      const reponses = await envoyer(lot)
+      for (const r of reponses) {
         if (r.success) continue
         progres.erreurs.push(`${r.email} — ${r.reason ?? 'Erreur inconnue'}`)
+        progres.erreursCompte += 1
+      }
+      // Shopify a pu répondre pour moins de clients qu'il n'en a reçu : les absents ne sont pas des succès.
+      const repondus = new Set(reponses.map((r) => r.email))
+      for (const absent of lot.filter((e) => !repondus.has(e.email))) {
+        progres.erreurs.push(`${absent.email} — Pas de réponse de Shopify`)
         progres.erreursCompte += 1
       }
     } catch (e) {

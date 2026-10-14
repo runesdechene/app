@@ -162,4 +162,5 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 - **Hub V2 — jeu** : Titres de Compagnie V1 masqués, à purger avec `docs/v2/purge-back.md`.
 - **Hub V2 — jeu** : Une icône ou une image envoyée puis abandonnée sans enregistrer reste dans son bucket.
 - **Hub V2 — fonctions Netlify** : un `netlify/tsconfig.json` + `tsc --noEmit -p netlify` une fois que les copies pourront diverger de l'ancien Hub (après la bascule).
+- **Hub V2 — fonctions Netlify** : l'étape PATCH de `shopify-sync` ignore les codes de réponse (`updated` = taille des lots, même si Shopify ou la base refuse) — à corriger dans la fonction après la bascule.
 - **Hub V2 — fonctions Netlify** : `shopify-callback` ne vérifie ni `state` ni le `hmac` de Shopify (déjà le cas dans l'ancien Hub) ; son HTML renvoie encore vers l'ancienne route `/shopify/sync`.
