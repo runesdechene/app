@@ -45,14 +45,17 @@ function poser(carte: maplibregl.Map, source: string, donnees: GeoJsonDonnees) {
   if (sAlimente(s)) s.setData(donnees)
 }
 
-export function CarteDesCercles({ cercles, eveils, onChange }: { cercles: Cercle[]; eveils: Eveil[]; onChange: (cercles: Cercle[]) => void }) {
+type Props = { cercles: Cercle[]; eveils: Eveil[]; couleur: string | null; onChange: (cercles: Cercle[]) => void }
+
+export function CarteDesCercles({ cercles, eveils, couleur, onChange }: Props) {
   const conteneur = useRef<HTMLDivElement>(null)
   const carte = useRef<maplibregl.Map | null>(null)
   const prete = useRef(false)
+  const accent = useRef('')
   // Les écouteurs de la carte sont posés une fois : ils lisent toujours les dernières valeurs.
-  const dernier = useRef({ cercles, eveils, onChange })
+  const dernier = useRef({ cercles, eveils, couleur, onChange })
   useEffect(() => {
-    dernier.current = { cercles, eveils, onChange }
+    dernier.current = { cercles, eveils, couleur, onChange }
   })
 
   useEffect(() => {
@@ -60,16 +63,20 @@ export function CarteDesCercles({ cercles, eveils, onChange }: { cercles: Cercle
     const m = new maplibregl.Map({ container: conteneur.current, style: STYLE_DE_CARTE, ...cadrage(dernier.current.cercles) })
     carte.current = m
     m.on('load', () => {
-      const accent = getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim()
+      accent.current = getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim()
+      const trait = dernier.current.couleur ?? accent.current
       m.addSource('cercles', { type: 'geojson', data: polygones(dernier.current.cercles) })
       m.addSource('eveils', { type: 'geojson', data: points(dernier.current.eveils) })
-      m.addLayer({ id: 'cercles-fond', type: 'fill', source: 'cercles', paint: { 'fill-color': accent, 'fill-opacity': 0.15 } })
-      m.addLayer({ id: 'cercles-bord', type: 'line', source: 'cercles', paint: { 'line-color': accent, 'line-width': 2 } })
-      m.addLayer({ id: 'eveils', type: 'circle', source: 'eveils', paint: { 'circle-color': accent, 'circle-radius': 5 } })
+      m.addLayer({ id: 'cercles-fond', type: 'fill', source: 'cercles', paint: { 'fill-color': trait, 'fill-opacity': 0.15 } })
+      m.addLayer({ id: 'cercles-bord', type: 'line', source: 'cercles', paint: { 'line-color': trait, 'line-width': 2 } })
+      m.addLayer({ id: 'eveils', type: 'circle', source: 'eveils', paint: { 'circle-color': accent.current, 'circle-radius': 5 } })
       prete.current = true
     })
     m.on('click', (e) => {
-      dernier.current.onChange([...dernier.current.cercles, { lat: e.lngLat.lat, lng: e.lngLat.lng, rayon_km: 50 }])
+      // La base n'accepte que des latitudes de −80 à 80 ; la longitude revient dans −180..180.
+      const { lat, lng } = e.lngLat.wrap()
+      if (Math.abs(lat) > 80) return
+      dernier.current.onChange([...dernier.current.cercles, { lat, lng, rayon_km: 50 }])
     })
     return () => {
       prete.current = false
@@ -80,6 +87,11 @@ export function CarteDesCercles({ cercles, eveils, onChange }: { cercles: Cercle
   useEffect(() => {
     if (carte.current && prete.current) poser(carte.current, 'cercles', polygones(cercles))
   }, [cercles])
+  useEffect(() => {
+    if (!carte.current || !prete.current) return
+    carte.current.setPaintProperty('cercles-fond', 'fill-color', couleur ?? accent.current)
+    carte.current.setPaintProperty('cercles-bord', 'line-color', couleur ?? accent.current)
+  }, [couleur])
   useEffect(() => {
     if (carte.current && prete.current) poser(carte.current, 'eveils', points(eveils))
   }, [eveils])

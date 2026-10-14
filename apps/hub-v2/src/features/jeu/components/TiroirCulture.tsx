@@ -50,7 +50,7 @@ function Formulaire({ fiche }: { fiche: CultureDuHub }) {
     try {
       const adresse = await envoyerFichier(BUCKET, `cultures/${fiche.id}-${String(Date.now())}.${EXTENSIONS[fichier.type] ?? 'png'}`, fichier)
       // Une icône envoyée puis remplacée avant d'enregistrer n'est référencée par personne : on la retire.
-      if (icone && icone !== fiche.icone) await retirerFichier(BUCKET, icone)
+      if (icone && icone !== fiche.icone) await retirerFichier(BUCKET, icone).catch(() => undefined)
       setIcone(adresse)
       ecriture.reset()
     } catch (err) {
@@ -61,7 +61,7 @@ function Formulaire({ fiche }: { fiche: CultureDuHub }) {
   function enregistrer(e: SyntheticEvent) {
     e.preventDefault()
     const erreur = !label.trim() ? 'Une culture a un nom.'
-      : couleur && !COULEUR.test(couleur) ? 'La couleur s’écrit #RRGGBB.'
+      : couleur !== (fiche.couleur ?? '') && couleur && !COULEUR.test(couleur) ? 'La couleur s’écrit #RRGGBB.'
         : active && cercles.length === 0 ? 'Une culture active doit s’éveiller quelque part : ajoute au moins un cercle.'
           : null
     setRefus(erreur)
@@ -73,7 +73,10 @@ function Formulaire({ fiche }: { fiche: CultureDuHub }) {
   }
 
   return (
-    <form className={styles.formulaire} onSubmit={enregistrer} onChange={modifie}>
+    <form className={styles.formulaire} onSubmit={enregistrer} onChange={(e) => {
+      // Le refus d'un fichier vient du champ lui-même : l'événement qui remonte ne l'efface pas.
+      if (!(e.target instanceof HTMLInputElement && e.target.type === 'file')) modifie()
+    }}>
       <label className={styles.champ}>Nom
         <input value={label} onChange={(e) => { setLabel(e.target.value) }} />
       </label>
@@ -102,7 +105,7 @@ function Formulaire({ fiche }: { fiche: CultureDuHub }) {
         <input type="checkbox" checked={active} onChange={(e) => { setActive(e.target.checked) }} /> Active
       </label>
 
-      <CarteDesCercles cercles={cercles} eveils={fiche.eveils} onChange={(suivants) => { setCercles(suivants); modifie() }} />
+      <CarteDesCercles couleur={COULEUR.test(couleur) ? couleur : null} cercles={cercles} eveils={fiche.eveils} onChange={(suivants) => { setCercles(suivants); modifie() }} />
 
       <div>
         <button type="submit" className={styles.boutonContour} disabled={ecriture.isPending}>Enregistrer</button>
