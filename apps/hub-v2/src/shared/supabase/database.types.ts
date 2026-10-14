@@ -7904,10 +7904,20 @@ export type Database = {
       }
       herald_grade_promotions: { Args: never; Returns: undefined }
       histoire_du_lieu: { Args: { p_id: string }; Returns: Json }
+      hub_achats: { Args: never; Returns: Json }
       hub_activer_enigme: {
         Args: { p_active: boolean; p_id: number }
         Returns: undefined
       }
+      hub_associer_achat: {
+        Args: { p_achat: number; p_fragment: number }
+        Returns: undefined
+      }
+      hub_associer_fragment: {
+        Args: { p_fragment: number; p_user: string }
+        Returns: undefined
+      }
+      hub_classer_achat: { Args: { p_achat: number }; Returns: undefined }
       hub_compagnie: { Args: { p_id: string }; Returns: Json }
       hub_compagnies: { Args: never; Returns: Json }
       hub_compte: { Args: { p_id: string }; Returns: Json }
@@ -7920,6 +7930,16 @@ export type Database = {
           p_provenance?: string
           p_recherche?: string
           p_tri?: string
+        }
+        Returns: Json
+      }
+      hub_comptes_clients: { Args: never; Returns: Json }
+      hub_contributions: {
+        Args: {
+          p_decalage?: number
+          p_limite?: number
+          p_recherche?: string
+          p_statut?: string
         }
         Returns: Json
       }
@@ -7951,6 +7971,17 @@ export type Database = {
         }
         Returns: number
       }
+      hub_enregistrer_fragment: {
+        Args: {
+          p_id: number
+          p_origine_lat?: number
+          p_origine_lng?: number
+          p_origine_nom: string
+          p_theme: string
+          p_visible: boolean
+        }
+        Returns: undefined
+      }
       hub_est_admin: { Args: never; Returns: boolean }
       hub_lieux: {
         Args: {
@@ -7973,6 +8004,10 @@ export type Database = {
         Returns: undefined
       }
       hub_ouverture: { Args: { p_periode: string }; Returns: Json }
+      hub_retirer_fragment: {
+        Args: { p_fragment: number; p_user: string }
+        Returns: undefined
+      }
       increment_community_quest: {
         Args: {
           p_amount?: number
