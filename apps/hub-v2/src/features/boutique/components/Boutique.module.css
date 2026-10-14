@@ -185,3 +185,53 @@ a.ligne:hover { background: var(--color-surface); }
   height: 40px;
   border-color: var(--color-accent);
 }
+
+/* La correspondance Shopify : le formulaire en ligne et une ligne par étiquette */
+.enLigne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-3);
+}
+
+.correspondance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.correspondance .nom { flex: 1; }
+
+.debloque {
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.confirmation {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--legende-size);
+}
+
+/* Les achats à associer : une ligne par commande */
+.achat {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+}
+
+.achatEntete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.etiquettes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}

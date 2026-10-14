@@ -12,6 +12,7 @@ import { Balise } from '@/shared/ui/Balise'
 import { Bloc } from '@/shared/ui/Bloc'
 import { EnTeteDePage } from '@/shared/ui/EnTeteDePage'
 import type { Fragment } from '../api/fragments'
+import { useAchats } from '../hooks/useAchats'
 import { useFragments, useScans } from '../hooks/useFragments'
 import { useSynchroFragments } from '../hooks/useSynchroFragments'
 import styles from './Boutique.module.css'
@@ -40,6 +41,7 @@ function LigneDeFragment({ fragment, aFilmer }: { fragment: Fragment; aFilmer: b
 export function Fragments() {
   const { data: fragments, isError } = useFragments()
   const { data: scans } = useScans()
+  const { data: achats } = useAchats()
   const synchro = useSynchroFragments()
 
   // Tant que les scans ne sont pas lus, personne n'est « à filmer » : on ne l'affirme pas.
@@ -63,7 +65,7 @@ export function Fragments() {
           </button>
         }
       />
-      <OngletsFragments />
+      <OngletsFragments achats={achats?.filter((a) => a.statut === 'no_match').length} />
       {synchro.compteRendu && <p className={styles.calme} role="status">{synchro.compteRendu}</p>}
       {synchro.erreur && <p className={styles.erreur} role="alert">{synchro.erreur}</p>}
       {isError && <p className={styles.erreur} role="alert">La base ne répond pas.</p>}

@@ -6,7 +6,7 @@
 import { NavLink } from 'react-router'
 import styles from './Boutique.module.css'
 
-export function OngletsFragments({ achats }: { achats?: number }) {
+export function OngletsFragments({ achats }: { achats?: number | undefined }) {
   return (
     <nav className={styles.onglets} aria-label="Fragments">
       <NavLink className={styles.onglet ?? ''} to="/boutique/fragments" end>Les Fragments</NavLink>

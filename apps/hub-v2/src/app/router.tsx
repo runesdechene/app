@@ -13,6 +13,8 @@ import { TiroirCompagnie } from '@/features/communaute/components/TiroirCompagni
 import { TiroirCompte } from '@/features/communaute/components/TiroirCompte'
 import { TiroirLieu } from '@/features/communaute/components/TiroirLieu'
 import { TiroirFragment } from '@/features/boutique/components/TiroirFragment'
+import { Achats } from '@/features/boutique/components/Achats'
+import { Correspondance } from '@/features/boutique/components/Correspondance'
 import { Fragments } from '@/features/boutique/components/Fragments'
 import { Bannieres } from '@/features/jeu/components/Bannieres'
 import { Cultures } from '@/features/jeu/components/Cultures'
@@ -32,7 +34,7 @@ import { MENU } from './coquille/menu'
 import { PorteDEntree } from './entree/PorteDEntree'
 
 // Les écrans faits quittent « bientôt » ; chaque tâche suivante ajoute le sien.
-const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures', '/jeu/natures', '/jeu/titres', '/jeu/bannieres', '/jeu/energie', '/boutique/fragments'])
+const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures', '/jeu/natures', '/jeu/titres', '/jeu/bannieres', '/jeu/energie', '/boutique/fragments', '/boutique/fragments/correspondance', '/boutique/fragments/achats'])
 
 const autres = MENU.flatMap((d) => d.liens)
   .filter((l) => l.chemin !== '/' && !ECRANS_FAITS.has(l.chemin))
@@ -60,6 +62,8 @@ export const routes: RouteObject[] = [
       { path: 'jeu/enigmes-signalees', Component: EnigmesSignalees },
       { path: 'jeu/energie', Component: Energie },
       { path: 'boutique/fragments', Component: Fragments, children: [{ path: ':id', Component: TiroirFragment }] },
+      { path: 'boutique/fragments/correspondance', Component: Correspondance },
+      { path: 'boutique/fragments/achats', Component: Achats },
       ...autres,
     ],
   },
