@@ -13,6 +13,9 @@
 --         14/10 : une pastille veut dire une action ; les pending se règlent seuls à l'inscription).
 --      8. update_submission_message range un message vidé en NULL (R16) : '' s'affichait ailleurs
 --         (mur « Ils nous portent », l'appli). Corps live (mig 513), seule la ligne SET change.
+--      9. hub_ouverture.sante.derniere_commande ne compte que les lignes du webhook (shopify_order_id
+--         renseigné) : une association à la main (purchase_log 'manual', sans commande) rendait
+--         « Commandes Shopify » vert alors que le webhook pouvait être mort.
 -- SCHEMA CHECKED (14/10/2026, live) : voir le plan 4, Task 1 Step 1 ; _is_admin(), _is_staff(), _refus().
 --      pg_get_functiondef live de get_photo_submissions(text), get_photo_tags(),
 --      get_submission_images_batch(uuid[]), get_submission_tags_batch(uuid[]), hub_ouverture(text)
@@ -352,7 +355,8 @@ $function$;
 REVOKE ALL ON FUNCTION public.hub_enregistrer_fragment(integer, boolean, text, text, double precision, double precision) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.hub_enregistrer_fragment(integer, boolean, text, text, double precision, double precision) TO authenticated;
 
--- 6. La pastille « achats » ne compte que les no_match (corps live = mig 518, une ligne change)
+-- 6. La pastille « achats » ne compte que les no_match, la dernière commande que les commandes
+--    Shopify (corps live = mig 518, deux lignes changent)
 CREATE OR REPLACE FUNCTION public.hub_ouverture(p_periode text)
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -399,7 +403,7 @@ BEGIN
       'achats', (SELECT count(*) FROM purchase_log WHERE status = 'no_match')
     ),
     'sante', jsonb_build_object(
-      'derniere_commande', (SELECT max(created_at) FROM purchase_log),
+      'derniere_commande', (SELECT max(created_at) FROM purchase_log WHERE shopify_order_id IS NOT NULL),
       'notifications', (SELECT count(*) FROM notifications WHERE created_at >= v_debut),
       'notifications_lues', (SELECT count(*) FROM notifications WHERE created_at >= v_debut AND read)
     )
