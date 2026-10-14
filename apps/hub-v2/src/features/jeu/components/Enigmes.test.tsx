@@ -63,3 +63,9 @@ test('« + Nouvelle énigme » garde la recherche', () => {
   monter('/jeu/enigmes?q=qui')
   expect(screen.getByRole('link', { name: '+ Nouvelle énigme' })).toHaveAttribute('href', '/jeu/enigmes/nouvelle?q=qui')
 })
+
+test('une page au-delà de la dernière : l’adresse revient à la dernière page', () => {
+  mockUseEnigmes.mockReturnValue({ data: { ...liste, total: 120 }, isError: false })
+  const router = monter('/jeu/enigmes?q=x&page=9')
+  expect(router.state.location.search).toBe('?q=x&page=3')
+})

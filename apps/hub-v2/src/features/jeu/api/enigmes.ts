@@ -1,5 +1,5 @@
 /**
- * QUOI     — lit les énigmes (hub_enigmes, hub_enigme), les enregistre et les active (mig 519), et lit les cultures.
+ * QUOI     — lit les énigmes (hub_enigmes, hub_enigme), les enregistre (mig 519), et lit les cultures.
  * POURQUOI — une énigme ne se supprime pas (les réponses des joueurs la référencent) : elle se désactive.
  */
 import { supabase } from '@/shared/supabase/client'
@@ -44,11 +44,6 @@ export async function enregistrerEnigme(id: number | null, brouillon: Brouillon)
   const { data, error } = await supabase.rpc('hub_enregistrer_enigme', { ...versEnvoi(brouillon), ...(id !== null && { p_id: id }) })
   if (error) throw new Error(error.message)
   return data
-}
-
-export async function activerEnigme(id: number, oui: boolean): Promise<void> {
-  const { error } = await supabase.rpc('hub_activer_enigme', { p_id: id, p_active: oui })
-  if (error) throw new Error(error.message)
 }
 
 // Lecture publique des cultures (enigma_themes), dans l'ordre du jeu.

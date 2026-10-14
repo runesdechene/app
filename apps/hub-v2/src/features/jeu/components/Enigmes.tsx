@@ -4,6 +4,7 @@
  * POURQUOI — état, culture, difficulté, recherche et page sont dans l'adresse. La liste n'écrit rien :
  *            activer une énigme se fait dans son éditeur (c'est un champ du formulaire).
  */
+import { useEffect } from 'react'
 import { Link, Outlet, useLocation, useSearchParams } from 'react-router'
 import { texteEnClair } from '@/shared/lib/texte'
 import { Balise } from '@/shared/ui/Balise'
@@ -56,6 +57,15 @@ export function Enigmes() {
     decalage: (numeroDePage(params.get('page')) - 1) * PAR_PAGE,
   }
   const { data, isError } = useEnigmes(criteres)
+  // Une page au-delà de la dernière (adresse recopiée, liste raccourcie) : on se replace sur la dernière.
+  const total = data?.total ?? 0
+  useEffect(() => {
+    if (total > 0 && criteres.decalage >= total) {
+      const suivants = new URLSearchParams(params)
+      suivants.set('page', String(Math.ceil(total / PAR_PAGE)))
+      setParams(suivants, { replace: true })
+    }
+  }, [total, criteres.decalage, params, setParams])
   const nomDeCulture = (id: string | null) => (id === null ? 'Universelle' : (cultures.find((c) => c.id === id)?.label ?? id))
 
   function changer(cle: string, valeur: string | null) {

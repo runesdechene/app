@@ -91,3 +91,9 @@ test('une énigme inconnue : « Énigme introuvable » et un lien vers la liste'
   expect(await screen.findByText('Énigme introuvable.')).toBeInTheDocument()
   expect(screen.getByRole('link', { name: 'Retour à la liste' })).toHaveAttribute('href', '/jeu/enigmes')
 })
+
+test('un identifiant qui n’est pas un numéro : introuvable, sans interroger la base', () => {
+  monter('/jeu/enigmes/abc')
+  expect(screen.getByText('Énigme introuvable.')).toBeInTheDocument()
+  expect(mockLireEnigme).not.toHaveBeenCalled()
+})

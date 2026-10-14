@@ -123,6 +123,15 @@ function Formulaire({ fiche }: { fiche: FicheEnigme | null }) {
   )
 }
 
+function Introuvable({ retour }: { retour: string }) {
+  return (
+    <Tiroir titre="Énigme introuvable" retour={retour}>
+      <p>Énigme introuvable.</p>
+      <Link to={retour}>Retour à la liste</Link>
+    </Tiroir>
+  )
+}
+
 function FicheExistante({ id }: { id: number }) {
   const { data, isPending, isError, refetch } = useEnigme(id)
   const retour = LISTE + useLocation().search
@@ -139,14 +148,7 @@ function FicheExistante({ id }: { id: number }) {
       </Tiroir>
     )
   }
-  if (data === null) {
-    return (
-      <Tiroir titre="Énigme introuvable" retour={retour}>
-        <p>Énigme introuvable.</p>
-        <Link to={retour}>Retour à la liste</Link>
-      </Tiroir>
-    )
-  }
+  if (data === null) return <Introuvable retour={retour} />
   // La clé remet le formulaire à zéro quand on passe d'une énigme à l'autre.
   return <Tiroir titre={`Énigme n° ${String(id)}`} retour={retour}><Formulaire key={id} fiche={data} /></Tiroir>
 }
@@ -155,5 +157,7 @@ export function TiroirEnigme() {
   const { id } = useParams()
   const retour = LISTE + useLocation().search
   if (id === undefined) return <Tiroir titre="Nouvelle énigme" retour={retour}><Formulaire fiche={null} /></Tiroir>
+  // Une adresse qui n'est pas un numéro n'interroge pas la base.
+  if (!/^[1-9]\d*$/.test(id)) return <Introuvable retour={retour} />
   return <FicheExistante id={Number(id)} />
 }
