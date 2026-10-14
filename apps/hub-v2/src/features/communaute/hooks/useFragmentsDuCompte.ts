@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { associerFragment, lireFragmentsAssociables, retirerFragment } from '../api/fragmentsDuCompte'
 
 export function useFragmentsAssociables() {
-  return useQuery({ queryKey: ['hub-fragments-associables'], queryFn: lireFragmentsAssociables })
+  return useQuery({ queryKey: ['hub-fragments', 'associables'], queryFn: lireFragmentsAssociables })
 }
 
 // Un Fragment associé ou retiré rafraîchit la fiche et la liste (la colonne « Fragments »).
