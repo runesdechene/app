@@ -77,12 +77,17 @@ describe('PageCadeau', () => {
     )
   })
 
-  it('fonction absente (une page HTML en 404) : un message lisible, jamais « Unexpected token »', async () => {
-    repondre(new Response('<!doctype html><title>Not found</title>', { status: 404 }))
+  it.each([
+    ['fonction absente (une page HTML en 404)', new Response('<!doctype html><title>Not found</title>', { status: 404 })],
+    ['passerelle en panne (502 HTML)', new Response('<html>Bad gateway</html>', { status: 502 })],
+    ['erreur du serveur en anglais (500)', Response.json({ error: 'Shopify create failed' }, { status: 500 })],
+    ['un 200 sans code', Response.json({ success: true })],
+    ['un 200 au code vide', Response.json({ success: true, promoCode: '' })],
+  ])('%s : une seule phrase pour le visiteur', async (_cas, reponse) => {
+    repondre(reponse)
     await envoyer()
     const alerte = await screen.findByRole('alert')
-    expect(alerte).toHaveTextContent('HTTP 404')
-    expect(alerte).not.toHaveTextContent('Unexpected token')
+    expect(alerte).toHaveTextContent(/^Le cadeau n’a pas pu être préparé, réessaie dans un instant\.$/)
   })
 
   it('réseau coupé : « Connexion impossible, réessaie. »', async () => {

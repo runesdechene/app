@@ -3,7 +3,8 @@
 // Calqué sur stand-create-account.ts, MAIS public → garde-fous : idempotence email
 // + rate-limit par IP (table flyer_signup_log). Code promo générique via env FLYER_PROMO_CODE.
 // Copie du Hub V2 (plan 5) : une erreur ne renvoie jamais le texte de Shopify ou de Supabase, qui
-// peut contenir l'e-mail reçu ; seul le statut part dans les journaux de la fonction.
+// peut contenir l'e-mail reçu ; seul le statut part dans les journaux de la fonction. Le `try`
+// couvre tout ce qui parle au réseau : une réponse illisible donne un 500 JSON, pas la page de Netlify.
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -68,54 +69,54 @@ export default async function handler(request: Request) {
 
   const ip = clientIp(request)
 
-  // 0. Rate-limit par IP : compte les tentatives de la dernière heure.
-  const sinceIso = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString()
-  const rlResp = await fetch(
-    `${SUPABASE_URL}/rest/v1/flyer_signup_log?ip=eq.${encodeURIComponent(ip)}&created_at=gte.${encodeURIComponent(sinceIso)}&select=id`,
-    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
-  )
-  if (rlResp.ok) {
-    const rows = await rlResp.json() as Array<{ id: number }>
-    if (Array.isArray(rows) && rows.length >= RATE_LIMIT_MAX) {
-      return json({ error: 'Trop de tentatives, réessaie dans un moment.' }, 429)
-    }
-  }
-
-  // Journalise la tentative (best-effort, ne bloque pas le flow).
-  await fetch(`${SUPABASE_URL}/rest/v1/flyer_signup_log`, {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ ip, email }),
-  })
-
-  // 1. Idempotence : email déjà connu côté Supabase → on réaffiche le code, pas de doublon.
-  const existingResp = await fetch(
-    `${SUPABASE_URL}/rest/v1/users?email_address=eq.${encodeURIComponent(email)}&select=id&limit=1`,
-    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
-  )
-  const existingRows = await existingResp.json() as Array<{ id: string }>
-  if (existingRows.length > 0) {
-    return json({ success: true, action: 'already_exists', promoCode: PROMO_CODE })
-  }
-
-  // 2. Token Shopify (env ou app_settings).
-  let shopifyToken: string | null = process.env.SHOPIFY_ACCESS_TOKEN || null
-  if (!shopifyToken) {
-    const settingsResp = await fetch(`${SUPABASE_URL}/rest/v1/app_settings?key=eq.shopify_access_token&select=value&limit=1`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
-    })
-    const settings = await settingsResp.json()
-    shopifyToken = Array.isArray(settings) && settings.length > 0 ? settings[0].value : null
-  }
-  if (!shopifyToken) return json({ error: 'Shopify not connected' }, 500)
-
-  const shop = 'runes-de-chene.myshopify.com'
-
   try {
+    // 0. Rate-limit par IP : compte les tentatives de la dernière heure.
+    const sinceIso = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString()
+    const rlResp = await fetch(
+      `${SUPABASE_URL}/rest/v1/flyer_signup_log?ip=eq.${encodeURIComponent(ip)}&created_at=gte.${encodeURIComponent(sinceIso)}&select=id`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    )
+    if (rlResp.ok) {
+      const rows = await rlResp.json() as Array<{ id: number }>
+      if (Array.isArray(rows) && rows.length >= RATE_LIMIT_MAX) {
+        return json({ error: 'Trop de tentatives, réessaie dans un moment.' }, 429)
+      }
+    }
+
+    // Journalise la tentative (best-effort, ne bloque pas le flow).
+    await fetch(`${SUPABASE_URL}/rest/v1/flyer_signup_log`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ip, email }),
+    })
+
+    // 1. Idempotence : email déjà connu côté Supabase → on réaffiche le code, pas de doublon.
+    const existingResp = await fetch(
+      `${SUPABASE_URL}/rest/v1/users?email_address=eq.${encodeURIComponent(email)}&select=id&limit=1`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    )
+    const existingRows = await existingResp.json() as Array<{ id: string }>
+    if (existingRows.length > 0) {
+      return json({ success: true, action: 'already_exists', promoCode: PROMO_CODE })
+    }
+
+    // 2. Token Shopify (env ou app_settings).
+    let shopifyToken: string | null = process.env.SHOPIFY_ACCESS_TOKEN || null
+    if (!shopifyToken) {
+      const settingsResp = await fetch(`${SUPABASE_URL}/rest/v1/app_settings?key=eq.shopify_access_token&select=value&limit=1`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+      })
+      const settings = await settingsResp.json()
+      shopifyToken = Array.isArray(settings) && settings.length > 0 ? settings[0].value : null
+    }
+    if (!shopifyToken) return json({ error: 'Shopify not connected' }, 500)
+
+    const shop = 'runes-de-chene.myshopify.com'
+
     // 3. Customer Shopify existant ? (achat antérieur sans inscription app)
     let customerId: number | null = null
     const searchResp = await fetch(

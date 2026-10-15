@@ -268,14 +268,18 @@ describe('flyer-create-account : publique, donc freinée', () => {
   const IP = '203.0.113.7'
 
   // `essais` : ce que la table flyer_signup_log rend pour cette IP sur la dernière heure.
-  function simuler(essais: number, shopify: Response = new Response('{}', { status: 500 })) {
+  function simuler(
+    essais: number,
+    shopify: Response = new Response('{}', { status: 500 }),
+    comptes: Response = Response.json([]),
+  ) {
     const appels: { url: string; methode: string }[] = []
     vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
       appels.push({ url, methode: init?.method ?? 'GET' })
       if (url.includes('/rest/v1/flyer_signup_log?')) {
         return Promise.resolve(Response.json(Array.from({ length: essais }, (_, i) => ({ id: i }))))
       }
-      if (url.includes('/rest/v1/users?email_address')) return Promise.resolve(Response.json([]))
+      if (url.includes('/rest/v1/users?email_address')) return Promise.resolve(comptes.clone())
       if (url.includes('/customers/search.json')) return Promise.resolve(Response.json({ customers: [] }))
       if (url.includes('/admin/api/')) return Promise.resolve(shopify.clone())
       return Promise.resolve(new Response(null, { status: 201 }))
@@ -323,5 +327,13 @@ describe('flyer-create-account : publique, donc freinée', () => {
     expect(JSON.stringify(await r.json())).not.toContain('claire@exemple.fr')
     expect(JSON.stringify(journal.mock.calls)).not.toContain('claire@exemple.fr')
     journal.mockRestore()
+  })
+
+  test('une réponse illisible de Supabase à la recherche du compte : 500 en JSON, pas la page de Netlify', async () => {
+    simuler(0, undefined, new Response('<html>Bad gateway</html>', { status: 502 }))
+    const handler = await charger('flyer-create-account')
+    const r = await handler(demander('{"email":"claire@exemple.fr"}'))
+    expect(r.status).toBe(500)
+    expect(await r.json()).toEqual({ error: 'Unexpected error' })
   })
 })
