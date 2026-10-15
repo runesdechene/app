@@ -23,3 +23,7 @@ test('un appel javascript: est ignoré', () => {
   expect(html).not.toContain('javascript:')
   expect(html).not.toContain('Piège')
 })
+
+test('un lien Markdown javascript: est neutralisé', () => {
+  expect(versHtml('[x](javascript:alert(1))')).not.toContain('javascript:')
+})

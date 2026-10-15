@@ -6,13 +6,14 @@
  *            (plus besoin de publier dans l'app). Le fichier choisi ne s'envoie qu'à l'enregistrement ; l'erreur de la
  *            fonction, ou du marquage « publié », est dite telle quelle.
  */
-import { useEffect, useState, type ChangeEvent, type SyntheticEvent } from 'react'
+import { useEffect, useMemo, useState, type ChangeEvent, type SyntheticEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { verifierFichier } from '@/shared/lib/envoi'
 import { ChoixSegmente } from '@/shared/ui/ChoixSegmente'
 import { Tiroir } from '@/shared/ui/Tiroir'
 import type { Article, TypeArticle } from '../api/blog'
 import { useBlog, useCreerArticle, useEnregistrerArticle, usePublierArticle } from '../hooks/useBlog'
+import { versHtml } from '../lib/markdown'
 import { REGLE_IMAGE } from '../lib/miseAJour'
 import styles from './Joueurs.module.css'
 
@@ -20,7 +21,6 @@ const LISTE = '/joueurs/blog'
 const TYPES: { valeur: TypeArticle; libelle: string }[] = [
   { valeur: 'produit', libelle: 'produit' }, { valeur: 'app', libelle: 'app' }, { valeur: 'marque', libelle: 'marque' },
 ]
-const typeDe = (t: string): TypeArticle => (t === 'app' || t === 'marque' ? t : 'produit')
 
 function Creation() {
   const { search } = useLocation()
@@ -52,7 +52,7 @@ function Formulaire({ fiche }: { fiche: Article }) {
   const enregistrer = useEnregistrerArticle()
   const publier = usePublierArticle()
   const [titre, setTitre] = useState(fiche.title)
-  const [type, setType] = useState<TypeArticle>(typeDe(fiche.type))
+  const [type, setType] = useState(fiche.type) // un type inconnu reste tel quel tant qu'on n'en choisit pas un autre
   const [texte, setTexte] = useState(fiche.body)
   const [ctaUrl, setCtaUrl] = useState(fiche.cta_url ?? '')
   const [ctaLibelle, setCtaLibelle] = useState(fiche.cta_label ?? '')
@@ -67,6 +67,7 @@ function Formulaire({ fiche }: { fiche: Article }) {
   }, [choix])
 
   const image = choix?.apercu ?? (retirer ? null : fiche.cover_image)
+  const apercu = useMemo(() => versHtml(texte, { url: ctaUrl, libelle: ctaLibelle }), [texte, ctaUrl, ctaLibelle])
   const occupe = enregistrer.isPending || publier.isPending
   const brouillon = { titre, type, texte, ctaUrl, ctaLibelle, fichier: choix?.fichier ?? null, retirer }
 
@@ -98,13 +99,20 @@ function Formulaire({ fiche }: { fiche: Article }) {
           onClick={() => { setChoix(null); setRetirer(true) }}>Retirer la couverture</button>
       )}
 
-      <ChoixSegmente nom="Type" options={TYPES} choisi={type} onChoix={setType} />
+      <ChoixSegmente<string> nom="Type" options={TYPES} choisi={type} onChoix={setType} />
       <label className={styles.champ}>Titre
         <input value={titre} onChange={(e) => { setTitre(e.target.value) }} />
       </label>
-      <div className={styles.champ}>
-        <label htmlFor="texte-article">Texte</label>
-        <textarea id="texte-article" value={texte} rows={14} onChange={(e) => { setTexte(e.target.value) }} />
+      <div className={styles.redaction}>
+        <div className={styles.champ}>
+          <label htmlFor="texte-article">Texte</label>
+          <textarea id="texte-article" value={texte} rows={14} onChange={(e) => { setTexte(e.target.value) }} />
+        </div>
+        <div className={styles.champ}>
+          Aperçu
+          {/* versHtml passe par DOMPurify : le HTML est sûr. */}
+          <div className={styles.apercu} data-testid="apercu" dangerouslySetInnerHTML={{ __html: apercu }} />
+        </div>
       </div>
       <p className={styles.aide}>Markdown : « ## » pour un titre, « - » pour une liste, « ** » autour d’un mot pour le mettre en gras.</p>
       <label className={styles.champ}>Lien du bouton

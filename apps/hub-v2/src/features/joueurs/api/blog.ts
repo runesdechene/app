@@ -15,7 +15,14 @@ import { BUCKET, cheminDeImage } from '../lib/miseAJour'
 export type Article = Tables<'announcements'>
 export type TypeArticle = 'produit' | 'app' | 'marque'
 export type Brouillon = {
-  titre: string; type: TypeArticle; texte: string; ctaUrl: string; ctaLibelle: string; fichier: File | null; retirer: boolean
+  titre: string; type: string; texte: string; ctaUrl: string; ctaLibelle: string; fichier: File | null; retirer: boolean
+}
+
+/** Shopify a l'article mais la base ne l'a pas noté : l'identifiant sert à l'essai suivant, qui met à jour au lieu de recréer. */
+export class MarquageEchoue extends Error {
+  constructor(message: string, readonly articleId: string, cause: unknown) {
+    super(message, { cause })
+  }
 }
 
 const messageDe = (e: unknown) => (e instanceof Error ? e.message : String(e))
@@ -79,5 +86,5 @@ export async function publierSurLaBoutique(article: Article): Promise<void> {
   const { error } = await supabase.rpc('set_announcement_channel', {
     p_id: article.id, p_channel: 'blog', p_state: 'published', p_shopify_article_id: article_id,
   })
-  if (error) throw new Error(`Publié sur la boutique, mais la base ne l’a pas noté : ${error.message}`, { cause: error })
+  if (error) throw new MarquageEchoue(`Publié sur la boutique, mais la base ne l’a pas noté : ${error.message}`, article_id, error)
 }
