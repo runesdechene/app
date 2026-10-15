@@ -99,7 +99,8 @@ export default async function handler(request: Request) {
     article: {
       title: announcement.title,
       body_html: announcement.body_html ?? '',
-      ...(announcement.cover_image ? { image: { src: announcement.cover_image } } : {}),
+      // Sans couverture, une mise à jour envoie image: null : Shopify retire l'ancienne (la couverture est facultative).
+      ...(announcement.cover_image ? { image: { src: announcement.cover_image } } : shopify_article_id ? { image: null } : {}),
       tags: announcement.type ? `annonce,${announcement.type}` : 'annonce',
     },
   }

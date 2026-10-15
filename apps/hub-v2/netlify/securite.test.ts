@@ -229,3 +229,37 @@ describe('shopify-batch-tags : la requête GraphQL', () => {
     expect(((await r.json()) as { error: string }).error).toContain('Access denied')
   })
 })
+
+describe('shopify-article : l’image de l’article', () => {
+  // Admin valide, un blog configuré ; on garde le corps envoyé à Shopify.
+  function simuler() {
+    const envoyes: { methode: string | undefined; corps: { article: Record<string, unknown> } }[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
+      if (url.includes('/auth/v1/user')) return Promise.resolve(Response.json({ id: 'u0' }))
+      if (url.includes('/rest/v1/users?select=role')) return Promise.resolve(Response.json([{ role: 'admin' }]))
+      if (url.includes('app_settings')) return Promise.resolve(Response.json([{ value: '99' }]))
+      envoyes.push({ methode: init?.method, corps: JSON.parse(String(init?.body)) as { article: Record<string, unknown> } })
+      return Promise.resolve(Response.json({ article: { id: 7 } }))
+    }))
+    return envoyes
+  }
+  const appeler = async (annonce: object, id: string | null) => {
+    const handler = await charger('shopify-article')
+    return handler(post(JSON.stringify({ announcement: annonce, shopify_article_id: id }), { Authorization: 'Bearer jwt' }))
+  }
+
+  test('sans couverture, la mise à jour envoie image: null : Shopify retire l’ancienne', async () => {
+    const envoyes = simuler()
+    const r = await appeler({ title: 'T', body_html: '<p>x</p>', cover_image: '', type: 'app' }, '7')
+    expect(r.status).toBe(200)
+    expect(envoyes[0]?.methode).toBe('PUT')
+    expect(envoyes[0]?.corps.article).toHaveProperty('image', null)
+  })
+
+  test('avec une couverture, l’image part avec son adresse', async () => {
+    const envoyes = simuler()
+    await appeler({ title: 'T', body_html: '', cover_image: 'https://x/c.png', type: 'app' }, null)
+    expect(envoyes[0]?.methode).toBe('POST')
+    expect(envoyes[0]?.corps.article).toHaveProperty('image', { src: 'https://x/c.png' })
+  })
+})

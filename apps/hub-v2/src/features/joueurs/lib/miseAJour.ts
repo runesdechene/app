@@ -12,7 +12,7 @@ export const REGLE_IMAGE: RegleFichier = { types: ['image/jpeg', 'image/png', 'i
 
 const EXTENSIONS: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }
 
-export const cheminDeImage = (fichier: File) => `mise-a-jour-${String(Date.now())}.${EXTENSIONS[fichier.type] ?? 'jpg'}`
+export const cheminDeImage = (fichier: File, prefixe = 'mise-a-jour') => `${prefixe}-${String(Date.now())}.${EXTENSIONS[fichier.type] ?? 'jpg'}`
 
 export function estPubliable(titre: string, texte: string): boolean {
   const t = titre.trim().length
