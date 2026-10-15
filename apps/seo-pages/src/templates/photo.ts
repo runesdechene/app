@@ -14,7 +14,7 @@ export function renderPhoto(input: {
   url: string;
 }): string {
   const premiere = input.photos[0]?.url;
-  const texte = input.texteDePartage.replace('{name}', input.nom);
+  const texte = input.texteDePartage.replaceAll('{name}', input.nom);
   return `<header class="photo">
   ${premiere ? `<img id="photo-du-lieu" src="${echapper(aLaTaille(premiere, 1440))}" alt="${echapper(input.nom)}" fetchpriority="high" />` : ''}
   <a class="logo" href="/bienvenue"><img src="/lieu/_static/logo-explore-clair.webp" alt="Runes de Chêne Explore" width="197" height="45" /></a>

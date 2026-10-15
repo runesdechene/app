@@ -14,6 +14,7 @@ import copier from '@/assets/ui/copier.svg'
 import partager from '@/assets/ui/partager-encre.svg'
 import { Feuille } from '@/shared/ui/Feuille'
 import type { FicheLieu } from '../api/lireLieu'
+import { usePhraseDePartage } from '../hooks/usePhraseDePartage'
 import styles from './Feuilles.module.css'
 
 const DUREE_COPIE = 2000
@@ -27,7 +28,7 @@ export function FeuillePartager({
   onFermer: () => void
 }) {
   const [copie, setCopie] = useState(false)
-  const phrase = `J’ai trouvé ${fiche.nom} sur Runes de Chêne EXPLORE - tu connais ?`
+  const phrase = usePhraseDePartage(fiche.nom)
   const lien = fiche.slug
     ? `${PAGES_PUBLIQUES}${fiche.slug}`
     : `${window.location.origin}${import.meta.env.BASE_URL}carte/lieu/${fiche.id}`
