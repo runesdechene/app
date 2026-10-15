@@ -14,7 +14,10 @@ vi.mock('@/shared/lib/envoi', async (orig) => ({
 vi.mock('@/shared/supabase/client', () => ({
   supabase: {
     from: () => ({
-      select: () => ({ in: () => Promise.resolve({ data: LIGNES, error: null }) }),
+      select: () => ({
+        in: () => Promise.resolve({ data: LIGNES, error: null }),
+        eq: () => ({ neq: () => Promise.resolve({ data: AUTRES_CLES, error: null }) }),
+      }),
       upsert: mockUpsert,
     }),
   },
@@ -22,6 +25,7 @@ vi.mock('@/shared/supabase/client', () => ({
 
 const ANCIENNE = 'https://x/storage/v1/object/public/app-assets/landing-image-desktop-1.jpg'
 const NOUVELLE = 'https://x/storage/v1/object/public/app-assets/landing-image-desktop-2.png'
+let AUTRES_CLES: { key: string }[] = []
 const LIGNES = [
   { key: 'share_text_template', value: 'Un trésor t’attend : {name}.', updated_at: '2026-10-12T10:00:00Z' },
   { key: 'landing_image_desktop_url', value: ANCIENNE, updated_at: '2026-10-01T10:00:00Z' },
@@ -37,6 +41,7 @@ function monter() {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  AUTRES_CLES = []
   mockUpsert.mockResolvedValue({ error: null })
   mockEnvoyer.mockResolvedValue(NOUVELLE)
   mockRetirer.mockResolvedValue(undefined)
@@ -109,4 +114,15 @@ test('sur téléphone, les liens « Parler aux joueurs » viennent avant le text
   expect(screen.getByRole('link', { name: /Blog de la boutique/ })).toHaveAttribute('href', '/joueurs/blog')
   const partage = await screen.findByRole('heading', { name: 'Le texte de partage' })
   expect(liens.compareDocumentPosition(partage) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+})
+
+test('une ancienne image encore utilisée par une autre clé n’est pas effacée', async () => {
+  AUTRES_CLES = [{ key: 'studio_bg_image_url' }]
+  monter()
+  await screen.findByLabelText('La phrase')
+  await userEvent.upload(screen.getByLabelText('Remplacer l’image'), new File(['x'], 'n.png', { type: 'image/png' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer l’image' }))
+  await waitFor(() => { expect(mockUpsert).toHaveBeenCalledTimes(1) })
+  await screen.findByText('Image enregistrée.')
+  expect(mockRetirer).not.toHaveBeenCalled()
 })

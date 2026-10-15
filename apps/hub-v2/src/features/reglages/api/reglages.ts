@@ -3,7 +3,7 @@
  *            (table app_settings, une ligne par clé), et envoie la nouvelle image dans le bucket app-assets.
  * POURQUOI — écriture directe (politique app_settings_admin_write, admins) en upsert : l'ancien update ne faisait
  *            rien si la ligne manquait. Le fichier choisi ne part qu'à l'enregistrement ; l'ancien quitte le bucket
- *            une fois la base à jour, et un upsert qui échoue défait l'envoi.
+ *            une fois la base à jour (sauf si une autre clé la montre encore), et un upsert qui échoue défait l'envoi.
  */
 import { envoyerFichier, retirerFichier } from '@/shared/lib/envoi'
 import { supabase } from '@/shared/supabase/client'
@@ -38,6 +38,13 @@ const EXTENSIONS: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': '
 
 const messageDe = (e: unknown) => (e instanceof Error ? e.message : String(e))
 
+// Une autre clé (le fond de /soumettre-contenu) peut pointer vers le même fichier : on ne l'efface pas sous elle.
+async function encoreUtilisee(adresse: string): Promise<boolean> {
+  const { data, error } = await supabase.from('app_settings').select('key').eq('value', adresse).neq('key', CLE_IMAGE)
+  if (error) throw new Error(`Enregistrée, mais l’ancienne image n’a pas pu être vérifiée : ${error.message}`)
+  return data.length > 0
+}
+
 /** Envoie le fichier, écrit l'adresse, puis retire l'ancienne image ; le retrait qui échoue est dit comme un succès partiel. */
 export async function remplacerImageSeo(fichier: File, ancienne: string): Promise<void> {
   const chemin = `landing-image-desktop-${String(Date.now())}.${EXTENSIONS[fichier.type] ?? 'jpg'}`
@@ -48,7 +55,7 @@ export async function remplacerImageSeo(fichier: File, ancienne: string): Promis
     await retirerFichier(BUCKET, adresse).catch(() => undefined)
     throw e
   }
-  if (!ancienne) return
+  if (!ancienne || (await encoreUtilisee(ancienne))) return
   try {
     await retirerFichier(BUCKET, ancienne)
   } catch (e) {
