@@ -1,0 +1,69 @@
+/*
+ * QUOI     — les deux mises en page des pages publiques (voir PagePublique.tsx).
+ * POURQUOI — le parchemin vient de la DA (global.css, body::before) ; la bascule PC suit la
+ *            largeur, comme la coquille du Hub (900 px).
+ */
+.page {
+  min-height: var(--hauteur-ecran);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+}
+
+/* Colonne : la photo en haut, la colonne en dessous. */
+.page[data-disposition='colonne'] .contenu {
+  width: min(100% - 2 * var(--space-6), 420px);
+  margin-inline: auto;
+  padding-block: var(--space-6);
+}
+
+/* Carte : au téléphone, la carte prend la page ; la photo ne se montre que sur PC. */
+.page[data-disposition='carte'] {
+  display: grid;
+}
+
+.page[data-disposition='carte'] .photo {
+  display: none;
+}
+
+@container app (width >= 900px) {
+  /* Colonne : la photo à gauche sur toute la hauteur, la colonne au milieu de la moitié droite. */
+  .page[data-disposition='colonne'] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+
+  .page[data-disposition='colonne'] .photo {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: var(--hauteur-ecran);
+  }
+
+  .page[data-disposition='colonne'] .contenu {
+    grid-column: 2;
+  }
+
+  /* Carte : la photo couvre la page sous un voile, la carte au centre. */
+  .page[data-disposition='carte'] {
+    place-items: center;
+    padding: var(--space-6) 14px;
+  }
+
+  .page[data-disposition='carte'] .photo {
+    display: block;
+    position: fixed;
+    inset: 0;
+  }
+
+  .page[data-disposition='carte'] .photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--color-ombre) 42%, transparent);
+  }
+
+  .page[data-disposition='carte'] .contenu {
+    position: relative;
+  }
+}

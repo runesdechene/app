@@ -2,6 +2,8 @@
  * QUOI     — toutes les adresses du Hub V2.
  * POURQUOI — tout état navigable est une URL (spec Hub V2 §4) ; le menu (coquille/menu.ts) est la
  *            liste des adresses, l'accueil a son écran, les autres attendent leur plan.
+ *            Les trois pages publiques (QR imprimés, spec §3) passent AVANT la porte : sœurs de
+ *            `/`, chargées à la demande, elles n'appellent jamais `hub_est_admin`.
  */
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { Ouverture } from '@/features/accueil/components/Ouverture'
@@ -51,6 +53,11 @@ const autres = MENU.flatMap((d) => d.liens)
   .map((l) => ({ path: l.chemin.slice(1), Component: BientotIci }))
 
 export const routes: RouteObject[] = [
+  // `lazy` en fonction, pas en objet : la forme objet ne charge qu'une fois par définition de
+  // route ; un second routeur bâti sur ces mêmes routes (les tests) répond alors 404.
+  { path: 'soumettre-contenu', lazy: async () => ({ Component: (await import('@/public/soumettre/PageSoumettre')).PageSoumettre }) },
+  { path: 'flyer', lazy: async () => ({ Component: (await import('@/public/flyer/PageFlyer')).PageFlyer }) },
+  { path: 'flyercadeau', lazy: async () => ({ Component: (await import('@/public/cadeau/PageCadeau')).PageCadeau }) },
   {
     path: '/',
     element: (

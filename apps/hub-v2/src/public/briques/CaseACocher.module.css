@@ -1,0 +1,45 @@
+/*
+ * QUOI     — case de 22 px, filet de 1,5 px, coins de 6 px ; cochée, rouge avec la coche crème
+ *            (Figma 604:1444 et 604:1447). Texte Cabin 14.
+ */
+.ligne {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  color: var(--color-texte);
+  font-size: var(--sous-titre-size);
+  line-height: var(--corps-leading);
+  cursor: pointer;
+}
+
+.case {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border: 1.5px solid var(--color-bord);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--color-sur-accent) 70%, transparent) center / 14px no-repeat;
+  appearance: none;
+  cursor: pointer;
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.case:checked {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  background-image: url('../../assets/ui/coche.svg');
+}
+
+.case:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case {
+    transition: none;
+  }
+}
