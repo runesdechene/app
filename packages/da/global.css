@@ -43,6 +43,14 @@ body::before {
   pointer-events: none;
 }
 
+/* Écran couché : le même parchemin tourné d'un quart, la frise à droite. */
+@media (orientation: landscape) {
+  body::before {
+    background-image: url('./fond-parchemin-paysage.webp');
+    background-position: right center;
+  }
+}
+
 button {
   font: inherit;
   cursor: pointer;
