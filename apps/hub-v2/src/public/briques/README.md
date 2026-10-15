@@ -4,3 +4,4 @@ Les briques des pages publiques, d'après la maquette Figma « Hub V2 — pages 
 - `Champ` : la carte bordée du flyer cadeau, libellé Bebas et saisie soulignée.
 - `CaseACocher` : une vraie case, redessinée ; son texte la coche aussi.
 - `MessageDErreur` : l'encart rouge pâle, annoncé aux lecteurs d'écran.
+- `PhotoFlyer` : la photo du flyer à lisière ondulée, pour la place `photo` de `PagePublique` (`telephone={false}` la cache sous 900 px).

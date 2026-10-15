@@ -13,6 +13,7 @@ import chevron from '@/assets/flyer/chevron.svg'
 import fellowship from '@/assets/flyer/fellowship.png'
 import instagram from '@/assets/flyer/instagram.svg'
 import logo from '@/assets/flyer/logo-slogan.webp'
+import { PhotoFlyer } from '../briques/PhotoFlyer'
 import { PagePublique } from '../PagePublique'
 import styles from './PageFlyer.module.css'
 
@@ -62,7 +63,7 @@ const LIENS: Lien[] = [
 
 export function PageFlyer() {
   return (
-    <PagePublique photo={<img src="/flyer-photo.webp" alt="" className={styles.photo} />}>
+    <PagePublique photo={<PhotoFlyer />}>
       <h1 className={styles.logo}>
         <img src={logo} alt="Runes de Chêne — Portez l’histoire" />
       </h1>

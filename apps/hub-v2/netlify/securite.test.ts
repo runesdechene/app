@@ -263,3 +263,65 @@ describe('shopify-article : l’image de l’article', () => {
     expect(envoyes[0]?.corps.article).toHaveProperty('image', { src: 'https://x/c.png' })
   })
 })
+
+describe('flyer-create-account : publique, donc freinée', () => {
+  const IP = '203.0.113.7'
+
+  // `essais` : ce que la table flyer_signup_log rend pour cette IP sur la dernière heure.
+  function simuler(essais: number, shopify: Response = new Response('{}', { status: 500 })) {
+    const appels: { url: string; methode: string }[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
+      appels.push({ url, methode: init?.method ?? 'GET' })
+      if (url.includes('/rest/v1/flyer_signup_log?')) {
+        return Promise.resolve(Response.json(Array.from({ length: essais }, (_, i) => ({ id: i }))))
+      }
+      if (url.includes('/rest/v1/users?email_address')) return Promise.resolve(Response.json([]))
+      if (url.includes('/customers/search.json')) return Promise.resolve(Response.json({ customers: [] }))
+      if (url.includes('/admin/api/')) return Promise.resolve(shopify.clone())
+      return Promise.resolve(new Response(null, { status: 201 }))
+    }))
+    return appels
+  }
+  const demander = (corps: string) =>
+    post(corps, { 'x-nf-client-connection-ip': IP, 'Content-Type': 'application/json' })
+
+  test('sans e-mail valide : 400, rien n’est appelé, la valeur reçue n’est pas renvoyée', async () => {
+    const appels = simuler(0)
+    const handler = await charger('flyer-create-account')
+    const r = await handler(demander('{"email":"pas-un-email"}'))
+    expect(r.status).toBe(400)
+    expect(JSON.stringify(await r.json())).not.toContain('pas-un-email')
+    expect(appels).toEqual([])
+  })
+
+  test('la 16ᵉ demande de la même IP dans l’heure : 429, ni Shopify ni compte', async () => {
+    const appels = simuler(15)
+    const handler = await charger('flyer-create-account')
+    const r = await handler(demander('{"email":"claire@exemple.fr"}'))
+    expect(r.status).toBe(429)
+    expect(typeof ((await r.json()) as { error: unknown }).error).toBe('string')
+    expect(appels[0]?.url).toContain(`ip=eq.${IP}`)
+    expect(appels.some((a) => a.url.includes('/admin/api/'))).toBe(false)
+    expect(appels.some((a) => a.methode === 'POST')).toBe(false)
+  })
+
+  test('la 15ᵉ passe le frein et ne parle qu’à la boutique Runes de Chêne', async () => {
+    const appels = simuler(14)
+    const handler = await charger('flyer-create-account')
+    await handler(demander('{"email":"claire@exemple.fr"}'))
+    const shopify = appels.filter((a) => a.url.includes('/admin/api/'))
+    expect(shopify.length).toBeGreaterThan(0)
+    expect(shopify.every((a) => a.url.startsWith(`https://${BOUTIQUE}/`))).toBe(true)
+  })
+
+  test('un refus de Shopify ne renvoie ni l’e-mail ni le texte de Shopify', async () => {
+    const journal = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    simuler(0, new Response('{"errors":{"email":["claire@exemple.fr is invalid"]}}', { status: 422 }))
+    const handler = await charger('flyer-create-account')
+    const r = await handler(demander('{"email":"claire@exemple.fr"}'))
+    expect(r.status).toBe(500)
+    expect(JSON.stringify(await r.json())).not.toContain('claire@exemple.fr')
+    expect(JSON.stringify(journal.mock.calls)).not.toContain('claire@exemple.fr')
+    journal.mockRestore()
+  })
+})

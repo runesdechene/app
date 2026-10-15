@@ -74,7 +74,7 @@ test('/communaute/comptes ouvre l’écran des comptes, pas « bientôt »', asy
 const PAGES_PUBLIQUES = [
   { adresse: '/flyer', titre: /^Runes de Chêne/ },
   { adresse: '/flyer/', titre: /^Runes de Chêne/ },
-  { adresse: '/flyercadeau', titre: 'Un mouvement s’éveille' },
+  { adresse: '/flyercadeau', titre: /un mouvement s’éveille$/ },
   { adresse: '/soumettre-contenu?quete=hoplite', titre: 'Envoyer mes contenus' },
   { adresse: '/soumettre-contenu/', titre: 'Envoyer mes contenus' },
 ]
