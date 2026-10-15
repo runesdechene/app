@@ -77,7 +77,7 @@ export function PageCadeau() {
   }
 
   return (
-    <PagePublique photo={<PhotoFlyer telephone={false} />}>
+    <PagePublique titre="Ton cadeau — Runes de Chêne" photo={<PhotoFlyer telephone={false} />}>
       <div className={styles.page}>
         <a href={BOUTIQUE} className={styles.retour}>
           ← Retourner sur la boutique

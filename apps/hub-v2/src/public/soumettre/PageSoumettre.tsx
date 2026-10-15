@@ -184,7 +184,7 @@ export function PageSoumettre() {
   }
 
   return (
-    <PagePublique disposition="carte" photo={fond ? <img className={styles.fond} src={fond} alt="" /> : undefined}>
+    <PagePublique titre="Envoyer mes contenus — Runes de Chêne" disposition="carte" photo={fond ? <img className={styles.fond} src={fond} alt="" /> : undefined}>
       {corps}
     </PagePublique>
   )

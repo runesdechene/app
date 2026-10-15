@@ -25,6 +25,11 @@ afterEach(() => {
 })
 
 describe('PageCadeau', () => {
+  it('donne son titre à l’onglet', () => {
+    render(<PageCadeau />)
+    expect(document.title).toBe('Ton cadeau — Runes de Chêne')
+  })
+
   it('garde le bouton inactif tant que l’e-mail n’est pas valide', async () => {
     render(<PageCadeau />)
     const bouton = screen.getByRole('button', { name: 'Recevoir mon cadeau' })

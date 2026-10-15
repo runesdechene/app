@@ -63,7 +63,7 @@ const LIENS: Lien[] = [
 
 export function PageFlyer() {
   return (
-    <PagePublique photo={<PhotoFlyer />}>
+    <PagePublique titre="Runes de Chêne" photo={<PhotoFlyer />}>
       <h1 className={styles.logo}>
         <img src={logo} alt="Runes de Chêne — Portez l’histoire" />
       </h1>
