@@ -298,6 +298,37 @@ describe('flyer-create-account : publique, donc freinée', () => {
     expect(appels).toEqual([])
   })
 
+  test.each([
+    ['un espace', '{"email":"claire @exemple.fr"}'],
+    ['une requête Shopify glissée', '{"email":"claire@exemple.fr OR email:x@y.fr"}'],
+  ])('un e-mail avec %s : 400, rien n’est appelé', async (_, corps) => {
+    const appels = simuler(0)
+    const handler = await charger('flyer-create-account')
+    const r = await handler(demander(corps))
+    expect(r.status).toBe(400)
+    expect(appels).toEqual([])
+  })
+
+  test('compte déjà connu ou tout juste créé : la même réponse, rien ne dit lequel', async () => {
+    simuler(0, Response.json({ customer: { id: 42 } }))
+    const handler = await charger('flyer-create-account')
+    const cree = await handler(demander('{"email":"claire@exemple.fr"}'))
+    simuler(0, undefined, Response.json([{ id: 'u1' }]))
+    const connu = await (await charger('flyer-create-account'))(demander('{"email":"claire@exemple.fr"}'))
+    expect(cree.status).toBe(200)
+    expect(await cree.json()).toEqual({ success: true, promoCode: 'CONFRERIE' })
+    expect(await connu.json()).toEqual({ success: true, promoCode: 'CONFRERIE' })
+  })
+
+  test('ni CORS ouvert ni pré-requête : seul POST passe', async () => {
+    simuler(0)
+    const handler = await charger('flyer-create-account')
+    const options = await handler(new Request('http://localhost/fonction', { method: 'OPTIONS' }))
+    expect(options.status).toBe(405)
+    const r = await handler(demander('{"email":"pas-un-email"}'))
+    expect(r.headers.get('Access-Control-Allow-Origin')).toBeNull()
+  })
+
   test('la 16ᵉ demande de la même IP dans l’heure : 429, ni Shopify ni compte', async () => {
     const appels = simuler(15)
     const handler = await charger('flyer-create-account')

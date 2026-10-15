@@ -5,6 +5,9 @@
 // Copie du Hub V2 (plan 5) : une erreur ne renvoie jamais le texte de Shopify ou de Supabase, qui
 // peut contenir l'e-mail reçu ; seul le statut part dans les journaux de la fonction. Le `try`
 // couvre tout ce qui parle au réseau : une réponse illisible donne un 500 JSON, pas la page de Netlify.
+// L'e-mail est vérifié ici, pas seulement dans la page : il part dans une recherche Shopify. La
+// réponse est la même pour un compte connu ou créé (rien ne dit qui est inscrit), et aucun en-tête
+// CORS : le seul appelant est la page /flyer, sur le même domaine.
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -12,6 +15,9 @@ const PROMO_CODE = process.env.FLYER_PROMO_CODE || 'CONFRERIE'
 
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000 // 1 heure
 const RATE_LIMIT_MAX = 15 // tentatives max par IP et par fenêtre
+
+// La même règle que la page /flyercadeau.
+const EMAIL_VALIDE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 // Le consentement à la newsletter Shopify, daté du moment où il est donné.
 function abonne() {
@@ -21,7 +27,7 @@ function abonne() {
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+    headers: { 'Content-Type': 'application/json' },
   })
 }
 
@@ -43,16 +49,6 @@ function buildTags(existing: string): string {
 }
 
 export default async function handler(request: Request) {
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-    })
-  }
-
   if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
   if (!SUPABASE_URL || !SUPABASE_KEY) return json({ error: 'Missing Supabase env vars' }, 500)
 
@@ -65,7 +61,7 @@ export default async function handler(request: Request) {
   } catch {
     return json({ error: 'Invalid JSON' }, 400)
   }
-  if (!email || !email.includes('@')) return json({ error: 'Invalid email' }, 400)
+  if (!EMAIL_VALIDE.test(email)) return json({ error: 'Invalid email' }, 400)
 
   const ip = clientIp(request)
 
@@ -101,7 +97,7 @@ export default async function handler(request: Request) {
     )
     const existingRows = await existingResp.json() as Array<{ id: string }>
     if (existingRows.length > 0) {
-      return json({ success: true, action: 'already_exists', promoCode: PROMO_CODE })
+      return json({ success: true, promoCode: PROMO_CODE })
     }
 
     // 2. Token Shopify (env ou app_settings).
@@ -194,7 +190,7 @@ export default async function handler(request: Request) {
       return json({ error: 'Supabase insert failed' }, 500)
     }
 
-    return json({ success: true, action: 'created', promoCode: PROMO_CODE })
+    return json({ success: true, promoCode: PROMO_CODE })
   } catch {
     return json({ error: 'Unexpected error' }, 500)
   }
