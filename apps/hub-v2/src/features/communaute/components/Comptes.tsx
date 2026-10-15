@@ -22,7 +22,7 @@ const FILTRES: { valeur: Filtre; libelle: string }[] = [
   { valeur: 'sommeil', libelle: 'En sommeil' }, { valeur: 'porteurs', libelle: 'Porteurs' }, { valeur: 'equipe', libelle: 'Équipe' },
 ]
 const TRIS: { valeur: Tri; libelle: string }[] = [
-  { valeur: 'visite', libelle: 'Dernière visite' }, { valeur: 'inscription', libelle: 'Inscription' }, { valeur: 'nom', libelle: 'Nom' },
+  { valeur: 'inscription', libelle: 'Inscription' }, { valeur: 'visite', libelle: 'Dernière visite' }, { valeur: 'nom', libelle: 'Nom' },
 ]
 function numeroDePage(texte: string | null): number {
   const page = Math.floor(Number(texte))
@@ -38,7 +38,7 @@ export function Comptes() {
     recherche: params.get('q') ?? '',
     provenance: params.get('provenance'),
     departement: params.get('departement'),
-    tri: TRIS.find((t) => t.valeur === params.get('tri'))?.valeur ?? 'visite',
+    tri: TRIS.find((t) => t.valeur === params.get('tri'))?.valeur ?? 'inscription',
     limite: PAR_PAGE,
     decalage: (numeroDePage(params.get('page')) - 1) * PAR_PAGE,
   }
@@ -58,7 +58,7 @@ export function Comptes() {
 
   function changer(cle: string, valeur: string | null) {
     const suivants = new URLSearchParams(params)
-    if (valeur === null || valeur === '' || (cle === 'filtre' && valeur === 'tous') || (cle === 'tri' && valeur === 'visite')) suivants.delete(cle)
+    if (valeur === null || valeur === '' || (cle === 'filtre' && valeur === 'tous') || (cle === 'tri' && valeur === 'inscription')) suivants.delete(cle)
     else suivants.set(cle, valeur)
     if (cle !== 'page') suivants.delete('page')
     setParams(suivants)

@@ -85,3 +85,11 @@ test('« + Compte du stand » mène à /nouveau en gardant les critères de la l
   monter('/communaute/comptes?filtre=porteurs')
   expect(screen.getByRole('link', { name: '+ Compte du stand' })).toHaveAttribute('href', '/communaute/comptes/nouveau?filtre=porteurs')
 })
+
+test('l’inscription au jour près, et la liste triée par inscription par défaut', () => {
+  mockUseComptes.mockReturnValue({ data: liste, isError: false })
+  monter()
+  expect(screen.getByText('14/10/2026')).toBeInTheDocument()
+  expect(screen.getByRole('combobox', { name: 'Trier' })).toHaveValue('inscription')
+  expect(mockUseComptes).toHaveBeenLastCalledWith(expect.objectContaining({ tri: 'inscription' }))
+})
