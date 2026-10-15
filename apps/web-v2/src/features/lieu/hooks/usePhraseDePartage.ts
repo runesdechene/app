@@ -4,7 +4,8 @@
  *            rarement : une heure de cache.
  */
 import { useQuery } from '@tanstack/react-query'
-import { lireModeleDePartage, phraseDePartage } from '../api/phraseDePartage'
+import { lireModeleDePartage } from '../api/modeleDePartage'
+import { phraseDePartage } from '../lib/phraseDePartage'
 
 const UNE_HEURE = 60 * 60 * 1000
 

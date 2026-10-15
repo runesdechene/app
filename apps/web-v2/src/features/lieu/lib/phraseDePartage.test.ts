@@ -10,3 +10,7 @@ test.each([[null], [''], ['   '], ['Un trésor t’attend.']])('le modèle %j do
 test('{name} devient le nom du lieu, partout où il apparaît', () => {
   expect(phraseDePartage('{name} ! Viens voir {name}.', 'Jonjeac')).toBe('Jonjeac ! Viens voir Jonjeac.')
 })
+
+test('un nom avec $& ou $\' reste tel quel', () => {
+  expect(phraseDePartage('Viens voir {name} !', 'Fort $& $\' Lac')).toBe('Viens voir Fort $& $\' Lac !')
+})

@@ -29,7 +29,7 @@ interface RenderPageInput {
   nearby: NearbyPlace[];
   numeros: Map<string, string>;
   nombreDeLieux: number;
-  texteDePartage: string;
+  texteDePartage: string | null;
 }
 
 export function renderPage(input: RenderPageInput): string {

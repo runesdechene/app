@@ -68,7 +68,7 @@ function TexteDePartage({ depart }: { depart: LesReglages }) {
           </div>
           <p className={styles.aide}>
             {'{name}'} devient le nom du lieu, partout où il apparaît. Explore et les pages /lieu lisent cette phrase ;
-            vide ou sans {'{name}'}, Explore garde la sienne.
+            vide ou sans {'{name}'}, les deux gardent leur phrase d’origine, celle de l’aperçu.
           </p>
           <div className={styles.champ}>
             <p className={styles.etiquette}>Aperçu — {NOM_D_EXEMPLE}</p>
