@@ -6,8 +6,9 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
-import { createMemoryRouter, RouterProvider } from 'react-router'
+import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router'
 import { vi } from 'vitest'
+import { MENU, ONGLETS } from './coquille/menu'
 import { routes } from './router'
 
 const { faux } = vi.hoisted(() => ({
@@ -71,6 +72,20 @@ test('une adresse inconnue renvoie à l’accueil', async () => {
 test('/communaute/comptes ouvre l’écran des comptes, pas « bientôt »', async () => {
   monter('/communaute/comptes')
   expect(await screen.findByRole('heading', { name: 'Les comptes' })).toBeInTheDocument()
+})
+
+// Chaque adresse du menu et des onglets a sa route écrite (plus de « bientôt »).
+function cheminsRoutes(liste: RouteObject[], base = ''): string[] {
+  return liste.flatMap((r) => {
+    const chemin = r.index ? base || '/' : `${base}/${r.path ?? ''}`.replace(/\/+/g, '/')
+    return [chemin, ...cheminsRoutes(r.children ?? [], chemin === '/' ? '' : chemin)]
+  })
+}
+
+test('chaque adresse du menu et des onglets a sa route', () => {
+  const connues = new Set(cheminsRoutes(routes))
+  const attendues = [...MENU.flatMap((d) => d.liens), ...ONGLETS].map((l) => l.chemin)
+  for (const chemin of attendues) expect(connues, chemin).toContain(chemin)
 })
 
 const PAGES_PUBLIQUES = [

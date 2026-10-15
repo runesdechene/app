@@ -1,7 +1,7 @@
 /**
  * QUOI     — toutes les adresses du Hub V2.
  * POURQUOI — tout état navigable est une URL (spec Hub V2 §4) ; le menu (coquille/menu.ts) est la
- *            liste des adresses, l'accueil a son écran, les autres attendent leur plan.
+ *            liste des adresses, et chaque adresse du menu a sa route écrite ici (un test le garde).
  *            Les trois pages publiques (QR imprimés, spec §3) passent AVANT la porte : sœurs de
  *            `/`, chargées à la demande, elles n'appellent jamais `hub_est_admin`.
  */
@@ -40,17 +40,8 @@ import { TiroirEnigme } from '@/features/jeu/components/TiroirEnigme'
 import { TiroirNature } from '@/features/jeu/components/TiroirNature'
 import { TiroirTitre } from '@/features/jeu/components/TiroirTitre'
 import { Reglages } from '@/features/reglages/components/Reglages'
-import { BientotIci } from './coquille/BientotIci'
 import { Coquille } from './coquille/Coquille'
-import { MENU } from './coquille/menu'
 import { PorteDEntree } from './entree/PorteDEntree'
-
-// Les écrans faits quittent « bientôt » ; chaque tâche suivante ajoute le sien.
-const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures', '/jeu/natures', '/jeu/titres', '/jeu/bannieres', '/jeu/energie', '/boutique/fragments', '/boutique/fragments/correspondance', '/boutique/fragments/achats', '/boutique/photos', '/boutique/audio', '/boutique/synchro', '/joueurs/mises-a-jour', '/joueurs/notifications', '/joueurs/blog', '/reglages'])
-
-const autres = MENU.flatMap((d) => d.liens)
-  .filter((l) => l.chemin !== '/' && !ECRANS_FAITS.has(l.chemin))
-  .map((l) => ({ path: l.chemin.slice(1), Component: BientotIci }))
 
 export const routes: RouteObject[] = [
   // `lazy` en fonction, pas en objet : la forme objet ne charge qu'une fois par définition de
@@ -88,7 +79,6 @@ export const routes: RouteObject[] = [
       { path: 'joueurs/notifications', Component: Notifications },
       { path: 'joueurs/blog', Component: Blog, children: [{ path: 'nouveau', Component: TiroirArticle }, { path: ':id', Component: TiroirArticle }] },
       { path: 'reglages', Component: Reglages },
-      ...autres,
     ],
   },
   { path: '*', element: <Navigate to="/" replace /> },
