@@ -1,0 +1,238 @@
+/*
+ * QUOI     — la mise en page des écrans de la Boutique : l'écran, les onglets des Fragments, la liste des
+ *            Fragments et celle des motifs Shopify sans Fragment, la fiche d'un Fragment et sa carte d'origine.
+ */
+.ecran {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.calme {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-texte-doux);
+}
+
+.erreur {
+  margin: 0;
+  color: var(--color-accent);
+}
+
+.boutonContour {
+  justify-self: start;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  background: none;
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--sous-titre-size);
+  color: var(--color-texte);
+  text-decoration: none;
+}
+
+.boutonContour:disabled {
+  opacity: 0.5;
+}
+
+/* Les onglets des Fragments */
+.onglets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.onglet {
+  padding-bottom: var(--space-1);
+  border-bottom: 2px solid transparent;
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--sous-titre-size);
+  color: var(--color-texte-doux);
+  text-decoration: none;
+}
+
+.onglet[aria-current='page'] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* Les lignes : un Fragment, un motif */
+.ligne {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--duree-douce) var(--courbe-douce);
+}
+
+a.ligne:hover { background: var(--color-surface); }
+
+.vignette {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-rond);
+  background: var(--color-vignette);
+  object-fit: cover;
+}
+
+.nom {
+  display: grid;
+  justify-items: start;
+  min-width: 0;
+  color: var(--color-encre);
+}
+
+.nom span {
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.actions {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-1);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.intro {
+  margin: 0;
+  color: var(--color-texte-doux);
+}
+
+/* La fiche d'un Fragment */
+.section {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.formulaire {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.champ {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.champ input, .champ select {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-petit);
+  background: var(--color-fond);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  color: var(--color-encre);
+}
+
+.paragraphes {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.apercu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.pastilleDeCulture {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-rond);
+  background: var(--couleur);
+}
+
+.uneVue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+/* La carte des origines et ses marqueurs (créés par MapLibre, hors de React : classes globales) */
+.carteDOrigine {
+  height: 320px;
+  border-radius: var(--radius-petit);
+  overflow: hidden;
+}
+
+.carteDOrigine :global(.pastilleDOrigine) {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--color-fond);
+  border-radius: var(--radius-rond);
+  background: var(--color-vignette) var(--image) center / cover;
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  color: var(--color-encre);
+}
+
+.carteDOrigine :global(.pastilleDOrigineChoisie) {
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  border-color: var(--color-accent);
+}
+
+/* La correspondance Shopify : le formulaire en ligne et une ligne par étiquette */
+.enLigne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-3);
+}
+
+.correspondance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.correspondance .nom { flex: 1; }
+
+.debloque {
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.confirmation {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--legende-size);
+}
+
+/* Les achats à associer : une ligne par commande */
+.achat {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+}
+
+.achatEntete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.etiquettes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}

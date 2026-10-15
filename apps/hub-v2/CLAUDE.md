@@ -10,4 +10,4 @@ Règles communes : `CLAUDE.md` racine. Règles de construction : `.claude/rules/
 
 pnpm --filter hub-v2 dev | test | lint | build
 pnpm --filter hub-v2 gen:types   # après chaque migration qui touche le Hub
-cd apps/hub-v2 && netlify deploy --prod --dir "$PWD/dist" --no-build   # site rdc-hub-v2 seulement
+cd apps/hub-v2 && netlify deploy --prod --dir "$PWD/dist" --functions "$PWD/netlify/functions" --no-build --site=5d04dcdd-6374-4e8b-a0f4-fcef64a707f3

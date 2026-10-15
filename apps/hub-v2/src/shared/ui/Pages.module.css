@@ -1,0 +1,24 @@
+.pages {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--flux-size);
+  color: var(--color-texte-doux);
+}
+
+.boutons {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.boutons button {
+  border: 0;
+  background: none;
+  font-weight: var(--weight-semi);
+  color: var(--color-accent);
+}
+
+.boutons button:disabled {
+  color: var(--color-texte-pale);
+}

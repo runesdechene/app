@@ -78,6 +78,6 @@ les deux rebuilds Graphify ci-dessus.
 ## Repo voisin — thème Shopify
 
 `../shopify (Runes de Chêne)/`, repo séparé (pas de fusion). Il consomme des RPC anon d'ici :
-`get_community_photos_by_product` (mur « Ils nous portent ») et `get_fragment_unlocks_by_product`
+`get_community_photos_by_product` (mur « Ils nous portent ») et `get_fragment_unlocks_by_tag`
 (bloc app-unlock). **Les modifier casse une section du thème** → vérifier dans ses `sections/`.
 Le Hub pousse avis et photos vers la boutique. Graphify n'indexe pas le Liquid.

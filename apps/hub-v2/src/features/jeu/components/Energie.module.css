@@ -1,0 +1,58 @@
+/*
+ * QUOI     — l'écran de l'Énergie : les champs en grille et la règle redessinée (segments de distance, points de jauge).
+ */
+.champs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.regle {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.segments, .jauge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.segment {
+  flex: 1 1 6rem;
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-petit);
+  background: var(--color-surface);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+.segment strong { color: var(--color-encre); }
+
+.point {
+  width: var(--space-4);
+  height: var(--space-4);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-petit);
+}
+.plein { background: var(--color-accent); }
+
+.legende {
+  margin: 0;
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.pied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}

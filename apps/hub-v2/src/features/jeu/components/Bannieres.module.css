@@ -1,0 +1,118 @@
+/*
+ * QUOI     — la grille des cartes de bannières, l'aperçu tel qu'il paraît sur l'Accueil d'Explore et le champ d'envoi.
+ *            L'aperçu reprend la bannière de la V2 (apps/web-v2/.../Banniere.module.css) : 140 px de haut, image,
+ *            voile, texte calé en bas à gauche ; les couleurs viennent de la fiche, en variables.
+ */
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.carte {
+  display: grid;
+  gap: var(--space-2);
+  color: inherit;
+  text-decoration: none;
+}
+
+.carte img {
+  display: block;
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: var(--radius-carte);
+  border: 1px solid var(--color-bord);
+}
+
+.legende {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--color-encre);
+}
+
+/* Le champ de fichier se cache, son étiquette fait le bouton. */
+.envoi {
+  cursor: pointer;
+}
+
+.envoi:focus-within {
+  outline: 2px solid var(--color-encre);
+  outline-offset: 2px;
+}
+
+.envoi input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.apercu {
+  position: relative;
+  height: 140px;
+  overflow: hidden;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+}
+
+.apercu img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.voile {
+  position: absolute;
+  inset: 0;
+  background: var(--degrade);
+}
+
+.texte {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-6);
+  text-shadow: var(--ombre-texte);
+}
+
+.tag {
+  font-family: var(--font-condensee);
+  font-size: var(--pilule-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  color: var(--teinte-tag);
+  text-transform: uppercase;
+}
+
+.titre {
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--bandeau-titre-tracking);
+  line-height: var(--titre-leading);
+  color: var(--teinte-titre);
+  text-transform: uppercase;
+}
+
+.sousTitre {
+  font-family: var(--font-inscription);
+  font-size: var(--flux-size);
+  font-style: italic;
+  line-height: var(--dense-leading);
+  color: var(--teinte-sous-titre);
+}
+
+.reglage {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}

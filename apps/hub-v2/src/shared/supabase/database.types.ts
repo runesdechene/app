@@ -5501,6 +5501,7 @@ export type Database = {
           email_address: string
           energy_points: number
           energy_reset_at: string
+          entree_v2_le: string | null
           erudition_points: number
           exploration_points: number
           faction_change_count: number
@@ -5572,6 +5573,7 @@ export type Database = {
           email_address: string
           energy_points?: number
           energy_reset_at?: string
+          entree_v2_le?: string | null
           erudition_points?: number
           exploration_points?: number
           faction_change_count?: number
@@ -5643,6 +5645,7 @@ export type Database = {
           email_address?: string
           energy_points?: number
           energy_reset_at?: string
+          entree_v2_le?: string | null
           erudition_points?: number
           exploration_points?: number
           faction_change_count?: number
@@ -6773,6 +6776,24 @@ export type Database = {
         Returns: boolean
       }
       _hasard_fixe: { Args: { p_texte: string }; Returns: number }
+      _hub_comptes_base: {
+        Args: never
+        Returns: {
+          avatar: string
+          client: boolean
+          code: string
+          departement: string
+          derniere_visite: string
+          email: string
+          entree_v2: string
+          fragments: number
+          id: string
+          inscrit: string
+          nom: string
+          provenance: string
+          role: string
+        }[]
+      }
       _hub_pouls: { Args: { p_debut: string; p_fin: string }; Returns: Json }
       _is_admin: { Args: never; Returns: boolean }
       _is_staff:
@@ -7883,8 +7904,110 @@ export type Database = {
       }
       herald_grade_promotions: { Args: never; Returns: undefined }
       histoire_du_lieu: { Args: { p_id: string }; Returns: Json }
+      hub_achats: { Args: never; Returns: Json }
+      hub_activer_enigme: {
+        Args: { p_active: boolean; p_id: number }
+        Returns: undefined
+      }
+      hub_associer_achat: {
+        Args: { p_achat: number; p_fragment: number }
+        Returns: undefined
+      }
+      hub_associer_fragment: {
+        Args: { p_fragment: number; p_user: string }
+        Returns: undefined
+      }
+      hub_classer_achat: { Args: { p_achat: number }; Returns: undefined }
+      hub_compagnie: { Args: { p_id: string }; Returns: Json }
+      hub_compagnies: { Args: never; Returns: Json }
+      hub_compte: { Args: { p_id: string }; Returns: Json }
+      hub_comptes: {
+        Args: {
+          p_decalage?: number
+          p_departement?: string
+          p_filtre?: string
+          p_limite?: number
+          p_provenance?: string
+          p_recherche?: string
+          p_tri?: string
+        }
+        Returns: Json
+      }
+      hub_comptes_clients: { Args: never; Returns: Json }
+      hub_contributions: {
+        Args: {
+          p_decalage?: number
+          p_limite?: number
+          p_recherche?: string
+          p_statut?: string
+        }
+        Returns: Json
+      }
+      hub_enigme: { Args: { p_id: number }; Returns: Json }
+      hub_enigmes: {
+        Args: {
+          p_actives?: string
+          p_culture?: string
+          p_decalage?: number
+          p_difficulte?: string
+          p_limite?: number
+          p_recherche?: string
+        }
+        Returns: Json
+      }
+      hub_enregistrer_enigme: {
+        Args: {
+          p_active: boolean
+          p_choix: Json
+          p_culture?: string
+          p_difficulte: string
+          p_explication: string
+          p_format: string
+          p_id?: number
+          p_question: string
+          p_recit: string
+          p_reponse: string
+          p_variantes: string[]
+        }
+        Returns: number
+      }
+      hub_enregistrer_fragment: {
+        Args: {
+          p_id: number
+          p_origine_lat?: number
+          p_origine_lng?: number
+          p_origine_nom: string
+          p_theme: string
+          p_visible: boolean
+        }
+        Returns: undefined
+      }
       hub_est_admin: { Args: never; Returns: boolean }
+      hub_lieux: {
+        Args: {
+          p_decalage?: number
+          p_filtre?: string
+          p_limite?: number
+          p_nature?: string
+          p_recherche?: string
+        }
+        Returns: Json
+      }
+      hub_modifier_compagnie: {
+        Args: {
+          p_couleur: string
+          p_devise: string
+          p_id: string
+          p_mission: string
+          p_nom: string
+        }
+        Returns: undefined
+      }
       hub_ouverture: { Args: { p_periode: string }; Returns: Json }
+      hub_retirer_fragment: {
+        Args: { p_fragment: number; p_user: string }
+        Returns: undefined
+      }
       increment_community_quest: {
         Args: {
           p_amount?: number

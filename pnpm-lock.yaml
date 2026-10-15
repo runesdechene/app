@@ -82,6 +82,9 @@ importers:
 
   apps/hub-v2:
     dependencies:
+      '@mediapipe/tasks-vision':
+        specifier: 1.1.0
+        version: 1.1.0
       '@runes/da':
         specifier: workspace:*
         version: link:../../packages/da
@@ -91,6 +94,12 @@ importers:
       '@tanstack/react-query':
         specifier: 5.104.0
         version: 5.104.0(react@19.3.0)
+      jszip:
+        specifier: 3.10.1
+        version: 3.10.1
+      maplibre-gl:
+        specifier: 6.11.2
+        version: 6.11.2
       react:
         specifier: 19.3.0
         version: 19.3.0

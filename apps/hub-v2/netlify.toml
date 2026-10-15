@@ -1,7 +1,22 @@
 # QUOI     — le site Netlify du Hub V2 (préparation, puis hub.runesdechene.com à la bascule).
-# POURQUOI — une appli d'une page : toute adresse sert index.html, le routeur fait le reste.
+# POURQUOI — une appli d'une page : toute adresse sert index.html, le routeur fait le reste. Les
+#            fonctions (Shopify, compte du stand) sont celles de l'ancien Hub, déménagées.
 [build]
   publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@supabase/supabase-js"]
+
+[functions."shopify-sync"]
+  timeout = 60
+
+[functions."shopify-callback"]
+  timeout = 15
+
+[functions."shopify-proxy"]
+  timeout = 15
 
 [[redirects]]
   from = "/*"

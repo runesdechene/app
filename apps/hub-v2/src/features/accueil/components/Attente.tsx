@@ -16,7 +16,7 @@ export function Attente({ attente, maintenant }: { attente: Ouverture['attente']
     { nombre: attente.lieux, titre: 'Lieux à modérer', vers: '/communaute/lieux', detail: 'Ajoutés depuis la bascule, jamais vérifiés' },
     { nombre: attente.signalements_lieu, titre: 'Signalements de lieux', vers: '/communaute/signalements', detail: 'Pas encore traités' },
     { nombre: attente.signalements_enigme, titre: 'Énigmes signalées', vers: '/jeu/enigmes-signalees', detail: 'Pas encore traitées' },
-    { nombre: attente.achats, titre: 'Achats à associer à la main', vers: '/boutique/fragments', detail: 'Commandes sans compte trouvé' },
+    { nombre: attente.achats, titre: 'Achats à associer à la main', vers: '/boutique/fragments/achats', detail: 'Commandes sans Fragment trouvé' },
   ].filter((l) => l.nombre > 0)
 
   return (

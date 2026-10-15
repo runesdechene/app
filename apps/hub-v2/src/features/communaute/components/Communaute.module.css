@@ -1,0 +1,212 @@
+/*
+ * QUOI     — la mise en page des écrans de la Communauté : listes en grille sur PC, compactes au téléphone.
+ */
+.ecran {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.tuiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.barre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+.air { flex: 1; }
+
+.calme {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-texte-doux);
+}
+
+.choix, .boutonContour {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  background: none;
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--sous-titre-size);
+  color: var(--color-texte);
+}
+
+.entetesCompte { display: none; }
+
+.ligneCompte {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  grid-template-areas: 'portrait qui chevron';
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--duree-douce) var(--courbe-douce);
+}
+.ligneCompte:hover { background: var(--color-surface); }
+
+.portrait {
+  grid-area: portrait;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-rond);
+  background: var(--color-vignette);
+  object-fit: cover;
+}
+
+.qui {
+  grid-area: qui;
+  display: grid;
+  min-width: 0;
+}
+
+.nomEtBalises {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.nom {
+  font-weight: var(--weight-semi);
+  color: var(--color-encre);
+}
+
+.detail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.colonne, .nombre {
+  display: none;
+  font-size: var(--flux-size);
+  color: var(--color-texte);
+}
+
+.chevron {
+  grid-area: chevron;
+  width: 16px;
+  opacity: 0.5;
+}
+
+@container app (width >= 900px) {
+  .tuiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+  .entetesCompte, .ligneCompte {
+    grid-template-columns: 32px minmax(0, 1fr) 170px 150px 70px 120px 90px 16px;
+    grid-template-areas: none;
+  }
+
+  .entetesCompte {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4) var(--space-2);
+    font-family: var(--font-condensee);
+    font-weight: var(--weight-gras);
+    font-size: var(--micro-size);
+    letter-spacing: var(--pilule-tracking);
+    text-transform: uppercase;
+    color: var(--color-texte-pale);
+  }
+  .portrait, .qui, .chevron { grid-area: auto; }
+  .colonne, .nombre { display: block; }
+
+  .nombre {
+    text-align: center;
+    color: var(--color-encre);
+  }
+}
+
+/* La fiche d'un compte (tiroir) */
+.identite {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.grandPortrait {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-rond);
+  background: var(--color-vignette);
+  object-fit: cover;
+}
+
+.nomFiche {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+  color: var(--color-encre);
+}
+
+.parcours {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-4);
+}
+
+.quatre {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.ligneFiche {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+}
+
+.vignette {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-petit);
+  background: var(--color-vignette);
+  object-fit: cover;
+}
+
+/* Le compte du stand : un formulaire simple, un champ par ligne */
+.formulaire {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.champ {
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.champ input {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-petit);
+  background: none;
+  font: inherit;
+  font-size: var(--flux-size);
+  color: var(--color-texte);
+}
+
+.caseACocher {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}

@@ -19,7 +19,7 @@ const OTHER_ZONE = {
 }
 
 export default tseslint.config(
-  { ignores: ['dist', 'src/shared/supabase/database.types.ts'] },
+  { ignores: ['dist', 'netlify', 'src/shared/supabase/database.types.ts'] },
   {
     files: ['**/*.{ts,tsx}'],
     extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],

@@ -6,6 +6,7 @@
 import { useSearchParams } from 'react-router'
 import type { Periode } from '../api/ouverture'
 import { useOuverture } from '../hooks/useOuverture'
+import { useSanteBoutique } from '../hooks/useSanteBoutique'
 import { Attente } from './Attente'
 import { EnTete } from './EnTete'
 import { FilDActivite } from './FilDActivite'
@@ -20,6 +21,7 @@ export function Ouverture() {
   const brute = params.get('periode')
   const periode: Periode = VALIDES.find((p) => p === brute) ?? 'semaine'
   const { data, isError, refetch } = useOuverture(periode)
+  const boutique = useSanteBoutique()
   const maintenant = new Date()
 
   function choisirPeriode(p: Periode) {
@@ -41,7 +43,7 @@ export function Ouverture() {
           <Pouls pouls={data.pouls} avant={data.avant} />
           <div className={styles.paire}>
             <Attente attente={data.attente} maintenant={maintenant} />
-            <Sante sante={data.sante} maintenant={maintenant} />
+            <Sante sante={data.sante} boutique={boutique} maintenant={maintenant} />
           </div>
         </>
       )}

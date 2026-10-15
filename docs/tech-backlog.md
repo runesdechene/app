@@ -143,9 +143,8 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 
 ## Hub V2 (14/10/2026)
 
-- **Hub V2 — santé** : Synchro Shopify et fiches publiques dans « La santé » (plan 4, avec les
-  fonctions Netlify) ; la reconstruction nocturne des fiches n'écrit son résultat nulle part de
-  lisible (spec Hub V2 §13.4).
+- **Hub V2 — santé** : la version d'Explore (`app_settings.explore.version`) dans « La santé » ; la santé des
+  fiches publiques ne voit pas un déploiement réussi mais vide.
 - **Hub V2 — fil et santé, reste de la spec §9/§10** : recherche par Explorateur ou lieu ; lien de
   chaque ligne du fil vers sa page ; « Porteur » dans le détail d'un compte ; nature du lieu et
   nombre de photos ; nombre de photos d'une contribution ; lignes `purchase_log` sous Boutique ;
@@ -153,3 +152,21 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
   Compagnie) et les types de notification (plus d'identifiants bruts) ; déconnexion depuis la
   coquille ; fenêtre de comparaison de « Aujourd'hui » (en attente de la décision d'Uriel).
 - **Hub V2 — image de fond** : une grande image de parchemin (≥ 2 880 px) pour le PC (spec §13.5).
+- **Hub V2 — communauté** : Associer un Fragment à la main depuis la fiche d'un compte (plan 4).
+- **Hub V2 — communauté** : Membres d'une Compagnie : pas de retrait ni de changement de rôle par l'équipe (YAGNI, à demander).
+- **Hub V2 — communauté** : Signalements → fiche de modération : fermer la fiche ramène aux Lieux, pas à la file (passer un retour).
+- **Hub V2 — communauté** : Export CSV des comptes limité à 10 000 lignes.
+- **Hub V2 — jeu** : Énigmes : pas de suppression (on désactive) ; pas de filtre « Universelle » (`hub_enigmes` ne filtre pas sur une culture nulle).
+- **Hub V2 — jeu** : Cultures et natures : ni création de culture ni suppression de nature.
+- **Hub V2 — jeu** : Titres de Compagnie V1 masqués, à purger avec `docs/v2/purge-back.md`.
+- **Hub V2 — jeu** : Une icône ou une image envoyée puis abandonnée sans enregistrer reste dans son bucket.
+- **Hub V2 — fonctions Netlify** : un `netlify/tsconfig.json` + `tsc --noEmit -p netlify` une fois que les copies pourront diverger de l'ancien Hub (après la bascule).
+- **Hub V2 — fonctions Netlify** : `shopify-callback` ne vérifie ni `state` ni le `hmac` de Shopify (déjà le cas dans l'ancien Hub) ; son HTML renvoie encore vers l'ancienne route `/shopify/sync`.
+- **Hub V2 — boutique** : Photos et avis : filtres par rôle et par étiquette, suppression d'une étiquette, Missions V1 non repris (R7).
+- **Hub V2 — boutique** : les gardes de la base sont mêlées (`_is_staff` sur les écritures de photo, `_is_admin` sur `hub_contributions` et sur la policy DELETE du stockage) : sans conséquence tant que le Hub est réservé aux admins ; à aligner à l’arrivée des modérateurs (chantier C).
+- **Hub V2 — boutique** : Fragments en attente pour un e-mail sans compte non repris (le compte du stand le remplace).
+- **Hub V2 — bascule (plan 5)** : repointer le webhook `orders/paid` vers le nouveau site et vérifier `SHOPIFY_WEBHOOK_SECRET` (la copie refuse toute requête sans signature, 500 sans secret).
+- **Hub V2 — bascule (plan 5)** : déménager `flyer-create-account` avec la page `/flyercadeau` (R2b).
+- **Hub V2 — bascule (plan 5)** : faire tourner les clés exposées — le secret client Shopify (`SHOPIFY_CLIENT_SECRET`), la clé Resend (`resend_api_key`), `email_trigger_secret` et `push_trigger_secret` ; **pas** la clé VAPID (la changer obligerait chaque joueur à réactiver ses notifications ; seule, la clé privée n'atteint aucun abonné sans leurs adresses d'envoi privées) — décision d'Uriel du 14/10.
+- **Hub V2 — bascule (plan 5)** : supprimer l'ancien site referme ses trous (fonctions sans garde, webhook sans signature, `shopify-callback` sur n'importe quelle boutique) — il n'est pas corrigé d'ici là (décision d'Uriel).
+- **Thème Shopify** : il appelle `get_approved_photos_by_tag`, absente de la base (relevé du 14/10) — à vérifier dans `../shopify (Runes de Chêne)/`.

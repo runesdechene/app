@@ -1,0 +1,99 @@
+/*
+ * QUOI     — la mise en page des Écoutes : tuiles (2 par ligne, 4 sur PC), verdict, trois relevés de
+ *            couverture côte à côte sur PC, une ligne par Fragment.
+ */
+.ecran {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.tuiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.verdict {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  color: var(--color-encre);
+}
+
+.calme {
+  margin: 0;
+  color: var(--color-texte-doux);
+}
+
+.erreur {
+  margin: 0;
+  color: var(--color-accent);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.releves {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.releve {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+}
+
+.releveTitre {
+  margin: 0;
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-semi);
+  color: var(--color-encre);
+}
+
+.releveNombre {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--vitrine-lieux-titre-pc-size);
+  line-height: 1;
+  color: var(--color-encre);
+}
+
+.noms {
+  margin: 0;
+  padding-left: var(--space-4);
+  color: var(--color-texte);
+}
+
+.fragment {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  list-style: none;
+}
+
+.fragmentNom {
+  color: var(--color-encre);
+}
+
+.fragmentMesures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  color: var(--color-texte-doux);
+}
+
+@container app (width >= 900px) {
+  .tuiles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .releves {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
