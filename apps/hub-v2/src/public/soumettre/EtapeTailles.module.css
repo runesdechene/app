@@ -1,0 +1,99 @@
+/*
+ * QUOI     — étape 2 : le contenu en grand, les tailles, les points (StudioSubmit.css, .studio__stage,
+ *            __shot, __sizes, __sz, __count, __dots).
+ * ÉCARTS   — #d8c39a = --color-vignette ; #fffaf0 = --color-sur-accent ; #46352e =
+ *            --color-boutique-brun ; #2a2418 = --color-ombre ; #963e3e = --color-fiche-badge ;
+ *            9 px de coins = --radius-petit (8 px) ; 16 px = --radius-carte (15 px) ; .8rem =
+ *            --flux-size.
+ */
+.scene {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-4);
+  align-items: center;
+  justify-content: center;
+  padding: 14px 0;
+}
+
+.cliche {
+  width: 200px;
+  height: 250px;
+  border-radius: var(--radius-carte);
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--color-ombre) 35%, transparent);
+  object-fit: cover;
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    translate var(--duree-douce) var(--courbe-douce);
+}
+
+@starting-style {
+  .cliche {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+.tailles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  justify-content: center;
+}
+
+.taille {
+  padding: 7px 13px;
+  border: 1.5px solid var(--color-vignette);
+  border-radius: var(--radius-petit);
+  background: var(--color-sur-accent);
+  color: var(--color-boutique-brun);
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    border-color var(--duree-douce) var(--courbe-douce),
+    color var(--duree-douce) var(--courbe-douce);
+}
+
+.taille[aria-pressed='true'] {
+  border-color: var(--color-ombre);
+  background: var(--color-ombre);
+  color: var(--color-sur-accent);
+}
+
+.compte {
+  margin: 0;
+  color: var(--color-boutique-brun);
+  font-size: var(--flux-size);
+  opacity: 0.65;
+}
+
+.points {
+  display: flex;
+  gap: 6px;
+}
+
+.point {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-rond);
+  background: var(--color-vignette);
+  transition:
+    width var(--duree-elan) var(--courbe-elan),
+    background-color var(--duree-douce) var(--courbe-douce);
+}
+
+.point[data-actif='true'] {
+  width: 20px;
+  background: var(--color-fiche-badge);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cliche,
+  .taille,
+  .point {
+    transition: none;
+  }
+}

@@ -1,0 +1,153 @@
+/*
+ * QUOI     — ce que les quatre étapes partagent : en-tête, libellés, champs, barre du bas, bouton
+ *            sombre. Repris de StudioSubmit.css (.studio__kick, __h, __lead, __label, __field,
+ *            __nav, __ghost, __next).
+ * ÉCARTS   — jetons les plus proches des couleurs V1 : #9a7b41 = --color-boutique-or ;
+ *            #963e3e = --color-fiche-badge (#9b3f39) ; #46352e = --color-boutique-brun ;
+ *            #2a2418 = --color-ombre ; #fffaf0 = --color-sur-accent ; #d8c39a = --color-vignette.
+ *            Tailles : .74rem = --legende-size, 2,7rem (PC) = --code-size (2,875rem), 2rem
+ *            (téléphone) = --titre-ecran-size, .78rem = --libelle-size, 1,2rem = --titre-carte-size,
+ *            .8rem = --flux-size ; espacements .2em/.12em = --bandeau-tracking, .04em =
+ *            --bandeau-titre-tracking.
+ */
+.enTete {
+  display: flex;
+  flex-direction: column;
+}
+
+.numero {
+  margin: 0;
+  color: var(--color-boutique-or);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.titre {
+  margin: 3px 0 0;
+  color: var(--color-fiche-badge);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  line-height: 1;
+}
+
+.chapo {
+  margin: 5px 0 0;
+  opacity: 0.9;
+}
+
+.libelle {
+  display: block;
+  margin: var(--space-4) 0 6px;
+  color: var(--color-boutique-brun);
+  font-family: var(--font-condensee);
+  font-size: var(--libelle-size);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.discret {
+  opacity: 0.6;
+}
+
+.champ {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--color-vignette);
+  border-radius: var(--radius);
+  background: var(--color-sur-accent);
+  color: var(--color-ombre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  transition: border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.champ:focus-visible {
+  border-color: var(--color-fiche-badge);
+  outline: none;
+}
+
+textarea.champ {
+  resize: none;
+}
+
+.aide {
+  margin: 6px 0 0;
+  font-size: var(--flux-size);
+  line-height: var(--corps-leading);
+  opacity: 0.7;
+}
+
+.navigation {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.precedent {
+  border: none;
+  background: none;
+  color: var(--color-boutique-brun);
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  opacity: 0.65;
+  cursor: pointer;
+}
+
+.sombre {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-2);
+  align-items: center;
+  height: 40px;
+  padding: 0 18px;
+  border: 1.5px solid var(--color-ombre);
+  border-radius: var(--radius);
+  background: var(--color-ombre);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-ombre) 22%, transparent);
+  color: var(--color-sur-accent);
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-titre-tracking);
+  cursor: pointer;
+  transition:
+    translate var(--duree-douce) var(--courbe-douce),
+    opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.sombre:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sombre:hover:not(:disabled) {
+  translate: 0 -1px;
+}
+
+.sombre[data-envoi='true'] {
+  height: 46px;
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+}
+
+@container app (width >= 900px) {
+  .titre {
+    font-size: var(--code-size);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .champ,
+  .sombre {
+    transition: none;
+  }
+}

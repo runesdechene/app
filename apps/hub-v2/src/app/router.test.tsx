@@ -24,6 +24,8 @@ vi.mock('@/shared/supabase/client', () => ({
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: vi.fn() } } }),
     },
     rpc: faux.rpc,
+    // /soumettre-contenu lit les missions ouvertes, sans compte.
+    from: () => ({ select: () => ({ eq: () => ({ order: () => Promise.resolve({ data: [], error: null }) }) }) }),
   },
 }))
 
@@ -87,7 +89,7 @@ describe.each([
     faux.session = session
     monter(adresse)
     expect(await screen.findByRole('heading', { name: titre })).toBeInTheDocument()
-    expect(faux.rpc).not.toHaveBeenCalled()
+    expect(faux.rpc).not.toHaveBeenCalledWith('hub_est_admin')
     expect(screen.queryByRole('navigation', { name: 'Menu du Hub' })).not.toBeInTheDocument()
   })
 })

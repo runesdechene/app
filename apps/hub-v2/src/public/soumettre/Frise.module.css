@@ -1,0 +1,167 @@
+/*
+ * QUOI     — la frise des étapes, reprise de StudioSubmit.css (.studio__steps et .studio__steps-h).
+ * ÉCARTS   — jetons les plus proches des couleurs V1 : #241d12 = --color-ombre ;
+ *            #b8945a = --color-boutique-or ; #8fc079 = --color-vert ; #6b8a5a = --color-confetti-vert ;
+ *            #d8c39a = --color-vignette ; #f4ecd8 = --color-gravure ; #46352e = --color-boutique-brun ;
+ *            #fff = --color-sur-accent. Le libellé de .62rem prend --micro-size (.625rem).
+ */
+.frise {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.numero {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    border-color var(--duree-douce) var(--courbe-douce),
+    color var(--duree-douce) var(--courbe-douce);
+}
+
+.nom {
+  font-family: var(--font-condensee);
+}
+
+/* La pastille, selon le sens ; ses états suivent plus bas. */
+.frise[data-sens='vertical'] .numero {
+  width: 32px;
+  height: 32px;
+  border: 2px solid color-mix(in srgb, var(--color-sur-accent) 35%, transparent);
+}
+
+.frise[data-sens='horizontal'] .numero {
+  z-index: 1;
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--color-vignette);
+  background: var(--color-gravure);
+  color: var(--color-boutique-brun);
+}
+
+/* Verticale, dans la colonne sombre (PC) : pastilles reliées par un trait. */
+.frise[data-sens='vertical'] {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+
+.frise[data-sens='vertical'] .pas {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  opacity: 0.55;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.frise[data-sens='vertical'] .pas[data-etat='en-cours'] {
+  opacity: 1;
+}
+
+.frise[data-sens='vertical'] .pas[data-etat='faite'] {
+  opacity: 0.95;
+}
+
+.frise[data-sens='vertical'] .pas:not(:last-child) .numero::after {
+  content: '';
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 50%;
+  width: 2px;
+  height: var(--space-4);
+  background: color-mix(in srgb, var(--color-sur-accent) 28%, transparent);
+  translate: -50% 0;
+}
+
+.frise[data-sens='vertical'] .pas[data-etat='en-cours'] .numero {
+  border-color: var(--color-boutique-or);
+  background: var(--color-boutique-or);
+  color: var(--color-ombre);
+}
+
+.frise[data-sens='vertical'] .pas[data-etat='faite'] .numero {
+  border-color: var(--color-vert);
+  color: var(--color-vert);
+}
+
+.frise[data-sens='vertical'] .pas[data-etat='faite'] .numero::after {
+  background: var(--color-vert);
+}
+
+/* En ligne, en haut du formulaire (téléphone). */
+.frise[data-sens='horizontal'] {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.frise[data-sens='horizontal'] .pas {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  text-align: center;
+  opacity: 0.5;
+}
+
+.frise[data-sens='horizontal'] .pas:not([data-etat='a-venir']) {
+  opacity: 1;
+}
+
+.frise[data-sens='horizontal'] .pas:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  z-index: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--color-vignette);
+}
+
+.frise[data-sens='horizontal'] .pas[data-etat='faite']::after {
+  background: var(--color-confetti-vert);
+}
+
+.frise[data-sens='horizontal'] .pas[data-etat='en-cours'] .numero {
+  border-color: var(--color-ombre);
+  background: var(--color-ombre);
+  color: var(--color-sur-accent);
+}
+
+.frise[data-sens='horizontal'] .pas[data-etat='faite'] .numero {
+  border-color: var(--color-confetti-vert);
+  color: var(--color-confetti-vert);
+}
+
+.frise[data-sens='horizontal'] .nom {
+  color: var(--color-boutique-brun);
+  font-size: var(--micro-size);
+  line-height: var(--titre-leading);
+}
+
+@container app (width >= 900px) {
+  .frise[data-sens='vertical'] {
+    display: flex;
+  }
+
+  .frise[data-sens='horizontal'] {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .numero,
+  .frise[data-sens='vertical'] .pas {
+    transition: none;
+  }
+}

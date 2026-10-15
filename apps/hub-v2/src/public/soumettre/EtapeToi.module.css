@@ -1,0 +1,14 @@
+/*
+ * QUOI     — étape 4 : l'espace des accords et de l'erreur (StudioSubmit.css, .studio__consent).
+ * ÉCARTS   — les cases sont la brique CaseACocher des pages publiques, plus la case native de la V1.
+ */
+.accords {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.erreur {
+  margin-top: var(--space-4);
+}
