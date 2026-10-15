@@ -181,3 +181,14 @@ choisir) ; puis une requête PostgREST devenue ambiguë (voir `supabase.md`).
 `gh run list --workflow seo-nightly.yml --limit 3`, et relancer à la main
 (`gh workflow run seo-nightly.yml`) pour voir passer. Ne jamais répéter la version de pnpm
 dans un workflow : `packageManager` fait foi.
+
+## `pnpm install` depuis un chemin à la mauvaise casse : React en double, les tests tombent (15/10/2026)
+
+L'onglet peut s'ouvrir sur `desktop\devs\app (runes de chêne)` en minuscules. Windows accepte ce
+chemin, mais pnpm écrit les liens de `node_modules` avec cette casse. Vite et Vitest voient alors
+deux React : dans le Hub, 241 tests échouent sur « Unable to find an element », alors que le build
+et le lint passent.
+
+**How to apply :** toujours lancer `pnpm install` depuis `C:\Users\uriel\Desktop\DEVs\app (Runes de Chêne)`.
+Pour vérifier : `(Get-Item apps\hub-v2\node_modules\react).Target` doit montrer cette casse. Sinon,
+relancer `pnpm install --frozen-lockfile --force` depuis ce chemin.
