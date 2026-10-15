@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { vi } from 'vitest'
+import { oublierLesArticlesCrees } from '../hooks/useBlog'
 import { Blog } from './Blog'
 import { TiroirArticle } from './TiroirArticle'
 
@@ -42,7 +43,7 @@ function monter(adresse: string, liste = [brouillon, enLigne]) {
 }
 
 beforeEach(() => {
-  vi.clearAllMocks(); appels.length = 0
+  vi.clearAllMocks(); appels.length = 0; oublierLesArticlesCrees()
   mockEnvoyer.mockImplementation(() => { appels.push('envoi'); return Promise.resolve('https://x/nouvelle.png') })
   mockRetirer.mockImplementation(() => { appels.push('retrait'); return Promise.resolve() })
   URL.createObjectURL = vi.fn(() => 'blob:apercu')
@@ -108,7 +109,7 @@ test('un nouvel article se crée avec son type et son titre, puis s’ouvre', as
 })
 
 test('set_announcement_channel en échec puis nouvel essai : jamais deux articles Shopify', async () => {
-  monter('/joueurs/blog/a1')
+  const router = monter('/joueurs/blog/a1')
   let canalEnPanne = true
   mockRpc.mockImplementation((nom: string, args: { p_id?: string }) => {
     if (nom === 'list_announcements_admin') return Promise.resolve({ data: [brouillon], error: null })
@@ -117,6 +118,9 @@ test('set_announcement_channel en échec puis nouvel essai : jamais deux article
   })
   await userEvent.click(await screen.findByRole('button', { name: 'Publier sur la boutique' }))
   expect(await screen.findByRole('alert')).toHaveTextContent('admin_only')
+  // Le tiroir se ferme puis se rouvre : le formulaire repart de zéro.
+  await router.navigate('/joueurs/blog')
+  await userEvent.click(await screen.findByRole('link', { name: /Le nouveau jeu/ }))
   canalEnPanne = false
   await userEvent.click(screen.getByRole('button', { name: 'Publier sur la boutique' }))
   await waitFor(() => { expect(screen.getByRole('status')).toHaveTextContent('Publié') })
