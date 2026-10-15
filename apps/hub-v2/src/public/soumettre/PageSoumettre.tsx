@@ -9,7 +9,7 @@
  *            que ce qui est rempli.
  */
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PagePublique } from '../PagePublique'
 import { lireConfigStudio, lireMissions } from './api'
@@ -23,14 +23,28 @@ import { Succes } from './Succes'
 import { useEnvoi } from './useEnvoi'
 import styles from './PageSoumettre.module.css'
 
+function liberer(apercus: Set<string>) {
+  for (const apercu of apercus) URL.revokeObjectURL(apercu)
+  apercus.clear()
+}
+
 export function PageSoumettre() {
   const [params, setParams] = useSearchParams()
   const missions = useQuery({ queryKey: ['soumettre', 'missions'], queryFn: lireMissions })
   const config = useQuery({ queryKey: ['soumettre', 'config'], queryFn: lireConfigStudio })
   const [contenus, setContenus] = useState<Contenu[]>([])
+  // Les adresses d'aperçu encore ouvertes : libérées au retrait, à l'envoi réussi et en quittant.
+  const [apercus] = useState(() => new Set<string>())
   const [histoire, setHistoire] = useState(HISTOIRE_VIDE)
   const [toi, setToi] = useState(TOI_VIDE)
   const { envoyer, progression, erreur, reussite } = useEnvoi()
+
+  useEffect(
+    () => () => {
+      liberer(apercus)
+    },
+    [apercus],
+  )
 
   const etape = etapeAffichee(params.get('etape'), contenus)
   const quete = params.get('quete') ?? ''
@@ -58,12 +72,16 @@ export function PageSoumettre() {
 
   function ajouter(fichiers: File[]) {
     const nouveaux = fichiers.map((fichier) => ({ fichier, apercu: URL.createObjectURL(fichier), taille: null }))
+    for (const c of nouveaux) apercus.add(c.apercu)
     setContenus((cs) => [...cs, ...nouveaux])
   }
 
   function retirer(rang: number) {
     const contenu = contenus[rang]
-    if (contenu) URL.revokeObjectURL(contenu.apercu)
+    if (contenu) {
+      URL.revokeObjectURL(contenu.apercu)
+      apercus.delete(contenu.apercu)
+    }
     setContenus((cs) => cs.filter((_, i) => i !== rang))
   }
 
@@ -154,7 +172,9 @@ export function PageSoumettre() {
                 allerA(3)
               }}
               envoyer={() => {
-                void envoyer(contenus, histoire, toi, mission)
+                void envoyer(contenus, histoire, toi, mission).then((reussi) => {
+                  if (reussi) liberer(apercus)
+                })
               }}
             />
           )}

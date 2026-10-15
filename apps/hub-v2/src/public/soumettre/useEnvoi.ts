@@ -16,18 +16,21 @@ export const AUCUN_FICHIER = 'Aucun fichier n’a pu partir. Vérifie ta connexi
 // Les seules phrases qu'un visiteur lit ; toute autre erreur devient PAS_ENREGISTRE.
 const PHRASES_PUBLIQUES = [AUCUN_FICHIER, TROP_D_ENVOIS, PAS_ENREGISTRE]
 
-export type Reussite = { nouveauCompte: boolean; partis: number; total: number }
+/** La fin d'un envoi : le compte est-il nouveau, et quels fichiers sont restés en route. */
+export type Reussite = { nouveauCompte: boolean; echecs: string[] }
 
 export function useEnvoi() {
   const [progression, setProgression] = useState<string | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
   const [reussite, setReussite] = useState<Reussite | null>(null)
 
-  async function envoyer(contenus: Contenu[], histoire: Histoire, toi: Toi, quete: string) {
+  /** Rend vrai si l'envoi est enregistré. */
+  async function envoyer(contenus: Contenu[], histoire: Histoire, toi: Toi, quete: string): Promise<boolean> {
     setErreur(null)
     try {
       const dossier = crypto.randomUUID()
       const images: Depot['images'] = []
+      const echecs: string[] = []
       for (const [i, c] of contenus.entries()) {
         setProgression(`Envoi du fichier ${String(i + 1)} sur ${String(contenus.length)}…`)
         try {
@@ -35,6 +38,7 @@ export function useEnvoi() {
           images.push({ path: await envoyerFichierPublic(pret, dossier), size: c.taille })
         } catch {
           // Ce fichier reste de côté ; les autres partent quand même.
+          echecs.push(c.fichier.name)
         }
       }
       if (images.length === 0) throw new Error(AUCUN_FICHIER)
@@ -54,9 +58,11 @@ export function useEnvoi() {
         noteProduits: histoire.noteProduits,
         motEquipe: histoire.motEquipe,
       })
-      setReussite({ nouveauCompte, partis: images.length, total: contenus.length })
+      setReussite({ nouveauCompte, echecs })
+      return true
     } catch (e) {
       setErreur(e instanceof Error && PHRASES_PUBLIQUES.includes(e.message) ? e.message : PAS_ENREGISTRE)
+      return false
     } finally {
       setProgression(null)
     }

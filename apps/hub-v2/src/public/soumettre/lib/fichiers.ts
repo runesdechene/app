@@ -8,6 +8,21 @@
 export const MAX_FICHIERS = 10
 
 const MO = 1024 * 1024
+// Le type envoyé au stockage, tiré de l'extension : un téléphone donne souvent un type vide, et le
+// bucket (mig 331) refuse ce qu'il ne connaît pas — d'où m4v en video/mp4 (le même conteneur), car
+// video/x-m4v n'y figure pas.
+const TYPES: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  heic: 'image/heic',
+  heif: 'image/heif',
+  mp4: 'video/mp4',
+  mov: 'video/quicktime',
+  webm: 'video/webm',
+  m4v: 'video/mp4',
+}
 const PHOTOS = ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif']
 const VIDEOS = ['mp4', 'mov', 'webm', 'm4v']
 const LIMITE_PHOTO_MO = 15
@@ -16,6 +31,9 @@ const LIMITE_VIDEO_MO = 50
 const extension = (f: File) => f.name.split('.').pop()?.toLowerCase() ?? ''
 
 export const estVideo = (f: File) => VIDEOS.includes(extension(f))
+
+/** Le type MIME d'un fichier accepté, d'après son extension ; null hors de la liste. */
+export const typeDuFichier = (f: File): string | null => TYPES[extension(f)] ?? null
 
 export function refusDuFichier(f: File): string | null {
   const video = estVideo(f)

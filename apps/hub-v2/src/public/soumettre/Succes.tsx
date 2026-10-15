@@ -3,7 +3,7 @@
  *            nouveau compte, le lien vers l'appli.
  * POURQUOI — les Couronnes de bienvenue (réglage `ugc_welcome_crowns`) sont en pause mais
  *            reviendront en bonus : la carte les montre dès que le réglage dépasse zéro. Si des
- *            fichiers sont restés en route, le joueur le sait.
+ *            fichiers sont restés en route, le joueur sait lesquels.
  */
 import drapeau from '@/assets/ui/drapeau.svg'
 import type { Reussite } from './useEnvoi'
@@ -12,7 +12,7 @@ import styles from './Succes.module.css'
 const APPLI = 'https://app.runesdechene.com'
 
 export function Succes({ reussite, couronnes }: { reussite: Reussite; couronnes: number }) {
-  const { nouveauCompte, partis, total } = reussite
+  const { nouveauCompte, echecs } = reussite
   return (
     <div className={styles.carte}>
       <img className={styles.drapeau} src={drapeau} alt="" />
@@ -21,9 +21,9 @@ export function Succes({ reussite, couronnes }: { reussite: Reussite; couronnes:
         Tes contenus partent en validation. Dès qu’ils sont adoubés, tes Couronnes de Chêne atterrissent sur ton compte — on te
         prévient par e-mail.
       </p>
-      {partis < total && (
+      {echecs.length > 0 && (
         <p className={styles.texte}>
-          Envoyés : {partis} sur {total}. Les autres n’ont pas pu partir.
+          {echecs.length > 1 ? 'Pas partis' : 'Pas parti'} : {echecs.join(', ')}
         </p>
       )}
       {nouveauCompte && couronnes > 0 && (

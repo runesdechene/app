@@ -8,6 +8,7 @@
  *            cadeau/api.ts).
  */
 import { supabase } from '@/shared/supabase/client'
+import { typeDuFichier } from './lib/fichiers'
 
 export const TROP_D_ENVOIS = 'Trop d’envois d’un coup : réessaie dans une heure.'
 export const PAS_ENREGISTRE = 'Ton envoi n’a pas pu être enregistré, réessaie dans un instant.'
@@ -58,7 +59,7 @@ export async function envoyerFichierPublic(f: File, dossier: string): Promise<st
   const chemin = `submissions/${dossier}/${crypto.randomUUID()}.${extension}`
   const { error } = await supabase.storage
     .from('community-photos')
-    .upload(chemin, f, { contentType: f.type, upsert: false })
+    .upload(chemin, f, { contentType: typeDuFichier(f) ?? f.type, upsert: false })
   if (error) throw error
   return chemin
 }

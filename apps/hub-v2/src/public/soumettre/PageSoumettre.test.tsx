@@ -47,9 +47,16 @@ vi.mock('./lib/compression', () => ({ versWebp: (f: File) => Promise.resolve(f) 
 
 const CHEMIN = /^submissions\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.jpg$/
 
+// Les aperçus : chaque adresse créée doit être libérée.
+const creer = vi.fn<(f: Blob) => string>(() => `blob:${crypto.randomUUID()}`)
+const liberer = vi.fn<(adresse: string) => void>()
+const creees = () => creer.mock.results.map((r) => String(r.value))
+
 beforeEach(() => {
-  URL.createObjectURL = vi.fn(() => `blob:${crypto.randomUUID()}`)
-  URL.revokeObjectURL = vi.fn()
+  creer.mockClear()
+  liberer.mockClear()
+  URL.createObjectURL = creer
+  URL.revokeObjectURL = liberer
   faux.upload.mockReset().mockResolvedValue({ data: {}, error: null })
   faux.deposer.mockReset().mockResolvedValue({ data: { nouveauCompte: false }, error: null })
 })
@@ -58,12 +65,12 @@ function ouvrir(adresse = '/soumettre-contenu') {
   const router = createMemoryRouter([{ path: '/soumettre-contenu', element: <PageSoumettre /> }], {
     initialEntries: [adresse],
   })
-  render(
+  const rendu = render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <RouterProvider router={router} />
     </QueryClientProvider>,
   )
-  return router
+  return { router, rendu }
 }
 
 const photo = (nom: string) => new File(['x'], nom, { type: 'image/jpeg' })
@@ -129,7 +136,7 @@ describe('les étapes', () => {
   })
 
   it('l’étape est dans l’adresse, ?quete= y reste', async () => {
-    const router = ouvrir('/soumettre-contenu?quete=hoplite')
+    const { router } = ouvrir('/soumettre-contenu?quete=hoplite')
     await deposer('a.jpg')
     await userEvent.click(bouton(/^Suivant/))
     expect(await screen.findByRole('heading', { name: 'Quelle taille portes-tu ?' })).toBeInTheDocument()
@@ -198,7 +205,7 @@ describe('l’envoi', () => {
         p_quest_ref: 'hoplite',
       }),
     )
-    expect(screen.getByText(/Envoyés : 2 sur 3\./)).toBeInTheDocument()
+    expect(screen.getByText('Pas parti : a.jpg')).toBeInTheDocument()
   })
 
   it('aucun fichier réussi : rien n’est déposé, le formulaire reste rempli', async () => {
@@ -250,5 +257,26 @@ describe('l’envoi', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       /^Ton envoi n’a pas pu être enregistré, réessaie dans un instant\.$/,
     )
+  })
+
+  it('libère les aperçus une fois l’envoi réussi', async () => {
+    await jusquAToi()
+    await remplirToi()
+    const crees = creees()
+    expect(crees).toHaveLength(2)
+    await envoyer()
+    await screen.findByRole('heading', { name: 'Bienvenue dans le Mouvement !' })
+    for (const apercu of crees) expect(liberer).toHaveBeenCalledWith(apercu)
+  })
+})
+
+describe('les aperçus', () => {
+  it('sont libérés quand on quitte la page', async () => {
+    const { rendu } = ouvrir()
+    await deposer('a.jpg', 'b.jpg')
+    const crees = creees()
+    expect(liberer).not.toHaveBeenCalled()
+    rendu.unmount()
+    for (const apercu of crees) expect(liberer).toHaveBeenCalledWith(apercu)
   })
 })
