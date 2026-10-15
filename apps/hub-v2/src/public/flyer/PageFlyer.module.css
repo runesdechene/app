@@ -1,0 +1,129 @@
+/*
+ * QUOI     — /flyer : la photo à lisière ondulée, le logo, la carte des liens (Figma 605:1433 / 605:1497).
+ * POURQUOI — la lisière est un masque SVG (public/lisiere-bas.svg, lisiere-droite.svg) : le bord
+ *            ondule, le flou et le dégradé fondent la photo dans le parchemin. Bas au téléphone,
+ *            droite sur PC.
+ * ÉCARTS   — aucun jeton ajouté : #494841 = --color-encre, #e7dcca = --color-sable,
+ *            #f6e1c3 = --color-pastille ; les fonds à transparence sont des color-mix de jetons.
+ */
+.photo {
+  display: block;
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  object-position: 50% 40%;
+  mask-image: url('/lisiere-bas.svg');
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+.logo {
+  margin: 0;
+}
+
+.logo img {
+  display: block;
+  width: 240px;
+  margin: 0 auto var(--space-8);
+}
+
+.liens {
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 60%, transparent);
+  overflow: hidden;
+}
+
+.liens li + li {
+  border-top: 1px solid var(--color-sable);
+}
+
+.lien {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 14px 14px 16px;
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--duree-douce) var(--courbe-douce);
+}
+
+.lien:hover {
+  background: color-mix(in srgb, var(--color-pastille) 40%, transparent);
+}
+
+.lien:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.pastille {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-pastille) 90%, transparent);
+}
+
+.icone {
+  width: 20px;
+  height: 20px;
+}
+
+.iconeImage {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.texte {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.titre {
+  color: var(--color-encre);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+}
+
+.sousTitre {
+  color: var(--color-texte-doux);
+  font-size: var(--flux-size);
+}
+
+.chevron {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.pied {
+  margin: var(--space-4) 0 0;
+  color: var(--color-texte-pale);
+  font-size: var(--legende-size);
+  text-align: center;
+}
+
+@container app (width >= 900px) {
+  .photo {
+    height: 100%;
+    object-position: 30% 50%;
+    mask-image: url('/lisiere-droite.svg');
+    mask-size: calc(100% + 21px) calc(100% + 21px);
+    mask-position: -10.5px -10.5px;
+  }
+
+  .logo img {
+    width: 300px;
+  }
+}
