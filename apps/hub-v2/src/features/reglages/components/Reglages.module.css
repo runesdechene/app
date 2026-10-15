@@ -1,0 +1,215 @@
+/*
+ * QUOI     — la mise en page de « Réglages » : deux blocs côte à côte sur PC, l'un sous l'autre sur téléphone,
+ *            précédés sur téléphone seulement des liens « Parler aux joueurs » (maquettes 613:1553 et 613:1825).
+ */
+.ecran {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.blocs {
+  display: grid;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.section {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.telephone {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@container app (width >= 900px) {
+  .telephone {
+    display: none;
+  }
+
+  .blocs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.carte {
+  padding: var(--space-4);
+}
+
+.lien {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  color: inherit;
+  text-decoration: none;
+}
+
+.lienTitre {
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+  color: var(--color-encre);
+}
+
+.chevron {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  height: var(--space-3);
+}
+
+.formulaire {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.champ {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.etiquette {
+  margin: 0;
+  font-size: var(--libelle-size);
+  font-weight: var(--weight-semi);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+  color: var(--color-texte-doux);
+}
+
+.champ textarea {
+  padding: var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-petit);
+  background: var(--color-fond);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  color: var(--color-encre);
+  resize: vertical;
+}
+
+.compteur {
+  justify-self: end;
+  font-size: var(--legende-size);
+  color: var(--color-texte-pale);
+}
+
+.aide {
+  margin: 0;
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.lien .aide {
+  grid-column: 1;
+}
+
+.apercu {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-petit);
+  background: var(--color-doux-fond);
+  font-size: var(--corps-size);
+  color: var(--color-encre);
+  overflow-wrap: anywhere;
+}
+
+.pied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.bouton {
+  padding: var(--space-2) var(--space-6);
+  border: 1px solid var(--color-accent-bord);
+  border-radius: var(--radius-petit);
+  background: var(--color-accent);
+  font-family: var(--font-corps);
+  font-weight: var(--weight-semi);
+  font-size: var(--corps-size);
+  color: var(--color-sur-accent);
+  cursor: pointer;
+}
+
+.bouton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.boutonContour {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-petit);
+  background: var(--color-fond);
+  font-family: var(--font-corps);
+  font-weight: var(--weight-semi);
+  font-size: var(--corps-size);
+  color: var(--color-encre);
+  text-align: center;
+  cursor: pointer;
+}
+
+.boutonContour:focus-within {
+  outline: 2px solid var(--color-encre);
+  outline-offset: 2px;
+}
+
+/* Le champ de fichier se cache, son étiquette fait le bouton. */
+.boutonContour input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.vignette {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-petit);
+  background: var(--color-doux-fond);
+  overflow: clip;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.puce {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-rond);
+  background: var(--color-pilule);
+  font-size: var(--legende-size);
+  color: var(--color-pilule-texte);
+}
+
+.legende {
+  margin: 0;
+  font-size: var(--corps-size);
+  color: var(--color-texte);
+}
+
+.nuit {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-petit);
+  background: var(--color-doux-fond);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.erreur {
+  margin: 0;
+  color: var(--color-accent);
+}

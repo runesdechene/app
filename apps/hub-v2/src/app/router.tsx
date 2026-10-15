@@ -37,13 +37,14 @@ import { TiroirCulture } from '@/features/jeu/components/TiroirCulture'
 import { TiroirEnigme } from '@/features/jeu/components/TiroirEnigme'
 import { TiroirNature } from '@/features/jeu/components/TiroirNature'
 import { TiroirTitre } from '@/features/jeu/components/TiroirTitre'
+import { Reglages } from '@/features/reglages/components/Reglages'
 import { BientotIci } from './coquille/BientotIci'
 import { Coquille } from './coquille/Coquille'
 import { MENU } from './coquille/menu'
 import { PorteDEntree } from './entree/PorteDEntree'
 
 // Les écrans faits quittent « bientôt » ; chaque tâche suivante ajoute le sien.
-const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures', '/jeu/natures', '/jeu/titres', '/jeu/bannieres', '/jeu/energie', '/boutique/fragments', '/boutique/fragments/correspondance', '/boutique/fragments/achats', '/boutique/photos', '/boutique/audio', '/boutique/synchro', '/joueurs/mises-a-jour', '/joueurs/notifications', '/joueurs/blog'])
+const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures', '/jeu/natures', '/jeu/titres', '/jeu/bannieres', '/jeu/energie', '/boutique/fragments', '/boutique/fragments/correspondance', '/boutique/fragments/achats', '/boutique/photos', '/boutique/audio', '/boutique/synchro', '/joueurs/mises-a-jour', '/joueurs/notifications', '/joueurs/blog', '/reglages'])
 
 const autres = MENU.flatMap((d) => d.liens)
   .filter((l) => l.chemin !== '/' && !ECRANS_FAITS.has(l.chemin))
@@ -79,6 +80,7 @@ export const routes: RouteObject[] = [
       { path: 'joueurs/mises-a-jour', Component: MisesAJour, children: [{ path: 'nouvelle', Component: TiroirMiseAJour }, { path: ':id', Component: TiroirMiseAJour }] },
       { path: 'joueurs/notifications', Component: Notifications },
       { path: 'joueurs/blog', Component: Blog, children: [{ path: 'nouveau', Component: TiroirArticle }, { path: ':id', Component: TiroirArticle }] },
+      { path: 'reglages', Component: Reglages },
       ...autres,
     ],
   },
