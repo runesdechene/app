@@ -113,3 +113,61 @@
   overflow: hidden;
   clip-path: inset(50%);
 }
+
+/* Notifications : trois tuiles, puis les sortes et le fil */
+.tuiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.erreur, .alerte {
+  margin: 0;
+  color: var(--color-accent);
+}
+
+.sorte {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-bord);
+}
+
+.sorteTete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.sorteTete code {
+  font-size: var(--legende-size);
+  color: var(--color-texte-pale);
+}
+
+.bulle {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: var(--color-surface);
+  color: var(--color-encre);
+}
+
+.ligneDuFil {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-bord);
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}

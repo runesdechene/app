@@ -27,6 +27,7 @@ import { Titres } from '@/features/jeu/components/Titres'
 import { Energie } from '@/features/jeu/components/Energie'
 import { Enigmes } from '@/features/jeu/components/Enigmes'
 import { EnigmesSignalees } from '@/features/jeu/components/EnigmesSignalees'
+import { Notifications } from '@/features/joueurs/components/Notifications'
 import { MisesAJour } from '@/features/joueurs/components/MisesAJour'
 import { TiroirMiseAJour } from '@/features/joueurs/components/TiroirMiseAJour'
 import { TiroirBanniere } from '@/features/jeu/components/TiroirBanniere'
@@ -40,7 +41,7 @@ import { MENU } from './coquille/menu'
 import { PorteDEntree } from './entree/PorteDEntree'
 
 // Les écrans faits quittent « bientôt » ; chaque tâche suivante ajoute le sien.
-const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures', '/jeu/natures', '/jeu/titres', '/jeu/bannieres', '/jeu/energie', '/boutique/fragments', '/boutique/fragments/correspondance', '/boutique/fragments/achats', '/boutique/photos', '/boutique/audio', '/boutique/synchro', '/joueurs/mises-a-jour'])
+const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures', '/jeu/natures', '/jeu/titres', '/jeu/bannieres', '/jeu/energie', '/boutique/fragments', '/boutique/fragments/correspondance', '/boutique/fragments/achats', '/boutique/photos', '/boutique/audio', '/boutique/synchro', '/joueurs/mises-a-jour', '/joueurs/notifications'])
 
 const autres = MENU.flatMap((d) => d.liens)
   .filter((l) => l.chemin !== '/' && !ECRANS_FAITS.has(l.chemin))
@@ -74,6 +75,7 @@ export const routes: RouteObject[] = [
       { path: 'boutique/audio', Component: Ecoutes },
       { path: 'boutique/synchro', Component: Synchro },
       { path: 'joueurs/mises-a-jour', Component: MisesAJour, children: [{ path: 'nouvelle', Component: TiroirMiseAJour }, { path: ':id', Component: TiroirMiseAJour }] },
+      { path: 'joueurs/notifications', Component: Notifications },
       ...autres,
     ],
   },

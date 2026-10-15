@@ -11,7 +11,8 @@ export default defineConfig({
   base: '/',
   envDir: path.resolve(import.meta.dirname, '../..'),
   plugins: [react()],
-  resolve: { alias: { '@': path.resolve(import.meta.dirname, 'src') } },
+  // @send-push : le code de send-push (Deno), source de ce qui part en notification, lu tel quel.
+  resolve: { alias: { '@': path.resolve(import.meta.dirname, 'src'), '@send-push': path.resolve(import.meta.dirname, '../../supabase/functions/send-push') } },
   server: { port: 5175 },
   test: {
     environment: 'jsdom',
