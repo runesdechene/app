@@ -6,6 +6,7 @@
  *            Le fichier de couverture ne part qu'à l'enregistrement, l'ancien quitte le bucket une fois la base à jour.
  */
 import { envoyerFichier, retirerFichier } from '@/shared/lib/envoi'
+import { messageDErreur } from '@/shared/lib/erreur'
 import { appelerFonction, lireReponse } from '@/shared/lib/fonctions'
 import { supabase } from '@/shared/supabase/client'
 import type { Tables } from '@/shared/supabase/database.types'
@@ -24,8 +25,6 @@ export class MarquageEchoue extends Error {
     super(message, { cause })
   }
 }
-
-const messageDe = (e: unknown) => (e instanceof Error ? e.message : String(e))
 
 export async function lireArticles(): Promise<Article[]> {
   const { data, error } = await supabase.rpc('list_announcements_admin')
@@ -66,7 +65,7 @@ export async function enregistrerArticle(fiche: Article, b: Brouillon): Promise<
     try {
       await retirerFichier(BUCKET, fiche.cover_image)
     } catch (e) {
-      throw new Error(`Enregistré, mais l’ancienne couverture n’a pas pu être retirée : ${messageDe(e)}`, { cause: e })
+      throw new Error(`Enregistré, mais l’ancienne couverture n’a pas pu être retirée : ${messageDErreur(e)}`, { cause: e })
     }
   }
   return article

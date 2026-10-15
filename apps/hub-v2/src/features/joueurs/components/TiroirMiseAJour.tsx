@@ -55,7 +55,13 @@ function Formulaire({ fiche, supprimee }: { fiche: MiseAJour | null; supprimee: 
     e.preventDefault()
     enregistrer.mutate(
       { fiche, brouillon: { titre, texte, version, fichier: choix?.fichier ?? null, retirer } },
-      { onSuccess: () => { if (!fiche) void naviguer(LISTE + search) } },
+      {
+        onSuccess: () => {
+          setChoix(null)
+          setRetirer(false)
+          if (!fiche) void naviguer(LISTE + search)
+        },
+      },
     )
   }
 

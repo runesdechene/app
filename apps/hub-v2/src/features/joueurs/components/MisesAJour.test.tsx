@@ -211,3 +211,21 @@ test('une erreur de la base s’affiche sous le formulaire', async () => {
   expect(await screen.findByRole('alert')).toHaveTextContent('Réservé aux admins')
   expect(mockRetirer).not.toHaveBeenCalled()
 })
+
+test('après un enregistrement réussi, le fichier choisi est oublié : enregistrer encore ne renvoie rien', async () => {
+  monter('/joueurs/mises-a-jour/4')
+  await userEvent.upload(await screen.findByLabelText('Changer l’image'), png())
+  const bouton = screen.getByRole('button', { name: 'Enregistrer' })
+  await userEvent.click(bouton)
+  await screen.findByRole('status')
+  await userEvent.click(bouton)
+  await vi.waitFor(() => { expect(mockRpc.mock.calls.filter(([nom]) => nom === 'modifier_mise_a_jour')).toHaveLength(2) })
+  expect(mockEnvoyer).toHaveBeenCalledTimes(1)
+})
+
+test('la liste qui ne se charge pas le dit, avec la raison', async () => {
+  mockRpc.mockResolvedValue({ data: null, error: { message: 'JWT expired' } })
+  const router = createMemoryRouter([{ path: '/', Component: MisesAJour }])
+  render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><RouterProvider router={router} /></QueryClientProvider>)
+  expect(await screen.findByRole('alert')).toHaveTextContent('Les mises à jour n’ont pas pu se charger : JWT expired')
+})

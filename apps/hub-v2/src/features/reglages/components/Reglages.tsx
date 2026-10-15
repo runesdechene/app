@@ -151,13 +151,13 @@ function ImageSeo({ depart }: { depart: LesReglages }) {
 }
 
 export function Reglages() {
-  const { data, isError } = useReglages()
+  const { data, error } = useReglages()
   return (
     <div className={styles.ecran}>
       <EnTeteDePage surtitre="Réglages" titre="Ce qui part vers les joueurs"
         phrase="La phrase qu’un Explorateur envoie en partageant un lieu, et l’image des pages publiques." />
       <ParlerAuxJoueurs />
-      {isError && <p className={styles.erreur}>La base ne répond pas.</p>}
+      {error && <p role="alert" className={styles.erreur}>Les réglages n’ont pas pu se charger : {error.message}</p>}
       {data && (
         <div className={styles.blocs}>
           <TexteDePartage depart={data} />

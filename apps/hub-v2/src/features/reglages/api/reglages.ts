@@ -5,7 +5,8 @@
  *            rien si la ligne manquait. Le fichier choisi ne part qu'à l'enregistrement ; l'ancien quitte le bucket
  *            une fois la base à jour (sauf si une autre clé la montre encore), et un upsert qui échoue défait l'envoi.
  */
-import { envoyerFichier, retirerFichier } from '@/shared/lib/envoi'
+import { envoyerFichier, extensionDe, retirerFichier } from '@/shared/lib/envoi'
+import { messageDErreur } from '@/shared/lib/erreur'
 import { supabase } from '@/shared/supabase/client'
 
 export const BUCKET = 'app-assets'
@@ -34,10 +35,6 @@ export const enregistrerPartage = (texte: string) => ecrire(CLE_PARTAGE, texte)
 
 export const enregistrerImageSeo = (adresse: string) => ecrire(CLE_IMAGE, adresse)
 
-const EXTENSIONS: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }
-
-const messageDe = (e: unknown) => (e instanceof Error ? e.message : String(e))
-
 // Une autre clé (le fond de /soumettre-contenu) peut pointer vers le même fichier : on ne l'efface pas sous elle.
 async function encoreUtilisee(adresse: string): Promise<boolean> {
   const { data, error } = await supabase.from('app_settings').select('key').eq('value', adresse).neq('key', CLE_IMAGE)
@@ -47,7 +44,7 @@ async function encoreUtilisee(adresse: string): Promise<boolean> {
 
 /** Envoie le fichier, écrit l'adresse, puis retire l'ancienne image ; le retrait qui échoue est dit comme un succès partiel. */
 export async function remplacerImageSeo(fichier: File, ancienne: string): Promise<void> {
-  const chemin = `landing-image-desktop-${String(Date.now())}.${EXTENSIONS[fichier.type] ?? 'jpg'}`
+  const chemin = `landing-image-desktop-${String(Date.now())}.${extensionDe(fichier)}`
   const adresse = await envoyerFichier(BUCKET, chemin, fichier)
   try {
     await enregistrerImageSeo(adresse)
@@ -59,6 +56,6 @@ export async function remplacerImageSeo(fichier: File, ancienne: string): Promis
   try {
     await retirerFichier(BUCKET, ancienne)
   } catch (e) {
-    throw new Error(`Enregistrée, mais l’ancienne image n’a pas pu être retirée : ${messageDe(e)}`, { cause: e })
+    throw new Error(`Enregistrée, mais l’ancienne image n’a pas pu être retirée : ${messageDErreur(e)}`, { cause: e })
   }
 }

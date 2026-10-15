@@ -3,16 +3,14 @@
  * POURQUOI — les mêmes bornes que la base (titre 80, texte 3000) et que le bucket announcement-covers
  *            (jpeg, png, webp, gif, 10 Mo) : un refus se dit avant l'envoi, pas après.
  */
-import type { RegleFichier } from '@/shared/lib/envoi'
+import { extensionDe, type RegleFichier } from '@/shared/lib/envoi'
 
 export const TITRE_MAX = 80
 export const TEXTE_MAX = 3000
 export const BUCKET = 'announcement-covers'
 export const REGLE_IMAGE: RegleFichier = { types: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], maxOctets: 10 * 1024 * 1024 }
 
-const EXTENSIONS: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }
-
-export const cheminDeImage = (fichier: File, prefixe = 'mise-a-jour') => `${prefixe}-${String(Date.now())}.${EXTENSIONS[fichier.type] ?? 'jpg'}`
+export const cheminDeImage = (fichier: File, prefixe = 'mise-a-jour') => `${prefixe}-${String(Date.now())}.${extensionDe(fichier)}`
 
 export function estPubliable(titre: string, texte: string): boolean {
   const t = titre.trim().length

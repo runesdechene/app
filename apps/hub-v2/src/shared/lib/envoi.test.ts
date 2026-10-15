@@ -1,4 +1,4 @@
-import { envoyerFichier, retirerFichier, retirerFichiers, verifierFichier } from './envoi'
+import { envoyerFichier, extensionDe, retirerFichier, retirerFichiers, verifierFichier } from './envoi'
 
 const from = vi.hoisted(() => vi.fn())
 vi.mock('@/shared/supabase/client', () => ({ supabase: { storage: { from } } }))
@@ -23,6 +23,12 @@ describe('verifierFichier', () => {
     const regle = { types: ['image/png'], maxOctets: 5 * MO }
     expect(verifierFichier(fichier('a.png', 'image/png', 1 * MO), regle)).toBeNull()
   })
+})
+
+test('extensionDe : l’extension suit le type, jpg pour un type inconnu', () => {
+  expect(extensionDe(fichier('a', 'image/png'))).toBe('png')
+  expect(extensionDe(fichier('a', 'image/svg+xml'))).toBe('svg')
+  expect(extensionDe(fichier('a', 'image/heic'))).toBe('jpg')
 })
 
 describe('envoyerFichier et retirerFichier', () => {

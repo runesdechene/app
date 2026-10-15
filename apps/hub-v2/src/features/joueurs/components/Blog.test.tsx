@@ -155,3 +155,21 @@ test('une couverture choisie ne part qu’à l’enregistrement : un envoi, apr�
   expect(appels.indexOf('update_announcement')).toBeLessThan(appels.indexOf('retrait'))
   expect(mockRpc).toHaveBeenCalledWith('update_announcement', expect.objectContaining({ p_cover_image: 'https://x/nouvelle.png' }))
 })
+
+test('après un enregistrement réussi, la couverture choisie est oubliée : enregistrer encore ne renvoie rien', async () => {
+  monter('/joueurs/blog/a1', [{ ...brouillon, cover_image: 'https://x/ancienne.png' }])
+  await userEvent.upload(await screen.findByLabelText(/Changer la couverture/), new File(['x'], 'c.png', { type: 'image/png' }))
+  const bouton = screen.getByRole('button', { name: 'Enregistrer' })
+  await userEvent.click(bouton)
+  await screen.findByRole('status')
+  await userEvent.click(bouton)
+  await waitFor(() => { expect(appels.filter((a) => a === 'update_announcement')).toHaveLength(2) })
+  expect(mockEnvoyer).toHaveBeenCalledTimes(1)
+})
+
+test('la liste qui ne se charge pas le dit, avec la raison', async () => {
+  mockRpc.mockResolvedValue({ data: null, error: { message: 'JWT expired' } })
+  const router = createMemoryRouter([{ path: '/', Component: Blog }])
+  render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><RouterProvider router={router} /></QueryClientProvider>)
+  expect(await screen.findByRole('alert')).toHaveTextContent('Les articles n’ont pas pu se charger : JWT expired')
+})

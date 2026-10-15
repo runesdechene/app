@@ -30,7 +30,7 @@ function LigneDArticle({ article }: { article: Article }) {
 }
 
 export function Blog() {
-  const { data, isError } = useBlog()
+  const { data, error } = useBlog()
   const { search } = useLocation()
   return (
     <div className={styles.ecran}>
@@ -41,7 +41,7 @@ export function Blog() {
         aDroite={<Link className={styles.boutonContour} to={{ pathname: 'nouveau', search }}>+ Nouvel article</Link>}
       />
       <TitreDeSection titre="Articles" />
-      {isError && <p className={styles.calme}>La base ne répond pas.</p>}
+      {error && <p role="alert" className={styles.erreur}>Les articles n’ont pas pu se charger : {error.message}</p>}
       {data?.length === 0 && <p className={styles.calme}>Aucun article.</p>}
       {data && data.length > 0 && <Bloc>{data.map((a) => <LigneDArticle key={a.id} article={a} />)}</Bloc>}
       <Outlet />

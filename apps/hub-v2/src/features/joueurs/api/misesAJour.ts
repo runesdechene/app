@@ -6,6 +6,7 @@
  *            échoue, l'erreur le dit comme un succès partiel.
  */
 import { envoyerFichier, retirerFichier } from '@/shared/lib/envoi'
+import { messageDErreur } from '@/shared/lib/erreur'
 import { supabase } from '@/shared/supabase/client'
 import { BUCKET, cheminDeImage } from '../lib/miseAJour'
 
@@ -22,10 +23,15 @@ export async function lireMisesAJour(): Promise<MiseAJour[]> {
 }
 
 // Une image ou une version vide ne part pas : la base les range à null (omettre p_image retire l'image).
-const champs = (m: MiseAJourAEcrire) => ({
-  p_titre: m.titre.trim(), p_texte: m.texte.trim(),
-  ...(m.image && { p_image: m.image }), ...(m.version?.trim() && { p_version: m.version.trim() }),
-})
+function champs(m: MiseAJourAEcrire) {
+  const args: { p_titre: string; p_texte: string; p_image?: string; p_version?: string } = {
+    p_titre: m.titre.trim(), p_texte: m.texte.trim(),
+  }
+  if (m.image) args.p_image = m.image
+  const version = m.version?.trim()
+  if (version) args.p_version = version
+  return args
+}
 
 async function publierMiseAJour(m: MiseAJourAEcrire): Promise<number> {
   const { data, error } = await supabase.rpc('publier_mise_a_jour', champs(m))
@@ -39,8 +45,6 @@ async function modifierMiseAJour(id: number, m: MiseAJourAEcrire): Promise<void>
 }
 
 export type Brouillon = { titre: string; texte: string; version: string; fichier: File | null; retirer: boolean }
-
-const messageDe = (e: unknown) => (e instanceof Error ? e.message : String(e))
 
 /**
  * Publie (fiche null) ou modifie une note. Ordre : envoi du nouveau fichier, RPC, retrait de l'ancien fichier.
@@ -61,7 +65,7 @@ export async function enregistrerMiseAJour(fiche: MiseAJour | null, b: Brouillon
     try {
       await retirerFichier(BUCKET, fiche.image)
     } catch (e) {
-      throw new Error(`Enregistré, mais l’ancienne image n’a pas pu être retirée : ${messageDe(e)}`, { cause: e })
+      throw new Error(`Enregistré, mais l’ancienne image n’a pas pu être retirée : ${messageDErreur(e)}`, { cause: e })
     }
   }
 }
@@ -73,7 +77,7 @@ export async function supprimerMiseAJour(id: number, image: string | null): Prom
   try {
     await retirerFichier(BUCKET, image)
   } catch (e) {
-    throw new Error(`Supprimée, mais l’image n’a pas pu être retirée : ${messageDe(e)}`, { cause: e })
+    throw new Error(`Supprimée, mais l’image n’a pas pu être retirée : ${messageDErreur(e)}`, { cause: e })
   }
 }
 

@@ -71,6 +71,12 @@ function Formulaire({ fiche }: { fiche: Article }) {
   const occupe = enregistrer.isPending || publier.isPending
   const brouillon = { titre, type, texte, ctaUrl, ctaLibelle, fichier: choix?.fichier ?? null, retirer }
 
+  // Une fois enregistré, le fichier est en ligne : l'enregistrement suivant ne doit pas le renvoyer.
+  function oublierLeFichier() {
+    setChoix(null)
+    setRetirer(false)
+  }
+
   function choisirImage(e: ChangeEvent<HTMLInputElement>) {
     const fichier = e.target.files?.[0]
     e.target.value = ''
@@ -86,7 +92,7 @@ function Formulaire({ fiche }: { fiche: Article }) {
     <form
       className={styles.formulaire}
       onChange={() => { enregistrer.reset(); publier.reset() }}
-      onSubmit={(e) => { e.preventDefault(); enregistrer.mutate({ fiche, brouillon }) }}
+      onSubmit={(e) => { e.preventDefault(); enregistrer.mutate({ fiche, brouillon }, { onSuccess: oublierLeFichier }) }}
     >
       {image && <img className={styles.image} src={image} alt="" />}
       <label className={[styles.boutonContour, styles.envoi].join(' ')}>
@@ -125,7 +131,7 @@ function Formulaire({ fiche }: { fiche: Article }) {
       <div>
         <button type="submit" className={styles.boutonContour} disabled={!titre.trim() || occupe}>Enregistrer</button>{' '}
         <button type="button" className={styles.boutonContour} disabled={!titre.trim() || occupe}
-          onClick={() => { publier.mutate({ fiche, brouillon }) }}>
+          onClick={() => { publier.mutate({ fiche, brouillon }, { onSuccess: oublierLeFichier }) }}>
           {fiche.shopify_article_id ? 'Mettre à jour l’article' : 'Publier sur la boutique'}
         </button>
         {enregistrer.isSuccess && <span role="status"> Enregistré.</span>}

@@ -31,7 +31,7 @@ function LigneDeMiseAJour({ note }: { note: MiseAJour }) {
 }
 
 export function MisesAJour() {
-  const { data, isError } = useMisesAJour()
+  const { data, error } = useMisesAJour()
   const { search } = useLocation()
   return (
     <div className={styles.ecran}>
@@ -42,7 +42,7 @@ export function MisesAJour() {
         aDroite={<Link className={styles.boutonContour} to={{ pathname: 'nouvelle', search }}>+ Nouvelle mise à jour</Link>}
       />
       <TitreDeSection titre="Déjà publiées" />
-      {isError && <p className={styles.calme}>La base ne répond pas.</p>}
+      {error && <p role="alert" className={styles.erreur}>Les mises à jour n’ont pas pu se charger : {error.message}</p>}
       {data?.length === 0 && <p className={styles.calme}>Aucune mise à jour publiée.</p>}
       {data && data.length > 0 && <Bloc>{data.map((m) => <LigneDeMiseAJour key={m.id} note={m} />)}</Bloc>}
       <Outlet />
