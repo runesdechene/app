@@ -9,6 +9,7 @@ import { TiroirMiseAJour } from './TiroirMiseAJour'
 const mockRpc = vi.hoisted(() => vi.fn())
 const mockEnvoyer = vi.hoisted(() => vi.fn())
 const mockRetirer = vi.hoisted(() => vi.fn())
+const mockRevoke = vi.hoisted(() => vi.fn())
 vi.mock('@/shared/lib/envoi', async (orig) => ({
   ...(await orig<typeof import('@/shared/lib/envoi')>()), envoyerFichier: mockEnvoyer, retirerFichier: mockRetirer,
 }))
@@ -46,7 +47,11 @@ function poser(champ: HTMLElement, valeur: string) {
   champ.dispatchEvent(new Event('input', { bubbles: true }))
 }
 
-beforeEach(() => { vi.clearAllMocks() })
+beforeEach(() => {
+  vi.clearAllMocks()
+  URL.createObjectURL = vi.fn(() => 'blob:apercu')
+  URL.revokeObjectURL = mockRevoke
+})
 
 test('la liste montre titre, date, version et « 3 cœurs · 1 mot »', async () => {
   monter('/joueurs/mises-a-jour?q=x')
@@ -91,18 +96,78 @@ test('une note existante : « Enregistrer », la fiche est préremplie', async (
   expect(screen.getByLabelText('Version')).toHaveValue('Pythéas 1.2.4')
 })
 
-test('remplacer l’image : l’ancienne est retirée après modifier_mise_a_jour réussie', async () => {
+const png = (nom = 'a.png') => new File(['x'], nom, { type: 'image/png' })
+
+test('remplacer l’image : choisir deux fois puis enregistrer envoie une seule fois, l’ancienne part après la RPC', async () => {
   monter('/joueurs/mises-a-jour/4')
-  await userEvent.upload(await screen.findByLabelText('Changer l’image'), new File(['x'], 'a.png', { type: 'image/png' }))
-  await vi.waitFor(() => { expect(mockEnvoyer).toHaveBeenCalledWith('announcement-covers', expect.stringMatching(/^mise-a-jour-\d+\.png$/), expect.any(File)) })
-  expect(mockRetirer).not.toHaveBeenCalled()
+  const champ = await screen.findByLabelText('Changer l’image')
+  await userEvent.upload(champ, png('a.png'))
+  await userEvent.upload(champ, png('b.png'))
+  expect(mockEnvoyer).not.toHaveBeenCalled()
   await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
   await vi.waitFor(() => { expect(mockRetirer).toHaveBeenCalledWith('announcement-covers', ANCIENNE) })
+  expect(mockEnvoyer).toHaveBeenCalledTimes(1)
+  expect(mockEnvoyer).toHaveBeenCalledWith('announcement-covers', expect.stringMatching(/^mise-a-jour-\d+\.png$/), expect.any(File))
   expect(mockRpc).toHaveBeenCalledWith('modifier_mise_a_jour', {
-    p_id: 4, p_titre: 'Filtrer la carte', p_texte: 'Un filtre.\n\nEt un autre.', p_image: NOUVELLE, p_version: 'Pythéas 1.2.4',
+    p_id: 4, p_titre: 'Filtrer la carte', p_texte: carte.texte, p_image: NOUVELLE, p_version: 'Pythéas 1.2.4',
   })
   const appelModifier = mockRpc.mock.calls.findIndex(([nom]) => nom === 'modifier_mise_a_jour')
   expect(mockRpc.mock.invocationCallOrder[appelModifier]).toBeLessThan(mockRetirer.mock.invocationCallOrder[0] ?? 0)
+  expect(mockEnvoyer.mock.invocationCallOrder[0]).toBeLessThan(mockRpc.mock.invocationCallOrder[appelModifier] ?? 0)
+})
+
+test('choisir une image puis fermer sans enregistrer n’envoie rien', async () => {
+  const router = monter('/joueurs/mises-a-jour/4')
+  await userEvent.upload(await screen.findByLabelText('Changer l’image'), png())
+  await router.navigate('/joueurs/mises-a-jour')
+  expect(mockEnvoyer).not.toHaveBeenCalled()
+  expect(mockRetirer).not.toHaveBeenCalled()
+})
+
+test('l’aperçu est libéré quand on change de fichier', async () => {
+  monter('/joueurs/mises-a-jour/4')
+  const champ = await screen.findByLabelText('Changer l’image')
+  await userEvent.upload(champ, png('a.png'))
+  await userEvent.upload(champ, png('b.png'))
+  expect(mockRevoke).toHaveBeenCalledTimes(1)
+})
+
+test('si la RPC échoue après l’envoi, le fichier tout juste envoyé est retiré', async () => {
+  monter('/joueurs/mises-a-jour/4', 'Réservé aux admins')
+  await userEvent.upload(await screen.findByLabelText('Changer l’image'), png())
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Réservé aux admins')
+  expect(mockRetirer).toHaveBeenCalledTimes(1)
+  expect(mockRetirer).toHaveBeenCalledWith('announcement-covers', NOUVELLE)
+})
+
+test('Retirer l’image : la RPC part sans p_image, puis l’ancien fichier est retiré', async () => {
+  monter('/joueurs/mises-a-jour/4')
+  await userEvent.click(await screen.findByRole('button', { name: 'Retirer l’image' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+  await vi.waitFor(() => { expect(mockRetirer).toHaveBeenCalledWith('announcement-covers', ANCIENNE) })
+  expect(mockRpc).toHaveBeenCalledWith('modifier_mise_a_jour', {
+    p_id: 4, p_titre: 'Filtrer la carte', p_texte: carte.texte, p_version: 'Pythéas 1.2.4',
+  })
+  expect(mockEnvoyer).not.toHaveBeenCalled()
+  const appelModifier = mockRpc.mock.calls.findIndex(([nom]) => nom === 'modifier_mise_a_jour')
+  expect(mockRpc.mock.invocationCallOrder[appelModifier]).toBeLessThan(mockRetirer.mock.invocationCallOrder[0] ?? 0)
+})
+
+test('enregistré mais l’ancienne image ne part pas : le message le dit', async () => {
+  monter('/joueurs/mises-a-jour/4')
+  mockRetirer.mockRejectedValue(new Error('droits ?'))
+  await userEvent.upload(await screen.findByLabelText('Changer l’image'), png())
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Enregistré, mais l’ancienne image n’a pas pu être retirée : droits ?')
+})
+
+test('le bouton est inactif pendant l’enregistrement', async () => {
+  monter('/joueurs/mises-a-jour/4')
+  const bouton = await screen.findByRole('button', { name: 'Enregistrer' })
+  mockRpc.mockImplementation(() => new Promise(() => undefined))
+  await userEvent.click(bouton)
+  await vi.waitFor(() => { expect(bouton).toBeDisabled() })
 })
 
 test('un fichier refusé n’est pas envoyé', async () => {
@@ -127,8 +192,10 @@ test('supprimer : si le retrait de l’image échoue, la note a quitté la liste
   mockRetirer.mockRejectedValue(new Error('droits ?'))
   await userEvent.click(await screen.findByRole('button', { name: 'Supprimer' }))
   await userEvent.click(screen.getByRole('button', { name: 'Confirmer' }))
-  expect(await screen.findByRole('alert')).toHaveTextContent('droits ?')
+  expect(await screen.findByRole('alert')).toHaveTextContent('Supprimée, mais l’image n’a pas pu être retirée : droits ?')
   await vi.waitFor(() => { expect(screen.queryByRole('link', { name: /Filtrer la carte/ })).not.toBeInTheDocument() })
+  expect(screen.queryByRole('button', { name: 'Supprimer' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Enregistrer' })).not.toBeInTheDocument()
 })
 
 test('annuler la suppression ne supprime rien', async () => {

@@ -3,33 +3,42 @@
  *            « Publier et prévenir les joueurs » (nouvelle) ou « Enregistrer » (existante), et « Supprimer »
  *            confirmée en ligne.
  * POURQUOI — publier envoie aussi une notification push aux joueurs abonnés : le bouton le dit. Enregistrer une
- *            note existante garde sa date et ne rallume pas la cloche. L'image s'envoie dès le choix ; l'ancienne
- *            n'est retirée du bucket qu'à l'enregistrement. Une note supprimée quitte la liste même si le retrait
+ *            note existante garde sa date et ne rallume pas la cloche. Le fichier choisi ne s'envoie qu'à l'enregistrement (aperçu local) ; l'ancien
+ *            n'est retiré du bucket qu'ensuite. Une note supprimée quitte la liste même si le retrait
  *            de son image échoue : le tiroir garde alors la fiche pour montrer l'erreur.
  */
-import { useState, type ChangeEvent, type SyntheticEvent } from 'react'
+import { useEffect, useState, type ChangeEvent, type SyntheticEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { verifierFichier } from '@/shared/lib/envoi'
 import { Tiroir } from '@/shared/ui/Tiroir'
 import type { MiseAJour } from '../api/misesAJour'
-import { useEnregistrerMiseAJour, useEnvoyerImage, useMisesAJour, useSupprimerMiseAJour } from '../hooks/useMisesAJour'
+import { useEnregistrerMiseAJour, useMisesAJour, useSupprimerMiseAJour } from '../hooks/useMisesAJour'
 import { estPubliable, REGLE_IMAGE, TEXTE_MAX, TITRE_MAX } from '../lib/miseAJour'
 import styles from './Joueurs.module.css'
 
 const LISTE = '/joueurs/mises-a-jour'
 
-function Formulaire({ fiche }: { fiche: MiseAJour | null }) {
+function Formulaire({ fiche, supprimee }: { fiche: MiseAJour | null; supprimee: boolean }) {
   const { search } = useLocation()
   const naviguer = useNavigate()
   const enregistrer = useEnregistrerMiseAJour()
   const supprimer = useSupprimerMiseAJour()
-  const envoi = useEnvoyerImage()
   const [titre, setTitre] = useState(fiche?.titre ?? '')
   const [texte, setTexte] = useState(fiche?.texte ?? '')
   const [version, setVersion] = useState(fiche?.version ?? '')
-  const [image, setImage] = useState(fiche?.image ?? null)
+  // Le fichier choisi ne part qu'à l'enregistrement ; son aperçu est libéré au changement et à la fermeture.
+  const [choix, setChoix] = useState<{ fichier: File; apercu: string } | null>(null)
+  const [retirer, setRetirer] = useState(false)
   const [confirmer, setConfirmer] = useState(false)
   const [refus, setRefus] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!choix) return
+    return () => { URL.revokeObjectURL(choix.apercu) }
+  }, [choix])
+
+  const image = choix?.apercu ?? (retirer ? null : fiche?.image ?? null)
+  const occupe = enregistrer.isPending || supprimer.isPending
 
   function choisirImage(e: ChangeEvent<HTMLInputElement>) {
     const fichier = e.target.files?.[0]
@@ -38,13 +47,14 @@ function Formulaire({ fiche }: { fiche: MiseAJour | null }) {
     const erreur = verifierFichier(fichier, REGLE_IMAGE)
     setRefus(erreur)
     if (erreur) return
-    envoi.mutate(fichier, { onSuccess: setImage })
+    setChoix({ fichier, apercu: URL.createObjectURL(fichier) })
+    setRetirer(false)
   }
 
   function valider(e: SyntheticEvent) {
     e.preventDefault()
     enregistrer.mutate(
-      { fiche, note: { titre, texte, image, version } },
+      { fiche, brouillon: { titre, texte, version, fichier: choix?.fichier ?? null, retirer } },
       { onSuccess: () => { if (!fiche) void naviguer(LISTE + search) } },
     )
   }
@@ -54,10 +64,13 @@ function Formulaire({ fiche }: { fiche: MiseAJour | null }) {
       {image && <img className={styles.image} src={image} alt="" />}
       <label className={[styles.boutonContour, styles.envoi].join(' ')}>
         {image ? 'Changer l’image' : 'Ajouter une image'}
-        <input type="file" accept={REGLE_IMAGE.types.join(',')} disabled={envoi.isPending} onChange={choisirImage} />
+        <input type="file" accept={REGLE_IMAGE.types.join(',')} disabled={occupe} onChange={choisirImage} />
       </label>
       {refus && <p role="alert">{refus}</p>}
-      {envoi.isError && <p role="alert">{envoi.error.message}</p>}
+      {image && (
+        <button type="button" className={styles.boutonContour} disabled={occupe}
+          onClick={() => { setChoix(null); setRetirer(true) }}>Retirer l’image</button>
+      )}
 
       <label className={styles.champ}>Titre
         <input value={titre} maxLength={TITRE_MAX} placeholder="ex. Filtrer la carte" onChange={(e) => { setTitre(e.target.value) }} />
@@ -76,14 +89,16 @@ function Formulaire({ fiche }: { fiche: MiseAJour | null }) {
       </label>
 
       <div>
-        <button type="submit" className={styles.boutonContour} disabled={!estPubliable(titre, texte) || enregistrer.isPending}>
-          {fiche ? 'Enregistrer' : 'Publier et prévenir les joueurs'}
-        </button>
+        {!supprimee && (
+          <button type="submit" className={styles.boutonContour} disabled={!estPubliable(titre, texte) || occupe}>
+            {fiche ? 'Enregistrer' : 'Publier et prévenir les joueurs'}
+          </button>
+        )}
         {enregistrer.isSuccess && <span role="status"> Enregistré.</span>}
         {enregistrer.isError && <p role="alert">{enregistrer.error.message}</p>}
       </div>
 
-      {fiche && (
+      {fiche && !supprimee && (
         <div>
           {confirmer ? (
             <span>
@@ -95,9 +110,9 @@ function Formulaire({ fiche }: { fiche: MiseAJour | null }) {
           ) : (
             <button type="button" className={styles.boutonContour} onClick={() => { setConfirmer(true) }}>Supprimer</button>
           )}
-          {supprimer.isError && <p role="alert">{supprimer.error.message}</p>}
         </div>
       )}
+      {supprimer.isError && <p role="alert">{supprimer.error.message}</p>}
     </form>
   )
 }
@@ -110,7 +125,7 @@ export function TiroirMiseAJour() {
   const [vue, setVue] = useState<MiseAJour | null>(null)
 
   if (id === undefined) {
-    return <Tiroir titre="Nouvelle mise à jour" retour={retour}><Formulaire fiche={null} /></Tiroir>
+    return <Tiroir titre="Nouvelle mise à jour" retour={retour}><Formulaire fiche={null} supprimee={false} /></Tiroir>
   }
   if (isPending) {
     return <Tiroir titre="Mise à jour" retour={retour}><p className={styles.calme}>Lecture…</p></Tiroir>
@@ -137,5 +152,5 @@ export function TiroirMiseAJour() {
     )
   }
   // La clé remet le formulaire à zéro quand on passe d'une note à l'autre.
-  return <Tiroir titre={fiche.titre} retour={retour}><Formulaire key={fiche.id} fiche={fiche} /></Tiroir>
+  return <Tiroir titre={fiche.titre} retour={retour}><Formulaire key={fiche.id} fiche={fiche} supprimee={!trouvee} /></Tiroir>
 }
