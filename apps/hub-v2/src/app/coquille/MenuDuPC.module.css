@@ -33,7 +33,7 @@
   gap: 1px;
 }
 
-/* Une rubrique de carnet : petites capitales douces, un filet jusqu'au bord. Le titre range,
+/* Une rubrique de carnet : petites capitales, un filet jusqu'au bord. Le titre range,
    l'œil lit les liens. */
 .titre {
   display: flex;
@@ -46,7 +46,7 @@
   font-size: var(--libelle-size);
   letter-spacing: var(--libelle-tracking);
   text-transform: uppercase;
-  color: var(--color-texte-doux);
+  color: var(--color-encre);
 }
 
 .titre::after {
