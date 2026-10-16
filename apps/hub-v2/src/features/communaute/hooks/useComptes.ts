@@ -6,8 +6,8 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { lireComptes, type Criteres } from '../api/comptes'
 import { versCsv } from '../lib/csv'
 
-export function useComptes(criteres: Criteres) {
-  return useQuery({ queryKey: ['hub-comptes', criteres], queryFn: () => lireComptes(criteres), placeholderData: keepPreviousData })
+export function useComptes(criteres: Criteres, actif = true) {
+  return useQuery({ queryKey: ['hub-comptes', criteres], queryFn: () => lireComptes(criteres), placeholderData: keepPreviousData, enabled: actif })
 }
 
 export async function exporterComptes(criteres: Criteres): Promise<string> {
