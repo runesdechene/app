@@ -1,6 +1,6 @@
 # hub-v2 — le Hub V2
 
-> Port dev 5175. Préparation : site Netlify `rdc-hub-v2`. Prod (après le plan 5) : hub.runesdechene.com.
+> Port dev 5175. En ligne sur hub.runesdechene.com (site Netlify `rdc-hub-v2`) depuis la bascule du 16/10/2026.
 > Réservé aux admins (`hub_est_admin()`).
 
 Règles communes : `CLAUDE.md` racine. Règles de construction : `.claude/rules/v2.md` et

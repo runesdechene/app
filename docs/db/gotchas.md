@@ -133,7 +133,7 @@ json_build_object(
 )
 ```
 
-**Règle générale** : ne jamais retirer un champ du retour d'une RPC sans grep le nom dans `apps/explore-web/` et `apps/hub/`.
+**Règle générale** : ne jamais retirer un champ du retour d'une RPC sans grep le nom dans `apps/web-v2/` et `apps/hub-v2/`.
 
 ---
 

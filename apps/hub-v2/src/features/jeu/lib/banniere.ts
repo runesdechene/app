@@ -1,7 +1,7 @@
 /**
  * QUOI     — le voile et l'ombre du texte d'une bannière d'Accueil, et la règle du lien.
  * POURQUOI — degradeDeVoile et ombreDeTexte reprennent tels quels buildOverlayGradient et buildTextShadow de
- *            l'ancien Hub (apps/hub/src/components/Banners.tsx), qui devaient rester alignés sur l'Accueil : la V2
+ *            l'ancien Hub (Banners, retiré le 16/10), qui devaient rester alignés sur l'Accueil : la V2
  *            (apps/web-v2/src/features/accueil/components/Banniere.module.css) fait le même calcul en CSS
  *            (force, puis 58,8 % et 23,5 % d'elle ; ombre « 0 1px 3px »). Le lien se vérifie comme la V2 (lireAccueil.ts,
  *            estHttp) : une adresse lisible en http(s), sinon la V2 n'affiche pas la bannière.

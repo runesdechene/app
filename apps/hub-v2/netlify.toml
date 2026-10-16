@@ -1,4 +1,4 @@
-# QUOI     — le site Netlify du Hub V2 (préparation, puis hub.runesdechene.com à la bascule).
+# QUOI     — le site Netlify du Hub (`rdc-hub-v2`), qui sert hub.runesdechene.com depuis le 16/10/2026.
 # POURQUOI — une appli d'une page : toute adresse sert index.html, le routeur fait le reste. Les
 #            fonctions (Shopify, compte du stand) sont celles de l'ancien Hub, déménagées.
 [build]

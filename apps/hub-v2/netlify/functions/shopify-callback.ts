@@ -64,7 +64,7 @@ export default async function handler(request: Request) {
 <div class="step">2. Va sur Netlify Dashboard → site Hub → Site configuration → Environment variables.</div>
 <div class="step">3. Édite la variable <code style="display:inline; padding:2px 6px;">SHOPIFY_ACCESS_TOKEN</code> et colle la nouvelle valeur. Save.</div>
 <div class="step">4. Trigger redeploy Netlify pour que les Functions rechargent l'env (sinon les instances warm gardent l'ancien token).</div>
-<div class="step">5. Test sur <a href="${url.origin}/shopify/sync">/shopify/sync</a> que la sync Shopify marche.</div>
+<div class="step">5. Test sur <a href="${url.origin}/boutique/synchro">/boutique/synchro</a> que la sync Shopify marche.</div>
 </div>
 <p style="font-size: 12px; opacity: 0.7;">Ce token n'est PAS stocké côté serveur. Si tu fermes cette page sans copier, il faudra refaire un OAuth flow pour en générer un nouveau.</p>
 </body>

@@ -198,3 +198,33 @@ relié, ça ne voulait rien dire ».
 **How to apply :** un compte qui a au moins un Fragment (`user_fragments`) est un **Porteur** — c'est
 la balise à montrer, dans l'appli comme dans le Hub. Pour dire qu'un compte correspond à un client
 Shopify, écrire « client validé ». « Explorateur » n'est pas une balise : c'est tout le monde.
+
+## Modèle veille — 1 user = 1 mécène = 1 veilleur
+
+**Modèle de veille des lieux (figé Uriel, rappelé 9/05 — déjà donné "un million de fois") :**
+
+- 1 **user** OU 1 **groupe avec nom custom** (s'ils sont plusieurs à veiller — typiquement plantage GPS avec compagnons) = 1 mécène = 1 veilleur. **Mécène = Veilleur**. Synonymes.
+- Pas de camp (defense/attack). Pas de notion d'expédition au sens "événement RDV" (qui est un autre concept du 6/05 — événements communautaires).
+- **Score d'un user sur un lieu** = total Couronnes investies (toutes sources confondues : plant_flag GPS, invest_crowns, etc.).
+- **Veilleur** = le user avec le score le plus élevé sur ce lieu. Point.
+- **Bascule** : dès qu'un autre user dépasse le score du veilleur actuel (même de 1), il devient le nouveau veilleur. Instant, pas de seuil, pas de cooldown.
+- **Plant_flag GPS — règle uniforme** : à chaque plantage, **tous les autres users** sur ce lieu voient leur score wipé à 0. Le planteur **conserve** son propre score (s'il en avait un, à distance ou local) et reçoit en plus **+50 + 30/compagnon présent** (max 10 compagnons → max +350). Le planteur devient veilleur (puisqu'il a au moins son ancien score + 50, et tous les autres sont à 0). Cette règle est unique : pas de cas "déjà veilleur" vs "pas veilleur" — c'est la même chose, le planteur est toujours protégé, les autres toujours wipés.
+- **Verbes UI selon contexte :**
+  - Si je suis veilleur courant → un seul bouton : **Renforcer** (Couronnes → mon score).
+  - Si je ne suis pas veilleur → deux boutons : **Défier** (Couronnes → mon score) ou **Soutenir** (Couronnes → score du veilleur courant).
+  - Mécaniquement : Renforcer ≡ Défier (`beneficiary = self`). Soutenir = `beneficiary = veilleur courant`. Pas de defense/attack côté code.
+
+**Where I went wrong :**
+
+Le 5/05, dans la spec `docs/superpowers/specs/2026-05-05-v07-phase5-la-cour-design.md`, j'ai écrit "expédition" partout alors qu'Uriel avait dit "user". Falsification de la consigne dès la rédaction. J'ai ensuite codé sur la base de ma spec falsifiée — d'où `place_veille.expedition_id`, `invest_crowns(p_target_expedition_id)`, scores agrégés par expé, distinction defense/attack. Et chaque correction d'Uriel ces 3 derniers jours, je l'ai patchée en surface au lieu de remonter au modèle.
+
+Le mot "expédition" dans le code de veille est une scorie de cette falsification. Pas une dette technique neutre — une trace de ma désobéissance.
+
+**Why:** Uriel me l'a redit "un million de fois". Si je remets en doute ce modèle ou je code à côté, ce n'est plus une erreur — c'est une trahison de consigne. Et ça casse le game design (cf. bug Veymont 9/05 : Néphéris top points pas veilleuse, points qui semblent cumulés, etc.).
+
+**How to apply:**
+- Toute spec, plan, RPC, table, composant qui touche la veille des lieux doit être rédigé en **user_id**, pas expedition_id.
+- Si je vois encore `expedition_id` ou `expedition_members` dans la veille, c'est une dette à éliminer, pas un acquis à respecter.
+- Si on touche au code de veille, c'est l'occasion de purger le mot "expédition" du domaine. Le mot "Expédition" n'a qu'un seul sens autorisé dans l'app : **événement RDV** (spec 6/05).
+- Avant d'écrire une spec sur la veille / la cour / le mécénat, RELIRE cette mémoire pour ne pas re-falsifier.
+- Quand Uriel donne une règle simple ("le top prend la place, point"), ne pas la complexifier en ajoutant expé/camps/seuils/effective scores. La complexité que je rajoute = la falsification.

@@ -61,6 +61,8 @@ Migration 004 a posé deux RPCs sur ce pattern :
 
 Détection : `userName === '' && userFactionId === null`.
 
-## Flow Hub — fetch role
+## Flow Hub — la porte des admins
 
-Le Hub utilise `fetchRole` (chercher via Graphify, cluster auth) qui fait `.eq('email_address', authUser.email)`.
+Le Hub (`apps/hub-v2`) n'ouvre qu'aux admins : à l'entrée, `hub_est_admin()` (mig 505), lue par
+la porte (`src/app/entree/PorteDEntree.tsx`). Les pages publiques (`/flyer`, `/flyercadeau`,
+`/soumettre-contenu`) passent avant elle et ne l'appellent jamais.

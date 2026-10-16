@@ -1,7 +1,7 @@
-Les fonctions Netlify du Hub V2 : celles de l'ancien Hub, déménagées. Code serveur repris tel quel,
+Les fonctions Netlify du Hub : celles de l'ancien Hub, déménagées. Code serveur repris tel quel,
 sauf les trous de sécurité refermés dans les copies (plan 4, R2). Hors du lint et du `tsc` du Hub.
 `../securite.test.ts` (hors de ce dossier, qui est déployé) teste les garde-fous (`fetch` simulé). En local elles ne tournent pas : tester
-sur le site de préparation. L'appel côté client passe par `appelerFonction` (`src/shared/lib/fonctions.ts`),
+en ligne. L'appel côté client passe par `appelerFonction` (`src/shared/lib/fonctions.ts`),
 sauf `flyer-create-account`, appelée sans session par `/flyercadeau` (`src/public/cadeau/api.ts`).
 
 | Fonction | Rôle · qui l'appelle | Garde |
@@ -22,5 +22,5 @@ Variables d'environnement lues (sans aucune valeur ici) : `VITE_SUPABASE_URL`,
 `SHOPIFY_CLIENT_SECRET`, `SHOPIFY_SHOP`, `FLYER_PROMO_CODE` (`flyer-create-account`, qui lit aussi
 `VITE_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` et `SHOPIFY_ACCESS_TOKEN`).
 
-Le webhook `orders/paid` de Shopify pointe encore vers l'ancien site ; il ne change qu'au plan 5.
+Le webhook `orders/paid` de Shopify pointe vers `hub.runesdechene.com` : il suit le domaine, passé au Hub V2 le 16/10.
 `shopify-create-customer` ne déménage pas (spec §3) ; `flyer-create-account` a déménagé au plan 5, avec `/flyercadeau`.

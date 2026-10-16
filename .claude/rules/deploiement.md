@@ -22,7 +22,8 @@ la CLI est installée en global par pnpm, `netlify deploy …` avec les mêmes o
 | Site | SITE_ID | Domaine |
 |---|---|---|
 | `runesdechene` (Explore, `apps/web-v2` depuis la bascule du 07/10/2026) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` |
-| `hub-runesdechene` | `d1cac03c-19a1-4b92-be72-fa3805428cd1` | `hub.runesdechene.com` |
+| `rdc-hub-v2` (le Hub, `apps/hub-v2`, depuis la bascule du 16/10/2026) | `5d04dcdd-6374-4e8b-a0f4-fcef64a707f3` | `hub.runesdechene.com` |
+| `hub-runesdechene` (l'ancien Hub, gardé en secours, à supprimer) | `d1cac03c-19a1-4b92-be72-fa3805428cd1` | `hub-runesdechene.netlify.app` |
 | `rdc-seo-pages` | `5a5b9cb9-d330-41d7-a037-6bd65ac67eb9` | sert `/lieu/*` via rewrite |
 | `runesdechene-demo` (borne) | `01d23d77-db08-4ecd-a0b6-f2b76035deb6` | `demo.runesdechene.com` — **abandonnée le 26/09/2026**, branche `demo-borne` supprimée : ne plus déployer |
 
@@ -51,12 +52,24 @@ le service worker a vu la mise à jour la proposent.
 
 ## Le Hub : `--site=<ID>` et `--no-build`, jamais son nom
 
-**Le piège** (07/10/2026) : `--site=hub-runesdechene` sans `--no-build` lance un build Netlify qui
-répond « Failed retrieving site data … Not Found ». Avec l'identifiant et `--no-build`, c'est passé :
-`npx netlify-cli deploy --prod --no-build --dir "<abs>/apps/hub/dist" --functions
-"<abs>/apps/hub/netlify/functions" --site=d1cac03c-19a1-4b92-be72-fa3805428cd1` (build fait avant,
-`pnpm build` dans `apps/hub`). Pour la V1 c'est l'inverse (le nom passe, l'identifiant non) : en cas
-de « Not Found », essayer l'autre forme.
+**Le piège** (07/10/2026, ancien Hub) : `--site=<nom>` sans `--no-build` lance un build Netlify qui
+répond « Failed retrieving site data … Not Found ». Avec l'identifiant et `--no-build`, ça passe.
+
+**How to apply :** `pnpm build` dans `apps/hub-v2`, puis
+`cd apps/hub-v2 && netlify deploy --prod --no-build --dir "$PWD/dist" --functions "$PWD/netlify/functions" --site=5d04dcdd-6374-4e8b-a0f4-fcef64a707f3`.
+Vérifier : `curl -s https://hub.runesdechene.com/ | grep -o 'assets/index-[^"]*\.js'` = celui de
+`apps/hub-v2/dist/index.html` ; `/flyer` → 200 ; `POST /.netlify/functions/shopify-order-webhook`
+sans signature → 401.
+
+## Déplacer un domaine d'un site Netlify à un autre (bascule du Hub, 16/10/2026)
+
+Un domaine n'appartient qu'à un site : l'ajouter au nouveau site tant que l'ancien le garde répond
+« Unprocessable Entity ». D'abord le retirer de l'ancien (`netlify api updateSite --data
+'{"site_id":"<ancien>","body":{"custom_domain":null}}'` — `null`, pas `""`, qui répond « Bad
+Request »), puis l'ajouter au nouveau, aussitôt : entre les deux, le domaine ne répond plus. Le
+CNAME qui pointe vers l'adresse `netlify.app` de l'ancien site n'empêche rien, Netlify aiguille sur
+le domaine. La protection automatique de Claude Code refuse ce geste : Uriel le lance lui-même
+(`! netlify api …`). Retour en arrière : le même geste dans l'autre sens.
 
 ## Netlify : créer un site, écrire une redirection
 
@@ -98,7 +111,7 @@ Ne JAMAIS écrire `--dir=dist` seul.
 
 Pour le hub, **toujours** ajouter `--functions "$PWD/netlify/functions"` (chemin absolu) :
 ```
-cd apps/hub && netlify deploy --prod --dir "$PWD/dist" --functions "$PWD/netlify/functions"
+cd apps/hub-v2 && netlify deploy --prod --no-build --dir "$PWD/dist" --functions "$PWD/netlify/functions" --site=5d04dcdd-6374-4e8b-a0f4-fcef64a707f3
 ```
 Pour explore-web (pas de Netlify Functions), `--no-build` seul suffit. Apprentissage 2026-04-22.
 

@@ -41,5 +41,5 @@ jobs:
             fi
           }
           check_site app.runesdechene.com 1b29da09-c7af-44bf-9c31-465bfaae9d74
-          check_site hub.runesdechene.com d1cac03c-19a1-4b92-be72-fa3805428cd1
+          check_site hub.runesdechene.com 5d04dcdd-6374-4e8b-a0f4-fcef64a707f3
           exit $fail

@@ -270,3 +270,26 @@ d'origine avant de rendre la main.
 l'ignore, stylelint et les tests ne disent rien, et les onglets des Fragments se sont collés en prod de
 préparation. **How to apply :** n'écrire un `var(--…)` qu'après l'avoir vu dans `tokens.css` ; un écran
 neuf se regarde dans le navigateur avant d'être dit fini.
+
+## feedback_editeurs_vues_internes_pas_panneau
+
+Dans une modale (ex. le Hall de Compagnie), un sous-éditeur (grades, identité d'une Compagnie, etc.) doit **remplacer entièrement le contenu de la modale** = une vraie vue interne plein-écran avec un bouton « ← Retour ». **Jamais** un panneau appendé sous le contenu existant (qui oblige à scroller pour l'atteindre), **ni** une 2ᵉ modale empilée par-dessus.
+
+**Why:** Uriel a qualifié la 1ʳᵉ version de l'éditeur de grades (panneau sous le roster, qu'il fallait scroller tout en bas) de « la pire interface » (26/06). Il veut aussi que l'édition d'identité soit *dans* la modale Compagnie, pas une modale par-dessus.
+
+**How to apply:** modale avec un état `view` (`'roster' | 'grades' | 'identity' | …`) ; chaque vue ≠ roster fait un `return` plein-modale (header retour + corps scrollable + footer collé). Pour embarquer un composant qui se portale d'habitude (ex. `FactionCreateForm`), lui donner un mode `embedded` qui rend le formulaire seul sans overlay/portal. Implémenté ainsi dans `FactionHallModal.tsx`.
+
+## Modales d'explication user-facing — texte minimal, pas de pédagogie sur l'algorithme backend
+
+Le 2026-05-02, j'avais réécrit la modale "Couronnes de Chêne" pour expliquer en détail le cap quotidien à 15, le tirage MD5, le roulement, l'espérance de gain. Uriel a coupé net : *"Tu rentres trop dans les détails. Les joueurs vont se plaindre."* Texte ramené à 1 phrase + 4 lignes simples.
+
+**Why:** un joueur qui découvre une mécanique veut savoir 1) ce qui se passe 2) ce qu'il gagne 3) éventuellement où c'est plafonné. Pas comment c'est implémenté. Trop d'explication = méfiance ("pourquoi ils me parlent d'un algorithme ?") + mur de texte ignoré + sentiment de complexité bureaucratique.
+
+**How to apply:** quand je rédige une modale `InfoModal` ou un texte d'aide :
+- 1 phrase de description (ce qui se passe)
+- Quelques rows label/valeur (les chiffres clés)
+- Pas de mention de "tirage au sort", "algorithme", "cap silencieux", "hash", "espérance", "roulement"
+- Pas de "pour les meilleurs joueurs / pour les petits joueurs" — le joueur ne doit pas se classer
+- Si je sens le besoin d'expliquer l'algo, c'est probablement que la mécanique elle-même est trop compliquée — alerte
+
+Les détails backend restent dans : commentaires SQL, docs/ specs, mémoire XO, jamais en user-facing.

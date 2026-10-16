@@ -11,7 +11,7 @@
 | Quoi                                                     | Où                                                              |
 | -------------------------------------------------------- | --------------------------------------------------------------- |
 | Explore, l'appli (`app.runesdechene.com`, depuis la bascule du 07/10) | `apps/web-v2/` — carnet : `docs/v2/`                |
-| Back-office (`hub.runesdechene.com`)                     | `apps/hub/`                                                     |
+| Back-office (`hub.runesdechene.com`, depuis le 16/10)    | `apps/hub-v2/`                                                  |
 | Pages SEO (`/lieu/*`)                                    | `apps/seo-pages/`                                               |
 | Base, migrations, RPC, edge functions                    | `supabase/`                                                     |
 | Conception V2 — **fait foi**, points ouverts en bas      | `docs/superpowers/specs/2026-08-18-app-v2-design.md`            |

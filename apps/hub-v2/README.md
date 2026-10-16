@@ -1,7 +1,7 @@
 # hub-v2 — le Hub, au design de la V2
 
 La zone de pilotage de Runes de Chêne et de sa communauté (spec
-`docs/superpowers/specs/2026-10-14-hub-v2-design.md`). Remplacera `apps/hub` à la bascule.
+`docs/superpowers/specs/2026-10-14-hub-v2-design.md`). A remplacé l'ancien Hub le 16/10/2026 (bascule).
 
 - `src/app/` — la coquille : entrée par code, porte admin, menu, routes.
 - `src/features/<domaine>/` — un dossier par domaine du menu (`api/`, `components/`, `hooks/`, `lib/`).
