@@ -1,8 +1,8 @@
 /*
  * QUOI     — la photo à lisière ondulée (Figma 605:1433 / 605:1497 / 606:1591).
  * POURQUOI — la lisière est un masque SVG (public/lisiere-bas.svg, lisiere-droite.svg) : le bord
- *            ondule, le flou et le dégradé fondent la photo dans le parchemin. Bas au téléphone,
- *            droite sur PC.
+ *            ondule, le flou et le dégradé fondent la photo dans le parchemin. Au téléphone
+ *            seulement : sur PC, la photo s'arrête net au milieu de l'écran (Uriel, 16/10).
  */
 .photo {
   display: block;
@@ -25,8 +25,6 @@
     display: block;
     height: 100%;
     object-position: 30% 50%;
-    mask-image: url('/lisiere-droite.svg');
-    mask-size: calc(100% + 21px) calc(100% + 21px);
-    mask-position: -10.5px -10.5px;
+    mask-image: none;
   }
 }

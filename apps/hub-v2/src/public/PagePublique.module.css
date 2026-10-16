@@ -1,12 +1,21 @@
 /*
  * QUOI     — les deux mises en page des pages publiques (voir PagePublique.tsx).
- * POURQUOI — pas d'image de fond (src/fond.css) ; la bascule PC suit la
+ * POURQUOI — pas d'image de fond commune (src/fond.css) : une page peut poser la sienne (`fond`,
+ *            frise en haut) ; la bascule PC suit la
  *            largeur, comme la coquille du Hub (900 px).
  */
 .page {
   min-height: var(--hauteur-ecran);
   color: var(--color-texte);
   font-family: var(--font-corps);
+}
+
+/* L’image de fond d’une page, frise en haut : toute la page au téléphone, la moitié droite sur PC. */
+.fond {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--fond) center top / cover no-repeat;
 }
 
 /* Colonne : la photo en haut, la colonne en dessous. */
@@ -41,7 +50,17 @@
   }
 
   .page[data-disposition='colonne'] .contenu {
+    position: relative;
+    z-index: 2;
     grid-column: 2;
+  }
+
+  /* Le parchemin couvre la moitié droite et son ombre passe sur la photo (Uriel, 16/10) : la photo,
+     puis le parchemin, puis le contenu. */
+  .page[data-disposition='colonne'] .fond {
+    left: 50%;
+    z-index: 1;
+    box-shadow: -14px 0 36px color-mix(in srgb, var(--color-ombre) 35%, transparent);
   }
 
   /* Carte : la photo couvre la page sous un voile, la carte au centre. */

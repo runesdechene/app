@@ -12,6 +12,7 @@ import carte from '@/assets/flyer/carte.svg'
 import chevron from '@/assets/flyer/chevron.svg'
 import fellowship from '@/assets/flyer/fellowship.png'
 import instagram from '@/assets/flyer/instagram.svg'
+import fond from '@/assets/flyer/fond-parchemin-entrelacs.webp'
 import logo from '@/assets/flyer/logo-slogan.webp'
 import { PhotoFlyer } from '../briques/PhotoFlyer'
 import { PagePublique } from '../PagePublique'
@@ -63,7 +64,7 @@ const LIENS: Lien[] = [
 
 export function PageFlyer() {
   return (
-    <PagePublique titre="Runes de Chêne" photo={<PhotoFlyer />}>
+    <PagePublique titre="Runes de Chêne" photo={<PhotoFlyer />} fond={fond}>
       <h1 className={styles.logo}>
         <img src={logo} alt="Runes de Chêne — Portez l’histoire" />
       </h1>
