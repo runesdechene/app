@@ -46,7 +46,7 @@
   font-size: var(--libelle-size);
   letter-spacing: var(--libelle-tracking);
   text-transform: uppercase;
-  color: var(--color-encre);
+  color: var(--color-ombre);
 }
 
 .titre::after {
