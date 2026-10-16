@@ -59,7 +59,7 @@
 }
 
 .lien[aria-current='page'] {
-  background: var(--color-pastille);
+  background: color-mix(in srgb, var(--color-pastille) 70%, transparent);
   font-weight: var(--weight-semi);
   color: var(--color-encre);
 }
