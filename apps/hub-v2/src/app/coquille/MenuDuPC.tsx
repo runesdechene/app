@@ -3,6 +3,7 @@
  *            files qui attendent (maquette « Hub — Ouverture (PC) », Figma 579:615).
  */
 import { NavLink } from 'react-router'
+import logo from '@/assets/ui/logo-runes-de-chene.webp'
 import { MENU } from './menu'
 import { useAttente } from './useAttente'
 import styles from './MenuDuPC.module.css'
@@ -12,7 +13,7 @@ export function MenuDuPC() {
   return (
     <nav className={styles.menu} aria-label="Menu du Hub">
       <div className={styles.marque}>
-        <span className={styles.nom}>Runes de Chêne</span>
+        <img src={logo} alt="Runes de Chêne" />
         <span className={styles.role}>Le Hub · Pilotage</span>
       </div>
       {MENU.map((domaine) => (
