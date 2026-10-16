@@ -38,9 +38,9 @@
   margin: 0;
   padding: 14px 0 var(--space-1) var(--space-3);
   font-family: var(--font-condensee);
-  font-weight: var(--weight-semi);
+  font-weight: var(--weight-gras);
   font-size: var(--libelle-size);
-  letter-spacing: var(--bandeau-tracking);
+  letter-spacing: var(--libelle-tracking);
   text-transform: uppercase;
   color: var(--color-texte-pale);
 }
@@ -62,8 +62,10 @@
   background: color-mix(in srgb, var(--color-pastille) 50%, transparent);
 }
 
+/* Le lien de l'écran ouvert : le parchemin doré et un trait d'accent à gauche. */
 .lien[aria-current='page'] {
-  background: var(--color-pastille);
+  background: var(--color-vignette);
+  box-shadow: inset 3px 0 0 var(--color-accent);
   font-weight: var(--weight-semi);
   color: var(--color-encre);
 }
