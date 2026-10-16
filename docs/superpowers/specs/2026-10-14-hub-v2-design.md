@@ -221,7 +221,8 @@ d'un flyer (chantier B), les échecs d'envoi des notifications.
 | Tableau de bord | l'ouverture | Accueil, Écoutes audio, Notifications |
 | Réglages (formulaire) | à maquetter au moment de l'écran | Énergie, Réglages, Synchro Shopify, Mises à jour, Blog |
 
-**Comptes** : cinq chiffres (comptes, actifs, réactivés depuis la V2, en sommeil, jamais connectés) ;
+**Comptes** : six chiffres (comptes, déjà connectés — V1 ou V2, soit tout compte sauf « jamais connecté » —,
+actifs, réactivés depuis la V2, en sommeil, jamais connectés) ;
 filtres Tous, Nouveaux, Réactivés, En sommeil, Jamais connectés, Porteurs, Équipe ; menus « Arrivés par » (`account_source`)
 et « Département » ; tri ; recherche par nom ou e-mail ; export CSV. Colonnes : l'Explorateur et
 ses balises, arrivé par, département, Fragments, dernière visite, inscription. **Le tiroir** : son

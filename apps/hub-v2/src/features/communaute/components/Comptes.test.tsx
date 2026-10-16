@@ -31,11 +31,12 @@ function monter(adresse = '/communaute/comptes') {
   return router
 }
 
-test('les cinq chiffres, les lignes et leurs balises', () => {
+test('les six chiffres, les lignes et leurs balises', () => {
   mockUseComptes.mockReturnValue({ data: liste, isError: false })
   monter()
   expect(screen.getByText('4 750')).toBeInTheDocument()
   expect(screen.getByText('96')).toBeInTheDocument()
+  expect(screen.getByText('4 654')).toBeInTheDocument()
   expect(screen.getByRole('link', { name: /Kelpie/ })).toHaveAttribute('href', '/communaute/comptes/u1')
   expect(screen.getByText('Seine-et-Marne (77)')).toBeInTheDocument()
   expect(screen.getByText('En sommeil', { selector: '[data-teinte]' })).toBeInTheDocument()

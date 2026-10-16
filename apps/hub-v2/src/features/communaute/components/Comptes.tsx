@@ -91,6 +91,8 @@ export function Comptes() {
       {data && (
         <div className={styles.tuiles}>
           <Tuile libelle="Comptes" valeur={nombre.format(data.compteurs.comptes)} />
+          {/* Connecté au moins une fois, V1 ou V2 : tout compte qui n'est pas « Jamais connecté ». */}
+          <Tuile libelle="Déjà connectés" valeur={nombre.format(data.compteurs.comptes - data.compteurs.jamais)} />
           <Tuile libelle="Actifs en 7 jours" valeur={nombre.format(data.compteurs.actifs)} />
           <Tuile libelle="Réactivés depuis la V2" valeur={nombre.format(data.compteurs.reactives)} />
           <Tuile libelle="En sommeil" valeur={nombre.format(data.compteurs.sommeil)} />
