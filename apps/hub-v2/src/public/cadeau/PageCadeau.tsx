@@ -3,7 +3,8 @@
  *            fonction `flyer-create-account` crée au passage le client Shopify et le compte de l'appli.
  * POURQUOI — le visiteur vient d'un flyer, sans compte : un champ, une case (décochée, la newsletter
  *            se demande), un bouton. Le bouton reste inactif tant que l'e-mail n'en est pas un.
- *            Maquette Figma 606:1435 / 606:1472 (téléphone), 606:1591 / 606:1615 (PC).
+ *            Maquette Figma 606:1435 / 606:1472 (téléphone), 606:1591 / 606:1615 (PC). La photo et le
+ *            parchemin sont au cadre commun (CadreFlyer).
  */
 import { useState, type SubmitEvent } from 'react'
 import cadeau from '@/assets/flyer/cadeau.webp'
@@ -11,8 +12,6 @@ import { Bouton, LienBouton } from '../briques/Bouton'
 import { CaseACocher } from '../briques/CaseACocher'
 import { Champ } from '../briques/Champ'
 import { MessageDErreur } from '../briques/MessageDErreur'
-import { PhotoFlyer } from '../briques/PhotoFlyer'
-import { PagePublique } from '../PagePublique'
 import { demanderCadeau } from './api'
 import styles from './PageCadeau.module.css'
 
@@ -77,7 +76,8 @@ export function PageCadeau() {
   }
 
   return (
-    <PagePublique titre="Ton cadeau — Runes de Chêne" photo={<PhotoFlyer telephone={false} />}>
+    <>
+      <title>Ton cadeau — Runes de Chêne</title>
       <div className={styles.page}>
         <a href={BOUTIQUE} className={styles.retour}>
           ← Retourner sur la boutique
@@ -130,6 +130,6 @@ export function PageCadeau() {
           </form>
         )}
       </div>
-    </PagePublique>
+    </>
   )
 }

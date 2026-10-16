@@ -21,7 +21,7 @@ export function PagePublique({
   fond,
   disposition = 'colonne',
 }: {
-  titre: string
+  titre?: string
   children: ReactNode
   photo?: ReactNode
   fond?: string
@@ -29,7 +29,7 @@ export function PagePublique({
 }) {
   return (
     <main className={styles.page} data-disposition={disposition}>
-      <title>{titre}</title>
+      {titre && <title>{titre}</title>}
       {fond && <div className={styles.fond} style={{ '--fond': `url(${fond})` } as CSSProperties} aria-hidden="true" />}
       {photo && (
         <div className={styles.photo} data-photo>

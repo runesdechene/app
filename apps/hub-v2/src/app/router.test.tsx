@@ -6,6 +6,7 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router'
 import { vi } from 'vitest'
 import { MENU, ONGLETS } from './coquille/menu'
@@ -107,4 +108,16 @@ describe.each([
     expect(faux.rpc).not.toHaveBeenCalledWith('hub_est_admin')
     expect(screen.queryByRole('navigation', { name: 'Menu du Hub' })).not.toBeInTheDocument()
   })
+})
+
+test('de /flyer au cadeau : le cadre reste (la même photo), seule la page change', async () => {
+  faux.session = null
+  monter('/flyer')
+  await screen.findByRole('heading', { name: /^Runes de Chêne/ })
+  const photo = document.querySelector('[data-photo] img')
+  expect(photo).not.toBeNull()
+  await userEvent.click(screen.getByRole('link', { name: /Ton cadeau de bienvenue/ }))
+  expect(await screen.findByRole('heading', { name: /un mouvement s’éveille$/ })).toBeInTheDocument()
+  expect(document.querySelector('[data-photo] img')).toBe(photo)
+  expect(document.title).toBe('Ton cadeau — Runes de Chêne')
 })
