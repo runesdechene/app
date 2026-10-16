@@ -14,7 +14,6 @@
   --color-sable: #e7dcca;
   --color-bord: #c9bcbc;
   --color-bloc: #fef6eb; /* le fond des blocs clairs du Hub (Figma 587:761) */
-  --color-tuile: rgb(255 255 255 / 60%); /* les tuiles de chiffres du Hub, sur le dessin du fond (Uriel, 16/10) */
 
   /* Texte, du plus fort au plus pâle */
   --color-encre: #494841;
