@@ -7,6 +7,7 @@
  */
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { Ouverture } from '@/features/accueil/components/Ouverture'
+import { AssocierUnFragment } from '@/features/communaute/components/AssocierUnFragment'
 import { Compagnies } from '@/features/communaute/components/Compagnies'
 import { Comptes } from '@/features/communaute/components/Comptes'
 import { Lieux } from '@/features/communaute/components/Lieux'
@@ -72,6 +73,7 @@ export const routes: RouteObject[] = [
       { path: 'boutique/fragments', Component: Fragments, children: [{ path: ':id', Component: TiroirFragment }] },
       { path: 'boutique/fragments/correspondance', Component: Correspondance },
       { path: 'boutique/fragments/achats', Component: Achats },
+      { path: 'boutique/associer', Component: AssocierUnFragment },
       { path: 'boutique/photos', Component: Photos },
       { path: 'boutique/audio', Component: Ecoutes },
       { path: 'boutique/synchro', Component: Synchro },

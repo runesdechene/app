@@ -172,6 +172,16 @@
   padding: var(--space-3) var(--space-4);
 }
 
+/* Une ligne de fiche qui mène quelque part (le choix d'un Explorateur, « Associer un Fragment »). */
+.lienFiche {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lienFiche:hover {
+  background: color-mix(in srgb, var(--color-vignette) 45%, transparent);
+}
+
 .vignette {
   flex: none;
   width: 34px;

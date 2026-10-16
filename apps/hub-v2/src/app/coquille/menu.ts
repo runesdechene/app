@@ -38,6 +38,7 @@ export const MENU: Domaine[] = [
     icone: 'boutique',
     liens: [
       { libelle: 'Fragments', chemin: '/boutique/fragments', file: 'achats' },
+      { libelle: 'Associer un Fragment', chemin: '/boutique/associer' },
       { libelle: 'Photos et avis', chemin: '/boutique/photos', file: 'photos' },
       { libelle: 'Synchro Shopify', chemin: '/boutique/synchro' },
       { libelle: 'Écoutes audio', chemin: '/boutique/audio' },
