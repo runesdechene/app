@@ -42,22 +42,22 @@ beforeEach(() => {
 
 test('sans produit, « Fiche produit » et « Communauté » sont désactivés et le texte dit pourquoi', async () => {
   afficher(photo())
-  expect(screen.getByRole('checkbox', { name: 'Fiche produit' })).toBeDisabled()
-  expect(screen.getByRole('checkbox', { name: 'Communauté' })).toBeDisabled()
-  expect(screen.getByText('Relie d’abord un produit')).toBeInTheDocument()
-  await waitFor(() => { expect(screen.getByRole('checkbox', { name: 'Mur' })).toBeEnabled() })
+  expect(screen.getByRole('button', { name: 'Fiche produit' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: 'Communauté' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: 'Communauté' })).toHaveAttribute('title', 'Relie d’abord un produit')
+  await waitFor(() => { expect(screen.getByRole('button', { name: 'Mur' })).toBeEnabled() })
 })
 
 test('« Mur » appelle montrerAuMur(id, true)', async () => {
   afficher(photo())
-  await userEvent.click(screen.getByRole('checkbox', { name: 'Mur' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Mur' }))
   await waitFor(() => { expect(api.montrerAuMur).toHaveBeenCalledWith('p1', true) })
 })
 
 test('« Média » est l’accord de diffusion, en lecture seule', () => {
   afficher(photo())
-  const media = screen.getByRole('checkbox', { name: 'Média' })
-  expect(media).toBeChecked()
+  const media = screen.getByRole('button', { name: 'Média' })
+  expect(media).toHaveAttribute('aria-pressed', 'true')
   expect(media).toBeDisabled()
 })
 
@@ -73,13 +73,13 @@ test('relier un produit trouvé par la recherche', async () => {
 
 test('un produit relié : « Relié à … », « Retirer », et les canaux s’ouvrent', async () => {
   afficher(photo({ produit_id: '12', produit_titre: 'Veste Hoplite', media: '99', communaute: true }))
-  expect(screen.getByText('Relié à Veste Hoplite')).toBeInTheDocument()
-  expect(screen.getByRole('checkbox', { name: 'Fiche produit' })).toBeChecked()
-  expect(screen.getByRole('checkbox', { name: 'Communauté' })).toBeChecked()
-  expect(screen.queryByText('Relie d’abord un produit')).not.toBeInTheDocument()
-  await userEvent.click(screen.getByRole('checkbox', { name: 'Fiche produit' }))
+  expect(screen.getByText('Veste Hoplite')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Fiche produit' })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByRole('button', { name: 'Communauté' })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByRole('button', { name: 'Communauté' })).not.toHaveAttribute('title')
+  await userEvent.click(screen.getByRole('button', { name: 'Fiche produit' }))
   await waitFor(() => { expect(api.mettreSurLaFiche).toHaveBeenCalledWith(contribution, expect.objectContaining({ id: 'p1' }), false) })
-  await userEvent.click(screen.getByRole('button', { name: 'Retirer' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Retirer le produit' }))
   await waitFor(() => { expect(api.delierProduit).toHaveBeenCalledWith(expect.objectContaining({ id: 'p1' })) })
 })
 
@@ -107,7 +107,7 @@ test('un second clic avant que la liste soit relue ne repousse pas l’image', a
     return lectures === 1 ? Promise.resolve(null) : new Promise<null>((fin) => { relue = () => { fin(null) } })
   }
   afficher(photo({ produit_id: '12' }), lire)
-  const fiche = screen.getByRole('checkbox', { name: 'Fiche produit' })
+  const fiche = screen.getByRole('button', { name: 'Fiche produit' })
   await waitFor(() => { expect(fiche).toBeEnabled() })
   await userEvent.click(fiche)
   await waitFor(() => { expect(api.mettreSurLaFiche).toHaveBeenCalledOnce() })

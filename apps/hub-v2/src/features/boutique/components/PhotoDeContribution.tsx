@@ -1,10 +1,10 @@
 /**
  * QUOI     — une photo (ou une vidéo) d'une contribution, qui s'ouvre en grand dans un onglet, avec ses
- *            quatre canaux (Communauté, Mur, Fiche produit, Média), son produit Shopify, son téléchargement
- *            et sa suppression.
+ *            quatre canaux en pastilles (Communauté, Mur, Fiche produit, Média) et son produit Shopify ;
+ *            télécharger et supprimer apparaissent sur la photo, au survol (maquette 596:1319).
  * POURQUOI — Communauté et Fiche produit n'existent que sur un produit relié ; « Média » est l'accord de
  *            diffusion de la contribution, qu'on lit ici sans le changer. Une écriture à la fois : les
- *            cases sont désactivées pendant qu'elle part et que la liste se relit, et son erreur reste sous la photo.
+ *            pastilles sont désactivées pendant qu'elle part et que la liste se relit, et son erreur reste sous la photo.
  */
 import { useIsFetching } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -17,14 +17,14 @@ import { adresseDeTelechargement, estUneVideo, nomDeFichier, texteAlternatif } f
 import { ChoixDuProduit } from './ChoixDuProduit'
 import styles from './Photos.module.css'
 
-function Canal({ libelle, coche, desactive, onBascule }: {
-  libelle: string; coche: boolean; desactive: boolean; onBascule?: () => void
+/** Un canal de diffusion, en pastille : pleine quand la photo y est, en contour sinon. */
+function Canal({ libelle, actif, desactive, pourquoi, onBascule }: {
+  libelle: string; actif: boolean; desactive: boolean; pourquoi?: string | undefined; onBascule?: () => void
 }) {
   return (
-    <label className={styles.canal}>
-      <input type="checkbox" checked={coche} disabled={desactive} onChange={onBascule ?? (() => undefined)} />
+    <button type="button" className={styles.canal} aria-pressed={actif} disabled={desactive} title={pourquoi} onClick={onBascule}>
       {libelle}
-    </label>
+    </button>
   )
 }
 
@@ -36,6 +36,7 @@ export function PhotoDeContribution({ contribution, photo, rang }: { contributio
   // Tant que les contributions se relisent, la photo affichée est périmée : une écriture de plus la referait.
   const relecture = useIsFetching({ queryKey: ['hub-contributions'] }) > 0
   const occupe = ecriture.isPending || relecture
+  const pourquoi = sansProduit ? 'Relie d’abord un produit' : undefined
 
   function ecrire(action: () => Promise<void>, apres: () => void = () => undefined) {
     ecriture.reset()
@@ -44,48 +45,49 @@ export function PhotoDeContribution({ contribution, photo, rang }: { contributio
 
   return (
     <figure className={styles.photo}>
-      <a href={photo.url} target="_blank" rel="noreferrer">
-        {estUneVideo(photo.url)
-          ? <video src={photo.url} muted preload="metadata" />
-          : <img src={photo.url} alt={texteAlternatif(contribution.nom, contribution.hauteur, photo.taille ?? contribution.taille)} loading="lazy" />}
-      </a>
-      {photo.taille && <figcaption className={styles.calme}>{photo.taille === 'none' ? 'Aucun produit' : photo.taille}</figcaption>}
+      <div className={styles.cadre}>
+        <a href={photo.url} target="_blank" rel="noreferrer">
+          {estUneVideo(photo.url)
+            ? <video src={photo.url} muted preload="metadata" />
+            : <img src={photo.url} alt={texteAlternatif(contribution.nom, contribution.hauteur, photo.taille ?? contribution.taille)} loading="lazy" />}
+        </a>
+        <div className={styles.surLaPhoto}>
+          <a className={styles.rond} aria-label="Télécharger" title="Télécharger"
+            href={adresseDeTelechargement(photo.url, nomDeFichier(contribution.nom, contribution.instagram, rang, photo.url))}>↓</a>
+          <button type="button" className={styles.rond} aria-label="Supprimer la photo" title="Supprimer la photo" disabled={occupe}
+            onClick={() => { setConfirme(true) }}>✕</button>
+        </div>
+      </div>
 
       <div className={styles.canaux}>
-        <Canal libelle="Communauté" coche={photo.communaute} desactive={sansProduit || occupe}
+        <Canal libelle="Communauté" actif={photo.communaute} desactive={sansProduit || occupe} pourquoi={pourquoi}
           onBascule={() => { ecrire(() => montrerDansCommunaute(photo.id, !photo.communaute)) }} />
-        <Canal libelle="Mur" coche={photo.mur} desactive={occupe}
+        <Canal libelle="Mur" actif={photo.mur} desactive={occupe}
           onBascule={() => { ecrire(() => montrerAuMur(photo.id, !photo.mur)) }} />
-        <Canal libelle="Fiche produit" coche={photo.media !== null} desactive={sansProduit || occupe}
+        <Canal libelle="Fiche produit" actif={photo.media !== null} desactive={sansProduit || occupe} pourquoi={pourquoi}
           onBascule={() => { ecrire(() => mettreSurLaFiche(contribution, photo, photo.media === null)) }} />
-        <Canal libelle="Média" coche={contribution.diffusion} desactive />
-        {sansProduit && <span className={styles.calme}>Relie d’abord un produit</span>}
-      </div>
-
-      {photo.produit_id !== null ? (
-        <p className={styles.rangee}>
-          <span>{`Relié à ${photo.produit_titre ?? photo.produit_handle ?? photo.produit_id}`}</span>
-          <button type="button" className={styles.lien} disabled={occupe} onClick={() => { ecrire(() => delierProduit(photo)) }}>Retirer</button>
-        </p>
-      ) : choixDuProduit ? (
-        <ChoixDuProduit onChoix={(produit) => { ecrire(() => relierProduit(photo.id, produit), () => { setChoixDuProduit(false) }) }}
-          onAnnule={() => { setChoixDuProduit(false) }} />
-      ) : (
-        <button type="button" className={styles.lien} disabled={occupe} onClick={() => { setChoixDuProduit(true) }}>Relier à un produit</button>
-      )}
-
-      <div className={styles.rangee}>
-        <a className={styles.lien} href={adresseDeTelechargement(photo.url, nomDeFichier(contribution.nom, contribution.instagram, rang, photo.url))}>Télécharger</a>
-        {confirme ? (
-          <>
-            <span>Supprimer cette photo ?</span>
-            <button type="button" className={styles.lien} disabled={occupe} onClick={() => { ecrire(() => supprimerPhoto(photo), () => { setConfirme(false) }) }}>Confirmer</button>
-            <button type="button" className={styles.lien} onClick={() => { setConfirme(false) }}>Annuler</button>
-          </>
-        ) : (
-          <button type="button" className={styles.lien} disabled={occupe} onClick={() => { setConfirme(true) }}>Supprimer la photo</button>
+        <Canal libelle="Média" actif={contribution.diffusion} desactive pourquoi="L’accord de diffusion du client" />
+        {photo.produit_id !== null ? (
+          <span className={styles.produitRelie}>
+            {photo.produit_titre ?? photo.produit_handle ?? photo.produit_id}
+            <button type="button" aria-label="Retirer le produit" disabled={occupe} onClick={() => { ecrire(() => delierProduit(photo)) }}>✕</button>
+          </span>
+        ) : !choixDuProduit && (
+          <button type="button" className={styles.relier} disabled={occupe} onClick={() => { setChoixDuProduit(true) }}>Relier à un produit</button>
         )}
       </div>
+      {choixDuProduit && (
+        <ChoixDuProduit onChoix={(produit) => { ecrire(() => relierProduit(photo.id, produit), () => { setChoixDuProduit(false) }) }}
+          onAnnule={() => { setChoixDuProduit(false) }} />
+      )}
+
+      {confirme && (
+        <p className={styles.petit}>
+          <span>Supprimer cette photo ?</span>
+          <button type="button" className={styles.lien} disabled={occupe} onClick={() => { ecrire(() => supprimerPhoto(photo), () => { setConfirme(false) }) }}>Confirmer</button>
+          <button type="button" className={styles.lien} onClick={() => { setConfirme(false) }}>Annuler</button>
+        </p>
+      )}
       {ecriture.error && <p role="alert" className={styles.erreur}>{ecriture.error.message}</p>}
     </figure>
   )

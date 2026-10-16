@@ -23,6 +23,7 @@
     "noEmit": true,
     "paths": {
       "@/*": ["./src/*"],
+      "@send-push/*": ["../../supabase/functions/send-push/*"],
       "react": ["./node_modules/@types/react"],
       "react/*": ["./node_modules/@types/react/*"]
     }

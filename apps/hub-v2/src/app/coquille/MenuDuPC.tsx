@@ -1,9 +1,10 @@
 /**
- * QUOI     — le menu du PC : le logo, puis les domaines et leurs liens, avec la pastille des
- *            files qui attendent.
+ * QUOI     — le menu du PC : la marque, puis les domaines et leurs liens, avec la pastille des
+ *            files qui attendent (maquette « Hub — Ouverture (PC) », Figma 579:615).
  */
 import { NavLink } from 'react-router'
-import logo from '@/assets/ui/logo-explore.webp'
+import logo from '@/assets/ui/logo-runes-de-chene.webp'
+import { IconeDomaine } from './IconeDomaine'
 import { MENU } from './menu'
 import { useAttente } from './useAttente'
 import styles from './MenuDuPC.module.css'
@@ -13,12 +14,17 @@ export function MenuDuPC() {
   return (
     <nav className={styles.menu} aria-label="Menu du Hub">
       <div className={styles.marque}>
-        <img src={logo} alt="Runes de Chêne Explore" />
-        <span>Le Hub</span>
+        <img src={logo} alt="Runes de Chêne" />
+        <span className={styles.role}>Le Hub · Pilotage</span>
       </div>
       {MENU.map((domaine) => (
         <div key={domaine.titre ?? 'accueil'} className={styles.domaine}>
-          {domaine.titre && <p className={styles.titre}>{domaine.titre}</p>}
+          {domaine.titre && (
+            <p className={styles.titre}>
+              {domaine.icone && <IconeDomaine nom={domaine.icone} />}
+              {domaine.titre}
+            </p>
+          )}
           {domaine.liens.map((lien) => {
             const nombre = lien.file ? (attente[lien.file] ?? 0) : 0
             return (

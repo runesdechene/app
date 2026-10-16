@@ -23,8 +23,8 @@ export function MessageDeContribution({ id, message, ecriture }: { id: string; m
       {texte === null ? (
         <>
           {message && <p className={styles.texteDuMessage}>{message}</p>}
-          <button type="button" className={styles.lien} onClick={() => { ecriture.reset(); setTexte(message ?? '') }}>
-            {message ? 'Modifier' : '+ Ajouter un message'}
+          <button type="button" className={styles.discret} onClick={() => { ecriture.reset(); setTexte(message ?? '') }}>
+            {message ? 'Modifier le message' : '+ Ajouter un message'}
           </button>
         </>
       ) : (

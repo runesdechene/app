@@ -73,6 +73,21 @@ export default tseslint.config(
     },
   },
   {
+    // Les pages publiques (QR imprimés) ne tirent rien du Hub admin.
+    files: ['src/public/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            OTHER_ZONE_BY_PATH,
+            { group: ['@/features/*', '@/app/*'], message: 'Une page publique ne dépend pas du Hub admin.' },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // Un composant ne parle jamais à Supabase : il passe par un hook, qui passe par api/.
     files: ['src/**/components/**/*.{ts,tsx}', 'src/app/shell/**/*.{ts,tsx}'],
     rules: {

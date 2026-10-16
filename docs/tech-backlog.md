@@ -170,3 +170,6 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 - **Hub V2 — bascule (plan 5)** : faire tourner les clés exposées — le secret client Shopify (`SHOPIFY_CLIENT_SECRET`), la clé Resend (`resend_api_key`), `email_trigger_secret` et `push_trigger_secret` ; **pas** la clé VAPID (la changer obligerait chaque joueur à réactiver ses notifications ; seule, la clé privée n'atteint aucun abonné sans leurs adresses d'envoi privées) — décision d'Uriel du 14/10.
 - **Hub V2 — bascule (plan 5)** : supprimer l'ancien site referme ses trous (fonctions sans garde, webhook sans signature, `shopify-callback` sur n'importe quelle boutique) — il n'est pas corrigé d'ici là (décision d'Uriel).
 - **Thème Shopify** : il appelle `get_approved_photos_by_tag`, absente de la base (relevé du 14/10) — à vérifier dans `../shopify (Runes de Chêne)/`.
+- **Hub V2 — plan 5 (RGPD)** : `flyer_signup_log` garde chaque e-mail pour toujours — il faut une purge (durée de conservation).
+- **Hub V2 — plan 5 (perf)** : charger les écrans d'administration à la demande, pour que les pages publiques ne téléchargent pas leur code.
+- **Hub V2 — plan 5 (durcissement)** : une migration pour retirer à anon et authenticated les droits DELETE, INSERT et UPDATE qu'ils gardent sur `flyer_signup_log` (la RLS les bloque déjà).

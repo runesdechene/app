@@ -149,6 +149,7 @@
   --fete-size: 2.5rem; /* le 🎉 de la récompense (250:140) */
   --suivant-size: 1.875rem; /* « Suivant → » de l'onboarding : Bebas 30 px (Figma 94:142) */
   --code-size: 2.875rem; /* les chiffres du code reçu par e-mail : Bebas 46 px (94:319) */
+  --code-promo-size: 2.375rem; /* le code promo de /flyercadeau, dans son cadre : Bebas 38 px (Hub V2, 606:1495) */
   --explore-tracking: 0.45em; /* « E X P L O R E » sous le logo (94:107) */
   --vitrine-surtitre-size: 1.625rem; /* « Porter l'Histoire » sur la vitrine : 26 px (314:146) */
   --scan-titre-size: 1.625rem; /* « Scanner un Fragment » : Bebas 26 px (Figma 530:915) */

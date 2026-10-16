@@ -1,0 +1,88 @@
+/*
+ * QUOI     — les deux mises en page des pages publiques (voir PagePublique.tsx).
+ * POURQUOI — pas d'image de fond commune (src/fond.css) : une page peut poser la sienne (`fond`,
+ *            frise en haut) ; la bascule PC suit la
+ *            largeur, comme la coquille du Hub (900 px).
+ */
+.page {
+  min-height: var(--hauteur-ecran);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+}
+
+/* L’image de fond d’une page, frise en haut : toute la page au téléphone, la moitié droite sur PC. */
+.fond {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--fond) center top / cover no-repeat;
+}
+
+/* Colonne : la photo en haut, la colonne en dessous. */
+.page[data-disposition='colonne'] .contenu {
+  width: min(100% - 2 * var(--space-6), 420px);
+  margin-inline: auto;
+  padding-block: var(--space-6);
+}
+
+/* Carte : au téléphone, la carte prend la page ; la photo ne se montre que sur PC. */
+.page[data-disposition='carte'] {
+  display: grid;
+}
+
+.page[data-disposition='carte'] .photo {
+  display: none;
+}
+
+@container app (width >= 900px) {
+  /* Colonne : la photo à gauche sur toute la hauteur, la colonne au milieu de la moitié droite. */
+  .page[data-disposition='colonne'] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+
+  .page[data-disposition='colonne'] .photo {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: var(--hauteur-ecran);
+  }
+
+  .page[data-disposition='colonne'] .contenu {
+    position: relative;
+    z-index: 2;
+    grid-column: 2;
+  }
+
+  /* Le parchemin couvre la moitié droite et son ombre passe sur la photo (Uriel, 16/10) : la photo,
+     puis le parchemin, puis le contenu. */
+  .page[data-disposition='colonne'] .fond {
+    left: 50%;
+    z-index: 1;
+    box-shadow: -14px 0 36px color-mix(in srgb, var(--color-ombre) 35%, transparent);
+  }
+
+  /* Carte : la photo couvre la page sous un voile, la carte au centre. */
+  .page[data-disposition='carte'] {
+    place-items: center;
+    padding: var(--space-6) 14px;
+  }
+
+  .page[data-disposition='carte'] .photo {
+    display: block;
+    position: fixed;
+    inset: 0;
+  }
+
+  .page[data-disposition='carte'] .photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--color-ombre) 42%, transparent);
+  }
+
+  .page[data-disposition='carte'] .contenu {
+    position: relative;
+  }
+}

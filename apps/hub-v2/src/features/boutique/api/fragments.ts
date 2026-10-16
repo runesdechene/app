@@ -47,3 +47,9 @@ export async function enregistrerFragment(f: FragmentAEcrire): Promise<void> {
   })
   if (error) throw new Error(error.message)
 }
+
+/** Donne un Fragment à un compte (le Fragment + une ligne de journal « manual », mig 521). */
+export async function associerAuCompte(compte: string, fragment: number): Promise<void> {
+  const { error } = await supabase.rpc('hub_associer_fragment', { p_user: compte, p_fragment: fragment })
+  if (error) throw new Error(error.message)
+}

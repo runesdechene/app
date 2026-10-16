@@ -6,7 +6,7 @@
  *            joueurs. La ligne est supprimée avant le fichier (si la ligne résistait, une bannière active
  *            montrerait une image cassée) ; l'ancien fichier n'est retiré qu'une fois la ligne à jour.
  */
-import { envoyerFichier, retirerFichier } from '@/shared/lib/envoi'
+import { envoyerFichier, extensionDe, retirerFichier } from '@/shared/lib/envoi'
 import { supabase } from '@/shared/supabase/client'
 import type { Database } from '@/shared/supabase/database.types'
 
@@ -14,10 +14,9 @@ export type Banniere = Database['public']['Tables']['home_banners']['Row']
 export type BanniereAEcrire = Omit<Banniere, 'id' | 'created_at' | 'image_url'>
 
 const BUCKET = 'home-banners'
-const EXTENSIONS: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }
 
 // Même nom de fichier que l'ancien Hub : banner-{date}.{extension}.
-const cheminDe = (fichier: File) => `banner-${String(Date.now())}.${EXTENSIONS[fichier.type] ?? 'jpg'}`
+const cheminDe = (fichier: File) => `banner-${String(Date.now())}.${extensionDe(fichier)}`
 
 export async function lireBannieres(): Promise<Banniere[]> {
   const { data, error } = await supabase.from('home_banners').select('*').order('id')

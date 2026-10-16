@@ -1,0 +1,179 @@
+/*
+ * QUOI     — /flyercadeau (Figma 606:1435, 606:1472, 606:1591, 606:1615).
+ * POURQUOI — au téléphone, la colonne tient l'écran et le bouton reste en bas, à portée du pouce ;
+ *            sur PC, la colonne est centrée à droite de la photo, le bouton suit le contenu.
+ * ÉCARTS   — aucune couleur ajoutée : #857575 = --color-texte-doux, #594848 = --color-texte,
+ *            #ab9d9d = --color-texte-pale, #a89369 = --color-ocre, #f6e1c3 = --color-pastille.
+ *            Le code (Bebas 38, 0,1 em) prend --code-promo-size, ajouté ; son espacement prend
+ *            --bandeau-tracking (0,12 em), le jeton le plus proche.
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: calc(var(--hauteur-ecran) - 2 * var(--space-6));
+}
+
+.retour {
+  align-self: flex-start;
+  padding: 9px var(--space-4) 9px 14px;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  background: var(--color-sur-accent);
+  color: var(--color-texte);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+.retour:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.cadeau {
+  width: 92px;
+  height: 86px;
+  margin-top: var(--space-4);
+  object-fit: contain;
+}
+
+/* Le formulaire ou le code : le contenu en haut, l'action en bas de l'écran. */
+.etape {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.haut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.titre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+  letter-spacing: var(--titre-tracking);
+}
+
+.surtitre {
+  color: var(--color-texte-doux);
+  font-size: var(--vitrine-surtitre-size);
+  letter-spacing: var(--bouton-tracking);
+}
+
+.texte {
+  max-width: 400px;
+  margin: 0;
+  color: var(--color-texte);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+.saisie {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  margin-top: var(--space-1);
+  text-align: start;
+}
+
+.code {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 18px var(--space-3) var(--space-4);
+  border: 1.5px dashed var(--color-ocre);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-pastille) 70%, transparent);
+}
+
+.valeur {
+  max-width: 100%;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--code-promo-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--bandeau-tracking);
+  overflow-wrap: anywhere;
+}
+
+.lien {
+  max-width: 100%;
+  color: var(--color-texte-doux);
+  font-size: var(--flux-size);
+  overflow-wrap: anywhere;
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: auto;
+}
+
+.aBientot {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-size: var(--vitrine-phrase-size);
+  text-align: center;
+}
+
+.pied {
+  margin: 0;
+  color: var(--color-texte-pale);
+  font-size: var(--legende-size);
+  line-height: var(--corps-leading);
+  text-align: center;
+}
+
+.pied a {
+  color: var(--color-texte-doux);
+}
+
+@container app (width >= 900px) {
+  .page {
+    min-height: 0;
+  }
+
+  /* Sur PC, la pilule se pose en haut à gauche de la moitié du contenu (Uriel, 16/10) : `fixed`, car
+     la colonne du cadre est positionnée (CadreFlyer) et une pilule `absolute` s'y accrochait, sur le
+     cadeau. */
+  .retour {
+    position: fixed;
+    top: 28px;
+    left: calc(50% + var(--space-8));
+    z-index: 1;
+  }
+
+  .cadeau {
+    margin-top: 0;
+  }
+
+  .etape {
+    flex: none;
+    gap: 26px;
+  }
+
+  .action {
+    margin-top: 0;
+  }
+}

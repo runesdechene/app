@@ -1,0 +1,43 @@
+/*
+ * QUOI     — 48 px de haut, rouge bordé de rose, Cabin gras 14 (Figma 604:1433).
+ */
+.bouton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  padding-inline: 20px;
+  border: 2px solid var(--color-accent-clair);
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  box-shadow: 0 0 4px color-mix(in srgb, var(--color-sable) 40%, transparent);
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--bouton-size);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+  transition:
+    translate var(--duree-douce) var(--courbe-douce),
+    opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.bouton:active {
+  translate: 0 1px;
+}
+
+.bouton:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.bouton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bouton {
+    transition: none;
+  }
+}

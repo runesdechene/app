@@ -1,7 +1,8 @@
 /**
  * QUOI     — l'envoi d'un fichier vers un bucket Supabase : vérification avant l'envoi, envoi, retrait vérifié.
  * POURQUOI — bannières, icônes de natures et de cultures passent toutes par là : un fichier refusé
- *            l'est avant de partir (aucun orphelin), et le retrait se déduit de l'adresse publique.
+ *            l'est avant de partir (aucun orphelin), et le retrait se déduit de l'adresse publique. L'extension
+ *            du nom de fichier se déduit du type, une seule table pour tous les écrans.
  */
 import { supabase } from '@/shared/supabase/client'
 
@@ -11,6 +12,15 @@ export type RegleFichier = { types: string[]; maxOctets?: number }
 
 // « image/svg+xml » → « SVG », « image/png » → « PNG ».
 const nomDuType = (type: string) => type.replace(/^.*\//, '').replace(/\+.*$/, '').toUpperCase()
+
+const EXTENSIONS: Record<string, string> = {
+  'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif', 'image/svg+xml': 'svg',
+}
+
+/** « image/png » → « png » ; un type inconnu donne « jpg ». */
+export function extensionDe(fichier: File): string {
+  return EXTENSIONS[fichier.type] ?? 'jpg'
+}
 
 export function verifierFichier(f: File, regle: RegleFichier): string | null {
   if (!regle.types.includes(f.type)) {

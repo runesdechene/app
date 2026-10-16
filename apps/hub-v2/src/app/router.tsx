@@ -1,17 +1,19 @@
 /**
  * QUOI     — toutes les adresses du Hub V2.
  * POURQUOI — tout état navigable est une URL (spec Hub V2 §4) ; le menu (coquille/menu.ts) est la
- *            liste des adresses, l'accueil a son écran, les autres attendent leur plan.
+ *            liste des adresses, et chaque adresse du menu a sa route écrite ici (un test le garde).
+ *            Les trois pages publiques (QR imprimés, spec §3) passent AVANT la porte : sœurs de
+ *            `/`, chargées à la demande, elles n'appellent jamais `hub_est_admin`.
  */
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { Ouverture } from '@/features/accueil/components/Ouverture'
+import { AssocierUnFragment } from '@/features/communaute/components/AssocierUnFragment'
 import { Compagnies } from '@/features/communaute/components/Compagnies'
 import { Comptes } from '@/features/communaute/components/Comptes'
 import { Lieux } from '@/features/communaute/components/Lieux'
 import { Signalements } from '@/features/communaute/components/Signalements'
 import { TiroirCompagnie } from '@/features/communaute/components/TiroirCompagnie'
 import { TiroirCompte } from '@/features/communaute/components/TiroirCompte'
-import { TiroirCompteDuStand } from '@/features/communaute/components/TiroirCompteDuStand'
 import { TiroirLieu } from '@/features/communaute/components/TiroirLieu'
 import { TiroirFragment } from '@/features/boutique/components/TiroirFragment'
 import { Achats } from '@/features/boutique/components/Achats'
@@ -27,24 +29,32 @@ import { Titres } from '@/features/jeu/components/Titres'
 import { Energie } from '@/features/jeu/components/Energie'
 import { Enigmes } from '@/features/jeu/components/Enigmes'
 import { EnigmesSignalees } from '@/features/jeu/components/EnigmesSignalees'
+import { Blog } from '@/features/joueurs/components/Blog'
+import { TiroirArticle } from '@/features/joueurs/components/TiroirArticle'
+import { Notifications } from '@/features/joueurs/components/Notifications'
+import { MisesAJour } from '@/features/joueurs/components/MisesAJour'
+import { TiroirMiseAJour } from '@/features/joueurs/components/TiroirMiseAJour'
 import { TiroirBanniere } from '@/features/jeu/components/TiroirBanniere'
 import { TiroirCulture } from '@/features/jeu/components/TiroirCulture'
 import { TiroirEnigme } from '@/features/jeu/components/TiroirEnigme'
 import { TiroirNature } from '@/features/jeu/components/TiroirNature'
 import { TiroirTitre } from '@/features/jeu/components/TiroirTitre'
-import { BientotIci } from './coquille/BientotIci'
+import { Reglages } from '@/features/reglages/components/Reglages'
 import { Coquille } from './coquille/Coquille'
-import { MENU } from './coquille/menu'
 import { PorteDEntree } from './entree/PorteDEntree'
 
-// Les écrans faits quittent « bientôt » ; chaque tâche suivante ajoute le sien.
-const ECRANS_FAITS = new Set(['/communaute/comptes', '/communaute/compagnies', '/communaute/lieux', '/communaute/signalements', '/jeu/enigmes', '/jeu/enigmes-signalees', '/jeu/cultures', '/jeu/natures', '/jeu/titres', '/jeu/bannieres', '/jeu/energie', '/boutique/fragments', '/boutique/fragments/correspondance', '/boutique/fragments/achats', '/boutique/photos', '/boutique/audio', '/boutique/synchro'])
-
-const autres = MENU.flatMap((d) => d.liens)
-  .filter((l) => l.chemin !== '/' && !ECRANS_FAITS.has(l.chemin))
-  .map((l) => ({ path: l.chemin.slice(1), Component: BientotIci }))
-
 export const routes: RouteObject[] = [
+  // `lazy` en fonction, pas en objet : la forme objet ne charge qu'une fois par définition de
+  // route ; un second routeur bâti sur ces mêmes routes (les tests) répond alors 404.
+  { path: 'soumettre-contenu', lazy: async () => ({ Component: (await import('@/public/soumettre/PageSoumettre')).PageSoumettre }) },
+  // Le cadre commun de /flyer et /flyercadeau : la photo et le parchemin restent, seule la page change.
+  {
+    lazy: async () => ({ Component: (await import('@/public/flyer/CadreFlyer')).CadreFlyer }),
+    children: [
+      { path: 'flyer', lazy: async () => ({ Component: (await import('@/public/flyer/CadreFlyer')).PageFlyer }) },
+      { path: 'flyercadeau', lazy: async () => ({ Component: (await import('@/public/flyer/CadreFlyer')).PageCadeau }) },
+    ],
+  },
   {
     path: '/',
     element: (
@@ -54,7 +64,7 @@ export const routes: RouteObject[] = [
     ),
     children: [
       { index: true, Component: Ouverture },
-      { path: 'communaute/comptes', Component: Comptes, children: [{ path: 'nouveau', Component: TiroirCompteDuStand }, { path: ':id', Component: TiroirCompte }] },
+      { path: 'communaute/comptes', Component: Comptes, children: [{ path: ':id', Component: TiroirCompte }] },
       { path: 'communaute/compagnies', Component: Compagnies, children: [{ path: ':id', Component: TiroirCompagnie }] },
       { path: 'communaute/lieux', Component: Lieux, children: [{ path: ':id', Component: TiroirLieu }] },
       { path: 'communaute/signalements', Component: Signalements },
@@ -68,10 +78,14 @@ export const routes: RouteObject[] = [
       { path: 'boutique/fragments', Component: Fragments, children: [{ path: ':id', Component: TiroirFragment }] },
       { path: 'boutique/fragments/correspondance', Component: Correspondance },
       { path: 'boutique/fragments/achats', Component: Achats },
+      { path: 'boutique/associer', Component: AssocierUnFragment },
       { path: 'boutique/photos', Component: Photos },
       { path: 'boutique/audio', Component: Ecoutes },
       { path: 'boutique/synchro', Component: Synchro },
-      ...autres,
+      { path: 'joueurs/mises-a-jour', Component: MisesAJour, children: [{ path: 'nouvelle', Component: TiroirMiseAJour }, { path: ':id', Component: TiroirMiseAJour }] },
+      { path: 'joueurs/notifications', Component: Notifications },
+      { path: 'joueurs/blog', Component: Blog, children: [{ path: 'nouveau', Component: TiroirArticle }, { path: ':id', Component: TiroirArticle }] },
+      { path: 'reglages', Component: Reglages },
     ],
   },
   { path: '*', element: <Navigate to="/" replace /> },

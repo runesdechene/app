@@ -8,6 +8,7 @@
 import { useState, type CSSProperties, type SyntheticEvent } from 'react'
 import { Link, useLocation, useParams } from 'react-router'
 import { couleurValide } from '@/shared/lib/couleur'
+import { extensionDe } from '@/shared/lib/envoi'
 import { Tiroir } from '@/shared/ui/Tiroir'
 import type { Cercle, CultureDuHub } from '@/shared/cultures/api'
 import { useCulturesDuHub } from '@/shared/cultures/useCulturesDuHub'
@@ -21,7 +22,6 @@ import cultures from './Cultures.module.css'
 const LISTE = '/jeu/cultures'
 const BUCKET = 'tag-icons'
 const TYPES_D_ICONE = ['image/svg+xml', 'image/png', 'image/webp']
-const EXTENSIONS: Record<string, string> = { 'image/svg+xml': 'svg', 'image/png': 'png', 'image/webp': 'webp' }
 
 function Formulaire({ fiche }: { fiche: CultureDuHub }) {
   const ecriture = useEcritureCulture()
@@ -81,7 +81,7 @@ function Formulaire({ fiche }: { fiche: CultureDuHub }) {
           <IconeDeCulture icone={icone || null} couleur={couleurChoisie} />
           <input
             type="file" accept={TYPES_D_ICONE.join(',')} disabled={envoiEnCours}
-            onChange={(e) => void choisir(e, { types: TYPES_D_ICONE }, (f) => `cultures/${fiche.id}-${String(Date.now())}.${EXTENSIONS[f.type] ?? 'png'}`)}
+            onChange={(e) => void choisir(e, { types: TYPES_D_ICONE }, (f) => `cultures/${fiche.id}-${String(Date.now())}.${extensionDe(f)}`)}
           />
         </span>
       </label>

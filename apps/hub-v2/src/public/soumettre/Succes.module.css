@@ -1,0 +1,102 @@
+/*
+ * QUOI     — la carte de fin (StudioSubmit.css, .studio__card, .reward-badge, .studio__cta,
+ *            .success-banner).
+ * ÉCARTS   — #f4ecd8 = --color-gravure ; #241d12 / #2a2418 = --color-ombre ; #e9d9b6 =
+ *            --color-canal-activite ; #963e3e = --color-fiche-badge. 18 px de coins =
+ *            --radius-feuille (20 px), 12 px = --radius (10 px). 1,2rem = --titre-carte-size, 22 px =
+ *            --titre-detail-size, 11 px = --pilule-size. Le titre h2 (sans style dans la V1) prend
+ *            celui des étapes, Bebas rouge.
+ */
+.carte {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: center;
+  width: min(100% - 2 * var(--space-4), 460px);
+  margin: var(--space-6) auto;
+  padding: 40px 34px;
+  border-radius: var(--radius-feuille);
+  background: var(--color-gravure);
+  box-shadow: 0 26px 60px color-mix(in srgb, var(--color-ombre) 45%, transparent);
+  color: var(--color-boutique-brun);
+  text-align: center;
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    translate var(--duree-douce) var(--courbe-douce);
+}
+
+@starting-style {
+  .carte {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+
+.drapeau {
+  width: 78px;
+  height: auto;
+  margin-bottom: var(--space-1);
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-fiche-badge);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  line-height: 1;
+}
+
+.texte {
+  margin: 0;
+  line-height: var(--corps-leading);
+}
+
+.cadeau {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: center;
+  margin: var(--space-2) auto;
+  padding: 14px 22px;
+  border-radius: var(--radius);
+  background: var(--color-ombre);
+  color: var(--color-canal-activite);
+}
+
+.cadeauLibelle {
+  font-size: var(--pilule-size);
+  letter-spacing: var(--bandeau-titre-tracking);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.cadeauMontant {
+  font-size: var(--titre-detail-size);
+  font-weight: var(--weight-gras);
+}
+
+.appli {
+  display: inline-block;
+  margin-top: var(--space-2);
+  padding: 13px 26px;
+  border-radius: var(--radius);
+  background: var(--color-ombre);
+  color: var(--color-sur-accent);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  letter-spacing: var(--bandeau-titre-tracking);
+  text-decoration: none;
+}
+
+.appli:focus-visible {
+  outline: 2px solid var(--color-fiche-badge);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carte {
+    transition: none;
+  }
+}

@@ -1,1 +1,1 @@
-La coquille : `menu.ts` (la liste unique), `MenuDuPC` (PC ; pas `Menu.tsx`, qui collisionne avec `menu.ts` sur Windows), `BarreDOnglets` (téléphone), `Coquille` (la mise en page), `BientotIci` (écrans pas encore repris), `useAttente` (pastilles).
+La coquille : `menu.ts` (la liste unique), `MenuDuPC` (PC ; pas `Menu.tsx`, qui collisionne avec `menu.ts` sur Windows), `BarreDOnglets` (téléphone), `Coquille` (la mise en page), `useAttente` (pastilles).

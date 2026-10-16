@@ -140,9 +140,12 @@ Les sources ont été relevées dans les migrations le 14/10.
 
 | Balise | Quand |
 |---|---|
-| Nouveau | compte créé il y a moins de 15 jours |
+| Jamais connecté | compte créé pour quelqu'un (`account_source` stand, flyer, shopify) qu'il n'a jamais ouvert (`last_login_at` vide) (Uriel, 16/10, mig 523) |
+| Nouveau | compte créé il y a moins de 15 jours, sauf Jamais connecté |
 | Réactivé | réactivé il y a moins de 15 jours (Uriel, 14/10) |
-| En sommeil | voir la définition ci-dessus (Uriel, 14/10) |
+| En sommeil | voir la définition ci-dessus (Uriel, 14/10), sauf Jamais connecté ou Nouveau (16/10) |
+
+Jamais connecté, Nouveau et En sommeil s'excluent, dans cet ordre (Uriel, 16/10).
 | Porteur | au moins un Fragment |
 | Admin | `users.role = 'admin'` |
 
@@ -218,8 +221,9 @@ d'un flyer (chantier B), les échecs d'envoi des notifications.
 | Tableau de bord | l'ouverture | Accueil, Écoutes audio, Notifications |
 | Réglages (formulaire) | à maquetter au moment de l'écran | Énergie, Réglages, Synchro Shopify, Mises à jour, Blog |
 
-**Comptes** : quatre chiffres (comptes, actifs, réactivés depuis la V2, en sommeil) ; filtres
-Tous, Nouveaux, Réactivés, En sommeil, Porteurs, Équipe ; menus « Arrivés par » (`account_source`)
+**Comptes** : six chiffres (comptes, connectés au moins une fois — V1 (sortie en mars 2026) ou V2, mig 526 —, puis le tableau « Par provenance » (comptes, créés depuis la V1, connectés V1/V2, pas connectés, total ; mig 527),
+actifs, réactivés depuis la V2, en sommeil, jamais connectés) ;
+filtres Tous, Nouveaux, Réactivés, En sommeil, Jamais connectés, Porteurs, Équipe ; menus « Arrivés par » (`account_source`)
 et « Département » ; tri ; recherche par nom ou e-mail ; export CSV. Colonnes : l'Explorateur et
 ses balises, arrivé par, département, Fragments, dernière visite, inscription. **Le tiroir** : son
 parcours (provenance, département, boutique, rôle avec « Changer » → `changer_role(p_user,

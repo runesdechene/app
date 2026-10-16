@@ -1,0 +1,8 @@
+/*
+ * QUOI     — le Hub n'a pas d'image de fond : la couleur unie de la DA seule (Uriel, 16/10).
+ * POURQUOI — @runes/da/global.css pose le parchemin sur body::before pour Explore ; importé
+ *            après lui, ce fichier l'éteint pour le Hub.
+ */
+body::before {
+  content: none;
+}

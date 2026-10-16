@@ -4,7 +4,7 @@
  * POURQUOI — filtre, recherche, provenance, département, tri et page sont dans l'adresse.
  */
 import { useEffect, useState } from 'react'
-import { Link, Outlet, useLocation, useSearchParams } from 'react-router'
+import { Outlet, useSearchParams } from 'react-router'
 import { Bloc } from '@/shared/ui/Bloc'
 import { ChampDeRecherche } from '@/shared/ui/ChampDeRecherche'
 import { ChoixSegmente } from '@/shared/ui/ChoixSegmente'
@@ -14,15 +14,17 @@ import { Tuile } from '@/shared/ui/Tuile'
 import type { Criteres, Filtre, Tri } from '../api/comptes'
 import { exporterComptes, useComptes } from '../hooks/useComptes'
 import { LigneDeCompte } from './LigneDeCompte'
+import { ParProvenance } from './ParProvenance'
 import styles from './Communaute.module.css'
 
 const PAR_PAGE = 50
 const FILTRES: { valeur: Filtre; libelle: string }[] = [
   { valeur: 'tous', libelle: 'Tous' }, { valeur: 'nouveaux', libelle: 'Nouveaux' }, { valeur: 'reactives', libelle: 'Réactivés' },
-  { valeur: 'sommeil', libelle: 'En sommeil' }, { valeur: 'porteurs', libelle: 'Porteurs' }, { valeur: 'equipe', libelle: 'Équipe' },
+  { valeur: 'sommeil', libelle: 'En sommeil' }, { valeur: 'jamais', libelle: 'Jamais connectés' }, { valeur: 'porteurs', libelle: 'Porteurs' },
+  { valeur: 'equipe', libelle: 'Équipe' },
 ]
 const TRIS: { valeur: Tri; libelle: string }[] = [
-  { valeur: 'visite', libelle: 'Dernière visite' }, { valeur: 'inscription', libelle: 'Inscription' }, { valeur: 'nom', libelle: 'Nom' },
+  { valeur: 'inscription', libelle: 'Inscription' }, { valeur: 'visite', libelle: 'Dernière visite' }, { valeur: 'nom', libelle: 'Nom' },
 ]
 function numeroDePage(texte: string | null): number {
   const page = Math.floor(Number(texte))
@@ -32,13 +34,12 @@ const nombre = new Intl.NumberFormat('fr-FR')
 
 export function Comptes() {
   const [params, setParams] = useSearchParams()
-  const { search } = useLocation()
   const criteres: Criteres = {
     filtre: FILTRES.find((f) => f.valeur === params.get('filtre'))?.valeur ?? 'tous',
     recherche: params.get('q') ?? '',
     provenance: params.get('provenance'),
     departement: params.get('departement'),
-    tri: TRIS.find((t) => t.valeur === params.get('tri'))?.valeur ?? 'visite',
+    tri: TRIS.find((t) => t.valeur === params.get('tri'))?.valeur ?? 'inscription',
     limite: PAR_PAGE,
     decalage: (numeroDePage(params.get('page')) - 1) * PAR_PAGE,
   }
@@ -58,7 +59,7 @@ export function Comptes() {
 
   function changer(cle: string, valeur: string | null) {
     const suivants = new URLSearchParams(params)
-    if (valeur === null || valeur === '' || (cle === 'filtre' && valeur === 'tous') || (cle === 'tri' && valeur === 'visite')) suivants.delete(cle)
+    if (valeur === null || valeur === '' || (cle === 'filtre' && valeur === 'tous') || (cle === 'tri' && valeur === 'inscription')) suivants.delete(cle)
     else suivants.set(cle, valeur)
     if (cle !== 'page') suivants.delete('page')
     setParams(suivants)
@@ -81,20 +82,20 @@ export function Comptes() {
         titre="Les comptes"
         phrase={data ? `${nombre.format(data.compteurs.comptes)} Explorateurs.` : ''}
         aDroite={(
-          <>
-            <Link className={styles.boutonContour} to={{ pathname: 'nouveau', search }}>+ Compte du stand</Link>{' '}
-            <button className={styles.boutonContour} type="button" onClick={() => { telecharger().catch(() => { setExportEchoue(true) }) }}>Exporter en CSV</button>
-          </>
+          <button className={styles.boutonContour} type="button" onClick={() => { telecharger().catch(() => { setExportEchoue(true) }) }}>Exporter en CSV</button>
         )}
       />
       {data && (
         <div className={styles.tuiles}>
           <Tuile libelle="Comptes" valeur={nombre.format(data.compteurs.comptes)} />
+          <Tuile libelle="Connectés au moins une fois" valeur={nombre.format(data.compteurs.connectes)} />
           <Tuile libelle="Actifs en 7 jours" valeur={nombre.format(data.compteurs.actifs)} />
           <Tuile libelle="Réactivés depuis la V2" valeur={nombre.format(data.compteurs.reactives)} />
           <Tuile libelle="En sommeil" valeur={nombre.format(data.compteurs.sommeil)} />
+          <Tuile libelle="Jamais connectés" valeur={nombre.format(data.compteurs.jamais)} />
         </div>
       )}
+      {data && <ParProvenance lignes={data.par_provenance} />}
       <div className={styles.barre}>
         <ChoixSegmente nom="Filtre" options={FILTRES} choisi={criteres.filtre} onChoix={(v) => { changer('filtre', v) }} />
         <select className={styles.choix} aria-label="Arrivés par" value={criteres.provenance ?? ''} onChange={(e) => { changer('provenance', e.target.value) }}>

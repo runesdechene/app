@@ -1,0 +1,106 @@
+/*
+ * QUOI     — étape 1 : la mission, la zone de dépôt, les vignettes (StudioSubmit.css, .studio__drop,
+ *            __thumbs, __thumb).
+ * ÉCARTS   — #d8c39a = --color-vignette ; #963e3e = --color-fiche-badge ; #2a2418 = --color-ombre ;
+ *            le blanc à 40 % de la zone = --color-sur-accent à 40 % ; 14 px de coins = --radius-carte
+ *            (15 px) ; 1,05rem = --corps-size.
+ */
+.mission {
+  margin-bottom: var(--space-4);
+}
+
+/* La zone remplit la hauteur libre du panneau, comme sur l'ancienne page. */
+.depot {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  margin-top: var(--space-4);
+  padding: 28px;
+  border: 2px dashed var(--color-vignette);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 40%, transparent);
+  color: var(--color-ombre);
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color var(--duree-douce) var(--courbe-douce),
+    background-color var(--duree-douce) var(--courbe-douce);
+}
+
+.depot:hover,
+.depot:focus-within {
+  border-color: var(--color-fiche-badge);
+  background: color-mix(in srgb, var(--color-fiche-badge) 6%, transparent);
+}
+
+/* Caché aux yeux, pas au clavier : Tab atteint encore le choix des fichiers. */
+.fichier {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.refus {
+  margin-top: var(--space-3);
+}
+
+.vignettes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vignette {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-douce) var(--courbe-douce);
+}
+
+@starting-style {
+  .vignette {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+
+.vignette img,
+.vignette video {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
+.retirer {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-ombre);
+  color: var(--color-sur-accent);
+  font-size: var(--legende-size);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .depot,
+  .vignette {
+    transition: none;
+  }
+}

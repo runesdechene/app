@@ -5,7 +5,7 @@
 import { Link, useLocation } from 'react-router'
 import chevron from '@/assets/ui/chevron.svg'
 import { depuis } from '@/shared/lib/quand'
-import { moisAnnee } from '@/shared/lib/dates'
+import { dateCourte } from '@/shared/lib/dates'
 import { Balise } from '@/shared/ui/Balise'
 import type { Compte } from '../api/comptes'
 import { balisesDuCompte } from '../lib/balises'
@@ -29,7 +29,7 @@ export function LigneDeCompte({ compte, maintenant }: { compte: Compte; maintena
       <span className={styles.colonne}>{compte.departement ? `${compte.departement}${compte.code ? ` (${compte.code})` : ''}` : '—'}</span>
       <span className={styles.nombre}>{compte.fragments}</span>
       <span className={styles.colonne}>{compte.derniere_visite ? depuis(compte.derniere_visite, maintenant) : 'jamais'}</span>
-      <span className={styles.colonne}>{moisAnnee(compte.inscrit)}</span>
+      <span className={styles.colonne}>{dateCourte(compte.inscrit)}</span>
       <img className={styles.chevron} src={chevron} alt="" />
     </Link>
   )

@@ -12,7 +12,8 @@ vi.mock('../hooks/useCompte', () => ({ useCompte: () => ({ data: null, isPending
 
 const liste = {
   total: 2,
-  compteurs: { comptes: 4750, actifs: 312, reactives: 1412, sommeil: 2459 },
+  compteurs: { comptes: 4750, connectes: 1070, actifs: 312, reactives: 1412, sommeil: 2459, jamais: 96 },
+  par_provenance: [{ provenance: 'app', comptes: 3471, crees_v1: 482, connectes: 651 }, { provenance: 'stand', comptes: 112, crees_v1: 112, connectes: 20 }],
   provenances: ['app', 'flyer'], departements: ['Aude'],
   lignes: [
     { id: 'u1', nom: 'Kelpie', email: 'k@x.fr', avatar: null, role: 'user', provenance: 'flyer', inscrit: '2026-10-14T09:00:00Z',
@@ -31,14 +32,25 @@ function monter(adresse = '/communaute/comptes') {
   return router
 }
 
-test('les quatre chiffres, les lignes et leurs balises', () => {
+test('les six chiffres, les lignes et leurs balises', () => {
   mockUseComptes.mockReturnValue({ data: liste, isError: false })
   monter()
   expect(screen.getByText('4 750')).toBeInTheDocument()
+  expect(screen.getByText('96')).toBeInTheDocument()
+  expect(screen.getByText('1 070')).toBeInTheDocument()
   expect(screen.getByRole('link', { name: /Kelpie/ })).toHaveAttribute('href', '/communaute/comptes/u1')
   expect(screen.getByText('Seine-et-Marne (77)')).toBeInTheDocument()
   expect(screen.getByText('En sommeil', { selector: '[data-teinte]' })).toBeInTheDocument()
   expect(screen.getByText('jamais')).toBeInTheDocument()
+})
+
+test('le tableau par provenance : une ligne par provenance, les « pas connectés » déduits, le total', () => {
+  mockUseComptes.mockReturnValue({ data: liste, isError: false })
+  monter()
+  const stand = screen.getByRole('row', { name: /Stand/ })
+  expect(stand).toHaveTextContent('112')
+  expect(stand).toHaveTextContent('92')
+  expect(screen.getByRole('row', { name: /Total/ })).toHaveTextContent('3 583')
 })
 
 test('le filtre va dans l’adresse et repart de la première page', async () => {
@@ -46,6 +58,13 @@ test('le filtre va dans l’adresse et repart de la première page', async () =>
   const router = monter('/communaute/comptes?page=2')
   await userEvent.click(screen.getByRole('radio', { name: 'En sommeil' }))
   expect(router.state.location.search).toBe('?filtre=sommeil')
+})
+
+test('le filtre « Jamais connectés » existe', async () => {
+  mockUseComptes.mockReturnValue({ data: liste, isError: false })
+  const router = monter()
+  await userEvent.click(screen.getByRole('radio', { name: 'Jamais connectés' }))
+  expect(router.state.location.search).toBe('?filtre=jamais')
 })
 
 test('un export qui échoue le dit', async () => {
@@ -80,8 +99,10 @@ test('ouvrir une fiche garde le filtre et la page, la fermer y ramène', async (
   expect(router.state.location.search).toBe('?filtre=porteurs&page=3')
 })
 
-test('« + Compte du stand » mène à /nouveau en gardant les critères de la liste', () => {
+test('l’inscription au jour près, et la liste triée par inscription par défaut', () => {
   mockUseComptes.mockReturnValue({ data: liste, isError: false })
-  monter('/communaute/comptes?filtre=porteurs')
-  expect(screen.getByRole('link', { name: '+ Compte du stand' })).toHaveAttribute('href', '/communaute/comptes/nouveau?filtre=porteurs')
+  monter()
+  expect(screen.getByText('14/10/2026')).toBeInTheDocument()
+  expect(screen.getByRole('combobox', { name: 'Trier' })).toHaveValue('inscription')
+  expect(mockUseComptes).toHaveBeenLastCalledWith(expect.objectContaining({ tri: 'inscription' }))
 })

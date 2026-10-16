@@ -20,7 +20,7 @@
 
 @container app (width >= 900px) {
   .coquille {
-    grid-template-columns: 232px minmax(0, 1fr);
+    grid-template-columns: 248px minmax(0, 1fr);
   }
 
   .menu {

@@ -68,7 +68,7 @@ test('la file est filtrée sur « À valider » et la première contribution est
   expect(screen.getByRole('radio', { name: 'À valider' })).toBeChecked()
   expect(api.lireContributions).toHaveBeenCalledWith({ filtre: 'pending', recherche: '', limite: 50, decalage: 0 })
   expect(screen.getByRole('button', { name: /Corentin/ })).toBeInTheDocument()
-  expect(screen.getAllByText('2 fichiers · 10/10/2026')).toHaveLength(2)
+  expect(screen.getAllByText('★★★★★  2 photos', { normalizer: (t) => t })).toHaveLength(2)
 })
 
 test('les quatre tuiles et la phrase de l’en-tête', async () => {
@@ -82,12 +82,11 @@ test('les quatre tuiles et la phrase de l’en-tête', async () => {
 test('le client, sa note, son message et ses photos', async () => {
   afficher([contribution('c1', 'Brune')])
   await screen.findByRole('heading', { name: 'Brune' })
-  expect(screen.getByText('Client')).toBeInTheDocument()
-  expect(screen.getByText('Diffusion OK')).toBeInTheDocument()
-  expect(screen.getByText('Porte : Veste Hoplite · taille M')).toBeInTheDocument()
-  expect(screen.getByLabelText('Expérience : 4 sur 5')).toHaveTextContent('★★★★☆')
-  expect(screen.getByLabelText('Produits : 5 sur 5')).toHaveTextContent('★★★★★')
-  expect(screen.getByText('Hauteur : 168 cm · Épaules : 40 cm')).toBeInTheDocument()
+  expect(screen.getByText(/^Client · /)).toBeInTheDocument()
+  expect(screen.getAllByRole('button', { name: 'Média' })[0]).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByText('Veste Hoplite · M')).toBeInTheDocument()
+  expect(screen.getByLabelText('Produits : 5 sur 5 · Expérience : 4 sur 5')).toHaveTextContent('★★★★★')
+  expect(screen.getByText(/168 cm · épaules 40 cm/)).toBeInTheDocument()
   expect(screen.getByText('Superbe veste')).toBeInTheDocument()
 })
 
@@ -150,7 +149,7 @@ test('le filtre et la recherche sont dans l’adresse', async () => {
 test('le message se corrige', async () => {
   afficher([contribution('c1', 'Brune')])
   await screen.findByRole('heading', { name: 'Brune' })
-  await userEvent.click(screen.getByRole('button', { name: 'Modifier' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Modifier le message' }))
   const zone = screen.getByRole('textbox', { name: 'Message' })
   expect(zone).toHaveAttribute('maxlength', '500')
   await userEvent.clear(zone)
@@ -166,6 +165,7 @@ test('les étiquettes : poser, retirer, créer', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Retirer #veste' }))
   await waitFor(() => { expect(api.retirerEtiquette).toHaveBeenCalledWith('c1', 't1') })
 
+  await userEvent.click(screen.getByRole('button', { name: '+ ajouter' }))
   await screen.findByRole('option', { name: '#hiver' })
   expect(screen.queryByRole('option', { name: '#veste' })).not.toBeInTheDocument()
   await userEvent.selectOptions(screen.getByLabelText('Ajouter une étiquette'), '#hiver')

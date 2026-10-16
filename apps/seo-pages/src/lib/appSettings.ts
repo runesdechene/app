@@ -1,8 +1,7 @@
 import { supabase } from './supabase'
 
-const FALLBACK_SHARE_TEMPLATE = "Un trésor oublié t'attend sur Runes de Chêne. Viens explorer {name}."
-
-export async function getShareTextTemplate(): Promise<string> {
+// Le texte de partage réglé dans le Hub, ou null : la phrase de repli se décide dans templates/photo.ts.
+export async function getShareTextTemplate(): Promise<string | null> {
   const { data, error } = await supabase
     .from('app_settings')
     .select('value')
@@ -11,7 +10,7 @@ export async function getShareTextTemplate(): Promise<string> {
 
   if (error || !data) {
     console.warn('[appSettings] Failed to fetch share_text_template, using fallback:', error?.message)
-    return FALLBACK_SHARE_TEMPLATE
+    return null
   }
 
   return data.value

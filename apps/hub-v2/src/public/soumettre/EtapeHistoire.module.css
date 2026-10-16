@@ -1,0 +1,31 @@
+/*
+ * QUOI     — étape 3 : les étoiles (StudioSubmit.css, .studio__stars, __star).
+ * ÉCARTS   — étoile éteinte #c9c2b4 = --color-fiche-credit-pale (#ccc4c4) ; allumée #e0a73d =
+ *            --color-confetti-or (#d4a84c) ; 1,8rem = --inscription-size (1,875rem).
+ */
+.etoiles {
+  display: flex;
+  gap: var(--space-1);
+  margin: 2px 0 10px;
+}
+
+.etoile {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-fiche-credit-pale);
+  font-size: var(--inscription-size);
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--duree-douce) var(--courbe-douce);
+}
+
+.etoile[data-allumee='true'] {
+  color: var(--color-confetti-or);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .etoile {
+    transition: none;
+  }
+}

@@ -1,0 +1,33 @@
+/*
+ * QUOI     — l'accent à 8 % dans un filet à 35 %, coins de 10 px, Cabin demi-gras 14 (Figma 606:1535).
+ * ATTENTION — le texte de la maquette (#8c2d22) n'a pas de jeton : --color-boutique-rouge est le
+ *            plus proche.
+ */
+.message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 11px 14px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  color: var(--color-boutique-rouge);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-semi);
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+.message img {
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message {
+    transition: none;
+  }
+}

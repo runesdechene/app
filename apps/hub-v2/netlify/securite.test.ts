@@ -229,3 +229,142 @@ describe('shopify-batch-tags : la requête GraphQL', () => {
     expect(((await r.json()) as { error: string }).error).toContain('Access denied')
   })
 })
+
+describe('shopify-article : l’image de l’article', () => {
+  // Admin valide, un blog configuré ; on garde le corps envoyé à Shopify.
+  function simuler() {
+    const envoyes: { methode: string | undefined; corps: { article: Record<string, unknown> } }[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
+      if (url.includes('/auth/v1/user')) return Promise.resolve(Response.json({ id: 'u0' }))
+      if (url.includes('/rest/v1/users?select=role')) return Promise.resolve(Response.json([{ role: 'admin' }]))
+      if (url.includes('app_settings')) return Promise.resolve(Response.json([{ value: '99' }]))
+      envoyes.push({ methode: init?.method, corps: JSON.parse(String(init?.body)) as { article: Record<string, unknown> } })
+      return Promise.resolve(Response.json({ article: { id: 7 } }))
+    }))
+    return envoyes
+  }
+  const appeler = async (annonce: object, id: string | null) => {
+    const handler = await charger('shopify-article')
+    return handler(post(JSON.stringify({ announcement: annonce, shopify_article_id: id }), { Authorization: 'Bearer jwt' }))
+  }
+
+  test('sans couverture, la mise à jour envoie image: null : Shopify retire l’ancienne', async () => {
+    const envoyes = simuler()
+    const r = await appeler({ title: 'T', body_html: '<p>x</p>', cover_image: '', type: 'app' }, '7')
+    expect(r.status).toBe(200)
+    expect(envoyes[0]?.methode).toBe('PUT')
+    expect(envoyes[0]?.corps.article).toHaveProperty('image', null)
+  })
+
+  test('avec une couverture, l’image part avec son adresse', async () => {
+    const envoyes = simuler()
+    await appeler({ title: 'T', body_html: '', cover_image: 'https://x/c.png', type: 'app' }, null)
+    expect(envoyes[0]?.methode).toBe('POST')
+    expect(envoyes[0]?.corps.article).toHaveProperty('image', { src: 'https://x/c.png' })
+  })
+})
+
+describe('flyer-create-account : publique, donc freinée', () => {
+  const IP = '203.0.113.7'
+
+  // `essais` : ce que la table flyer_signup_log rend pour cette IP sur la dernière heure.
+  function simuler(
+    essais: number,
+    shopify: Response = new Response('{}', { status: 500 }),
+    comptes: Response = Response.json([]),
+  ) {
+    const appels: { url: string; methode: string }[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
+      appels.push({ url, methode: init?.method ?? 'GET' })
+      if (url.includes('/rest/v1/flyer_signup_log?')) {
+        return Promise.resolve(Response.json(Array.from({ length: essais }, (_, i) => ({ id: i }))))
+      }
+      if (url.includes('/rest/v1/users?email_address')) return Promise.resolve(comptes.clone())
+      if (url.includes('/customers/search.json')) return Promise.resolve(Response.json({ customers: [] }))
+      if (url.includes('/admin/api/')) return Promise.resolve(shopify.clone())
+      return Promise.resolve(new Response(null, { status: 201 }))
+    }))
+    return appels
+  }
+  const demander = (corps: string) =>
+    post(corps, { 'x-nf-client-connection-ip': IP, 'Content-Type': 'application/json' })
+
+  test('sans e-mail valide : 400, rien n’est appelé, la valeur reçue n’est pas renvoyée', async () => {
+    const appels = simuler(0)
+    const handler = await charger('flyer-create-account')
+    const r = await handler(demander('{"email":"pas-un-email"}'))
+    expect(r.status).toBe(400)
+    expect(JSON.stringify(await r.json())).not.toContain('pas-un-email')
+    expect(appels).toEqual([])
+  })
+
+  test.each([
+    ['un espace', '{"email":"claire @exemple.fr"}'],
+    ['une requête Shopify glissée', '{"email":"claire@exemple.fr OR email:x@y.fr"}'],
+  ])('un e-mail avec %s : 400, rien n’est appelé', async (_, corps) => {
+    const appels = simuler(0)
+    const handler = await charger('flyer-create-account')
+    const r = await handler(demander(corps))
+    expect(r.status).toBe(400)
+    expect(appels).toEqual([])
+  })
+
+  test('compte déjà connu ou tout juste créé : la même réponse, rien ne dit lequel', async () => {
+    simuler(0, Response.json({ customer: { id: 42 } }))
+    const handler = await charger('flyer-create-account')
+    const cree = await handler(demander('{"email":"claire@exemple.fr"}'))
+    simuler(0, undefined, Response.json([{ id: 'u1' }]))
+    const connu = await (await charger('flyer-create-account'))(demander('{"email":"claire@exemple.fr"}'))
+    expect(cree.status).toBe(200)
+    expect(await cree.json()).toEqual({ success: true, promoCode: 'CONFRERIE' })
+    expect(await connu.json()).toEqual({ success: true, promoCode: 'CONFRERIE' })
+  })
+
+  test('ni CORS ouvert ni pré-requête : seul POST passe', async () => {
+    simuler(0)
+    const handler = await charger('flyer-create-account')
+    const options = await handler(new Request('http://localhost/fonction', { method: 'OPTIONS' }))
+    expect(options.status).toBe(405)
+    const r = await handler(demander('{"email":"pas-un-email"}'))
+    expect(r.headers.get('Access-Control-Allow-Origin')).toBeNull()
+  })
+
+  test('la 16ᵉ demande de la même IP dans l’heure : 429, ni Shopify ni compte', async () => {
+    const appels = simuler(15)
+    const handler = await charger('flyer-create-account')
+    const r = await handler(demander('{"email":"claire@exemple.fr"}'))
+    expect(r.status).toBe(429)
+    expect(typeof ((await r.json()) as { error: unknown }).error).toBe('string')
+    expect(appels[0]?.url).toContain(`ip=eq.${IP}`)
+    expect(appels.some((a) => a.url.includes('/admin/api/'))).toBe(false)
+    expect(appels.some((a) => a.methode === 'POST')).toBe(false)
+  })
+
+  test('la 15ᵉ passe le frein et ne parle qu’à la boutique Runes de Chêne', async () => {
+    const appels = simuler(14)
+    const handler = await charger('flyer-create-account')
+    await handler(demander('{"email":"claire@exemple.fr"}'))
+    const shopify = appels.filter((a) => a.url.includes('/admin/api/'))
+    expect(shopify.length).toBeGreaterThan(0)
+    expect(shopify.every((a) => a.url.startsWith(`https://${BOUTIQUE}/`))).toBe(true)
+  })
+
+  test('un refus de Shopify ne renvoie ni l’e-mail ni le texte de Shopify', async () => {
+    const journal = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    simuler(0, new Response('{"errors":{"email":["claire@exemple.fr is invalid"]}}', { status: 422 }))
+    const handler = await charger('flyer-create-account')
+    const r = await handler(demander('{"email":"claire@exemple.fr"}'))
+    expect(r.status).toBe(500)
+    expect(JSON.stringify(await r.json())).not.toContain('claire@exemple.fr')
+    expect(JSON.stringify(journal.mock.calls)).not.toContain('claire@exemple.fr')
+    journal.mockRestore()
+  })
+
+  test('une réponse illisible de Supabase à la recherche du compte : 500 en JSON, pas la page de Netlify', async () => {
+    simuler(0, undefined, new Response('<html>Bad gateway</html>', { status: 502 }))
+    const handler = await charger('flyer-create-account')
+    const r = await handler(demander('{"email":"claire@exemple.fr"}'))
+    expect(r.status).toBe(500)
+    expect(await r.json()).toEqual({ error: 'Unexpected error' })
+  })
+})

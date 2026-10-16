@@ -12,6 +12,42 @@
   gap: var(--space-3);
 }
 
+.tableau {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.tableau th,
+.tableau td {
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-sable);
+  text-align: end;
+}
+
+.tableau thead th {
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--libelle-size);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+  color: var(--color-texte-doux);
+}
+
+.tableau th:first-child {
+  text-align: start;
+}
+
+.tableau tbody tr:last-child {
+  font-weight: var(--weight-semi);
+  color: var(--color-encre);
+}
+
+.tableau tbody tr:last-child th,
+.tableau tbody tr:last-child td {
+  border-bottom: 0;
+}
+
 .barre {
   display: flex;
   flex-wrap: wrap;
@@ -100,7 +136,7 @@
 }
 
 @container app (width >= 900px) {
-  .tuiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .tuiles { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 
   .entetesCompte, .ligneCompte {
     grid-template-columns: 32px minmax(0, 1fr) 170px 150px 70px 120px 90px 16px;
@@ -181,7 +217,7 @@
   object-fit: cover;
 }
 
-/* Le compte du stand : un formulaire simple, un champ par ligne */
+/* Les formulaires des tiroirs (compagnie, lieu) : un champ par ligne */
 .formulaire {
   display: grid;
   gap: var(--space-3);
@@ -203,10 +239,4 @@
   font: inherit;
   font-size: var(--flux-size);
   color: var(--color-texte);
-}
-
-.caseACocher {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
 }
