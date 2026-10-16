@@ -33,4 +33,9 @@ jobs:
       - run: pnpm --filter web-v2 lint
       - run: pnpm --filter web-v2 format:check
       - run: pnpm --filter web-v2 test
-      - run: pnpm --filter web-v2 build
+      # Le build complet finit par le pré-rendu de /bienvenue, qui lit les vrais lieux en base (spec
+      # 2026-10-11-vitrine-html-google) : la CI n'a pas de base, il échouait à chaque push depuis le
+      # 11/10. Elle construit l'appli et le rendu serveur de la vitrine, sans les remplir ; le
+      # pré-rendu se fait au déploiement (pnpm build, depuis le poste qui a accès à la base).
+      - run: pnpm --filter web-v2 exec vite build
+      - run: pnpm --filter web-v2 exec vite build --ssr src/prerendu/vitrine.tsx --outDir dist-ssr
