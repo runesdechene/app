@@ -82,9 +82,9 @@ test('les quatre tuiles et la phrase de l’en-tête', async () => {
 test('le client, sa note, son message et ses photos', async () => {
   afficher([contribution('c1', 'Brune')])
   await screen.findByRole('heading', { name: 'Brune' })
-  expect(screen.getByText('Client')).toBeInTheDocument()
-  expect(screen.getByText('Diffusion OK')).toBeInTheDocument()
-  expect(screen.getByText('Porte : Veste Hoplite · taille M')).toBeInTheDocument()
+  expect(screen.getByText(/^Client · /)).toBeInTheDocument()
+  expect(screen.getAllByRole('button', { name: 'Média' })[0]).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByText('Veste Hoplite · M')).toBeInTheDocument()
   expect(screen.getByLabelText('Expérience : 4 sur 5')).toHaveTextContent('★★★★☆')
   expect(screen.getByLabelText('Produits : 5 sur 5')).toHaveTextContent('★★★★★')
   expect(screen.getByText('Hauteur : 168 cm · Épaules : 40 cm')).toBeInTheDocument()
@@ -166,6 +166,7 @@ test('les étiquettes : poser, retirer, créer', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Retirer #veste' }))
   await waitFor(() => { expect(api.retirerEtiquette).toHaveBeenCalledWith('c1', 't1') })
 
+  await userEvent.click(screen.getByRole('button', { name: '+ ajouter' }))
   await screen.findByRole('option', { name: '#hiver' })
   expect(screen.queryByRole('option', { name: '#veste' })).not.toBeInTheDocument()
   await userEvent.selectOptions(screen.getByLabelText('Ajouter une étiquette'), '#hiver')

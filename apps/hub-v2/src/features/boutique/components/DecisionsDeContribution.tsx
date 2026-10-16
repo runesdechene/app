@@ -37,15 +37,29 @@ export function DecisionsDeContribution({ contribution, ecriture, suppression, o
     suppression.mutate(contribution, { onSuccess: onDecide })
   }
 
+  const nombre = contribution.images.length
   return (
     <section className={styles.decisions}>
+      <button type="button" className={styles.telechargerTout} disabled={telechargement.enCours}
+        onClick={() => { void telechargement.telecharger(fichiersDeContributions([contribution]), `${nettoyer(contribution.nom)}.zip`) }}>
+        {`↓ Télécharger ${nombre === 1 ? 'la photo' : `les ${String(nombre)} photos`}`}
+      </button>
+      {confirme ? (
+        <span className={styles.rangee}>
+          <span>{`Supprimer cette contribution et ses ${String(nombre)} photos ?`}</span>
+          <button type="button" className={styles.plein} disabled={suppression.isPending} onClick={supprimer}>Confirmer</button>
+          <button type="button" className={styles.contour} onClick={() => { setConfirme(false) }}>Annuler</button>
+        </span>
+      ) : (
+        <button type="button" className={styles.supprimer} onClick={() => { suppression.reset(); setConfirme(true) }}>Supprimer</button>
+      )}
       {statut !== 'archived' && (
         <button type="button" className={styles.contour} disabled={ecriture.isPending} onClick={() => { decider('archived') }}>Archiver</button>
       )}
       {statut !== 'approved' && (
         <>
           {recompensee ? (
-            <span className={styles.calme}>{`Déjà récompensée le ${dateCourte(recompensee)}`}</span>
+            <span className={styles.petit}>{`Déjà récompensée le ${dateCourte(recompensee)}`}</span>
           ) : (
             <label className={styles.couronnes}>
               Couronnes offertes
@@ -57,17 +71,6 @@ export function DecisionsDeContribution({ contribution, ecriture, suppression, o
             Valider et publier
           </button>
         </>
-      )}
-      <button type="button" className={styles.contour} disabled={telechargement.enCours}
-        onClick={() => { void telechargement.telecharger(fichiersDeContributions([contribution]), `${nettoyer(contribution.nom)}.zip`) }}>Télécharger</button>
-      {confirme ? (
-        <>
-          <span>{`Supprimer cette contribution et ses ${String(contribution.images.length)} photos ?`}</span>
-          <button type="button" className={styles.plein} disabled={suppression.isPending} onClick={supprimer}>Confirmer</button>
-          <button type="button" className={styles.contour} onClick={() => { setConfirme(false) }}>Annuler</button>
-        </>
-      ) : (
-        <button type="button" className={styles.contour} onClick={() => { suppression.reset(); setConfirme(true) }}>Supprimer</button>
       )}
       {telechargement.message && <span className={styles.progres}>{telechargement.message}</span>}
       {ecriture.error && <p role="alert" className={styles.erreur}>{ecriture.error.message}</p>}

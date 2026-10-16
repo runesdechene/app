@@ -4,7 +4,7 @@
  *            et sa suppression.
  * POURQUOI — Communauté et Fiche produit n'existent que sur un produit relié ; « Média » est l'accord de
  *            diffusion de la contribution, qu'on lit ici sans le changer. Une écriture à la fois : les
- *            cases sont désactivées pendant qu'elle part et que la liste se relit, et son erreur reste sous la photo.
+ *            pastilles sont désactivées pendant qu'elle part et que la liste se relit, et son erreur reste sous la photo.
  */
 import { useIsFetching } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -17,14 +17,14 @@ import { adresseDeTelechargement, estUneVideo, nomDeFichier, texteAlternatif } f
 import { ChoixDuProduit } from './ChoixDuProduit'
 import styles from './Photos.module.css'
 
-function Canal({ libelle, coche, desactive, onBascule }: {
-  libelle: string; coche: boolean; desactive: boolean; onBascule?: () => void
+/** Un canal de diffusion, en pastille : pleine quand la photo y est, en contour sinon. */
+function Canal({ libelle, actif, desactive, onBascule }: {
+  libelle: string; actif: boolean; desactive: boolean; onBascule?: () => void
 }) {
   return (
-    <label className={styles.canal}>
-      <input type="checkbox" checked={coche} disabled={desactive} onChange={onBascule ?? (() => undefined)} />
+    <button type="button" className={styles.canal} aria-pressed={actif} disabled={desactive} onClick={onBascule}>
       {libelle}
-    </label>
+    </button>
   )
 }
 
@@ -49,22 +49,22 @@ export function PhotoDeContribution({ contribution, photo, rang }: { contributio
           ? <video src={photo.url} muted preload="metadata" />
           : <img src={photo.url} alt={texteAlternatif(contribution.nom, contribution.hauteur, photo.taille ?? contribution.taille)} loading="lazy" />}
       </a>
-      {photo.taille && <figcaption className={styles.calme}>{photo.taille === 'none' ? 'Aucun produit' : photo.taille}</figcaption>}
+      {photo.taille && <figcaption className={styles.petit}>{photo.taille === 'none' ? 'Aucun produit' : `Taille ${photo.taille}`}</figcaption>}
 
       <div className={styles.canaux}>
-        <Canal libelle="Communauté" coche={photo.communaute} desactive={sansProduit || occupe}
+        <Canal libelle="Communauté" actif={photo.communaute} desactive={sansProduit || occupe}
           onBascule={() => { ecrire(() => montrerDansCommunaute(photo.id, !photo.communaute)) }} />
-        <Canal libelle="Mur" coche={photo.mur} desactive={occupe}
+        <Canal libelle="Mur" actif={photo.mur} desactive={occupe}
           onBascule={() => { ecrire(() => montrerAuMur(photo.id, !photo.mur)) }} />
-        <Canal libelle="Fiche produit" coche={photo.media !== null} desactive={sansProduit || occupe}
+        <Canal libelle="Fiche produit" actif={photo.media !== null} desactive={sansProduit || occupe}
           onBascule={() => { ecrire(() => mettreSurLaFiche(contribution, photo, photo.media === null)) }} />
-        <Canal libelle="Média" coche={contribution.diffusion} desactive />
-        {sansProduit && <span className={styles.calme}>Relie d’abord un produit</span>}
+        <Canal libelle="Média" actif={contribution.diffusion} desactive />
       </div>
+      {sansProduit && <p className={styles.petit}>Communauté et fiche produit : relie d’abord un produit.</p>}
 
       {photo.produit_id !== null ? (
-        <p className={styles.rangee}>
-          <span>{`Relié à ${photo.produit_titre ?? photo.produit_handle ?? photo.produit_id}`}</span>
+        <p className={styles.petit}>
+          <span>{`Relié à ${photo.produit_titre ?? photo.produit_handle ?? photo.produit_id}`}</span>{' '}
           <button type="button" className={styles.lien} disabled={occupe} onClick={() => { ecrire(() => delierProduit(photo)) }}>Retirer</button>
         </p>
       ) : choixDuProduit ? (
@@ -74,7 +74,7 @@ export function PhotoDeContribution({ contribution, photo, rang }: { contributio
         <button type="button" className={styles.lien} disabled={occupe} onClick={() => { setChoixDuProduit(true) }}>Relier à un produit</button>
       )}
 
-      <div className={styles.rangee}>
+      <div className={styles.petit}>
         <a className={styles.lien} href={adresseDeTelechargement(photo.url, nomDeFichier(contribution.nom, contribution.instagram, rang, photo.url))}>Télécharger</a>
         {confirme ? (
           <>
