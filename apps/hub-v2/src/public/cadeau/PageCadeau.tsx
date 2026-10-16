@@ -7,6 +7,7 @@
  *            parchemin sont au cadre commun (CadreFlyer).
  */
 import { useState, type SubmitEvent } from 'react'
+import { Link } from 'react-router'
 import cadeau from '@/assets/flyer/cadeau.webp'
 import { Bouton, LienBouton } from '../briques/Bouton'
 import { CaseACocher } from '../briques/CaseACocher'
@@ -79,9 +80,9 @@ export function PageCadeau() {
     <>
       <title>Ton cadeau — Runes de Chêne</title>
       <div className={styles.page}>
-        <a href={BOUTIQUE} className={styles.retour}>
-          ← Retourner sur la boutique
-        </a>
+        <Link to="/flyer" viewTransition className={styles.retour}>
+          ← Retour
+        </Link>
         <img src={cadeau} alt="" className={styles.cadeau} />
         {code !== null ? (
           <LeCode code={code} />

@@ -5,6 +5,7 @@
  */
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { PageCadeau } from './PageCadeau'
 
@@ -15,7 +16,7 @@ function repondre(reponse: Response | Error) {
 }
 
 async function envoyer(email = 'claire@exemple.fr') {
-  render(<PageCadeau />)
+  render(<MemoryRouter><PageCadeau /></MemoryRouter>)
   await userEvent.type(screen.getByRole('textbox', { name: 'Ton e-mail' }), email)
   await userEvent.click(screen.getByRole('button', { name: 'Recevoir mon cadeau' }))
 }
@@ -26,12 +27,12 @@ afterEach(() => {
 
 describe('PageCadeau', () => {
   it('donne son titre à l’onglet', () => {
-    render(<PageCadeau />)
+    render(<MemoryRouter><PageCadeau /></MemoryRouter>)
     expect(document.title).toBe('Ton cadeau — Runes de Chêne')
   })
 
   it('garde le bouton inactif tant que l’e-mail n’est pas valide', async () => {
-    render(<PageCadeau />)
+    render(<MemoryRouter><PageCadeau /></MemoryRouter>)
     const bouton = screen.getByRole('button', { name: 'Recevoir mon cadeau' })
     expect(bouton).toBeDisabled()
     await userEvent.type(screen.getByRole('textbox', { name: 'Ton e-mail' }), 'claire@exemple')
@@ -41,7 +42,7 @@ describe('PageCadeau', () => {
   })
 
   it('laisse la case newsletter décochée au départ', () => {
-    render(<PageCadeau />)
+    render(<MemoryRouter><PageCadeau /></MemoryRouter>)
     expect(screen.getByRole('checkbox', { name: /Je veux recevoir les nouvelles/ })).not.toBeChecked()
   })
 
@@ -63,7 +64,7 @@ describe('PageCadeau', () => {
 
   it('envoie le choix de la newsletter quand la case est cochée', async () => {
     const f = repondre(Response.json({ success: true, action: 'created', promoCode: 'CONFRERIE' }))
-    render(<PageCadeau />)
+    render(<MemoryRouter><PageCadeau /></MemoryRouter>)
     await userEvent.type(screen.getByRole('textbox', { name: 'Ton e-mail' }), 'claire@exemple.fr')
     await userEvent.click(screen.getByRole('checkbox', { name: /Je veux recevoir les nouvelles/ }))
     await userEvent.click(screen.getByRole('button', { name: 'Recevoir mon cadeau' }))
@@ -101,12 +102,9 @@ describe('PageCadeau', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Connexion impossible, réessaie.')
   })
 
-  it('renvoie à la boutique et aux données personnelles', () => {
-    render(<PageCadeau />)
-    expect(screen.getByRole('link', { name: '← Retourner sur la boutique' })).toHaveAttribute(
-      'href',
-      'https://runesdechene.com',
-    )
+  it('ramène au flyer et renvoie aux données personnelles', () => {
+    render(<MemoryRouter><PageCadeau /></MemoryRouter>)
+    expect(screen.getByRole('link', { name: '← Retour' })).toHaveAttribute('href', '/flyer')
     expect(screen.getByRole('link', { name: 'Données personnelles' })).toHaveAttribute(
       'href',
       'https://app.runesdechene.com/legal/confidentialite',
