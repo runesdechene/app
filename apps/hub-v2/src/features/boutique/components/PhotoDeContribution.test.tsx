@@ -44,7 +44,7 @@ test('sans produit, « Fiche produit » et « Communauté » sont désactivés e
   afficher(photo())
   expect(screen.getByRole('button', { name: 'Fiche produit' })).toBeDisabled()
   expect(screen.getByRole('button', { name: 'Communauté' })).toBeDisabled()
-  expect(screen.getByText('Communauté et fiche produit : relie d’abord un produit.')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Communauté' })).toHaveAttribute('title', 'Relie d’abord un produit')
   await waitFor(() => { expect(screen.getByRole('button', { name: 'Mur' })).toBeEnabled() })
 })
 
@@ -73,13 +73,13 @@ test('relier un produit trouvé par la recherche', async () => {
 
 test('un produit relié : « Relié à … », « Retirer », et les canaux s’ouvrent', async () => {
   afficher(photo({ produit_id: '12', produit_titre: 'Veste Hoplite', media: '99', communaute: true }))
-  expect(screen.getByText('Relié à Veste Hoplite')).toBeInTheDocument()
+  expect(screen.getByText('Veste Hoplite')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Fiche produit' })).toHaveAttribute('aria-pressed', 'true')
   expect(screen.getByRole('button', { name: 'Communauté' })).toHaveAttribute('aria-pressed', 'true')
-  expect(screen.queryByText('Communauté et fiche produit : relie d’abord un produit.')).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Communauté' })).not.toHaveAttribute('title')
   await userEvent.click(screen.getByRole('button', { name: 'Fiche produit' }))
   await waitFor(() => { expect(api.mettreSurLaFiche).toHaveBeenCalledWith(contribution, expect.objectContaining({ id: 'p1' }), false) })
-  await userEvent.click(screen.getByRole('button', { name: 'Retirer' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Retirer le produit' }))
   await waitFor(() => { expect(api.delierProduit).toHaveBeenCalledWith(expect.objectContaining({ id: 'p1' })) })
 })
 

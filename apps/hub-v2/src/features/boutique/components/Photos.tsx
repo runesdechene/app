@@ -7,10 +7,8 @@
  */
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { dateCourte } from '@/shared/lib/dates'
-import { depuis } from '@/shared/lib/quand'
+import { depuis, heureDuFil } from '@/shared/lib/quand'
 import { pluriel } from '@/shared/lib/texte'
-import { Balise } from '@/shared/ui/Balise'
 import { Bloc } from '@/shared/ui/Bloc'
 import { ChampDeRecherche } from '@/shared/ui/ChampDeRecherche'
 import { ChoixSegmente } from '@/shared/ui/ChoixSegmente'
@@ -21,7 +19,7 @@ import type { Contribution, Filtre } from '../api/contributions'
 import { useContributions } from '../hooks/useContributions'
 import { useTelechargement } from '../hooks/useTelechargement'
 import { fichiersDeContributions } from '../lib/archive'
-import { estUneVideo, STATUTS } from '../lib/contribution'
+import { estUneVideo } from '../lib/contribution'
 import { LectureContribution } from './LectureContribution'
 import boutique from './Boutique.module.css'
 import styles from './Photos.module.css'
@@ -36,6 +34,15 @@ const nombre = new Intl.NumberFormat('fr-FR')
 function numeroDePage(texte: string | null): number {
   const page = Math.floor(Number(texte))
   return page >= 1 ? page : 1
+}
+
+/** « ★★★★★  3 photos », « 1 photo, sans avis » (maquette 596:1319). */
+function resumeDeLaLigne(c: Contribution): string {
+  const note = c.note_produits ?? c.note_experience
+  const photos = `${String(c.images.length)} ${pluriel(c.images.length, 'photo')}`
+  if (note === null) return `${photos}, sans avis`
+  const pleines = Math.min(5, Math.max(0, Math.round(note)))
+  return `${'★'.repeat(pleines)}${'☆'.repeat(5 - pleines)}  ${photos}`
 }
 
 function Vignette({ contribution }: { contribution: Contribution }) {
@@ -140,10 +147,9 @@ export function Photos() {
                   onClick={() => { choisir(c.id) }}>
                   <Vignette contribution={c} />
                   <span className={styles.nom}>{c.nom}</span>
-                  <span className={styles.detail}>
-                    {`${String(c.images.length)} ${pluriel(c.images.length, 'fichier')} · ${dateCourte(c.quand)}`}
-                  </span>
-                  <Balise texte={STATUTS[c.statut]} teinte="moderation" />
+                  <span className={styles.quand}>{c.quand ? heureDuFil(c.quand) : ''}</span>
+                  <span className={styles.porte}>{c.produit ?? 'Sans produit'}</span>
+                  <span className={styles.notes}>{resumeDeLaLigne(c)}</span>
                 </button>
               ))}
             </Bloc>

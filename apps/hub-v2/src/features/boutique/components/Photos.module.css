@@ -44,45 +44,56 @@
 
 .ligne {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) auto;
-  grid-template-areas: 'vignette nom balise' 'vignette detail balise';
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  grid-template-areas: 'vignette nom quand' 'vignette porte porte' 'vignette notes notes';
   align-items: center;
-  column-gap: var(--space-3);
+  gap: 1px var(--space-3);
   width: 100%;
-  padding: var(--space-3) var(--space-4);
+  padding: 10px 14px;
   border: 0;
   background: none;
   text-align: left;
   font: inherit;
-  font-size: var(--flux-size);
-  color: var(--color-texte);
   cursor: pointer;
   transition: background var(--duree-douce) var(--courbe-douce);
 }
 .ligne:hover { background: var(--color-surface); }
-.ligne[aria-current='true'] { background: var(--color-pastille); }
+.ligne[aria-current='true'] { background: color-mix(in srgb, var(--color-pastille) 70%, transparent); }
 .ligne > :nth-child(1) { grid-area: vignette; }
 .ligne > :nth-child(2) { grid-area: nom; }
-.ligne > :nth-child(3) { grid-area: detail; }
-.ligne > :nth-child(4) { grid-area: balise; }
+.ligne > :nth-child(3) { grid-area: quand; }
+.ligne > :nth-child(4) { grid-area: porte; }
+.ligne > :nth-child(5) { grid-area: notes; }
 
 .vignette {
   display: block;
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-petit);
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
   background: var(--color-vignette);
   object-fit: cover;
 }
 
 .nom {
-  font-weight: var(--weight-gras);
+  font-weight: var(--weight-semi);
+  font-size: var(--sous-titre-size);
   color: var(--color-encre);
 }
 
-.detail {
+.quand {
+  font-size: var(--micro-size);
+  color: var(--color-texte-pale);
+}
+
+.porte {
+  font-size: var(--flux-size);
+  color: var(--color-texte);
+}
+
+.notes {
   font-size: var(--legende-size);
-  color: var(--color-texte-doux);
+  color: var(--color-ocre);
+  white-space: pre;
 }
 
 /* La lecture (maquette 596:1319) */
@@ -90,6 +101,9 @@
   display: grid;
   gap: 20px;
   padding: 22px var(--space-6);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-bloc);
 }
 
 .rangee {
@@ -113,6 +127,7 @@
   height: 40px;
   border-radius: var(--radius-rond);
   background: var(--color-vignette);
+  object-fit: cover;
   font-family: var(--font-titre);
   font-size: var(--titre-carte-size);
   color: var(--color-brun);
@@ -156,7 +171,6 @@
 }
 
 .etoiles,
-.mesures,
 .noteEquipe,
 .message p {
   margin: 0;
@@ -165,11 +179,6 @@
 .etoiles {
   font-size: var(--rubrique-size);
   color: var(--color-ocre);
-}
-
-.mesures {
-  font-size: var(--legende-size);
-  color: var(--color-texte-doux);
 }
 
 .message {
@@ -212,8 +221,43 @@
 /* Les photos, trois de front, chacune avec ses canaux en pastilles */
 .photos {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-4);
+}
+
+/* Télécharger et supprimer, deux ronds sur la photo, au survol */
+.cadre {
+  position: relative;
+}
+
+.surLaPhoto {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity var(--duree-elan) var(--courbe-elan);
+}
+
+.surLaPhoto:focus-within,
+.cadre:hover .surLaPhoto {
+  opacity: 1;
+}
+
+.rond {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: var(--radius-rond);
+  background: var(--color-bloc);
+  font: inherit;
+  font-weight: var(--weight-gras);
+  color: var(--color-encre);
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .photo {
@@ -263,6 +307,49 @@
 
 .canal:disabled:not([aria-pressed='true']) {
   opacity: 0.5;
+}
+
+.produitRelie,
+.relier {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) 10px;
+  border-radius: var(--radius-rond);
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--legende-size);
+}
+
+.produitRelie {
+  padding-right: var(--space-1);
+  background: var(--color-choisie);
+  color: var(--color-brun);
+}
+
+.produitRelie button {
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--color-brun);
+  cursor: pointer;
+}
+
+.relier {
+  border: 1px dashed var(--color-bord);
+  background: none;
+  color: var(--color-texte-doux);
+  cursor: pointer;
+}
+
+.discret {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--legende-size);
+  color: var(--color-texte-pale);
+  cursor: pointer;
 }
 
 .petit {
@@ -379,12 +466,42 @@
   color: var(--color-texte-doux);
 }
 
+/* « Couronnes offertes » : une pastille en contour, le nombre dedans */
 .couronnes {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  padding: 3px var(--space-1) 3px var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--sous-titre-size);
+  color: var(--color-texte);
 }
-.couronnes input { width: 5em; }
+
+.couronnes input {
+  width: 3.5em;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-rond);
+  background: var(--color-pastille);
+  font: inherit;
+  color: var(--color-encre);
+  text-align: center;
+  appearance: textfield;
+}
+
+.couronnes input::-webkit-inner-spin-button,
+.couronnes input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.couronnes input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
 .calme { color: var(--color-texte-doux); }
 
 .erreur {
