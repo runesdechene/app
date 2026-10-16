@@ -1,0 +1,8 @@
+/*
+ * QUOI     — le fond du Hub : le fjord au crayon, à la place du parchemin de la DA.
+ * POURQUOI — choix d'Uriel (16/10) ; Explore garde le parchemin. Importé après
+ *            @runes/da/global.css, cette règle remplace aussi sa variante paysage.
+ */
+body::before {
+  background: url('./assets/ui/fond-hub.webp') center bottom / cover no-repeat;
+}

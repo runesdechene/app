@@ -1,6 +1,6 @@
 /*
  * QUOI     — les deux mises en page des pages publiques (voir PagePublique.tsx).
- * POURQUOI — le parchemin vient de la DA (global.css, body::before) ; la bascule PC suit la
+ * POURQUOI — le fond vient de src/fond.css (body::before) ; la bascule PC suit la
  *            largeur, comme la coquille du Hub (900 px).
  */
 .page {
