@@ -5,12 +5,14 @@
  */
 export type CleAttente = 'photos' | 'lieux' | 'signalementsLieu' | 'signalementsEnigme' | 'achats'
 export type Lien = { libelle: string; chemin: string; file?: CleAttente }
-export type Domaine = { titre: string | null; liens: Lien[] }
+export type IconeDomaine = 'communaute' | 'jeu' | 'boutique' | 'joueurs' | 'reglages'
+export type Domaine = { titre: string | null; icone?: IconeDomaine; liens: Lien[] }
 
 export const MENU: Domaine[] = [
   { titre: null, liens: [{ libelle: 'Accueil', chemin: '/' }] },
   {
     titre: 'Communauté',
+    icone: 'communaute',
     liens: [
       { libelle: 'Comptes', chemin: '/communaute/comptes' },
       { libelle: 'Compagnies', chemin: '/communaute/compagnies' },
@@ -20,6 +22,7 @@ export const MENU: Domaine[] = [
   },
   {
     titre: 'Le jeu',
+    icone: 'jeu',
     liens: [
       { libelle: 'Énigmes', chemin: '/jeu/enigmes' },
       { libelle: 'Énigmes signalées', chemin: '/jeu/enigmes-signalees', file: 'signalementsEnigme' },
@@ -32,6 +35,7 @@ export const MENU: Domaine[] = [
   },
   {
     titre: 'Fragments et boutique',
+    icone: 'boutique',
     liens: [
       { libelle: 'Fragments', chemin: '/boutique/fragments', file: 'achats' },
       { libelle: 'Photos et avis', chemin: '/boutique/photos', file: 'photos' },
@@ -41,13 +45,14 @@ export const MENU: Domaine[] = [
   },
   {
     titre: 'Parler aux joueurs',
+    icone: 'joueurs',
     liens: [
       { libelle: 'Mises à jour', chemin: '/joueurs/mises-a-jour' },
       { libelle: 'Notifications', chemin: '/joueurs/notifications' },
       { libelle: 'Blog de la boutique', chemin: '/joueurs/blog' },
     ],
   },
-  { titre: 'Réglages', liens: [{ libelle: 'Réglages', chemin: '/reglages' }] },
+  { titre: 'Réglages', icone: 'reglages', liens: [{ libelle: 'Réglages', chemin: '/reglages' }] },
 ]
 
 export type Onglet = { libelle: string; chemin: string; icone: 'accueil' | 'communaute' | 'jeu' | 'boutique' | 'plus' }

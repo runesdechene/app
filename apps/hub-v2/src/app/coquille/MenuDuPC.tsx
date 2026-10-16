@@ -4,6 +4,7 @@
  */
 import { NavLink } from 'react-router'
 import logo from '@/assets/ui/logo-runes-de-chene.webp'
+import { IconeDomaine } from './IconeDomaine'
 import { MENU } from './menu'
 import { useAttente } from './useAttente'
 import styles from './MenuDuPC.module.css'
@@ -18,7 +19,12 @@ export function MenuDuPC() {
       </div>
       {MENU.map((domaine) => (
         <div key={domaine.titre ?? 'accueil'} className={styles.domaine}>
-          {domaine.titre && <p className={styles.titre}>{domaine.titre}</p>}
+          {domaine.titre && (
+            <p className={styles.titre}>
+              {domaine.icone && <IconeDomaine nom={domaine.icone} />}
+              {domaine.titre}
+            </p>
+          )}
           {domaine.liens.map((lien) => {
             const nombre = lien.file ? (attente[lien.file] ?? 0) : 0
             return (
