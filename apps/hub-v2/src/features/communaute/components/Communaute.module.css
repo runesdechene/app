@@ -100,7 +100,7 @@
 }
 
 @container app (width >= 900px) {
-  .tuiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .tuiles { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 
   .entetesCompte, .ligneCompte {
     grid-template-columns: 32px minmax(0, 1fr) 170px 150px 70px 120px 90px 16px;

@@ -12,7 +12,7 @@ vi.mock('../hooks/useCompte', () => ({ useCompte: () => ({ data: null, isPending
 
 const liste = {
   total: 2,
-  compteurs: { comptes: 4750, actifs: 312, reactives: 1412, sommeil: 2459 },
+  compteurs: { comptes: 4750, actifs: 312, reactives: 1412, sommeil: 2459, jamais: 96 },
   provenances: ['app', 'flyer'], departements: ['Aude'],
   lignes: [
     { id: 'u1', nom: 'Kelpie', email: 'k@x.fr', avatar: null, role: 'user', provenance: 'flyer', inscrit: '2026-10-14T09:00:00Z',
@@ -31,10 +31,11 @@ function monter(adresse = '/communaute/comptes') {
   return router
 }
 
-test('les quatre chiffres, les lignes et leurs balises', () => {
+test('les cinq chiffres, les lignes et leurs balises', () => {
   mockUseComptes.mockReturnValue({ data: liste, isError: false })
   monter()
   expect(screen.getByText('4 750')).toBeInTheDocument()
+  expect(screen.getByText('96')).toBeInTheDocument()
   expect(screen.getByRole('link', { name: /Kelpie/ })).toHaveAttribute('href', '/communaute/comptes/u1')
   expect(screen.getByText('Seine-et-Marne (77)')).toBeInTheDocument()
   expect(screen.getByText('En sommeil', { selector: '[data-teinte]' })).toBeInTheDocument()
@@ -46,6 +47,13 @@ test('le filtre va dans l’adresse et repart de la première page', async () =>
   const router = monter('/communaute/comptes?page=2')
   await userEvent.click(screen.getByRole('radio', { name: 'En sommeil' }))
   expect(router.state.location.search).toBe('?filtre=sommeil')
+})
+
+test('le filtre « Jamais connectés » existe', async () => {
+  mockUseComptes.mockReturnValue({ data: liste, isError: false })
+  const router = monter()
+  await userEvent.click(screen.getByRole('radio', { name: 'Jamais connectés' }))
+  expect(router.state.location.search).toBe('?filtre=jamais')
 })
 
 test('un export qui échoue le dit', async () => {

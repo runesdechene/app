@@ -19,7 +19,8 @@ import styles from './Communaute.module.css'
 const PAR_PAGE = 50
 const FILTRES: { valeur: Filtre; libelle: string }[] = [
   { valeur: 'tous', libelle: 'Tous' }, { valeur: 'nouveaux', libelle: 'Nouveaux' }, { valeur: 'reactives', libelle: 'Réactivés' },
-  { valeur: 'sommeil', libelle: 'En sommeil' }, { valeur: 'porteurs', libelle: 'Porteurs' }, { valeur: 'equipe', libelle: 'Équipe' },
+  { valeur: 'sommeil', libelle: 'En sommeil' }, { valeur: 'jamais', libelle: 'Jamais connectés' }, { valeur: 'porteurs', libelle: 'Porteurs' },
+  { valeur: 'equipe', libelle: 'Équipe' },
 ]
 const TRIS: { valeur: Tri; libelle: string }[] = [
   { valeur: 'inscription', libelle: 'Inscription' }, { valeur: 'visite', libelle: 'Dernière visite' }, { valeur: 'nom', libelle: 'Nom' },
@@ -93,6 +94,7 @@ export function Comptes() {
           <Tuile libelle="Actifs en 7 jours" valeur={nombre.format(data.compteurs.actifs)} />
           <Tuile libelle="Réactivés depuis la V2" valeur={nombre.format(data.compteurs.reactives)} />
           <Tuile libelle="En sommeil" valeur={nombre.format(data.compteurs.sommeil)} />
+          <Tuile libelle="Jamais connectés" valeur={nombre.format(data.compteurs.jamais)} />
         </div>
       )}
       <div className={styles.barre}>

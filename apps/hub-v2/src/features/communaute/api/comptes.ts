@@ -3,7 +3,7 @@
  */
 import { supabase } from '@/shared/supabase/client'
 
-export type Filtre = 'tous' | 'nouveaux' | 'reactives' | 'sommeil' | 'porteurs' | 'equipe'
+export type Filtre = 'tous' | 'nouveaux' | 'reactives' | 'sommeil' | 'jamais' | 'porteurs' | 'equipe'
 export type Tri = 'visite' | 'inscription' | 'nom'
 export type Compte = {
   id: string; nom: string; email: string | null; avatar: string | null; role: string
@@ -12,7 +12,7 @@ export type Compte = {
 }
 export type ListeDeComptes = {
   total: number
-  compteurs: { comptes: number; actifs: number; reactives: number; sommeil: number }
+  compteurs: { comptes: number; actifs: number; reactives: number; sommeil: number; jamais: number }
   provenances: string[]
   departements: string[]
   lignes: Compte[]
