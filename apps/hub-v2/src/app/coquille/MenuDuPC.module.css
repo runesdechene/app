@@ -3,7 +3,13 @@
   align-content: start;
   gap: var(--space-1);
   padding: var(--space-6) var(--space-4) var(--space-8);
-  background: color-mix(in srgb, var(--color-barre) 55%, transparent);
+
+  /* Un voile clair qui s'efface vers la droite : le menu se fond dans le dessin du fond. */
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-fond) 75%, transparent),
+    transparent
+  );
   overflow-y: auto;
 }
 
