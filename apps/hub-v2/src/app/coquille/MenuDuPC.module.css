@@ -58,8 +58,10 @@
   transition: background var(--duree-elan) var(--courbe-elan);
 }
 
+/* Le survol : le même doré que le lien actif, à mi-force. */
 .lien:hover {
-  background: color-mix(in srgb, var(--color-pastille) 50%, transparent);
+  background: color-mix(in srgb, var(--color-vignette) 55%, transparent);
+  color: var(--color-encre);
 }
 
 /* Le lien de l'écran ouvert : le parchemin doré et un trait d'accent à gauche. */
