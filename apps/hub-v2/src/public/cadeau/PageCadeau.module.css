@@ -154,9 +154,10 @@
     min-height: 0;
   }
 
-  /* Sur PC, la pilule se pose sur la photo, en haut à gauche de la page. */
+  /* Sur PC, la pilule se pose sur la photo, en haut à gauche de l'écran : `fixed`, car la colonne
+     du cadre est positionnée (CadreFlyer) et une pilule `absolute` s'y accrochait, sur le cadeau. */
   .retour {
-    position: absolute;
+    position: fixed;
     top: 28px;
     left: var(--space-8);
     z-index: 1;
