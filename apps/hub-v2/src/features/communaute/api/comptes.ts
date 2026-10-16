@@ -12,7 +12,7 @@ export type Compte = {
 }
 export type ListeDeComptes = {
   total: number
-  compteurs: { comptes: number; actifs: number; reactives: number; sommeil: number; jamais: number }
+  compteurs: { comptes: number; connectes: number; actifs: number; reactives: number; sommeil: number; jamais: number }
   provenances: string[]
   departements: string[]
   lignes: Compte[]

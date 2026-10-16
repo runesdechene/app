@@ -12,7 +12,7 @@ vi.mock('../hooks/useCompte', () => ({ useCompte: () => ({ data: null, isPending
 
 const liste = {
   total: 2,
-  compteurs: { comptes: 4750, actifs: 312, reactives: 1412, sommeil: 2459, jamais: 96 },
+  compteurs: { comptes: 4750, connectes: 1070, actifs: 312, reactives: 1412, sommeil: 2459, jamais: 96 },
   provenances: ['app', 'flyer'], departements: ['Aude'],
   lignes: [
     { id: 'u1', nom: 'Kelpie', email: 'k@x.fr', avatar: null, role: 'user', provenance: 'flyer', inscrit: '2026-10-14T09:00:00Z',
@@ -36,7 +36,7 @@ test('les six chiffres, les lignes et leurs balises', () => {
   monter()
   expect(screen.getByText('4 750')).toBeInTheDocument()
   expect(screen.getByText('96')).toBeInTheDocument()
-  expect(screen.getByText('4 654')).toBeInTheDocument()
+  expect(screen.getByText('1 070')).toBeInTheDocument()
   expect(screen.getByRole('link', { name: /Kelpie/ })).toHaveAttribute('href', '/communaute/comptes/u1')
   expect(screen.getByText('Seine-et-Marne (77)')).toBeInTheDocument()
   expect(screen.getByText('En sommeil', { selector: '[data-teinte]' })).toBeInTheDocument()
