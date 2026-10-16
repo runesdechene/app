@@ -4,12 +4,8 @@
   gap: var(--space-1);
   padding: var(--space-6) var(--space-4) var(--space-8);
 
-  /* Un voile clair qui s'efface vers la droite : le menu se fond dans le dessin du fond. */
-  background: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--color-fond) 75%, transparent),
-    transparent
-  );
+  /* Un dégradé franc et opaque, du parchemin doré au plus clair vers le Hub. */
+  background: linear-gradient(to right, var(--color-vignette), var(--color-feuille));
   overflow-y: auto;
 }
 
