@@ -35,6 +35,9 @@
 }
 
 .titre {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin: 0;
   padding: 14px 0 var(--space-1) var(--space-3);
   font-family: var(--font-condensee);
