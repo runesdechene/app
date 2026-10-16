@@ -4,7 +4,7 @@
  * POURQUOI — filtre, recherche, provenance, département, tri et page sont dans l'adresse.
  */
 import { useEffect, useState } from 'react'
-import { Link, Outlet, useLocation, useSearchParams } from 'react-router'
+import { Outlet, useSearchParams } from 'react-router'
 import { Bloc } from '@/shared/ui/Bloc'
 import { ChampDeRecherche } from '@/shared/ui/ChampDeRecherche'
 import { ChoixSegmente } from '@/shared/ui/ChoixSegmente'
@@ -34,7 +34,6 @@ const nombre = new Intl.NumberFormat('fr-FR')
 
 export function Comptes() {
   const [params, setParams] = useSearchParams()
-  const { search } = useLocation()
   const criteres: Criteres = {
     filtre: FILTRES.find((f) => f.valeur === params.get('filtre'))?.valeur ?? 'tous',
     recherche: params.get('q') ?? '',
@@ -83,10 +82,7 @@ export function Comptes() {
         titre="Les comptes"
         phrase={data ? `${nombre.format(data.compteurs.comptes)} Explorateurs.` : ''}
         aDroite={(
-          <>
-            <Link className={styles.boutonContour} to={{ pathname: 'nouveau', search }}>+ Compte du stand</Link>{' '}
-            <button className={styles.boutonContour} type="button" onClick={() => { telecharger().catch(() => { setExportEchoue(true) }) }}>Exporter en CSV</button>
-          </>
+          <button className={styles.boutonContour} type="button" onClick={() => { telecharger().catch(() => { setExportEchoue(true) }) }}>Exporter en CSV</button>
         )}
       />
       {data && (

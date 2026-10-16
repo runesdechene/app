@@ -12,7 +12,7 @@ sauf `flyer-create-account`, appelée sans session par `/flyercadeau` (`src/publ
 | `shopify-batch-tags` | idem par lots de 25 (GraphQL) · écran Synchro Shopify | admin |
 | `shopify-article` | article de blog Shopify · écran Fiches | admin |
 | `shopify-health-check` | santé du jeton et des portées Shopify · écran Santé | admin |
-| `stand-create-account` | compte du stand · écran Comptes | admin |
+| `stand-create-account` | compte du stand · écran Associer un Fragment | admin |
 | `shopify-callback` | échange le code OAuth contre un jeton (affiché, à copier à la main), boutique fixe · redirection Shopify | publique (sans code : 400) |
 | `shopify-order-webhook` | webhook `orders/paid` : profil et Fragments · Shopify | signature HMAC obligatoire |
 | `flyer-create-account` | un e-mail contre le code promo `FLYER_PROMO_CODE` : client Shopify (boutique fixe) et compte de l'appli · page `/flyercadeau` | publique : 15 demandes par heure et par IP (`flyer_signup_log`), sinon 429 ; aucune erreur ne renvoie l'e-mail ni le texte de Shopify ou de Supabase |

@@ -217,7 +217,7 @@
   object-fit: cover;
 }
 
-/* Le compte du stand : un formulaire simple, un champ par ligne */
+/* Les formulaires des tiroirs (compagnie, lieu) : un champ par ligne */
 .formulaire {
   display: grid;
   gap: var(--space-3);
@@ -239,10 +239,4 @@
   font: inherit;
   font-size: var(--flux-size);
   color: var(--color-texte);
-}
-
-.caseACocher {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
 }
