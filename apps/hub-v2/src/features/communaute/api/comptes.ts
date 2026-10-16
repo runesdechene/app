@@ -13,6 +13,7 @@ export type Compte = {
 export type ListeDeComptes = {
   total: number
   compteurs: { comptes: number; connectes: number; actifs: number; reactives: number; sommeil: number; jamais: number }
+  par_provenance: { provenance: string | null; comptes: number; crees_v1: number; connectes: number }[]
   provenances: string[]
   departements: string[]
   lignes: Compte[]

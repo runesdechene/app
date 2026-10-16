@@ -14,6 +14,7 @@ import { Tuile } from '@/shared/ui/Tuile'
 import type { Criteres, Filtre, Tri } from '../api/comptes'
 import { exporterComptes, useComptes } from '../hooks/useComptes'
 import { LigneDeCompte } from './LigneDeCompte'
+import { ParProvenance } from './ParProvenance'
 import styles from './Communaute.module.css'
 
 const PAR_PAGE = 50
@@ -98,6 +99,7 @@ export function Comptes() {
           <Tuile libelle="Jamais connectés" valeur={nombre.format(data.compteurs.jamais)} />
         </div>
       )}
+      {data && <ParProvenance lignes={data.par_provenance} />}
       <div className={styles.barre}>
         <ChoixSegmente nom="Filtre" options={FILTRES} choisi={criteres.filtre} onChoix={(v) => { changer('filtre', v) }} />
         <select className={styles.choix} aria-label="Arrivés par" value={criteres.provenance ?? ''} onChange={(e) => { changer('provenance', e.target.value) }}>

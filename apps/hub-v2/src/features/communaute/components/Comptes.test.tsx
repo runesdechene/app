@@ -13,6 +13,7 @@ vi.mock('../hooks/useCompte', () => ({ useCompte: () => ({ data: null, isPending
 const liste = {
   total: 2,
   compteurs: { comptes: 4750, connectes: 1070, actifs: 312, reactives: 1412, sommeil: 2459, jamais: 96 },
+  par_provenance: [{ provenance: 'app', comptes: 3471, crees_v1: 482, connectes: 651 }, { provenance: 'stand', comptes: 112, crees_v1: 112, connectes: 20 }],
   provenances: ['app', 'flyer'], departements: ['Aude'],
   lignes: [
     { id: 'u1', nom: 'Kelpie', email: 'k@x.fr', avatar: null, role: 'user', provenance: 'flyer', inscrit: '2026-10-14T09:00:00Z',
@@ -41,6 +42,15 @@ test('les six chiffres, les lignes et leurs balises', () => {
   expect(screen.getByText('Seine-et-Marne (77)')).toBeInTheDocument()
   expect(screen.getByText('En sommeil', { selector: '[data-teinte]' })).toBeInTheDocument()
   expect(screen.getByText('jamais')).toBeInTheDocument()
+})
+
+test('le tableau par provenance : une ligne par provenance, les « pas connectés » déduits, le total', () => {
+  mockUseComptes.mockReturnValue({ data: liste, isError: false })
+  monter()
+  const stand = screen.getByRole('row', { name: /Stand/ })
+  expect(stand).toHaveTextContent('112')
+  expect(stand).toHaveTextContent('92')
+  expect(screen.getByRole('row', { name: /Total/ })).toHaveTextContent('3 583')
 })
 
 test('le filtre va dans l’adresse et repart de la première page', async () => {
