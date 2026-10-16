@@ -42,7 +42,12 @@ export function LecteurAudio({ src, ligne }: { src: string; ligne: string }) {
           setTemps(e.currentTarget.currentTime)
         }}
       />
-      <button type="button" className={styles.bouton} onClick={basculer} aria-label={enLecture ? 'Mettre en pause' : 'Écouter son récit'}>
+      <button
+        type="button"
+        className={styles.bouton}
+        onClick={basculer}
+        aria-label={enLecture ? 'Mettre en pause' : 'Écouter son récit'}
+      >
         <img src={enLecture ? pause : lecture} alt="" width={54} height={54} />
       </button>
       <div className={styles.piste}>

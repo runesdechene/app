@@ -6,7 +6,9 @@
  */
 const ZOOM_D_UN_LIEU = 14
 
-export function lireCentre(param: string | null): { lat: number; lng: number; zoom: number } | null {
+export function lireCentre(
+  param: string | null,
+): { lat: number; lng: number; zoom: number } | null {
   if (!param) return null
   const nombres = param.split(',').map(Number)
   if (nombres.length < 2 || nombres.length > 3 || !nombres.every(Number.isFinite)) return null

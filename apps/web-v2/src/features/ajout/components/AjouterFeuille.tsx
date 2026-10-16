@@ -94,8 +94,8 @@ export function AjouterFeuille({ onFermer, enTete }: { onFermer: () => void; enT
         <span className={styles.texte}>
           <span className={styles.nom}>Un pin GPS</span>
           <span className={styles.description}>
-            Marque ta position maintenant, et complète le plus tard. Idéal pour aller vite et profiter
-            de ton explo.
+            Marque ta position maintenant, et complète le plus tard. Idéal pour aller vite et
+            profiter de ton explo.
           </span>
         </span>
         <img className={styles.chevron} src={chevron} alt="" />

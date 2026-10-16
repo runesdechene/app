@@ -190,7 +190,6 @@ export function lireVersionDetail(json: unknown): VersionDetail | null {
   }
 }
 
-
 // Le prix d'une découverte depuis ma position, et ma jauge (cout_decouverte, migration 399).
 // `distanceKm` est null sans position : le prix est alors le plus haut.
 export type CoutDecouverte = {

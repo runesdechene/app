@@ -9,9 +9,31 @@ import { basculerFamille, filtrerChemins, garderFamilles, lireFamilles, TOUTES }
 const ligne = (type: TypeDeChemin) => ({ id: type, type })
 
 test('chaque ligne a sa famille', () => {
-  const fil = (['visite', 'ajout', 'revendication', 'enrichi', 'modifie', 'arrivee', 'fondation', 'adhesion', 'enigme'] as const).map(ligne)
-  expect(filtrerChemins(fil, new Set(['lieux'])).map((c) => c.type)).toEqual(['visite', 'ajout', 'revendication', 'enrichi', 'modifie'])
-  expect(filtrerChemins(fil, new Set(['gens'])).map((c) => c.type)).toEqual(['arrivee', 'fondation', 'adhesion'])
+  const fil = (
+    [
+      'visite',
+      'ajout',
+      'revendication',
+      'enrichi',
+      'modifie',
+      'arrivee',
+      'fondation',
+      'adhesion',
+      'enigme',
+    ] as const
+  ).map(ligne)
+  expect(filtrerChemins(fil, new Set(['lieux'])).map((c) => c.type)).toEqual([
+    'visite',
+    'ajout',
+    'revendication',
+    'enrichi',
+    'modifie',
+  ])
+  expect(filtrerChemins(fil, new Set(['gens'])).map((c) => c.type)).toEqual([
+    'arrivee',
+    'fondation',
+    'adhesion',
+  ])
   expect(filtrerChemins(fil, new Set(['enigmes'])).map((c) => c.type)).toEqual(['enigme'])
   expect(filtrerChemins(fil, TOUTES)).toHaveLength(9)
 })

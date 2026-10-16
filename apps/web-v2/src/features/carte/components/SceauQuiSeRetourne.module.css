@@ -56,7 +56,11 @@
 
 .cire circle {
   fill: none;
-  stroke: color-mix(in srgb, var(--couleur-culture, var(--color-carte-cire)) 70%, var(--color-carte-encre));
+  stroke: color-mix(
+    in srgb,
+    var(--couleur-culture, var(--color-carte-cire)) 70%,
+    var(--color-carte-encre)
+  );
   stroke-width: 2.5;
 }
 

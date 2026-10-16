@@ -8,10 +8,21 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
-const api = vi.hoisted(() => ({ fetchMesPins: vi.fn(), supprimerPin: vi.fn(), monIdentifiant: vi.fn() }))
+const api = vi.hoisted(() => ({
+  fetchMesPins: vi.fn(),
+  supprimerPin: vi.fn(),
+  monIdentifiant: vi.fn(),
+}))
 vi.mock('../api/pins', () => api)
-const attente = vi.hoisted(() => ({ lirePinsEnAttente: vi.fn(), garderPinEnAttente: vi.fn(), retirerPinEnAttente: vi.fn() }))
-vi.mock('../lib/pinsEnAttente', async (vrai) => ({ ...(await vrai<typeof import('../lib/pinsEnAttente')>()), ...attente }))
+const attente = vi.hoisted(() => ({
+  lirePinsEnAttente: vi.fn(),
+  garderPinEnAttente: vi.fn(),
+  retirerPinEnAttente: vi.fn(),
+}))
+vi.mock('../lib/pinsEnAttente', async (vrai) => ({
+  ...(await vrai<typeof import('../lib/pinsEnAttente')>()),
+  ...attente,
+}))
 const envoi = vi.hoisted(() => ({ envoyerPinsEnAttente: vi.fn() }))
 vi.mock('../lib/envoyer', () => envoi)
 
@@ -36,7 +47,12 @@ function wrapper({ children }: { children: ReactNode }) {
 }
 
 let horsLigne = false
-const SERVEUR_S1 = { id: 's1', point: { latitude: 1, longitude: 2 }, lieuDit: 'Près de Levens', poseLe: new Date('2026-09-23T12:00:00Z') }
+const SERVEUR_S1 = {
+  id: 's1',
+  point: { latitude: 1, longitude: 2 },
+  lieuDit: 'Près de Levens',
+  poseLe: new Date('2026-09-23T12:00:00Z'),
+}
 const S1_AFFICHE: PinAffiche = { ...SERVEUR_S1, jours: 2, enAttente: false, refuse: false }
 const ATT = { id: 'att', latitude: 1, longitude: 2, precision: 8, poseLe: '2026-10-06T11:00:00Z' }
 
@@ -76,9 +92,17 @@ test('poser : gardé dans le téléphone avec l’heure du téléphone et mon co
   api.fetchMesPins.mockResolvedValue({ validiteJours: 15, pins: [] })
   client.setQueryData(['moi'], 'moi')
   const { result } = renderHook(() => usePoserPin(), { wrapper })
-  await act(() => result.current.mutateAsync({ point: { latitude: 43.7, longitude: 7.2 }, precision: 8 }))
+  await act(() =>
+    result.current.mutateAsync({ point: { latitude: 43.7, longitude: 7.2 }, precision: 8 }),
+  )
   expect(attente.garderPinEnAttente).toHaveBeenCalledWith(
-    expect.objectContaining({ latitude: 43.7, longitude: 7.2, precision: 8, poseLe: '2026-10-06T12:00:00.000Z', userId: 'moi' }),
+    expect.objectContaining({
+      latitude: 43.7,
+      longitude: 7.2,
+      precision: 8,
+      poseLe: '2026-10-06T12:00:00.000Z',
+      userId: 'moi',
+    }),
   )
   expect(envoi.envoyerPinsEnAttente).toHaveBeenCalled()
 })
@@ -90,7 +114,10 @@ test('poser ne fait jamais attendre l’envoi : la pose rend la main pendant qu�
   const { result } = renderHook(() => usePoserPin(), { wrapper })
   let id: string | undefined
   await act(async () => {
-    id = await result.current.mutateAsync({ point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+    id = await result.current.mutateAsync({
+      point: { latitude: 43.7, longitude: 7.2 },
+      precision: 8,
+    })
   })
   expect(typeof id).toBe('string')
   expect(envoi.envoyerPinsEnAttente).toHaveBeenCalled()
@@ -100,7 +127,9 @@ test('poser hors ligne : aucun envoi tenté', async () => {
   horsLigne = true
   attente.lirePinsEnAttente.mockResolvedValue([])
   const { result } = renderHook(() => usePoserPin(), { wrapper })
-  await act(() => result.current.mutateAsync({ point: { latitude: 43.7, longitude: 7.2 }, precision: 8 }))
+  await act(() =>
+    result.current.mutateAsync({ point: { latitude: 43.7, longitude: 7.2 }, precision: 8 }),
+  )
   expect(attente.garderPinEnAttente).toHaveBeenCalled()
   expect(envoi.envoyerPinsEnAttente).not.toHaveBeenCalled()
 })
@@ -110,7 +139,12 @@ test('un envoi qui ne fait que refuser un pin relit quand même la liste', async
   api.fetchMesPins.mockResolvedValue({ validiteJours: 15, pins: [] })
   // l'envoi finit après la première lecture : TanStack ne relit une requête sans données qu'une fois
   envoi.envoyerPinsEnAttente.mockImplementation(
-    () => new Promise((fin) => setTimeout(() => { fin({ envoyes: 0, refuses: ['a'] }); }, 50)),
+    () =>
+      new Promise((fin) =>
+        setTimeout(() => {
+          fin({ envoyes: 0, refuses: ['a'] })
+        }, 50),
+      ),
   )
   renderHook(
     () => {
@@ -119,31 +153,56 @@ test('un envoi qui ne fait que refuser un pin relit quand même la liste', async
     },
     { wrapper },
   )
-  await waitFor(() => { expect(attente.lirePinsEnAttente).toHaveBeenCalledTimes(2); })
+  await waitFor(() => {
+    expect(attente.lirePinsEnAttente).toHaveBeenCalledTimes(2)
+  })
 })
 
 test('un envoi qui échoue ne laisse pas de promesse rejetée', async () => {
   envoi.envoyerPinsEnAttente.mockRejectedValue(new Error('IndexedDB'))
-  const { unmount } = renderHook(() => { useEnvoyerPins(); }, { wrapper })
-  await waitFor(() => { expect(envoi.envoyerPinsEnAttente).toHaveBeenCalled(); })
+  const { unmount } = renderHook(
+    () => {
+      useEnvoyerPins()
+    },
+    { wrapper },
+  )
+  await waitFor(() => {
+    expect(envoi.envoyerPinsEnAttente).toHaveBeenCalled()
+  })
   unmount()
 })
 
 test('revenir dans l’app (onglet de nouveau visible) envoie les pins en attente', async () => {
-  renderHook(() => { useEnvoyerPins(); }, { wrapper })
-  await waitFor(() => { expect(envoi.envoyerPinsEnAttente).toHaveBeenCalledTimes(1); })
+  renderHook(
+    () => {
+      useEnvoyerPins()
+    },
+    { wrapper },
+  )
+  await waitFor(() => {
+    expect(envoi.envoyerPinsEnAttente).toHaveBeenCalledTimes(1)
+  })
   vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
   act(() => {
     document.dispatchEvent(new Event('visibilitychange'))
   })
-  await waitFor(() => { expect(envoi.envoyerPinsEnAttente).toHaveBeenCalledTimes(2); })
+  await waitFor(() => {
+    expect(envoi.envoyerPinsEnAttente).toHaveBeenCalledTimes(2)
+  })
 })
 
 test('ouvrir le « + » envoie les pins en attente, puis relit la liste', async () => {
   envoi.envoyerPinsEnAttente.mockResolvedValue({ envoyes: 1, refuses: [] })
   const invalider = vi.spyOn(client, 'invalidateQueries')
-  renderHook(() => { useEnvoyerALOuverture(); }, { wrapper })
-  await waitFor(() => { expect(invalider).toHaveBeenCalledWith({ queryKey: PINS }); })
+  renderHook(
+    () => {
+      useEnvoyerALOuverture()
+    },
+    { wrapper },
+  )
+  await waitFor(() => {
+    expect(invalider).toHaveBeenCalledWith({ queryKey: PINS })
+  })
   expect(envoi.envoyerPinsEnAttente).toHaveBeenCalledTimes(1)
 })
 

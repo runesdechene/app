@@ -96,7 +96,10 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
   const ou = [lieu?.region, ilYA(chemin.quand)].filter(Boolean).join(', ')
   const { envols, lancer, finir } = useEnvols()
   return (
-    <li className={styles.ligne} style={culture?.couleur ? { '--couleur-culture': culture.couleur } : undefined}>
+    <li
+      className={styles.ligne}
+      style={culture?.couleur ? { '--couleur-culture': culture.couleur } : undefined}
+    >
       {chemin.type === 'ajout' && lieu?.type ? (
         // Un lieu ajouté : la bille de son type (Uriel, 29/09).
         <span className={styles.bille}>
@@ -104,10 +107,7 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
         </span>
       ) : culture?.icone ? (
         // Une énigme percée : le logo de sa culture, peint à sa couleur (Uriel, 07/10).
-        <span
-          className={styles.logo}
-          style={{ '--icone': `url("${culture.icone}")` }}
-        />
+        <span className={styles.logo} style={{ '--icone': `url("${culture.icone}")` }} />
       ) : (
         <img className={styles.type} src={ICONES[chemin.type]} alt="" />
       )}

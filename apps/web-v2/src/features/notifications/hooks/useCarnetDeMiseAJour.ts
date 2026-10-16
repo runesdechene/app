@@ -31,7 +31,8 @@ export function useCarnetDeMiseAJour(id: number, actif: boolean) {
   }
 
   const ecrire = useMutation({
-    mutationFn: ({ texte, photos, parent }: Ecrit) => ecrireSousMiseAJour(id, texte, photos, parent),
+    mutationFn: ({ texte, photos, parent }: Ecrit) =>
+      ecrireSousMiseAJour(id, texte, photos, parent),
     onSuccess: relire,
   })
 

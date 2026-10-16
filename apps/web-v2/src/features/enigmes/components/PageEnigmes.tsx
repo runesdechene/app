@@ -40,14 +40,16 @@ export function PageEnigmes({ onOuvrirCulture }: { onOuvrirCulture: (id: string)
       <section className={styles.bilan} aria-label="Mes énigmes">
         <p className={styles.compte}>
           <span className={styles.nombre}>{mesEnigmes.resolues}</span>
-          <span className={styles.sur}>{`${resoluesEnClair(mesEnigmes.resolues)} sur ${String(mesEnigmes.total)}`}</span>
+          <span
+            className={styles.sur}
+          >{`${resoluesEnClair(mesEnigmes.resolues)} sur ${String(mesEnigmes.total)}`}</span>
         </p>
         <span className={styles.piste} data-grande aria-hidden="true">
           <span className={styles.rempli} style={{ '--mesure': String(part) }} />
         </span>
         <p className={styles.phrase}>
-          Chaque énigme que tu perces sur la carte t’apprend un fait d’Histoire. Retrouve-les ici, culture
-          par culture.
+          Chaque énigme que tu perces sur la carte t’apprend un fait d’Histoire. Retrouve-les ici,
+          culture par culture.
         </p>
       </section>
       <h2 className={styles.rubrique}>Par culture</h2>
@@ -65,7 +67,9 @@ export function PageEnigmes({ onOuvrirCulture }: { onOuvrirCulture: (id: string)
               <PastilleCulture icone={c.icone} couleur={c.couleur} taille="grande" />
               <span className={styles.nom}>
                 <span className={styles.titre}>{c.nom}</span>
-                <span className={styles.part}>{`${String(c.resolues)} / ${String(c.total)} ${resoluesEnClair(c.resolues)}`}</span>
+                <span
+                  className={styles.part}
+                >{`${String(c.resolues)} / ${String(c.total)} ${resoluesEnClair(c.resolues)}`}</span>
                 <span className={styles.piste} aria-hidden="true">
                   <span
                     className={styles.rempli}

@@ -50,4 +50,3 @@ test('la progression se lit d’un trait, le niveau compris', () => {
   expect(progresEnClair('places_visited', 60, 150)).toBe('60 / 150 lieux visités')
   expect(progresEnClair('places_enriched', 0, 1)).toBe('0 / 1 lieu enrichi')
 })
-

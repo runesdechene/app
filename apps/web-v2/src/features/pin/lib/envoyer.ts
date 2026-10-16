@@ -27,7 +27,8 @@ const REFUS_DE_POSER_PIN = ['22023', 'P0001']
 type Echec = 'refus' | 'plus-tard' | 'arret'
 
 function echec(e: unknown): Echec {
-  if (typeof e !== 'object' || e === null || !('code' in e) || typeof e.code !== 'string') return 'arret'
+  if (typeof e !== 'object' || e === null || !('code' in e) || typeof e.code !== 'string')
+    return 'arret'
   if (!REFUS_DE_POSER_PIN.includes(e.code)) return 'arret'
   // L'horloge du téléphone en avance : ce pin repassera, les suivants peuvent partir.
   return 'hint' in e && e.hint === 'date' ? 'plus-tard' : 'refus'

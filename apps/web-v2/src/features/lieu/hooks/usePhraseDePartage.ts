@@ -10,6 +10,10 @@ import { phraseDePartage } from '../lib/phraseDePartage'
 const UNE_HEURE = 60 * 60 * 1000
 
 export function usePhraseDePartage(nom: string): string {
-  const { data } = useQuery({ queryKey: ['modele-de-partage'], queryFn: lireModeleDePartage, staleTime: UNE_HEURE })
+  const { data } = useQuery({
+    queryKey: ['modele-de-partage'],
+    queryFn: lireModeleDePartage,
+    staleTime: UNE_HEURE,
+  })
   return phraseDePartage(data ?? null, nom)
 }

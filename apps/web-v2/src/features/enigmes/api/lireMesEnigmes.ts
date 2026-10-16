@@ -15,7 +15,13 @@ export type CultureResolue = {
 }
 export type MesEnigmes = { resolues: number; total: number; cultures: CultureResolue[] }
 // `numero` : son numéro fixe, le même pour tous (migration 448).
-export type EnigmeApprise = { numero: number; reponse: string; question: string; explication: string; le: string }
+export type EnigmeApprise = {
+  numero: number
+  reponse: string
+  question: string
+  explication: string
+  le: string
+}
 // Mon grade dans la culture et le titre suivant, avec ce qui manque en points (migration 452).
 export type Grade = { titre: string; rang: number }
 export type Prochain = { titre: string; rang: number; manque: number }
@@ -53,12 +59,22 @@ function cultureResolue(v: unknown): CultureResolue {
 
 export function lireMesEnigmes(v: unknown): MesEnigmes {
   const o = objet(v)
-  return { resolues: nombre(o.resolues), total: nombre(o.total), cultures: liste(cultureResolue)(o.cultures) }
+  return {
+    resolues: nombre(o.resolues),
+    total: nombre(o.total),
+    cultures: liste(cultureResolue)(o.cultures),
+  }
 }
 
 function enigmeApprise(v: unknown): EnigmeApprise {
   const o = objet(v)
-  return { numero: nombre(o.numero), reponse: chaine(o.reponse), question: chaine(o.question), explication: chaine(o.explication), le: chaine(o.le) }
+  return {
+    numero: nombre(o.numero),
+    reponse: chaine(o.reponse),
+    question: chaine(o.question),
+    explication: chaine(o.explication),
+    le: chaine(o.le),
+  }
 }
 
 function centre(v: unknown) {

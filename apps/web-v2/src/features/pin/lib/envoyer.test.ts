@@ -6,9 +6,20 @@
  */
 import { beforeEach, expect, test, vi } from 'vitest'
 
-const attente = vi.hoisted(() => ({ lirePinsEnAttente: vi.fn(), retirerPinEnAttente: vi.fn(), marquerRefuse: vi.fn() }))
-vi.mock('./pinsEnAttente', async (vrai) => ({ ...(await vrai<typeof import('./pinsEnAttente')>()), ...attente }))
-const api = vi.hoisted(() => ({ poserPin: vi.fn(), supprimerPin: vi.fn(), monIdentifiant: vi.fn() }))
+const attente = vi.hoisted(() => ({
+  lirePinsEnAttente: vi.fn(),
+  retirerPinEnAttente: vi.fn(),
+  marquerRefuse: vi.fn(),
+}))
+vi.mock('./pinsEnAttente', async (vrai) => ({
+  ...(await vrai<typeof import('./pinsEnAttente')>()),
+  ...attente,
+}))
+const api = vi.hoisted(() => ({
+  poserPin: vi.fn(),
+  supprimerPin: vi.fn(),
+  monIdentifiant: vi.fn(),
+}))
 vi.mock('../api/pins', () => api)
 const adresse = vi.hoisted(() => ({ endroitDe: vi.fn() }))
 vi.mock('@/shared/lib/adresse', () => adresse)
@@ -83,14 +94,17 @@ test('un pin déjà refusé ne repart plus', async () => {
 test.each([
   { code: 'PGRST301', message: 'JWT expired' },
   { code: '42501', message: 'connexion requise' },
-])('une erreur du serveur qui n’est pas un refus du pin ($code) arrête l’envoi, sans rien marquer', async (erreur) => {
-  attente.lirePinsEnAttente.mockResolvedValue([A, B])
-  api.poserPin.mockRejectedValue(erreur)
-  expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 0, refuses: [] })
-  expect(api.poserPin).toHaveBeenCalledTimes(1)
-  expect(attente.marquerRefuse).not.toHaveBeenCalled()
-  expect(attente.retirerPinEnAttente).not.toHaveBeenCalled()
-})
+])(
+  'une erreur du serveur qui n’est pas un refus du pin ($code) arrête l’envoi, sans rien marquer',
+  async (erreur) => {
+    attente.lirePinsEnAttente.mockResolvedValue([A, B])
+    api.poserPin.mockRejectedValue(erreur)
+    expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 0, refuses: [] })
+    expect(api.poserPin).toHaveBeenCalledTimes(1)
+    expect(attente.marquerRefuse).not.toHaveBeenCalled()
+    expect(attente.retirerPinEnAttente).not.toHaveBeenCalled()
+  },
+)
 
 test('GPS trop imprécis (P0001) : refus définitif aussi', async () => {
   attente.lirePinsEnAttente.mockResolvedValue([A])
@@ -142,7 +156,10 @@ test('deux envois à la fois n’en font qu’un : chaque pin part une seule foi
 
 test('un pin posé pendant un envoi part dans une seconde passe', async () => {
   const C = { ...A, id: 'c' }
-  attente.lirePinsEnAttente.mockResolvedValueOnce([A]).mockResolvedValueOnce([C]).mockResolvedValue([])
+  attente.lirePinsEnAttente
+    .mockResolvedValueOnce([A])
+    .mockResolvedValueOnce([C])
+    .mockResolvedValue([])
   api.poserPin.mockResolvedValue(undefined)
   const premier = envoyerPinsEnAttente()
   const second = envoyerPinsEnAttente() // arrive pendant la première passe

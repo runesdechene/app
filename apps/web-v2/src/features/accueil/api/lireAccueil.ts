@@ -59,7 +59,12 @@ export type TypeDeChemin =
   | 'fondation'
   | 'adhesion'
   | 'enigme' // une énigme percée (migration 449)
-export type CultureDuChemin = { id: string; nom: string; couleur: string | null; icone: string | null }
+export type CultureDuChemin = {
+  id: string
+  nom: string
+  couleur: string | null
+  icone: string | null
+}
 export type Chemin = {
   id: string // la ligne, telle que la base la connaît pour les saluts
   type: TypeDeChemin

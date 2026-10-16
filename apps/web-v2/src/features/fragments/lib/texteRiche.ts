@@ -10,7 +10,8 @@ export type Bloc = Segment[]
 type Noeud = { type?: string; value?: string; bold?: boolean; italic?: boolean; children?: Noeud[] }
 
 function segments(n: Noeud): Segment[] {
-  if (n.type === 'text') return [{ texte: n.value ?? '', gras: n.bold === true, italique: n.italic === true }]
+  if (n.type === 'text')
+    return [{ texte: n.value ?? '', gras: n.bold === true, italique: n.italic === true }]
   return (n.children ?? []).flatMap(segments)
 }
 

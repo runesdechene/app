@@ -48,6 +48,10 @@ test('un brouillon né d’un pin : la position du pin, et rien d’autre', () =
   })
   expect(b).toEqual({
     ...BROUILLON_VIDE,
-    pin: { id: 'p1', point: { latitude: 43.7, longitude: 7.2 }, poseLe: '2026-10-03T12:00:00.000Z' },
+    pin: {
+      id: 'p1',
+      point: { latitude: 43.7, longitude: 7.2 },
+      poseLe: '2026-10-03T12:00:00.000Z',
+    },
   })
 })

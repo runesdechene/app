@@ -24,16 +24,31 @@ test('ouverture : une culture sans icône ni couleur reste lisible', () => {
 })
 
 test('ouverture : une réponse libre n’a pas de choix, un format inconnu devient libre', () => {
-  const base = { culture: { id: 'r', nom: 'Rome', icone: null, couleur: '#c94436' }, recit: '', question: '?', numero: 1 }
+  const base = {
+    culture: { id: 'r', nom: 'Rome', icone: null, couleur: '#c94436' },
+    recit: '',
+    question: '?',
+    numero: 1,
+  }
   expect(lireOuverture({ ...base, format: 'free', choix: null }).choix).toBeNull()
   expect(lireOuverture({ ...base, format: 'autre', choix: null }).format).toBe('free')
 })
 
 test('verdict : le prochain titre peut manquer', () => {
   const v = lireVerdict({
-    juste: true, reponse: 'Sainte-Sophie', explication: 'La coupole…', xp: 1, gagnes: 1,
-    points: 16, total: 130, nouveauxTitres: ['Apprentie de Byzance'], prochain: null, resteEnAttente: 3,
-    niveau: 12, avant: 0.62, apres: 0.64,
+    juste: true,
+    reponse: 'Sainte-Sophie',
+    explication: 'La coupole…',
+    xp: 1,
+    gagnes: 1,
+    points: 16,
+    total: 130,
+    nouveauxTitres: ['Apprentie de Byzance'],
+    prochain: null,
+    resteEnAttente: 3,
+    niveau: 12,
+    avant: 0.62,
+    apres: 0.64,
   })
   expect(v.prochain).toBeNull()
   expect(v.nouveauxTitres).toEqual(['Apprentie de Byzance'])

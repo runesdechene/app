@@ -40,7 +40,10 @@ export function SceauQuiSeRetourne({
         <Cire />
         <span className={styles.point}>?</span>
       </span>
-      <span className={styles.dos} style={culture?.couleur ? { '--couleur-culture': culture.couleur } : undefined}>
+      <span
+        className={styles.dos}
+        style={culture?.couleur ? { '--couleur-culture': culture.couleur } : undefined}
+      >
         <Cire />
         <span className={styles.coeur}>
           {culture?.icone ? (

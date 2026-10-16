@@ -10,7 +10,10 @@ export function resoluesEnClair(n: number): string {
 export function encartEnClair(restantes: number, culture: string, zone: string | null) {
   if (restantes <= 0) return { titre: 'Tout est percé', phrase: 'De nouvelles énigmes viendront.' }
   return {
-    titre: restantes === 1 ? 'Encore une énigme à percer' : `Encore ${String(restantes)} énigmes à percer`,
+    titre:
+      restantes === 1
+        ? 'Encore une énigme à percer'
+        : `Encore ${String(restantes)} énigmes à percer`,
     phrase: `Au fil des jours, les énigmes de ${culture} s’éveillent ${zone ?? 'quelque part dans sa zone'}. Zoome sur la carte : elles t’y attendent.`,
   }
 }
@@ -48,7 +51,9 @@ export function rangerEnigmes<T extends { numero: number }>(enigmes: T[], tri: T
 }
 
 // Ce qui manque pour le titre suivant, en points de connaissance ; au sommet, rien ne manque.
-export function prochainEnClair(prochain: { titre: string; rang: number; manque: number } | null): string {
+export function prochainEnClair(
+  prochain: { titre: string; rang: number; manque: number } | null,
+): string {
   if (!prochain) return 'Tu as atteint le plus haut titre de cette culture.'
   return `Encore ${String(prochain.manque)} ${prochain.manque > 1 ? 'points' : 'point'} pour ${prochain.titre}`
 }

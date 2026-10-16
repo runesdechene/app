@@ -30,7 +30,9 @@ beforeEach(() => {
         }),
     },
     geolocation: {
-      getCurrentPosition: (ok: (p: { coords: { latitude: number; longitude: number } }) => void) => {
+      getCurrentPosition: (
+        ok: (p: { coords: { latitude: number; longitude: number } }) => void,
+      ) => {
         // La question du navigateur : l'Explorateur dit oui.
         statut.state = 'granted'
         ok({ coords: { latitude: 45, longitude: 6 } })

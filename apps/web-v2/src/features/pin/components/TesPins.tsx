@@ -23,12 +23,19 @@ function nom(p: PinAffiche) {
 }
 
 function etat(p: PinAffiche) {
-  if (p.refuse) return 'Refusé : l’heure ou le GPS du téléphone étaient faux · touche pour le supprimer'
+  if (p.refuse)
+    return 'Refusé : l’heure ou le GPS du téléphone étaient faux · touche pour le supprimer'
   if (p.enAttente) return `En attente de réseau · ${dureeRestante(p.jours)}`
   return `${quand(p.poseLe)} · ${dureeRestante(p.jours)}`
 }
 
-export function TesPins({ pins, onOuvrir }: { pins: PinAffiche[]; onOuvrir: (id: string) => void }) {
+export function TesPins({
+  pins,
+  onOuvrir,
+}: {
+  pins: PinAffiche[]
+  onOuvrir: (id: string) => void
+}) {
   if (pins.length === 0) return null
   return (
     <section aria-label="Tes pins">

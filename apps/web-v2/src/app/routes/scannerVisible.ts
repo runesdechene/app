@@ -13,7 +13,12 @@ export const SCANNER_OUVERT_A_TOUS: boolean = false
 
 /** Admin ? Lu une fois, sans nouvel essai : sans session, la réponse « non » tombe aussitôt. */
 export function useScannerAdmin(): boolean | null {
-  const moi = useQuery({ queryKey: ['scanner', 'admin'], queryFn: fetchMoi, staleTime: Infinity, retry: false })
+  const moi = useQuery({
+    queryKey: ['scanner', 'admin'],
+    queryFn: fetchMoi,
+    staleTime: Infinity,
+    retry: false,
+  })
   return moi.isPending ? null : (moi.data?.admin ?? false)
 }
 

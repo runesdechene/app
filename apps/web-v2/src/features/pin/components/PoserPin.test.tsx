@@ -15,7 +15,9 @@ const reseau = vi.hoisted(() => ({ useEnLigne: vi.fn() }))
 vi.mock('@/shared/hooks/useEnLigne', () => reseau)
 const pins = vi.hoisted(() => ({ usePoserPin: vi.fn(), useMesPins: vi.fn() }))
 vi.mock('../hooks/usePins', () => pins)
-vi.mock('@/shared/hooks/useEndroit', () => ({ useEndroit: () => ({ titre: 'Près de Colomars', detail: 'Alpes-Maritimes', adresse: '' }) }))
+vi.mock('@/shared/hooks/useEndroit', () => ({
+  useEndroit: () => ({ titre: 'Près de Colomars', detail: 'Alpes-Maritimes', adresse: '' }),
+}))
 
 import { PoserPin } from './PoserPin'
 
@@ -46,7 +48,11 @@ function monter() {
 }
 
 test('GPS précis : « Poser mon pin ici » pose à cette position', async () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 8,
+  })
   monter()
   expect(screen.getByText(/± 8 m/)).toBeInTheDocument()
   expect(screen.getByText(/15 jours pour le compléter/)).toBeInTheDocument()
@@ -55,7 +61,11 @@ test('GPS précis : « Poser mon pin ici » pose à cette position', async () =>
 })
 
 test('GPS imprécis (± 340 m) : le bouton est grisé et dit pourquoi', () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 340 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 340,
+  })
   monter()
   expect(screen.getByRole('button', { name: 'GPS trop imprécis (± 340 m)' })).toBeDisabled()
 })
@@ -68,7 +78,11 @@ test('localisation refusée : on ne pose pas, et on dit comment l’autoriser', 
 })
 
 test('posé sans réseau : il partira tout seul', () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 8,
+  })
   reseau.useEnLigne.mockReturnValue(false)
   pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })
   pins.useMesPins.mockReturnValue([{ ...PIN, enAttente: true }])
@@ -80,7 +94,11 @@ test('posé sans réseau : il partira tout seul', () => {
 })
 
 test('posé avec un réseau faible : encore dans le téléphone, l’écran le dit (pas « encore 15 jours »)', () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 8,
+  })
   pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })
   pins.useMesPins.mockReturnValue([{ ...PIN, enAttente: true }])
   monter()
@@ -90,7 +108,11 @@ test('posé avec un réseau faible : encore dans le téléphone, l’écran le d
 })
 
 test('posé puis refusé par le serveur pendant que l’écran est ouvert : l’écran le dit', () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 8,
+  })
   pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })
   pins.useMesPins.mockReturnValue([{ ...PIN, enAttente: true, refuse: true }])
   monter()
@@ -99,7 +121,11 @@ test('posé puis refusé par le serveur pendant que l’écran est ouvert : l’
 })
 
 test('posé et envoyé : encore 15 jours pour le compléter', () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 8,
+  })
   pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })
   pins.useMesPins.mockReturnValue([PIN])
   monter()
@@ -115,14 +141,22 @@ test('le téléphone ne trouve pas sa position : on ne pose pas, et on dit quoi 
 })
 
 test('la carte n’est pas interactive et se centre sur la position connue', () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 8,
+  })
   monter()
   expect(FausseCarte.derniere?.options).toMatchObject({ interactive: false })
   expect(FausseCarte.derniere?.jumpTo).toHaveBeenCalledWith({ center: [7.2, 43.7], zoom: 16 })
 })
 
 test('l’attribution des tuiles se voit : dépliée, en haut à droite, hors de la feuille', () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 8,
+  })
   monter()
   const carte = FausseCarte.derniere
   expect(carte?.options).toEqual(expect.objectContaining({ attributionControl: false }))
@@ -133,7 +167,11 @@ test('l’attribution des tuiles se voit : dépliée, en haut à droite, hors de
 })
 
 test('posé : le badge dit l’heure de la pose (maquette 2), et « dans ton téléphone » sans réseau', () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 8,
+  })
   pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })
   pins.useMesPins.mockReturnValue([PIN])
   monter()
@@ -141,7 +179,11 @@ test('posé : le badge dit l’heure de la pose (maquette 2), et « dans ton té
 })
 
 test('posé sans réseau : l’heure, puis « dans ton téléphone »', () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 8,
+  })
   reseau.useEnLigne.mockReturnValue(false)
   pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })
   pins.useMesPins.mockReturnValue([{ ...PIN, enAttente: true }])
@@ -150,7 +192,11 @@ test('posé sans réseau : l’heure, puis « dans ton téléphone »', () => {
 })
 
 test('posé : le repère devient le pin, centré sur sa position', () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.71, longitude: 7.21 }, precision: 8 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.71, longitude: 7.21 },
+    precision: 8,
+  })
   pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })
   pins.useMesPins.mockReturnValue([PIN])
   monter()
@@ -159,7 +205,11 @@ test('posé : le repère devient le pin, centré sur sa position', () => {
 })
 
 test('avant la pose : le point rouge de ma position, pas le pin', () => {
-  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  position.usePositionPrecise.mockReturnValue({
+    etat: 'trouvee',
+    point: { latitude: 43.7, longitude: 7.2 },
+    precision: 8,
+  })
   monter()
   expect(screen.queryByRole('img', { name: 'Ton pin' })).not.toBeInTheDocument()
 })

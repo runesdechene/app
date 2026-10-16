@@ -8,7 +8,14 @@
  *            seule l'image attend la police du « ? ».
  */
 import type { FeatureCollection, Point } from 'geojson'
-import type { AddLayerObject, ExpressionSpecification, FilterSpecification, Map as Carte, PointLike, SourceSpecification } from 'maplibre-gl'
+import type {
+  AddLayerObject,
+  ExpressionSpecification,
+  FilterSpecification,
+  Map as Carte,
+  PointLike,
+  SourceSpecification,
+} from 'maplibre-gl'
 import type { EnigmeEnAttente } from '../api/lireEnigmes'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 import { BORD_DE_CIRE } from './cachet'
@@ -27,7 +34,9 @@ export function onde(t: number): { part: number; opacite: number } {
   return { part: t, opacite: 0.5 * (1 - t) ** 2 }
 }
 
-export function enGeoJSONEnigmes(enigmes: EnigmeEnAttente[]): FeatureCollection<Point, { id: number }> {
+export function enGeoJSONEnigmes(
+  enigmes: EnigmeEnAttente[],
+): FeatureCollection<Point, { id: number }> {
   return {
     type: 'FeatureCollection',
     features: enigmes.map((e) => ({
@@ -51,7 +60,10 @@ type SupportDeCalques = {
 }
 
 export function ajouterCalquesEnigmes(map: SupportDeCalques, ecran: number) {
-  map.addSource(SOURCE_ENIGMES, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+  map.addSource(SOURCE_ENIGMES, {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [] },
+  })
   // L'onde, sous les sceaux : un cercle de cire dont `fairePulser` fait varier le rayon et l'opacité.
   map.addLayer({
     id: CALQUE_ONDES_ENIGMES,
@@ -86,7 +98,9 @@ export function toileDesEnigmes(taille: number) {
   const ctx =
     typeof OffscreenCanvas !== 'undefined'
       ? new OffscreenCanvas(cote, cote).getContext('2d')
-      : Object.assign(document.createElement('canvas'), { width: cote, height: cote }).getContext('2d')
+      : Object.assign(document.createElement('canvas'), { width: cote, height: cote }).getContext(
+          '2d',
+        )
   if (!ctx) throw new Error('canevas indisponible')
   ctx.scale(RATIO, RATIO)
   return ctx
@@ -132,7 +146,15 @@ export function fairePulser(map: Carte, couleur: string, ecran: number): () => v
     if (!map.getLayer(CALQUE_ONDES_ENIGMES)) return
     const { part, opacite } = onde((maintenant % PERIODE) / PERIODE)
     const rayon = (16 + part * 16) * ecran
-    map.setPaintProperty(CALQUE_ONDES_ENIGMES, 'circle-radius', ['interpolate', ['linear'], ['zoom'], 3, PETIT * rayon, 6, rayon])
+    map.setPaintProperty(CALQUE_ONDES_ENIGMES, 'circle-radius', [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      3,
+      PETIT * rayon,
+      6,
+      rayon,
+    ])
     map.setPaintProperty(CALQUE_ONDES_ENIGMES, 'circle-opacity', opacite)
     image = requestAnimationFrame(pas)
   }

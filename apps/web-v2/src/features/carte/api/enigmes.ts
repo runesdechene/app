@@ -26,7 +26,12 @@ export async function percerEnigme(id: number, reponse: string) {
 export type RaisonEnigme = 'reponse_refusee' | 'erreur' | 'autre'
 
 // Signaler une énigme (migs 470, 472) : la base relève elle-même ma dernière réponse, s'il y en a une.
-export async function signalerEnigme(numero: number, raison: RaisonEnigme, precision: string, proposition: string) {
+export async function signalerEnigme(
+  numero: number,
+  raison: RaisonEnigme,
+  precision: string,
+  proposition: string,
+) {
   const { error } = await supabase.rpc('signaler_enigme', {
     p_enigme: numero,
     p_raison: raison,

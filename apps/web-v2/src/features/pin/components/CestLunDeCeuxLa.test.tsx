@@ -41,7 +41,9 @@ test('« C’est lui » : visite datée du pin, puis la fiche du lieu', async ()
   api.visiterDepuisPin.mockResolvedValue({ visite: true })
   const invalider = vi.spyOn(QueryClient.prototype, 'invalidateQueries')
   monter()
-  await userEvent.click(await screen.findByRole('button', { name: /C’est lui.*Chapelle Saint-Roch/ }))
+  await userEvent.click(
+    await screen.findByRole('button', { name: /C’est lui.*Chapelle Saint-Roch/ }),
+  )
   expect(api.visiterDepuisPin).toHaveBeenCalledWith('p1', 'l1')
   await waitFor(() => {
     expect(props.onVisite).toHaveBeenCalledWith('l1', true)
@@ -55,7 +57,11 @@ test('« C’est lui » : visite datée du pin, puis la fiche du lieu', async ()
 test('pin de plus de 15 jours : la note dit que « C’est lui » le ferme sans visite', async () => {
   api.fetchLieuxProches.mockResolvedValue([CHAPELLE])
   monter({ poseLe: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000) })
-  expect(await screen.findByText(/Ton pin a plus de 15 jours : « C’est lui » le ferme sans compter de visite/)).toBeInTheDocument()
+  expect(
+    await screen.findByText(
+      /Ton pin a plus de 15 jours : « C’est lui » le ferme sans compter de visite/,
+    ),
+  ).toBeInTheDocument()
   expect(screen.queryByText(/compte ta visite/)).not.toBeInTheDocument()
 })
 
@@ -69,7 +75,9 @@ test('« C’est lui » sans visite (pin périmé) : l’écran le dit, puis « 
   api.fetchLieuxProches.mockResolvedValue([CHAPELLE])
   api.visiterDepuisPin.mockResolvedValue({ visite: false })
   monter()
-  await userEvent.click(await screen.findByRole('button', { name: /C’est lui.*Chapelle Saint-Roch/ }))
+  await userEvent.click(
+    await screen.findByRole('button', { name: /C’est lui.*Chapelle Saint-Roch/ }),
+  )
   expect(await screen.findByText(/Pin fermé, sans visite/)).toBeInTheDocument()
   expect(props.onVisite).not.toHaveBeenCalled()
   await userEvent.click(screen.getByRole('button', { name: 'Voir le lieu' }))

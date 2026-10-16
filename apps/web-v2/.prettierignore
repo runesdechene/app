@@ -1,3 +1,5 @@
 dist
 dev-dist
 src/shared/supabase/database.types.ts
+# Le fichier de vérification de Google : son contenu se lit tel quel.
+public/google*.html

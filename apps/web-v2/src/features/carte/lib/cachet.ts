@@ -15,7 +15,9 @@ function bordDeCire(r: number, n: number, ampleur: number): string {
     `${((a[0] + b[0]) / 2).toFixed(1)} ${((a[1] + b[1]) / 2).toFixed(1)}`
   const premier = points[0] ?? [48, 48]
   const dernier = points[n - 1] ?? premier
-  const courbes = points.map((p, i) => `Q${p[0].toFixed(1)} ${p[1].toFixed(1)} ${milieu(p, points[(i + 1) % n] ?? premier)}`)
+  const courbes = points.map(
+    (p, i) => `Q${p[0].toFixed(1)} ${p[1].toFixed(1)} ${milieu(p, points[(i + 1) % n] ?? premier)}`,
+  )
   return `M${milieu(premier, dernier)} ${courbes.join(' ')}Z`
 }
 

@@ -3,12 +3,29 @@
  */
 import { expect, test } from 'vitest'
 import type { Verdict } from '../api/lireEnigmes'
-import { connaissanceEnClair, gainsEnClair, messageErreur, MOTS_DE_FETE, motDeFete, relanceEnClair, prochainEnClair } from './enigmeEnClair'
+import {
+  connaissanceEnClair,
+  gainsEnClair,
+  messageErreur,
+  MOTS_DE_FETE,
+  motDeFete,
+  relanceEnClair,
+  prochainEnClair,
+} from './enigmeEnClair'
 
 const verdict = (v: Partial<Verdict>): Verdict => ({
-  juste: true, reponse: 'Sainte-Sophie', explication: '', xp: 1, gagnes: 2, points: 16, total: 130,
-  nouveauxTitres: [], prochain: { nom: 'Lettrée de Byzance', seuil: 20 }, resteEnAttente: 3,
-  niveau: { niveau: 12, avant: 0.6, apres: 0.62 }, ...v,
+  juste: true,
+  reponse: 'Sainte-Sophie',
+  explication: '',
+  xp: 1,
+  gagnes: 2,
+  points: 16,
+  total: 130,
+  nouveauxTitres: [],
+  prochain: { nom: 'Lettrée de Byzance', seuil: 20 },
+  resteEnAttente: 3,
+  niveau: { niveau: 12, avant: 0.6, apres: 0.62 },
+  ...v,
 })
 
 test('les gains : l’XP puis la connaissance, rien quand c’est faux', () => {
@@ -22,15 +39,30 @@ test('la connaissance en pourcentage, arrondi vers le bas', () => {
 })
 
 test('le prochain titre, ou tous gagnés', () => {
-  expect(prochainEnClair(verdict({}), 'Byzance')).toBe('Encore 4 points pour « Lettrée de Byzance ».')
-  expect(prochainEnClair(verdict({ points: 19 }), 'Byzance')).toBe('Encore 1 point pour « Lettrée de Byzance ».')
-  expect(prochainEnClair(verdict({ prochain: null }), 'Byzance')).toBe('Tous les titres de Byzance sont à toi.')
+  expect(prochainEnClair(verdict({}), 'Byzance')).toBe(
+    'Encore 4 points pour « Lettrée de Byzance ».',
+  )
+  expect(prochainEnClair(verdict({ points: 19 }), 'Byzance')).toBe(
+    'Encore 1 point pour « Lettrée de Byzance ».',
+  )
+  expect(prochainEnClair(verdict({ prochain: null }), 'Byzance')).toBe(
+    'Tous les titres de Byzance sont à toi.',
+  )
 })
 
 test('la relance dit ce qui attend encore', () => {
-  expect(relanceEnClair(0)).toEqual({ titre: 'C’était la dernière énigme', phrase: 'Une nouvelle apparaît chaque jour.' })
-  expect(relanceEnClair(1)).toEqual({ titre: 'Encore une énigme', phrase: 'Elle t’attend sur la carte. Une nouvelle apparaît chaque jour.' })
-  expect(relanceEnClair(3)).toEqual({ titre: 'Encore 3 énigmes', phrase: 'Elles t’attendent sur la carte. Une nouvelle apparaît chaque jour.' })
+  expect(relanceEnClair(0)).toEqual({
+    titre: 'C’était la dernière énigme',
+    phrase: 'Une nouvelle apparaît chaque jour.',
+  })
+  expect(relanceEnClair(1)).toEqual({
+    titre: 'Encore une énigme',
+    phrase: 'Elle t’attend sur la carte. Une nouvelle apparaît chaque jour.',
+  })
+  expect(relanceEnClair(3)).toEqual({
+    titre: 'Encore 3 énigmes',
+    phrase: 'Elles t’attendent sur la carte. Une nouvelle apparaît chaque jour.',
+  })
 })
 
 test('une énigme rendormie se dit, le reste aussi', () => {

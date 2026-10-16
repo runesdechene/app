@@ -11,7 +11,13 @@ import type { GeoJSONSource, Map as Carte, MapLayerMouseEvent } from 'maplibre-g
 import { useEffect, useRef } from 'react'
 import { fetchEnigmesEnAttente } from '../api/enigmes'
 import type { EnigmeEnAttente } from '../api/lireEnigmes'
-import { CALQUE_SCEAUX_ENIGMES, CALQUES_ENIGMES, enGeoJSONEnigmes, sansLEnigme, SOURCE_ENIGMES } from '../lib/enigmes'
+import {
+  CALQUE_SCEAUX_ENIGMES,
+  CALQUES_ENIGMES,
+  enGeoJSONEnigmes,
+  sansLEnigme,
+  SOURCE_ENIGMES,
+} from '../lib/enigmes'
 
 export type EnigmeTouchee = { id: number; x: number; y: number }
 
@@ -40,20 +46,26 @@ export function useEnigmesSurLaCarte(
   }, [carte, enigmes])
 
   useEffect(() => {
-    for (const calque of CALQUES_ENIGMES) if (carte?.getLayer(calque)) carte.setFilter(calque, sansLEnigme(cachee))
+    for (const calque of CALQUES_ENIGMES)
+      if (carte?.getLayer(calque)) carte.setFilter(calque, sansLEnigme(cachee))
   }, [carte, cachee])
 
   useEffect(() => {
     if (!carte) return
     const reposer = () => {
-      void carte.getSource<GeoJSONSource>(SOURCE_ENIGMES)?.setData(enGeoJSONEnigmes(dernieres.current))
+      void carte
+        .getSource<GeoJSONSource>(SOURCE_ENIGMES)
+        ?.setData(enGeoJSONEnigmes(dernieres.current))
     }
     // Le sceau qui se retourne se pose sur le sceau de la carte, pas sous le doigt (un peu à côté).
     const surToucher = (e: MapLayerMouseEvent) => {
       const marque = e.features?.[0]
       const id: unknown = marque?.properties.id
       if (typeof id !== 'number') return
-      const ou = marque?.geometry.type === 'Point' ? carte.project(marque.geometry.coordinates as [number, number]) : e.point
+      const ou =
+        marque?.geometry.type === 'Point'
+          ? carte.project(marque.geometry.coordinates as [number, number])
+          : e.point
       toucher.current({ id, x: ou.x, y: ou.y })
     }
     carte.on('style.load', reposer)

@@ -27,7 +27,10 @@ type Props = {
 const TITRE = 'C’est l’un de ceux-là ?'
 
 export function CestLunDeCeuxLa({ pin, poseLe, onVisite, onAutre, onFermer }: Props) {
-  const proches = useQuery({ queryKey: ['pins', pin, 'proches'], queryFn: () => fetchLieuxProches(pin) })
+  const proches = useQuery({
+    queryKey: ['pins', pin, 'proches'],
+    queryFn: () => fetchLieuxProches(pin),
+  })
   const queryClient = useQueryClient()
   const visiter = useMutation({
     mutationFn: (lieu: string) => visiterDepuisPin(pin, lieu),

@@ -92,5 +92,13 @@ test('le nom de qui a revendiqué un lieu, dès le zoom 9, ni sur un lieu neuf (
   const map = { addSource: vi.fn(), addLayer: vi.fn<(calque: AddLayerObject) => void>() }
   ajouterCalques(map, couleurs)
   const pilules = map.addLayer.mock.calls.map(([calque]) => calque).find((c) => c.id === 'pilules')
-  expect(pilules).toMatchObject({ minzoom: 9, filter: ['all', ['has', 'pilule'], ['!=', ['get', 'nouveau'], true], ['!=', ['get', 'etat'], 'inconnu']] })
+  expect(pilules).toMatchObject({
+    minzoom: 9,
+    filter: [
+      'all',
+      ['has', 'pilule'],
+      ['!=', ['get', 'nouveau'], true],
+      ['!=', ['get', 'etat'], 'inconnu'],
+    ],
+  })
 })

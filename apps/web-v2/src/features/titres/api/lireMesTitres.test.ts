@@ -43,8 +43,20 @@ test('un JSON mal formé lève une erreur', () => {
 
 test('les connaissances ne sont pas des titres : « Tous les titres » ignore cultures et Polymathe (mig 452)', () => {
   const t = lireMesTitres({
-    obtenus: 1, total: 4, chemins: [],
-    cultures: [{ id: 'byzantine', nom: 'Byzance', icone: null, couleur: null, points: 5, total: 130, titres: [] }],
+    obtenus: 1,
+    total: 4,
+    chemins: [],
+    cultures: [
+      {
+        id: 'byzantine',
+        nom: 'Byzance',
+        icone: null,
+        couleur: null,
+        points: 5,
+        total: 130,
+        titres: [],
+      },
+    ],
     polymathe: { id: 199, nom: 'Polymathe', compteur: 0, obtenu: false, porte: false },
   })
   expect(t).toEqual({ obtenus: 1, total: 4, chemins: [] })

@@ -33,9 +33,7 @@ export function CarteNouveaute() {
         />
       )}
       <span className={styles.texte}>
-        <span className={styles.surtitre}>
-          Nouveautés{m.version && ` · ${m.version}`}
-        </span>
+        <span className={styles.surtitre}>Nouveautés{m.version && ` · ${m.version}`}</span>
         <span className={styles.titre}>{m.titre}</span>
         <span className={styles.comptes}>
           {m.coeurs > 0 && (

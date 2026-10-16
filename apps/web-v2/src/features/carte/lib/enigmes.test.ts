@@ -2,7 +2,17 @@
  * QUOI     — les énigmes en GeoJSON, leur calque de sceaux et l'onde qui rayonne dessous.
  */
 import { expect, test, vi } from 'vitest'
-import { ajouterCalquesEnigmes, toileDesEnigmes, onde, sansLEnigme, tailleDuSceau, CALQUE_ONDES_ENIGMES, CALQUE_SCEAUX_ENIGMES, enGeoJSONEnigmes, SOURCE_ENIGMES } from './enigmes'
+import {
+  ajouterCalquesEnigmes,
+  toileDesEnigmes,
+  onde,
+  sansLEnigme,
+  tailleDuSceau,
+  CALQUE_ONDES_ENIGMES,
+  CALQUE_SCEAUX_ENIGMES,
+  enGeoJSONEnigmes,
+  SOURCE_ENIGMES,
+} from './enigmes'
 
 test('une énigme devient un point qui ne porte que son id', () => {
   const g = enGeoJSONEnigmes([{ id: 7, lat: 41, lng: 28.9 }])
@@ -14,8 +24,14 @@ test('le sceau « ? » à tous les zooms, sans regroupement : on le touche même
   const addSource = vi.fn()
   const addLayer = vi.fn<(c: { id: string; minzoom?: number; maxzoom?: number }) => void>()
   ajouterCalquesEnigmes({ addSource, addLayer }, 1)
-  expect(addSource).toHaveBeenCalledWith(SOURCE_ENIGMES, expect.not.objectContaining({ cluster: true }))
-  expect(addLayer.mock.calls.map(([c]) => c.id)).toEqual([CALQUE_ONDES_ENIGMES, CALQUE_SCEAUX_ENIGMES])
+  expect(addSource).toHaveBeenCalledWith(
+    SOURCE_ENIGMES,
+    expect.not.objectContaining({ cluster: true }),
+  )
+  expect(addLayer.mock.calls.map(([c]) => c.id)).toEqual([
+    CALQUE_ONDES_ENIGMES,
+    CALQUE_SCEAUX_ENIGMES,
+  ])
   const sceaux = addLayer.mock.calls[1]?.[0]
   expect(sceaux?.minzoom).toBeUndefined()
   expect(sceaux?.maxzoom).toBeUndefined()
@@ -34,7 +50,9 @@ test('une onde rayonne sous les sceaux', () => {
   const addLayer = vi.fn<(c: { id: string; paint?: object }) => void>()
   ajouterCalquesEnigmes({ addSource: vi.fn(), addLayer }, 1)
   expect(addLayer.mock.calls[0]?.[0].id).toBe(CALQUE_ONDES_ENIGMES)
-  expect(addLayer).toHaveBeenCalledWith(expect.objectContaining({ id: CALQUE_ONDES_ENIGMES, type: 'circle' }))
+  expect(addLayer).toHaveBeenCalledWith(
+    expect.objectContaining({ id: CALQUE_ONDES_ENIGMES, type: 'circle' }),
+  )
   // Changée à chaque image, l'onde ne doit pas glisser en plus (300 ms par défaut) : elle saccaderait.
   expect(addLayer.mock.calls[0]?.[0].paint).toMatchObject({
     'circle-radius-transition': { duration: 0, delay: 0 },

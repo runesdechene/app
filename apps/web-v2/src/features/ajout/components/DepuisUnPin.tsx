@@ -48,7 +48,8 @@ export function DepuisUnPin({ pin, onOuvrir }: { pin: Pin; onOuvrir: Ouvrir }) {
     void chargerBrouillon().then(async (enCours) => {
       if (fini) return
       if (enConflit(enCours, pin)) setEnCours(enCours)
-      else if (enCours?.pin?.id === pin.id) onOuvrir(etapeDeReprise(enCours)) // déjà celui de ce pin
+      else if (enCours?.pin?.id === pin.id)
+        onOuvrir(etapeDeReprise(enCours)) // déjà celui de ce pin
       else await remplacer(pin, onOuvrir)
     })
     return () => {
@@ -64,8 +65,8 @@ export function DepuisUnPin({ pin, onOuvrir }: { pin: Pin; onOuvrir: Ouvrir }) {
     <Feuille titre="Remplacer ton brouillon en cours ?" onFermer={garder}>
       <p className={styles.question}>Remplacer ton brouillon en cours ?</p>
       <p className={styles.explication}>
-        Un lieu attend déjà d’être fini. Le remplacer l’efface ; le garder te ramène à lui, et ton pin
-        t’attendra.
+        Un lieu attend déjà d’être fini. Le remplacer l’efface ; le garder te ramène à lui, et ton
+        pin t’attendra.
       </p>
       <div className={styles.choix}>
         <button type="button" className={styles.garder} onClick={garder}>

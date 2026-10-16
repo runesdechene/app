@@ -48,7 +48,10 @@ export function PageCulture({ id }: { id: string }) {
   const { culture, resolues, total, grade, prochain, centre, enigmes } = maCulture
   const encart = encartEnClair(total - resolues, culture.nom, culture.zone)
   return (
-    <div className={styles.page} style={culture.couleur ? { '--couleur-culture': culture.couleur } : undefined}>
+    <div
+      className={styles.page}
+      style={culture.couleur ? { '--couleur-culture': culture.couleur } : undefined}
+    >
       {/* Le portrait de la culture, réglé dans le Hub : donner envie de s'y intéresser (Uriel, 07/10). */}
       {culture.presentation && (
         <section className={styles.portrait} aria-label={`${culture.nom}, en quelques mots`}>
@@ -63,7 +66,10 @@ export function PageCulture({ id }: { id: string }) {
         </p>
       </div>
       <span className={styles.piste} aria-hidden="true">
-        <span className={styles.rempli} style={{ '--mesure': String(total > 0 ? resolues / total : 0) }} />
+        <span
+          className={styles.rempli}
+          style={{ '--mesure': String(total > 0 ? resolues / total : 0) }}
+        />
       </span>
 
       {/* Mon grade (le plus haut titre gagné ici, ses étoiles) et ce qui manque pour le suivant :
@@ -72,7 +78,11 @@ export function PageCulture({ id }: { id: string }) {
         {grade && (
           <p className={styles.gradeTitre}>
             {grade.titre}
-            <span className={styles.etoiles} role="img" aria-label={`rang ${String(grade.rang)} sur 7`}>
+            <span
+              className={styles.etoiles}
+              role="img"
+              aria-label={`rang ${String(grade.rang)} sur 7`}
+            >
               {'★'.repeat(grade.rang)}
             </span>
           </p>

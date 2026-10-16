@@ -17,8 +17,11 @@ const aimerKey = (id: number) => [...nouveautesKey, 'aimer', id] as const
 export function useCoeursDeMiseAJour(id: number, ouverte: boolean) {
   const queryClient = useQueryClient()
   const gens =
-    useQuery({ queryKey: coeursKey(id), queryFn: () => fetchCoeursDeMiseAJour(id), enabled: ouverte })
-      .data ?? null
+    useQuery({
+      queryKey: coeursKey(id),
+      queryFn: () => fetchCoeursDeMiseAJour(id),
+      enabled: ouverte,
+    }).data ?? null
 
   const mutation = useMutation({
     mutationKey: aimerKey(id),

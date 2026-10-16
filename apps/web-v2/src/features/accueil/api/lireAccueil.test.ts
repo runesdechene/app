@@ -200,7 +200,12 @@ test('une énigme percée se lit avec sa culture et le nombre du jour (migration
     },
   ])
   expect(enigme?.type).toBe('enigme')
-  expect(enigme?.culture).toEqual({ id: 'romaine', nom: 'Romaine', couleur: '#a94842', icone: 'spqr.svg' })
+  expect(enigme?.culture).toEqual({
+    id: 'romaine',
+    nom: 'Romaine',
+    couleur: '#a94842',
+    icone: 'spqr.svg',
+  })
   expect(enigme?.nombre).toBe(3)
 })
 

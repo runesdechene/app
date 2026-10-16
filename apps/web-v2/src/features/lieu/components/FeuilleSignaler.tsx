@@ -4,7 +4,10 @@
  * POURQUOI — ce que Modifier ne répare pas (un lieu qui n'existe pas, un doublon, un endroit
  *            dangereux) part à l'équipe, qui le voit dans le Hub (mig 387).
  */
-import { FeuilleDeSignalement, type Raison as RaisonAffichee } from '@/shared/ui/FeuilleDeSignalement'
+import {
+  FeuilleDeSignalement,
+  type Raison as RaisonAffichee,
+} from '@/shared/ui/FeuilleDeSignalement'
 import { signalerLieu, type Raison } from '../api/lieu'
 
 const RAISONS: RaisonAffichee<Raison>[] = [

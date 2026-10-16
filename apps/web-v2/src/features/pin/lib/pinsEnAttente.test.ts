@@ -16,9 +16,20 @@ vi.mock('idb-keyval', () => ({
   },
 }))
 
-import { garderPinEnAttente, lirePinsEnAttente, marquerRefuse, retirerPinEnAttente } from './pinsEnAttente'
+import {
+  garderPinEnAttente,
+  lirePinsEnAttente,
+  marquerRefuse,
+  retirerPinEnAttente,
+} from './pinsEnAttente'
 
-const PIN = { id: 'p1', latitude: 43.7, longitude: 7.2, precision: 8, poseLe: '2026-10-06T12:32:00.000Z' }
+const PIN = {
+  id: 'p1',
+  latitude: 43.7,
+  longitude: 7.2,
+  precision: 8,
+  poseLe: '2026-10-06T12:32:00.000Z',
+}
 
 beforeEach(() => {
   memoire.clear()

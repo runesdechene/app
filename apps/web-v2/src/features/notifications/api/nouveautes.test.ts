@@ -15,7 +15,9 @@ const note = {
 }
 
 test('ses cœurs, les miens, ses mots, si elle est à moi', () => {
-  expect(lireMisesAJour([{ ...note, coeurs: 12, miens: 3, mots: 4, aMoi: true, lue: false }])[0]).toMatchObject({
+  expect(
+    lireMisesAJour([{ ...note, coeurs: 12, miens: 3, mots: 4, aMoi: true, lue: false }])[0],
+  ).toMatchObject({
     lue: false,
     coeurs: 12,
     miens: 3,
@@ -25,5 +27,11 @@ test('ses cœurs, les miens, ses mots, si elle est à moi', () => {
 })
 
 test('avant la 478 : rien encore', () => {
-  expect(lireMisesAJour([note])[0]).toMatchObject({ coeurs: 0, miens: 0, mots: 0, aMoi: false, lue: true })
+  expect(lireMisesAJour([note])[0]).toMatchObject({
+    coeurs: 0,
+    miens: 0,
+    mots: 0,
+    aMoi: false,
+    lue: true,
+  })
 })

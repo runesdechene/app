@@ -9,9 +9,10 @@ import type { Autorisation } from '@/shared/lib/position'
 import { InvitationPosition } from './InvitationPosition'
 
 type Position = { autorisation: Autorisation | null; autoriser: Mock<() => Promise<void>> }
-const position = vi.hoisted(
-  (): Position => ({ autorisation: 'a-demander', autoriser: vi.fn(() => Promise.resolve()) }),
-)
+const position = vi.hoisted((): Position => ({
+  autorisation: 'a-demander',
+  autoriser: vi.fn(() => Promise.resolve()),
+}))
 vi.mock('@/shared/hooks/useAutorisationPosition', () => ({
   useAutorisationPosition: () => position,
 }))

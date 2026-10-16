@@ -11,10 +11,17 @@ vi.mock('@/features/scan/components/ScanScreen', () => ({ ScanScreen: () => <p>L
 
 function monter() {
   const router = createMemoryRouter(
-    [{ path: '/', element: <p>Accueil</p> }, { path: '/scan', Component: RouteScan }],
+    [
+      { path: '/', element: <p>Accueil</p> },
+      { path: '/scan', Component: RouteScan },
+    ],
     { initialEntries: ['/scan'] },
   )
-  render(<QueryClientProvider client={new QueryClient()}><RouterProvider router={router} /></QueryClientProvider>)
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
   return router
 }
 

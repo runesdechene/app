@@ -19,7 +19,9 @@ vi.mock('@/shared/lib/calendrierDuCompte', () => calendrier)
 
 function afficher() {
   return render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+    <QueryClientProvider
+      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+    >
       <MemoryRouter>
         <PageCulture id="byzantine" />
       </MemoryRouter>
@@ -42,7 +44,13 @@ const byzance = {
   prochain: { titre: 'Initié de Byzance', rang: 4, manque: 6 },
   centre: { lat: 41, lng: 28.9 },
   enigmes: [
-    { numero: 242, reponse: 'Sainte-Sophie', question: 'Quel monument ?', explication: 'La plus grande coupole…', le: '2026-05-03T10:00:00Z' },
+    {
+      numero: 242,
+      reponse: 'Sainte-Sophie',
+      question: 'Quel monument ?',
+      explication: 'La plus grande coupole…',
+      le: '2026-05-03T10:00:00Z',
+    },
   ],
 }
 
@@ -52,7 +60,10 @@ test('le compte, l’encart et le lien qui vole sur la zone', async () => {
   expect(await screen.findByText('14 / 72')).toBeInTheDocument()
   expect(screen.getByText('Encore 58 énigmes à percer')).toBeInTheDocument()
   expect(screen.getByText(/s’éveillent entre la Thrace et l’Asie Mineure/)).toBeInTheDocument()
-  expect(screen.getByRole('link', { name: /Les chercher sur la carte/ })).toHaveAttribute('href', '/carte?centre=41,28.9,6.5')
+  expect(screen.getByRole('link', { name: /Les chercher sur la carte/ })).toHaveAttribute(
+    'href',
+    '/carte?centre=41,28.9,6.5',
+  )
 })
 
 test('une énigme apprise montre sa question ; la réponse et le savais-tu se déplient au toucher', async () => {
@@ -70,8 +81,20 @@ test('chaque énigme porte son numéro fixe ; on les range par date de réussite
   api.fetchMaCulture.mockResolvedValue({
     ...byzance,
     enigmes: [
-      { numero: 242, reponse: 'Sainte-Sophie', question: 'Quel monument ?', explication: 'La coupole…', le: '2026-05-03T10:00:00Z' },
-      { numero: 30, reponse: 'Justinien', question: 'Quel empereur ?', explication: 'Le code…', le: '2026-04-01T10:00:00Z' },
+      {
+        numero: 242,
+        reponse: 'Sainte-Sophie',
+        question: 'Quel monument ?',
+        explication: 'La coupole…',
+        le: '2026-05-03T10:00:00Z',
+      },
+      {
+        numero: 30,
+        reponse: 'Justinien',
+        question: 'Quel empereur ?',
+        explication: 'Le code…',
+        le: '2026-04-01T10:00:00Z',
+      },
     ],
   })
   afficher()
@@ -87,11 +110,14 @@ test('chaque énigme porte son numéro fixe ; on les range par date de réussite
 test('la page s’ouvre sur le portrait de la culture, réglé dans le Hub ; sans portrait, pas d’encart', async () => {
   api.fetchMaCulture.mockResolvedValue(byzance)
   const { unmount } = afficher()
-  expect(await screen.findByRole('region', { name: 'Byzance, en quelques mots' })).toHaveTextContent(
-    'Pendant mille ans, l’Empire romain d’Orient…',
-  )
+  expect(
+    await screen.findByRole('region', { name: 'Byzance, en quelques mots' }),
+  ).toHaveTextContent('Pendant mille ans, l’Empire romain d’Orient…')
   unmount()
-  api.fetchMaCulture.mockResolvedValue({ ...byzance, culture: { ...byzance.culture, presentation: null } })
+  api.fetchMaCulture.mockResolvedValue({
+    ...byzance,
+    culture: { ...byzance.culture, presentation: null },
+  })
   afficher()
   await screen.findByText('14 / 72')
   expect(screen.queryByRole('region', { name: 'Byzance, en quelques mots' })).toBeNull()
@@ -107,7 +133,11 @@ test('mon grade dans la culture, ses étoiles, et ce qui manque pour le suivant 
 })
 
 test('sans grade encore : seulement ce qui manque pour le premier', async () => {
-  api.fetchMaCulture.mockResolvedValue({ ...byzance, grade: null, prochain: { titre: 'Curieux de Byzance', rang: 1, manque: 1 } })
+  api.fetchMaCulture.mockResolvedValue({
+    ...byzance,
+    grade: null,
+    prochain: { titre: 'Curieux de Byzance', rang: 1, manque: 1 },
+  })
   afficher()
   const grade = await screen.findByRole('region', { name: 'Mon grade' })
   expect(grade).toHaveTextContent('Encore 1 point pour Curieux de Byzance')
@@ -124,7 +154,13 @@ test('sans cercle, pas de lien vers la carte', async () => {
 test('les énigmes résolues dans le calendrier choisi', async () => {
   api.fetchMaCulture.mockResolvedValue({
     ...byzance,
-    enigmes: [{ ...byzance.enigmes[0], question: 'Que se passe-t-il en {52 av. J.-C.} ?', reponse: '{IIIe siècle av. J.-C.}' }],
+    enigmes: [
+      {
+        ...byzance.enigmes[0],
+        question: 'Que se passe-t-il en {52 av. J.-C.} ?',
+        reponse: '{IIIe siècle av. J.-C.}',
+      },
+    ],
   })
   afficher()
   expect(await screen.findByText('Que se passe-t-il en 52 av. è. c. ?')).toBeInTheDocument()

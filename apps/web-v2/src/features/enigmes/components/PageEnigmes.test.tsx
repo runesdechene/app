@@ -12,7 +12,9 @@ vi.mock('../api/mesEnigmes', () => api)
 
 function afficher(onOuvrir = vi.fn()) {
   render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+    <QueryClientProvider
+      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+    >
       <PageEnigmes onOuvrirCulture={onOuvrir} />
     </QueryClientProvider>,
   )
@@ -24,7 +26,14 @@ test('le compte en tête, puis une ligne par culture', async () => {
     resolues: 137,
     total: 451,
     cultures: [
-      { id: 'celtique', nom: 'Mondes celtes', icone: null, couleur: '#57b33d', resolues: 61, total: 77 },
+      {
+        id: 'celtique',
+        nom: 'Mondes celtes',
+        icone: null,
+        couleur: '#57b33d',
+        resolues: 61,
+        total: 77,
+      },
       { id: 'byzantine', nom: 'Byzance', icone: null, couleur: '#a93d76', resolues: 14, total: 72 },
     ],
   })
@@ -42,7 +51,9 @@ test('un compte sans énigme résolue se lit à zéro', async () => {
   api.fetchMesEnigmes.mockResolvedValue({
     resolues: 0,
     total: 72,
-    cultures: [{ id: 'byzantine', nom: 'Byzance', icone: null, couleur: null, resolues: 0, total: 72 }],
+    cultures: [
+      { id: 'byzantine', nom: 'Byzance', icone: null, couleur: null, resolues: 0, total: 72 },
+    ],
   })
   afficher()
   expect(await screen.findByText('énigme résolue sur 72')).toBeInTheDocument()

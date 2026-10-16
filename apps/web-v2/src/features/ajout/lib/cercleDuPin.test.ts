@@ -37,8 +37,13 @@ function calque(c: ReturnType<typeof carte>, id: string): unknown {
 test('sur le plan : voile et contour pointillé à l’encre', () => {
   const c = carte()
   poserCercleDuPin(c, PIN, couleurs)
-  expect(c.addSource).toHaveBeenCalledWith('cercle-du-pin', expect.objectContaining({ type: 'geojson' }))
-  expect(calque(c, 'cercle-du-pin-voile')).toMatchObject({ paint: { 'fill-color': couleurs.encre } })
+  expect(c.addSource).toHaveBeenCalledWith(
+    'cercle-du-pin',
+    expect.objectContaining({ type: 'geojson' }),
+  )
+  expect(calque(c, 'cercle-du-pin-voile')).toMatchObject({
+    paint: { 'fill-color': couleurs.encre },
+  })
   expect(calque(c, 'cercle-du-pin-contour')).toMatchObject({
     paint: { 'line-color': couleurs.encre, 'line-dasharray': [3, 2] },
   })
@@ -48,8 +53,12 @@ test('sur le plan : voile et contour pointillé à l’encre', () => {
 test('sur le satellite : un contour clair, bordé d’un liseré d’encre dessous', () => {
   const c = carte(true)
   poserCercleDuPin(c, PIN, couleurs)
-  expect(calque(c, 'cercle-du-pin-contour')).toMatchObject({ paint: { 'line-color': couleurs.halo } })
-  expect(calque(c, 'cercle-du-pin-lisere')).toMatchObject({ paint: { 'line-color': couleurs.encre } })
+  expect(calque(c, 'cercle-du-pin-contour')).toMatchObject({
+    paint: { 'line-color': couleurs.halo },
+  })
+  expect(calque(c, 'cercle-du-pin-lisere')).toMatchObject({
+    paint: { 'line-color': couleurs.encre },
+  })
   expect(calque(c, 'cercle-du-pin-voile')).toMatchObject({ paint: { 'fill-color': couleurs.halo } })
   const ordre = c.addLayer.mock.calls.map(([l]) => l.id)
   expect(ordre.indexOf('cercle-du-pin-lisere')).toBeLessThan(ordre.indexOf('cercle-du-pin-contour'))

@@ -24,7 +24,13 @@ import { FeuilleSignalerEnigme, type OuEnEst } from './FeuilleSignalerEnigme'
 import { BilanDuVerdict, FeteDuVerdict } from './VerdictEnigme'
 import styles from './FeuilleEnigme.module.css'
 
-export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; onFermer: () => void }) {
+export function FeuilleEnigme({
+  touchee,
+  onFermer,
+}: {
+  touchee: EnigmeTouchee
+  onFermer: () => void
+}) {
   const { enigme, erreurOuverture, repondre, verdict, envoi, erreurReponse } = useEnigme(touchee.id)
   const calendrier = useCalendrier()
   const [retourne, setRetourne] = useState(false)
@@ -88,7 +94,10 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
           {/* Le sceau de la culture : son icône du Hub peinte à sa couleur, ou son initiale. */}
           <span className={styles.sceau} data-testid="sceau-culture">
             {enigme.culture.icone ? (
-              <span className={styles.logo} style={{ '--icone': `url("${enigme.culture.icone}")` }} />
+              <span
+                className={styles.logo}
+                style={{ '--icone': `url("${enigme.culture.icone}")` }}
+              />
             ) : (
               enigme.culture.nom.charAt(0)
             )}
@@ -98,8 +107,16 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
             <span className={styles.culture}>{enigme.culture.nom}</span>
           </span>
         </header>
-        {verdict ? <FeteDuVerdict verdict={verdict} /> : <p className={styles.recit}>{texteEnClair(enigme.recit, calendrier)}</p>}
-        {verdict ? <Text variant="legende">{question}</Text> : <p className={styles.question}>{question}</p>}
+        {verdict ? (
+          <FeteDuVerdict verdict={verdict} />
+        ) : (
+          <p className={styles.recit}>{texteEnClair(enigme.recit, calendrier)}</p>
+        )}
+        {verdict ? (
+          <Text variant="legende">{question}</Text>
+        ) : (
+          <p className={styles.question}>{question}</p>
+        )}
         {!verdict && (
           <button
             type="button"
@@ -129,7 +146,9 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
         {verdict ? (
           <Relance reste={verdict.resteEnAttente} onFermer={onFermer} />
         ) : (
-          <Text variant="legende">Une seule réponse. Juste : +1 XP et des points de connaissance.</Text>
+          <Text variant="legende">
+            Une seule réponse. Juste : +1 XP et des points de connaissance.
+          </Text>
         )}
         {verdict && (
           <button

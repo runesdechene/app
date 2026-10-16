@@ -2,7 +2,13 @@
  * QUOI     — les phrases de la page « Les énigmes » : le compte, l'encart, la date, le lien vers la carte.
  */
 import { expect, test } from 'vitest'
-import { encartEnClair, lienVersLaCarte, prochainEnClair, quandEnClair, resoluesEnClair } from './enClair'
+import {
+  encartEnClair,
+  lienVersLaCarte,
+  prochainEnClair,
+  quandEnClair,
+  resoluesEnClair,
+} from './enClair'
 
 test('résolues au singulier jusqu’à une', () => {
   expect(resoluesEnClair(0)).toBe('énigme résolue')
@@ -18,7 +24,10 @@ test('l’encart dit ce qui reste, et où ça s’éveille', () => {
   })
   expect(encartEnClair(1, 'Rome', null).titre).toBe('Encore une énigme à percer')
   expect(encartEnClair(1, 'Rome', null).phrase).toContain('s’éveillent quelque part dans sa zone.')
-  expect(encartEnClair(0, 'Rome', null)).toEqual({ titre: 'Tout est percé', phrase: 'De nouvelles énigmes viendront.' })
+  expect(encartEnClair(0, 'Rome', null)).toEqual({
+    titre: 'Tout est percé',
+    phrase: 'De nouvelles énigmes viendront.',
+  })
 })
 
 test('la date d’une bonne réponse, en mots', () => {
@@ -34,7 +43,11 @@ test('le lien vers la carte vole sur le centre de la culture', () => {
 })
 
 test('ce qui manque pour le titre suivant (mig 452)', () => {
-  expect(prochainEnClair({ titre: 'Maître de Byzance', rang: 7, manque: 12 })).toBe('Encore 12 points pour Maître de Byzance')
-  expect(prochainEnClair({ titre: 'Curieux de Byzance', rang: 1, manque: 1 })).toBe('Encore 1 point pour Curieux de Byzance')
+  expect(prochainEnClair({ titre: 'Maître de Byzance', rang: 7, manque: 12 })).toBe(
+    'Encore 12 points pour Maître de Byzance',
+  )
+  expect(prochainEnClair({ titre: 'Curieux de Byzance', rang: 1, manque: 1 })).toBe(
+    'Encore 1 point pour Curieux de Byzance',
+  )
   expect(prochainEnClair(null)).toBe('Tu as atteint le plus haut titre de cette culture.')
 })

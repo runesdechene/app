@@ -11,9 +11,15 @@ import { signalerEnigme, type RaisonEnigme } from '../api/enigmes'
 
 export type OuEnEst = 'avant' | 'juste' | 'faux'
 
-const REFUSEE: Raison<RaisonEnigme> = { id: 'reponse_refusee', libelle: 'Ma réponse aurait dû être acceptée' }
+const REFUSEE: Raison<RaisonEnigme> = {
+  id: 'reponse_refusee',
+  libelle: 'Ma réponse aurait dû être acceptée',
+}
 const ENONCE: Raison<RaisonEnigme> = { id: 'erreur', libelle: 'L’énoncé est faux ou ambigu' }
-const CONTENU: Raison<RaisonEnigme> = { id: 'erreur', libelle: 'L’énoncé, la réponse ou l’explication est faux' }
+const CONTENU: Raison<RaisonEnigme> = {
+  id: 'erreur',
+  libelle: 'L’énoncé, la réponse ou l’explication est faux',
+}
 const AUTRE: Raison<RaisonEnigme> = { id: 'autre', libelle: 'Autre chose' }
 
 const RAISONS: Record<OuEnEst, Raison<RaisonEnigme>[]> = {
@@ -38,7 +44,9 @@ export function FeuilleSignalerEnigme({
       raisons={RAISONS[ouEnEst]}
       merci="L’équipe va regarder cette énigme de près."
       proposition={{ pour: 'erreur', libelle: 'Quelle serait la bonne réponse ?' }}
-      onEnvoyer={(raison, precision, proposition) => signalerEnigme(numero, raison, precision, proposition)}
+      onEnvoyer={(raison, precision, proposition) =>
+        signalerEnigme(numero, raison, precision, proposition)
+      }
       onFermer={onFermer}
     />
   )

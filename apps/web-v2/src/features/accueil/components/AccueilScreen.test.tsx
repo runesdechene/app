@@ -162,8 +162,24 @@ test('un récit enrichi se dit aussi', async () => {
 test('une énigme percée se dit avec sa culture, jamais sa réponse ; la culture mène à « Les énigmes »', async () => {
   const romaine = { id: 'romaine', nom: 'Romaine', couleur: '#a94842', icone: null }
   api.fetchChemins.mockResolvedValue([
-    { ...VISITE, id: 'enigme:u7:a', type: 'enigme', lieu: null, culture: romaine, nombre: 1, qui: { ...LUNA, id: 'u7', nom: 'Aelis' } },
-    { ...VISITE, id: 'enigme:u8:a', type: 'enigme', lieu: null, culture: romaine, nombre: 3, qui: { ...LUNA, id: 'u8', nom: 'Mathéo' } },
+    {
+      ...VISITE,
+      id: 'enigme:u7:a',
+      type: 'enigme',
+      lieu: null,
+      culture: romaine,
+      nombre: 1,
+      qui: { ...LUNA, id: 'u7', nom: 'Aelis' },
+    },
+    {
+      ...VISITE,
+      id: 'enigme:u8:a',
+      type: 'enigme',
+      lieu: null,
+      culture: romaine,
+      nombre: 3,
+      qui: { ...LUNA, id: 'u8', nom: 'Mathéo' },
+    },
   ])
   const router = monter()
   const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
@@ -342,7 +358,15 @@ test('le filtre du fil : on éteint les énigmes, elles partent ; le choix est g
   const romaine = { id: 'romaine', nom: 'Romaine', couleur: '#a94842', icone: null }
   api.fetchChemins.mockResolvedValue([
     VISITE,
-    { ...VISITE, id: 'enigme:u7:a', type: 'enigme', lieu: null, culture: romaine, nombre: 1, qui: { ...LUNA, id: 'u7', nom: 'Aelis' } },
+    {
+      ...VISITE,
+      id: 'enigme:u7:a',
+      type: 'enigme',
+      lieu: null,
+      culture: romaine,
+      nombre: 1,
+      qui: { ...LUNA, id: 'u7', nom: 'Aelis' },
+    },
   ])
   monter()
   const fil = await screen.findByRole('list', { name: 'Sur les chemins' })

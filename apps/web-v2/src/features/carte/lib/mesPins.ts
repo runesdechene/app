@@ -69,12 +69,21 @@ function chargerIcone(): Promise<HTMLImageElement> {
 // Ce que le dessin d'un pin demande au canevas : les deux canevas (hors écran, ordinaire) l'offrent.
 type Pinceau = Pick<
   CanvasRenderingContext2D,
-  'beginPath' | 'arc' | 'fill' | 'stroke' | 'drawImage' | 'getImageData' | 'fillStyle' | 'lineWidth' | 'strokeStyle'
+  | 'beginPath'
+  | 'arc'
+  | 'fill'
+  | 'stroke'
+  | 'drawImage'
+  | 'getImageData'
+  | 'fillStyle'
+  | 'lineWidth'
+  | 'strokeStyle'
 >
 
 // OffscreenCanvas manque sur iOS avant 16.4 : un canevas ordinaire, jamais affiché, le remplace.
 export function contexte2d(taille: number): Pinceau | null {
-  if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(taille, taille).getContext('2d')
+  if (typeof OffscreenCanvas !== 'undefined')
+    return new OffscreenCanvas(taille, taille).getContext('2d')
   const canevas = document.createElement('canvas')
   canevas.width = taille
   canevas.height = taille

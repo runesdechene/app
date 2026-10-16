@@ -62,11 +62,7 @@ export function phraseDe(n: Notification): Morceau[] {
         t(' est acceptée'),
       ]
     case 'nouveau_membre':
-      return [
-        qui,
-        t(' a rejoint '),
-        { texte: n.compagnie?.nom ?? 'ta Compagnie', sorte: 'lieu' },
-      ]
+      return [qui, t(' a rejoint '), { texte: n.compagnie?.nom ?? 'ta Compagnie', sorte: 'lieu' }]
     case 'mention':
       return [qui, t(` t’a mentionné dans le Registre : « ${n.extrait ?? ''} »`)]
     case 'enigme_acceptee':

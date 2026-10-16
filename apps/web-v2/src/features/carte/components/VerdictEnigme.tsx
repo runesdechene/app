@@ -49,7 +49,9 @@ export function FeteDuVerdict({ verdict }: { verdict: Verdict }) {
         </div>
       )}
       <p className={styles.mot}>{verdict.juste ? mot : 'Pas cette fois'}</p>
-      <p className={styles.reponse}>{`La réponse : ${texteEnClair(verdict.reponse, calendrier)}`}</p>
+      <p
+        className={styles.reponse}
+      >{`La réponse : ${texteEnClair(verdict.reponse, calendrier)}`}</p>
       {verdict.nouveauxTitres.map((t) => (
         <div key={t} className={styles.titre}>
           <span className={styles.surtitre}>Nouveau titre</span>
@@ -90,7 +92,9 @@ export function BilanDuVerdict({ verdict, culture }: { verdict: Verdict; culture
         <span className={styles.savaisTitre}>Le savais-tu ?</span>
         <p className={styles.explication}>{texteEnClair(verdict.explication, calendrier)}</p>
       </div>
-      {!verdict.juste && <Text variant="legende">{connaissanceEnClair(verdict.points, verdict.total, culture)}</Text>}
+      {!verdict.juste && (
+        <Text variant="legende">{connaissanceEnClair(verdict.points, verdict.total, culture)}</Text>
+      )}
     </div>
   )
 }
@@ -122,7 +126,10 @@ function Jauge({
         aria-valuemax={100}
         aria-valuenow={Math.round(apres * 100)}
       >
-        <span className={styles.rempli} style={{ '--avant': String(avant), '--mesure': String(apres) }} />
+        <span
+          className={styles.rempli}
+          style={{ '--avant': String(avant), '--mesure': String(apres) }}
+        />
       </span>
     </div>
   )

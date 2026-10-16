@@ -31,7 +31,11 @@ export function poserCercleDuPin(carte: CarteDuCercle, pin: Point, c: CouleursCa
     const contour = cercle(pin.latitude, pin.longitude, RAYON_KM)
     carte.addSource(SOURCE, {
       type: 'geojson',
-      data: { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [contour] } },
+      data: {
+        type: 'Feature',
+        properties: {},
+        geometry: { type: 'Polygon', coordinates: [contour] },
+      },
     })
   }
   const satellite = estSatellite(carte)

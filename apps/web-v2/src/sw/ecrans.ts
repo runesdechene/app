@@ -8,7 +8,17 @@
  *            2026-10-09-v2-scan), les textes légaux aussi (/legal, 11/10) ; la zone Campement s'y
  *            ajoutera ('campement').
  */
-const ECRANS = ['accueil', 'carte', 'messages', 'compagnies', 'compte', 'bienvenue', 'da', 'scan', 'legal']
+const ECRANS = [
+  'accueil',
+  'carte',
+  'messages',
+  'compagnies',
+  'compte',
+  'bienvenue',
+  'da',
+  'scan',
+  'legal',
+]
 
 // « <base>accueil », « <base>accueil/… », ou la base seule ; « <base>accueillir » n'en est pas.
 export function ecransExplore(base: string): RegExp {

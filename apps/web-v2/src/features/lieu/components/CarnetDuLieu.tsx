@@ -19,7 +19,13 @@ export function CarnetDuLieu({ id, limite }: { id: string; limite: number | null
   return (
     <Carnet
       carnet={carnet}
-      actions={{ ecrire: ecrire.mutate, enCours: ecrire.isPending, erreur: ecrire.error, aimer, effacer }}
+      actions={{
+        ecrire: ecrire.mutate,
+        enCours: ecrire.isPending,
+        erreur: ecrire.error,
+        aimer,
+        effacer,
+      }}
       titre="Carnet de passage"
       chapo="Ce que les Explorateurs ont laissé ici : conseils, souvenirs…"
       indication="Laisse un mot sur ce lieu…"

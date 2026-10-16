@@ -153,10 +153,14 @@ function CarteVivante({
   useActifsSurLaCarte(visiteur ? null : carte, actifs, maPosition, soi, setExplorateurOuvert)
   useMesPinsSurLaCarte(visiteur ? null : carte, pins, tiroirMesure)
   const [enigmeTouchee, setEnigmeTouchee] = useState<EnigmeTouchee | null>(null)
-  useEnigmesSurLaCarte(visiteur ? null : carte, (t) => {
-    retournerLeSceau()
-    setEnigmeTouchee(t)
-  }, enigmeTouchee?.id ?? null)
+  useEnigmesSurLaCarte(
+    visiteur ? null : carte,
+    (t) => {
+      retournerLeSceau()
+      setEnigmeTouchee(t)
+    },
+    enigmeTouchee?.id ?? null,
+  )
   const actifOuvert = actifs.find((a) => a.id === explorateurOuvert)
 
   useEffect(() => {

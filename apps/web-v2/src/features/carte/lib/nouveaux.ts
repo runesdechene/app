@@ -12,7 +12,12 @@
  *            l'anneau s'anime image par image (comme `fairePulser` des énigmes). Animations réduites :
  *            un anneau fixe.
  */
-import type { AddLayerObject, ExpressionSpecification, FilterSpecification, Map as Carte } from 'maplibre-gl'
+import type {
+  AddLayerObject,
+  ExpressionSpecification,
+  FilterSpecification,
+  Map as Carte,
+} from 'maplibre-gl'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 import { PALIERS, SOURCE } from './calques'
 
@@ -28,7 +33,12 @@ const DE_PLUS_PRES = 7 // la gélule s'affiche dès l'échelle d'une région (9 
 const estNouveau: FilterSpecification = ['==', ['get', 'nouveau'], true]
 
 export function rayonAuZoom(rayon: number): ExpressionSpecification {
-  return ['interpolate', ['linear'], ['zoom'], ...PALIERS.flatMap(([z, t]) => [z, Math.round(rayon * t * 1000) / 1000])]
+  return [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    ...PALIERS.flatMap(([z, t]) => [z, Math.round(rayon * t * 1000) / 1000]),
+  ]
 }
 
 // Où en est l'anneau à la phase `t` (0 → 1) : il naît transparent au bord de la marque, se dessine en

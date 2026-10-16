@@ -8,7 +8,8 @@ import { FeuilleEnigme } from './FeuilleEnigme'
 
 const ouvrirEnigme = vi.fn<(id: number) => Promise<unknown>>()
 const percerEnigme = vi.fn<(id: number, r: string) => Promise<unknown>>()
-const signalerEnigme = vi.fn<(numero: number, raison: string, precision: string, proposition: string) => Promise<void>>()
+const signalerEnigme =
+  vi.fn<(numero: number, raison: string, precision: string, proposition: string) => Promise<void>>()
 vi.mock('../api/enigmes', () => ({
   ouvrirEnigme: (id: number) => ouvrirEnigme(id),
   percerEnigme: (id: number, r: string) => percerEnigme(id, r),
@@ -55,9 +56,17 @@ const enigme = {
 test('le sceau retourné, la question et ses réponses ; une réponse juste montre les gains', async () => {
   ouvrirEnigme.mockResolvedValue(enigme)
   percerEnigme.mockResolvedValue({
-    juste: true, reponse: 'Sainte-Sophie', explication: 'La plus grande coupole…', xp: 1, gagnes: 1,
-    points: 5, total: 130, nouveauxTitres: ['Apprentie de Byzance'], prochain: { nom: 'Lettrée de Byzance', seuil: 10 },
-    resteEnAttente: 2, niveau: { niveau: 12, avant: 0.5, apres: 0.52 },
+    juste: true,
+    reponse: 'Sainte-Sophie',
+    explication: 'La plus grande coupole…',
+    xp: 1,
+    gagnes: 1,
+    points: 5,
+    total: 130,
+    nouveauxTitres: ['Apprentie de Byzance'],
+    prochain: { nom: 'Lettrée de Byzance', seuil: 10 },
+    resteEnAttente: 2,
+    niveau: { niveau: 12, avant: 0.5, apres: 0.52 },
   })
   monter()
   await retourner()
@@ -67,10 +76,14 @@ test('le sceau retourné, la question et ses réponses ; une réponse juste mont
   expect(screen.getByRole('progressbar', { name: 'Niveau 12' })).toBeInTheDocument()
   expect(screen.getByRole('progressbar', { name: 'Byzance' })).toBeInTheDocument()
   expect(percerEnigme).toHaveBeenCalledWith(4, 'Sainte-Sophie')
-  expect(screen.getByText('Te voilà Apprentie de Byzance. Il se porte depuis ton profil.')).toBeInTheDocument()
+  expect(
+    screen.getByText('Te voilà Apprentie de Byzance. Il se porte depuis ton profil.'),
+  ).toBeInTheDocument()
   expect(screen.getByText('La plus grande coupole…')).toBeInTheDocument()
   expect(screen.getByText('Encore 2 énigmes')).toBeInTheDocument()
-  expect(screen.getByText('Elles t’attendent sur la carte. Une nouvelle apparaît chaque jour.')).toBeInTheDocument()
+  expect(
+    screen.getByText('Elles t’attendent sur la carte. Une nouvelle apparaît chaque jour.'),
+  ).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: 'Retour à la carte' }))
   expect(onFermer).toHaveBeenCalled()
 })
@@ -108,12 +121,17 @@ test('l’en-tête dit « Énigme » et la culture ; sans icône, le sceau porte
 })
 
 test('le logo de la culture se peint à sa couleur, jamais en noir', async () => {
-  ouvrirEnigme.mockResolvedValue({ ...enigme, culture: { ...enigme.culture, icone: 'https://x/chrisme.svg', couleur: '#a93d76' } })
+  ouvrirEnigme.mockResolvedValue({
+    ...enigme,
+    culture: { ...enigme.culture, icone: 'https://x/chrisme.svg', couleur: '#a93d76' },
+  })
   monter()
   await retourner()
   const sceau = await screen.findByTestId('sceau-culture')
   expect(sceau.querySelector('img')).toBeNull()
-  expect(sceau.querySelector('[style*="--icone"]')?.getAttribute('style')).toContain('https://x/chrisme.svg')
+  expect(sceau.querySelector('[style*="--icone"]')?.getAttribute('style')).toContain(
+    'https://x/chrisme.svg',
+  )
 })
 
 test('les réponses portent une lettre, hors de leur nom', async () => {
@@ -127,9 +145,17 @@ test('les réponses portent une lettre, hors de leur nom', async () => {
 test('une réponse fausse : pas cette fois, la bonne réponse, et le savais-tu', async () => {
   ouvrirEnigme.mockResolvedValue(enigme)
   percerEnigme.mockResolvedValue({
-    juste: false, reponse: 'Sainte-Sophie', explication: 'La plus grande coupole…', xp: 0, gagnes: 0,
-    points: 4, total: 130, nouveauxTitres: [], prochain: { nom: 'Apprentie de Byzance', seuil: 4 },
-    resteEnAttente: 2, niveau: { niveau: 12, avant: 0.5, apres: 0.5 },
+    juste: false,
+    reponse: 'Sainte-Sophie',
+    explication: 'La plus grande coupole…',
+    xp: 0,
+    gagnes: 0,
+    points: 4,
+    total: 130,
+    nouveauxTitres: [],
+    prochain: { nom: 'Apprentie de Byzance', seuil: 4 },
+    resteEnAttente: 2,
+    niveau: { niveau: 12, avant: 0.5, apres: 0.5 },
   })
   monter()
   await retourner()
@@ -141,9 +167,17 @@ test('une réponse fausse : pas cette fois, la bonne réponse, et le savais-tu',
 })
 
 const FAUX = {
-  juste: false, reponse: 'Sainte-Sophie', explication: 'La plus grande coupole…', xp: 0, gagnes: 0,
-  points: 5, total: 130, nouveauxTitres: [], prochain: null,
-  resteEnAttente: 2, niveau: { niveau: 12, avant: 0.5, apres: 0.5 },
+  juste: false,
+  reponse: 'Sainte-Sophie',
+  explication: 'La plus grande coupole…',
+  xp: 0,
+  gagnes: 0,
+  points: 5,
+  total: 130,
+  nouveauxTitres: [],
+  prochain: null,
+  resteEnAttente: 2,
+  niveau: { niveau: 12, avant: 0.5, apres: 0.5 },
 }
 
 test('avant la réponse, un seul lien : « Signaler une erreur » sous la question', async () => {
@@ -181,7 +215,9 @@ test('la réponse tapée survit au signalement', async () => {
   ouvrirEnigme.mockResolvedValue({ ...enigme, format: 'free', choix: null })
   monter()
   await retourner()
-  fireEvent.change(await screen.findByRole('textbox', { name: 'Ta réponse' }), { target: { value: 'Eudes' } })
+  fireEvent.change(await screen.findByRole('textbox', { name: 'Ta réponse' }), {
+    target: { value: 'Eudes' },
+  })
   fireEvent.click(screen.getByRole('button', { name: 'Signaler une erreur' }))
   fireEvent.click(screen.getByTestId('voile'))
   expect(await screen.findByRole('textbox', { name: 'Ta réponse' })).toHaveValue('Eudes')
@@ -193,8 +229,12 @@ test('après une bonne réponse, on signale encore le contenu, pas une réponse 
   monter()
   await retourner()
   fireEvent.click(await screen.findByRole('button', { name: 'Sainte-Sophie' }))
-  fireEvent.click(await screen.findByRole('button', { name: 'Signaler une erreur ou une injustice' }))
-  expect(screen.getByRole('radio', { name: 'L’énoncé, la réponse ou l’explication est faux' })).toBeInTheDocument()
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Signaler une erreur ou une injustice' }),
+  )
+  expect(
+    screen.getByRole('radio', { name: 'L’énoncé, la réponse ou l’explication est faux' }),
+  ).toBeInTheDocument()
   expect(screen.queryByRole('radio', { name: 'Ma réponse aurait dû être acceptée' })).toBeNull()
 })
 
@@ -205,7 +245,9 @@ test('après le verdict, signaler : une raison, un mot, un merci, puis retour à
   monter()
   await retourner()
   fireEvent.click(await screen.findByRole('button', { name: 'Sainte-Irène' }))
-  fireEvent.click(await screen.findByRole('button', { name: 'Signaler une erreur ou une injustice' }))
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Signaler une erreur ou une injustice' }),
+  )
   // La proposition ne vaut que pour une erreur de contenu : sa réponse, la base la connaît.
   fireEvent.click(screen.getByRole('radio', { name: 'Ma réponse aurait dû être acceptée' }))
   expect(screen.queryByRole('textbox', { name: 'Quelle serait la bonne réponse ?' })).toBeNull()
@@ -228,16 +270,29 @@ test('en calendrier de Rome : les dates converties, le choix stocké part au ser
     choix: ['{52 av. J.-C.}', '{58 av. J.-C.}'],
   })
   percerEnigme.mockResolvedValue({
-    juste: true, reponse: '{52 av. J.-C.}', explication: 'César le raconte en {51 av. J.-C.}.', xp: 1, gagnes: 1,
-    points: 5, total: 130, nouveauxTitres: [], prochain: null,
-    resteEnAttente: 0, niveau: { niveau: 12, avant: 0.5, apres: 0.52 },
+    juste: true,
+    reponse: '{52 av. J.-C.}',
+    explication: 'César le raconte en {51 av. J.-C.}.',
+    xp: 1,
+    gagnes: 1,
+    points: 5,
+    total: 130,
+    nouveauxTitres: [],
+    prochain: null,
+    resteEnAttente: 0,
+    niveau: { niveau: 12, avant: 0.5, apres: 0.52 },
   })
   monter()
   await retourner()
-  expect(await screen.findByText('En 702 ap. la fondation de Rome, Vercingétorix se rend.')).toBeInTheDocument()
+  expect(
+    await screen.findByText('En 702 ap. la fondation de Rome, Vercingétorix se rend.'),
+  ).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: '702 ap. la fondation de Rome' }))
   expect(await screen.findByText('La réponse : 702 ap. la fondation de Rome')).toBeInTheDocument()
   expect(percerEnigme).toHaveBeenCalledWith(4, '{52 av. J.-C.}')
   expect(screen.getByText('César le raconte en 703 ap. la fondation de Rome.')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: '702 ap. la fondation de Rome' })).toHaveAttribute('data-juste', 'true')
+  expect(screen.getByRole('button', { name: '702 ap. la fondation de Rome' })).toHaveAttribute(
+    'data-juste',
+    'true',
+  )
 })

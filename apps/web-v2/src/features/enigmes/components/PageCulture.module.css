@@ -13,7 +13,11 @@
   padding: var(--space-4);
   border-left: 3px solid var(--couleur-culture, var(--color-ocre));
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--couleur-culture, var(--color-ocre)) 9%, var(--color-feuille));
+  background: color-mix(
+    in srgb,
+    var(--couleur-culture, var(--color-ocre)) 9%,
+    var(--color-feuille)
+  );
 }
 
 .portraitTexte {

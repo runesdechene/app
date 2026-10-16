@@ -11,7 +11,10 @@ import type { Verdict } from '../api/lireEnigmes'
 export const MOTS_DE_FETE = ['Bien vu !', 'Juste !', 'Les dieux t’approuvent', 'Tu le savais !']
 
 export function motDeFete(alea: number): string {
-  return MOTS_DE_FETE[Math.min(MOTS_DE_FETE.length - 1, Math.floor(alea * MOTS_DE_FETE.length))] ?? 'Juste !'
+  return (
+    MOTS_DE_FETE[Math.min(MOTS_DE_FETE.length - 1, Math.floor(alea * MOTS_DE_FETE.length))] ??
+    'Juste !'
+  )
 }
 
 export function gainsEnClair(v: Verdict, culture: string): string[] {
@@ -36,8 +39,12 @@ export function prochainEnClair(v: Verdict, culture: string): string {
 export function relanceEnClair(reste: number): { titre: string; phrase: string } {
   const chaqueJour = 'Une nouvelle apparaît chaque jour.'
   if (reste === 0) return { titre: 'C’était la dernière énigme', phrase: chaqueJour }
-  if (reste === 1) return { titre: 'Encore une énigme', phrase: `Elle t’attend sur la carte. ${chaqueJour}` }
-  return { titre: `Encore ${String(reste)} énigmes`, phrase: `Elles t’attendent sur la carte. ${chaqueJour}` }
+  if (reste === 1)
+    return { titre: 'Encore une énigme', phrase: `Elle t’attend sur la carte. ${chaqueJour}` }
+  return {
+    titre: `Encore ${String(reste)} énigmes`,
+    phrase: `Elles t’attendent sur la carte. ${chaqueJour}`,
+  }
 }
 
 // `P0002` : l'éveil s'est effacé (le réveil du matin) ou a déjà reçu sa réponse.

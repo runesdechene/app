@@ -113,7 +113,10 @@ export function PoserPin({ onFermer }: { onFermer: () => void }) {
         {poser.isSuccess ? (
           <>
             <p className={styles.indice}>
-              {[pose ? `✓ Posé à ${heure(pose.poseLe)}` : '✓ Posé', envoye ? null : 'dans ton téléphone']
+              {[
+                pose ? `✓ Posé à ${heure(pose.poseLe)}` : '✓ Posé',
+                envoye ? null : 'dans ton téléphone',
+              ]
                 .filter(Boolean)
                 .join(' · ')}
             </p>

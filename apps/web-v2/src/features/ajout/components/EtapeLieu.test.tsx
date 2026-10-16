@@ -160,13 +160,19 @@ test('le cercle du pin se pose sur le plan, et revient sur le satellite, bordé 
   act(() => {
     carte.emettre('style.load')
   })
-  expect(calquesPoses(carte)).toEqual(expect.arrayContaining(['cercle-du-pin-voile', 'cercle-du-pin-contour']))
+  expect(calquesPoses(carte)).toEqual(
+    expect.arrayContaining(['cercle-du-pin-voile', 'cercle-du-pin-contour']),
+  )
   nouveauStyle(carte, true)
   act(() => {
     carte.emettre('style.load')
   })
   expect(calquesPoses(carte)).toEqual(
-    expect.arrayContaining(['cercle-du-pin-voile', 'cercle-du-pin-lisere', 'cercle-du-pin-contour']),
+    expect.arrayContaining([
+      'cercle-du-pin-voile',
+      'cercle-du-pin-lisere',
+      'cercle-du-pin-contour',
+    ]),
   )
 })
 

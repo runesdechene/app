@@ -69,9 +69,18 @@ function monter(b: Brouillon = brouillon) {
 test('le pin du brouillon n’existe plus : il est retiré, l’écran le dit, et on peut réessayer', async () => {
   changer.mockReset()
   api.ajouterLieu.mockRejectedValueOnce({ code: 'P0002', message: 'Pin introuvable' })
-  monter({ ...brouillon, pin: { id: 'pin1', point: { latitude: 43.76, longitude: 7.22 }, poseLe: '2026-10-01T12:00:00Z' } })
+  monter({
+    ...brouillon,
+    pin: {
+      id: 'pin1',
+      point: { latitude: 43.76, longitude: 7.22 },
+      poseLe: '2026-10-01T12:00:00Z',
+    },
+  })
   await userEvent.click(screen.getByRole('button', { name: 'Poser le lieu sur la carte' }))
-  expect(await screen.findByText('Ton pin n’existe plus : le lieu sera ajouté à distance.')).toBeInTheDocument()
+  expect(
+    await screen.findByText('Ton pin n’existe plus : le lieu sera ajouté à distance.'),
+  ).toBeInTheDocument()
   expect(changer).toHaveBeenCalledWith({ pin: null })
   expect(screen.queryByText(/Vérifie ta connexion/)).not.toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Poser le lieu sur la carte' })).toBeEnabled()
