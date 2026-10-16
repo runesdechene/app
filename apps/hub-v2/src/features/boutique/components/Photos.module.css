@@ -218,10 +218,10 @@
   font-style: italic;
 }
 
-/* Les photos, trois de front, chacune avec ses canaux en pastilles */
+/* Les photos, quatre de front, chacune avec ses canaux en pastilles */
 .photos {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
 }
 
@@ -543,7 +543,57 @@
   cursor: default;
 }
 
+/* La fenêtre « Associer un Fragment » */
+.voile {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-ombre) 40%, transparent);
+}
+
+.fenetre {
+  display: grid;
+  gap: var(--space-4);
+  width: min(440px, 100%);
+  padding: var(--space-6);
+  border-radius: var(--radius-feuille);
+  background: var(--color-bloc);
+}
+
+.titreFenetre {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-weight: var(--weight-normal);
+  font-size: var(--titre-section-size);
+  letter-spacing: var(--titre-tracking);
+  color: var(--color-encre);
+}
+
+.illustrationFragment {
+  justify-self: center;
+  width: 160px;
+  height: 160px;
+  border-radius: var(--radius-carte);
+  background: var(--color-vignette);
+  object-fit: contain;
+}
+
+.reussi {
+  margin: 0;
+  color: var(--color-succes);
+}
+
+.boutonsFenetre {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
 @container app (width >= 900px) {
   .tuiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .volets { grid-template-columns: 380px minmax(0, 1fr); }
+  .photos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }

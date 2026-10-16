@@ -11,6 +11,7 @@ import { dateCourte } from '@/shared/lib/dates'
 import type { Contribution } from '../api/contributions'
 import { useEcritureContribution } from '../hooks/useContributions'
 import { estUneVideo } from '../lib/contribution'
+import { AssocierAuCompte } from './AssocierAuCompte'
 import { DecisionsDeContribution } from './DecisionsDeContribution'
 import { EtiquettesDeContribution } from './EtiquettesDeContribution'
 import { MessageDeContribution } from './MessageDeContribution'
@@ -50,6 +51,7 @@ export function LectureContribution({ contribution, onDecide }: { contribution: 
           <p className={styles.infos}>{infos.join(' · ')}</p>
         </div>
         {c.produit && <span className={styles.produitPorte}>{`${c.produit}${c.taille ? ` · ${c.taille}` : ''}`}</span>}
+        <AssocierAuCompte contribution={c} />
       </header>
 
       <div className={styles.avis}>
