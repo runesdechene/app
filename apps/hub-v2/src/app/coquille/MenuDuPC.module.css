@@ -33,13 +33,27 @@
   gap: 1px;
 }
 
+/* Une rubrique de carnet : petites capitales douces, un filet jusqu'au bord. Le titre range,
+   l'œil lit les liens. */
 .titre {
-  margin: var(--space-4) 0 var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-6) 0 var(--space-1);
   padding: 0 var(--space-3);
-  font-family: var(--font-titre);
-  font-size: var(--surtitre-size);
-  letter-spacing: var(--titre-tracking);
-  color: var(--color-encre);
+  font-family: var(--font-condensee);
+  font-weight: var(--weight-gras);
+  font-size: var(--libelle-size);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+  color: var(--color-texte-doux);
+}
+
+.titre::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-sable);
 }
 
 .lien {
