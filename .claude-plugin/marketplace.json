@@ -1,0 +1,12 @@
+{
+  "name": "runes-de-chene",
+  "owner": { "name": "Runes de Chêne" },
+  "metadata": { "description": "Les mods Claude Code de Runes de Chêne." },
+  "plugins": [
+    {
+      "name": "pouls",
+      "source": "./mods/pouls",
+      "description": "Le pouls de Runes de Chêne dans Claude Code : six chiffres du Hub, par période."
+    }
+  ]
+}
