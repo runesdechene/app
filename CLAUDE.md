@@ -14,6 +14,7 @@
 | Back-office (`hub.runesdechene.com`, depuis le 16/10)    | `apps/hub-v2/`                                                  |
 | Pages SEO (`/lieu/*`)                                    | `apps/seo-pages/`                                               |
 | Base, migrations, RPC, edge functions                    | `supabase/`                                                     |
+| Mods Claude Code, un dossier chacun (le pouls du Hub)    | `mods/` — place de marché : `.claude-plugin/marketplace.json`   |
 | Conception V2 — **fait foi**, points ouverts en bas      | `docs/superpowers/specs/2026-08-18-app-v2-design.md`            |
 | Pièges DB, auth, storage, workflow migrations, dette SQL | `docs/db/`                                                      |
 | Chantiers différés                                       | `docs/tech-backlog.md`                                          |

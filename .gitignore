@@ -65,3 +65,6 @@ supabase/.temp/
 
 # La correspondance Firebase → Supabase (jetons d'accès des anciens fichiers)
 scripts/rapatriement-firebase.json
+
+# Mods Claude Code : le moteur écrit lui-même ses types (~22 000 lignes) à chaque chargement du mod depuis son dossier
+mods/*/.claude-plugin/types/
