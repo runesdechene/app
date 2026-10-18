@@ -102,3 +102,6 @@ REVOKE ALL ON FUNCTION public._hub_pouls_periode(text) FROM PUBLIC, anon, authen
 GRANT EXECUTE ON FUNCTION public._hub_pouls_periode(text) TO service_role;
 REVOKE ALL ON FUNCTION public.hub_ouverture(text) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.hub_ouverture(text) TO authenticated;
+
+-- PostgREST connaît tout de suite la fonction neuve (sinon : « Could not find the function in the schema cache »).
+NOTIFY pgrst, 'reload schema';
