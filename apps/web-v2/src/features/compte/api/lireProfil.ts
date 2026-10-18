@@ -3,7 +3,7 @@
  * POURQUOI — `get_profil_explorateur` renvoie du JSON (type `Json` : n'importe quoi pour le
  *            compilateur). On vérifie chaque champ au lieu de le « caster » : un profil mal formé
  *            devient `null` (« introuvable ») plutôt qu'un écran à trous.
- * ATTENTION — la forme suit les migrations 354-362, 431 et 452. Un champ ajouté là-bas s'ajoute ici.
+ * ATTENTION — la forme suit les migrations 354-362, 431, 452 et 530. Un champ ajouté là-bas s'ajoute ici.
  */
 import { lireCondition, type ConditionTitre } from '@/shared/lib/conditionTitre'
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
@@ -25,7 +25,9 @@ export type Signe = { id: number; nom: string; imageUrl: string | null }
 export type Fragment = { id: number; nom: string; imageUrl: string | null }
 // La forme du département (ou du pays), prête pour un <path> SVG (migration 362).
 export type Silhouette = { d: string; viewBox: string }
-export type Attache = { texte: string; silhouette: Silhouette | null }
+// Le département le plus visité, avec son article (« des Alpes-Maritimes »), ou le pays : la
+// phrase « Noble Explorateur … » s'écrit dans l'appli (migration 530).
+export type Attache = { nom: string; estUnPays: boolean; silhouette: Silhouette | null }
 // Une connaissance : le plus haut titre gagné dans une culture des énigmes, son rang (1 à 7) et
 // les énigmes résolues — une gélule du profil, jamais un titre qu'on porte (migration 452).
 export type Connaissance = {
@@ -39,6 +41,7 @@ export type ExplorateurProfile = {
   id: string
   nom: string
   avatarUrl: string | null
+  genre: 'm' | 'f' // pour accorder ses mots (migration 530)
   niveau: number
   titres: TitrePorte[]
   bio: string | null
@@ -109,7 +112,12 @@ function fragment(v: unknown): Fragment {
 
 function attache(v: unknown): Attache {
   const o = objet(v)
-  return { texte: chaine(o.texte), silhouette: ouNull(silhouette)(o.silhouette) }
+  const estUnPays = o.departement === undefined || o.departement === null
+  return {
+    nom: chaine(estUnPays ? o.pays : o.departement),
+    estUnPays,
+    silhouette: ouNull(silhouette)(o.silhouette),
+  }
 }
 
 function silhouette(v: unknown): Silhouette {
@@ -145,6 +153,7 @@ export function lireProfil(json: unknown): ExplorateurProfile | null {
       id: chaine(o.id),
       nom: chaine(o.nom),
       avatarUrl: ouNull(chaine)(o.avatarUrl),
+      genre: o.genre === 'f' ? 'f' : 'm',
       niveau: nombre(o.niveau),
       titres: liste(titre)(o.titres),
       bio: ouNull(chaine)(o.bio),
@@ -152,7 +161,8 @@ export function lireProfil(json: unknown): ExplorateurProfile | null {
       inscritLe: chaine(o.inscritLe),
       porteurVerifie: booleen(o.porteurVerifie),
       role: role(o.role),
-      attache: ouNull(attache)(o.attache),
+      // Illisible (une base d'avant la 530), la ligne disparaît ; le profil reste.
+      attache: facultatif(attache, o.attache),
       fragments: liste(fragment)(o.fragments),
       ajoutes: liste(lieu)(o.ajoutes),
       nbVisites: o.nbVisites === undefined ? 0 : nombre(o.nbVisites),

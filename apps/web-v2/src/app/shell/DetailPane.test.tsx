@@ -38,6 +38,7 @@ const profil = (id: string): ExplorateurProfile => ({
   id,
   nom: id === 'u1' ? 'Uriel' : 'Claire',
   avatarUrl: null,
+  genre: 'm',
   niveau: 3,
   titres: [],
   bio: null,

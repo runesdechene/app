@@ -39,6 +39,7 @@ import {
   type Reglage,
 } from '../hooks/usePreferences'
 import { usePush } from '../hooks/usePush'
+import { explorateur } from '../lib/accord'
 import { MesDonnees } from './MesDonnees'
 import styles from './PreferencesPage.module.css'
 
@@ -156,7 +157,7 @@ export function PreferencesPage() {
           'showDepartement',
           repere,
           'Montrer ton département',
-          '« Noble représentant de… » sous ton nom. Ton passeport reste visible.',
+          `« Noble ${explorateur(preferences.titleGender)} de… » sous ton nom. Ton passeport reste visible.`,
         )}
         {ligne(
           'showEnvies',

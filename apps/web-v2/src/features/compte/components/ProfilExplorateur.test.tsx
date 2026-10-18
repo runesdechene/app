@@ -37,6 +37,7 @@ const PROFIL: ExplorateurProfile = {
   id: 'u1',
   nom: 'Uriel',
   avatarUrl: null,
+  genre: 'm',
   niveau: 12,
   titres: [{ id: 1, nom: 'Chevalier errant', condition: { stat: 'places_visited', min: 50 } }],
   bio: 'Fondateur de @runesdechene',
@@ -45,7 +46,8 @@ const PROFIL: ExplorateurProfile = {
   porteurVerifie: true,
   role: 'admin',
   attache: {
-    texte: 'Noble représentant des Alpes-Maritimes',
+    nom: 'des Alpes-Maritimes',
+    estUnPays: false,
     silhouette: { d: 'M 0 0 L 1 0 1 -1 Z', viewBox: '0 -1 1 1' },
   },
   fragments: [{ id: 3, nom: 'Hoplite', imageUrl: null }],
@@ -109,12 +111,18 @@ test('l’en-tête dit qui il est', async () => {
   expect(await screen.findByText('Uriel')).toBeInTheDocument()
   expect(screen.getByText('Niveau 12')).toBeInTheDocument()
   expect(screen.getByText('Chevalier errant')).toBeInTheDocument()
-  expect(screen.getByText('Noble représentant des Alpes-Maritimes')).toBeInTheDocument()
+  expect(screen.getByText('Noble Explorateur des Alpes-Maritimes')).toBeInTheDocument()
   expect(screen.getByText('Explorateur depuis le 30 septembre 2024')).toBeInTheDocument()
   expect(screen.getByRole('link', { name: '@runesdechene' })).toHaveAttribute(
     'href',
     'https://www.instagram.com/runesdechene/',
   )
+})
+
+test('au féminin, l’en-tête s’accorde', async () => {
+  afficher({ ...PROFIL, genre: 'f' })
+  expect(await screen.findByText('Noble Exploratrice des Alpes-Maritimes')).toBeInTheDocument()
+  expect(screen.getByText('Exploratrice depuis le 30 septembre 2024')).toBeInTheDocument()
 })
 
 test('Explorateur introuvable : un message, jamais un écran vide', async () => {

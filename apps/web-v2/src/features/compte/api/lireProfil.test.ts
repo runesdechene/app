@@ -8,6 +8,7 @@ const COMPLET = {
   id: 'u1',
   nom: 'Uriel',
   avatarUrl: null,
+  genre: 'm',
   niveau: 12,
   titres: [{ id: 1, nom: 'Chevalier errant', condition: { stat: 'places_visited', min: 50 } }],
   bio: 'Chevalier errant',
@@ -16,7 +17,8 @@ const COMPLET = {
   porteurVerifie: true,
   role: 'admin',
   attache: {
-    texte: 'Noble représentant des Alpes-Maritimes',
+    nom: 'des Alpes-Maritimes',
+    estUnPays: false,
     silhouette: { d: 'M 0 0 L 1 0 1 -1 Z', viewBox: '0 -1 1 1' },
   },
   fragments: [{ id: 3, nom: 'Hoplite', imageUrl: 'https://x/h.webp' }],
@@ -48,8 +50,30 @@ const COMPLET = {
   estMoi: true,
 }
 
+// Ce que la base renvoie (migration 530) : le département avec son article, ou le pays.
+const DEPUIS_LA_BASE = {
+  ...COMPLET,
+  attache: { departement: 'des Alpes-Maritimes', silhouette: COMPLET.attache.silhouette },
+}
+
 test('un profil complet est lu tel quel', () => {
-  expect(lireProfil(COMPLET)).toEqual(COMPLET)
+  expect(lireProfil(DEPUIS_LA_BASE)).toEqual(COMPLET)
+})
+
+test('l’attache d’un pays se lit aussi', () => {
+  const p = lireProfil({ ...COMPLET, attache: { pays: 'Italie', silhouette: null } })
+  expect(p?.attache).toEqual({ nom: 'Italie', estUnPays: true, silhouette: null })
+})
+
+test('une attache illisible (base d’avant la 530) disparaît, le profil reste', () => {
+  const p = lireProfil({ ...COMPLET, attache: { texte: 'Noble représentant des Alpes-Maritimes' } })
+  expect(p?.attache).toBeNull()
+  expect(p?.nom).toBe('Uriel')
+})
+
+test('le genre : « f » accorde au féminin, tout le reste au masculin', () => {
+  expect(lireProfil({ ...DEPUIS_LA_BASE, genre: 'f' })?.genre).toBe('f')
+  expect(lireProfil({ ...DEPUIS_LA_BASE, genre: undefined })?.genre).toBe('m')
 })
 
 test('null (Explorateur inconnu) → null', () => {

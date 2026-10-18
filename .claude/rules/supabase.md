@@ -363,3 +363,15 @@ Pour les 489 et 492, retirer la ligne `\ir` : leurs contrôles valent contre l'�
 que la règle veut vérifier de toute façon. Un test neuf n'a pas besoin de la réinclusion quand sa
 migration est déjà appliquée. Question restée ouverte : le `\ir` sert-il encore à quoi que ce soit
 dans ces douze fichiers, ou faut-il l'en retirer partout ?
+
+## La base renvoie des données, jamais une phrase affichée
+
+**Le piège** (payé le 19/10/2026) : `get_profil_explorateur` fabriquait « Noble représentant des
+Alpes-Maritimes » (migrations 355 et 406). Pour changer un mot (« Explorateur »), il fallait une
+migration, et l'appli affichait la phrase sans pouvoir l'accorder elle-même. Uriel : « Elle devrait
+vivre dans l'application, la phrase ! »
+
+**How to apply :** une RPC renvoie les morceaux (`departement: 'des Alpes-Maritimes'`, `genre: 'f'`),
+l'appli écrit la phrase et son accord (`features/compte/lib/accord.ts`). Un article officiel ou un
+nom accordé rangé dans une table (`geo_departements.de_nom`, les titres masculin/féminin) est une
+donnée : il a le droit de sortir de la base. Reste à traiter : `hub_compte` écrit « Énigme n° … ».

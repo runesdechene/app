@@ -18,6 +18,7 @@ const BASE: ExplorateurProfile = {
   id: 'u1',
   nom: 'Uriel',
   avatarUrl: null,
+  genre: 'm',
   niveau: 12,
   titres: [],
   bio: null,

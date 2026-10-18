@@ -42,6 +42,7 @@ const PROFIL: ExplorateurProfile = {
   id: 'u1',
   nom: 'Uriel',
   avatarUrl: null,
+  genre: 'm',
   niveau: 12,
   titres: [{ id: 1, nom: 'Chevalier errant', condition: { stat: 'places_visited', min: 50 } }],
   bio: 'Chevalier errant',

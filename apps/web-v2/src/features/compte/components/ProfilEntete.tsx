@@ -4,8 +4,8 @@
  * POURQUOI — ordre et valeurs de la maquette COMPTE 89:124 (le signe : 109:107). Les badges sont
  *            à droite du titre du détail (BadgesExplorateur). Chaque titre s'explique au
  *            toucher (comment il a été gagné) ; le signe veille en filigrane derrière l'en-tête.
- * ATTENTION — `attache` arrive complète de la base (« Noble représentant des Alpes-Maritimes »,
- *            article officiel INSEE) : on l'affiche telle quelle, sans la recomposer. Sa
+ * ATTENTION — la base donne le département avec son article officiel INSEE (« des
+ *            Alpes-Maritimes ») ; la phrase et son accord s'écrivent ici (`lib/accord.ts`). Sa
  *            silhouette (la forme du département) se dessine en pochoir devant (migration 362).
  */
 import { aLaTaille } from '@/shared/lib/image'
@@ -17,6 +17,7 @@ import { Button } from '@/shared/ui/Button'
 import { Feuille } from '@/shared/ui/Feuille'
 import { Text } from '@/shared/ui/Text'
 import type { ExplorateurProfile, TitrePorte } from '../api/lireProfil'
+import { explorateur, phraseAttache } from '../lib/accord'
 import { decouperBio } from '../lib/bio'
 import { phraseCondition } from '@/shared/lib/conditionTitre'
 import { sousLeSigne } from '@/shared/lib/signe'
@@ -105,7 +106,7 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
             </a>
           )}
           <p className={styles.depuis}>
-            Explorateur depuis le {DATE_LONGUE.format(new Date(profil.inscritLe))}
+            {explorateur(profil.genre)} depuis le {DATE_LONGUE.format(new Date(profil.inscritLe))}
           </p>
           {profil.attache && (
             <p className={styles.attache}>
@@ -118,7 +119,7 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
                   <path d={profil.attache.silhouette.d} />
                 </svg>
               )}
-              {profil.attache.texte}
+              {phraseAttache(profil.attache, profil.genre)}
             </p>
           )}
         </div>

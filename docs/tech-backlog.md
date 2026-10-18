@@ -66,6 +66,7 @@
 - [ ] **Article de chaque Fragment dans le Hub** — un champ (« l' », « le », « la », aucun) pour que le profil dise juste *sous le signe de l'Hoplite / du Varègue / d'Avalon*. Remplace la règle approchée de `apps/web-v2/src/features/compte/lib/signe.ts` (décision d'Uriel).
 - [ ] **Titres offerts** — table (qui, quel titre, pourquoi, quand, offert par), action « Offrir un titre » dans le Hub réservée à Uriel, marque propre et feuille « Offert par Runes de Chêne — pourquoi, quand » dans la V2. Rares, jamais liés à un achat.
 - [ ] **Page « Tous les titres »** — maquette en cours ; les compteurs existent déjà (`get_all_player_titles().stats`).
+- [ ] **Retirer `attache.texte` de `get_profil_explorateur`** — gardé par la migration 530 pour les appareils restés sur la version d'avant (elle rejette le profil entier sans lui). Une migration suivante le retire, un jour ou deux après le déploiement de la version qui lit `departement` / `pays` / `genre`.
 
 ## Idées non instruites
 
