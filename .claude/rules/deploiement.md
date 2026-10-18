@@ -182,13 +182,13 @@ sans Docker ; `--linked` n'existe pas pour cette commande). Vérifier ensuite
 fonction elle-même, faute de secret) ; un JSON « Missing authorization header » veut dire que la
 passerelle bloque encore.
 
-**Vaut pour toute fonction protégée par un secret d'en-tête**, et `pouls` en est une depuis le
-18/10/2026 (`X-Pouls-Secret`, bloc `[functions.pouls] verify_jwt = false` dans `config.toml`,
-même commande de déploiement). **Le statut ne discrimine jamais** : la passerelle réarmée et la
-fonction qui refuse le secret répondent toutes deux 401. Seul le corps tranche —
-`{"erreur":"secret"}` pour `pouls`, « Missing authorization header » pour la passerelle. Et un
-client qui ne lit que le statut accuse le mauvais coupable : le mod `pouls` affiche « secret
-refusé » sur un 401, donc un déploiement sans l'option enverrait chercher du côté du secret.
+**Vaut pour toute fonction protégée par un secret d'en-tête**, et le bloc
+`[functions.<nom>] verify_jwt = false` de `config.toml` est ce qui verrouille le bon comportement.
+**Le statut ne discrimine jamais** (payé le 18/10/2026) : la passerelle réarmée et la fonction qui
+refuse le secret répondent toutes deux 401. Seul le corps tranche — la fonction rend son propre
+refus, la passerelle dit « Missing authorization header ». Et un client qui ne lit que le statut
+accuse le mauvais coupable : s'il affiche « secret refusé » sur tout 401, un déploiement sans
+l'option envoie chercher du côté du secret.
 
 ## La reconstruction nocturne de seo-pages échoue en silence — la regarder
 

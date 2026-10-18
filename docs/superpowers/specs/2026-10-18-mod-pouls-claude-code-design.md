@@ -1,5 +1,10 @@
 # Le pouls dans Claude Code — mod « pouls » (design)
 
+> **Retiré le 18/10/2026.** Le mod a été mis en service puis écarté le soir même : il marchait,
+> mais un chiffre ambiant n'apportait rien. Mod, place de marché et fonction edge supprimés du
+> dépôt ; seule la migration 528 reste (`hub_ouverture` dépend de ses deux fonctions). Document
+> gardé comme archive — **ne pas le rejouer**, la décision est dans le vault, « Écarté ».
+
 > Statut : **conception validée avec Uriel le 18/10/2026**, relue par un constructeur avant remise.
 > Rien n'est construit. Le mod est un plugin Claude Code (hooks + panneau) ; il vit dans ce dépôt
 > et s'installe sur les deux machines. Sa source de chiffres est une Edge Function dédiée, pas le

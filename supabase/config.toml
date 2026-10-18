@@ -43,7 +43,3 @@ file_size_limit = "50MiB"
 [functions.send-email]
 verify_jwt = false
 
-# pouls est appelée par le mod Claude Code avec un X-Pouls-Secret, PAS un JWT utilisateur
-# (même cas que send-email, même incident 2026-06-15 : voir .claude/rules/deploiement.md).
-[functions.pouls]
-verify_jwt = false

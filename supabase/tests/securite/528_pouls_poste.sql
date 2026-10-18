@@ -1,6 +1,9 @@
--- 528 : les deux fonctions internes du pouls restent fermées aux comptes ; service_role lit, hub_ouverture reste ouverte aux connectés. Annulé.
+-- 528 + 529 : les deux fonctions internes du pouls restent fermées à tout le monde — service_role
+-- compris depuis que la 529 a repris son grant, la fonction edge `pouls` étant retirée ;
+-- hub_ouverture reste ouverte aux connectés et fermée à anon. Annulé.
 BEGIN;
 \ir ../../migrations/528_pouls_poste.sql
+\ir ../../migrations/529_pouls_poste_ferme.sql
 DO $test$
 DECLARE r text := '';
   fermer text[] := ARRAY['public._hub_bornes(text)','public._hub_pouls_periode(text)'];
@@ -14,6 +17,6 @@ BEGIN
            || ' connecte_hub_ouverture=' || has_function_privilege('authenticated', 'public.hub_ouverture(text)', 'EXECUTE')
            || ' anon_hub_ouverture=' || has_function_privilege('anon', 'public.hub_ouverture(text)', 'EXECUTE')
     INTO r;
-  RAISE EXCEPTION 'BILAN% (attendu : rien d''ouvert à tort, serveur_pouls_periode true, connecte_hub_ouverture true, anon_hub_ouverture false)', r;
+  RAISE EXCEPTION 'BILAN% (attendu : rien d''ouvert à tort, serveur_pouls_periode false, connecte_hub_ouverture true, anon_hub_ouverture false)', r;
 END $test$;
 ROLLBACK;
