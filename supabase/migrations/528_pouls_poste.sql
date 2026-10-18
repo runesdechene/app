@@ -9,11 +9,11 @@
 --      hub_ouverture les appelle au lieu de calculer elle-même : même signature, même sortie, même
 --      garde _is_admin() en première ligne, attente et sante inchangées. Rien n'est ouvert à
 --      authenticated.
--- SCHEMA CHECKED : NON. Le corps de hub_ouverture est repris de la 521 (dernière migration à la
---   définir ; les 522 à 527 ne la touchent pas), PAS comparé à pg_get_functiondef. À faire avant
---   d'appliquer : SELECT pg_get_functiondef('public.hub_ouverture(text)'::regprocedure); — s'il
---   diffère de la 521, le live prime et cette migration se corrige. Colonne lue en plus : users(last_login_at),
---   déjà lue par la 521 ; _hub_pouls(timestamptz, timestamptz), _is_admin(), _refus() inchangées.
+-- SCHEMA CHECKED (18/10/2026, live) : pg_get_functiondef('public.hub_ouverture(text)') est identique
+--   au caractère près au corps repris ici de la 521 (les 522 à 527 ne la touchent pas) — aucune dérive,
+--   rien à reprendre du live. Le numéro 528 est libre : schema_migrations s'arrête à 527. Colonne lue
+--   en plus : users(last_login_at), déjà lue par la 521 ; _hub_pouls(timestamptz, timestamptz),
+--   _is_admin(), _refus() inchangées.
 
 -- 1. Les bornes d'une période (calcul repris mot pour mot de hub_ouverture, mig 521)
 CREATE OR REPLACE FUNCTION public._hub_bornes(p_periode text)
