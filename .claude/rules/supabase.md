@@ -346,3 +346,20 @@ du 11/10 l'avait manquée parce qu'elle ne reçoit pas de `p_user_id`.
 `IF NOT _is_admin() THEN PERFORM _refus('Réservé à l’équipe', 'role'); END IF;` (ou `_is_staff()`
 pour la modération). Pour en auditer une : `prosecdef` + `has_function_privilege('authenticated', …)`
 + chercher `_is_admin`/`_is_staff` dans `prosrc`.
+
+## Les tests de `supabase/tests/securite/` ne se rejouent pas par `db query`
+
+**Le piège** (18/10/2026, mise en service de la mig 528) : les douze fichiers commencent par
+`\ir ../../migrations/NNN_*.sql`, une méta-commande **psql**. `supabase db query --linked` passe par
+l'API de gestion, qui reçoit la ligne comme du SQL et rend `42601: syntax error at or near "\"`.
+La commande que le plan prescrivait ne pouvait donc rejouer aucun des douze. Et deux des migrations
+réincluses ne sont pas rejouables du tout : les 489 et 492 portent des `DROP POLICY` sans
+`IF EXISTS` sur des politiques que leur propre application a supprimées, d'où
+`42704: policy "…" does not exist`.
+
+**How to apply :** résoudre l'inclusion côté client avant d'envoyer le fichier — remplacer chaque
+ligne `\ir <chemin>` par le contenu du fichier visé, puis `db query --linked -f` sur le résultat.
+Pour les 489 et 492, retirer la ligne `\ir` : leurs contrôles valent contre l'état live, qui est ce
+que la règle veut vérifier de toute façon. Un test neuf n'a pas besoin de la réinclusion quand sa
+migration est déjà appliquée. Question restée ouverte : le `\ir` sert-il encore à quoi que ce soit
+dans ces douze fichiers, ou faut-il l'en retirer partout ?
