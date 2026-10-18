@@ -13,6 +13,8 @@ const SEMAINE = {
 }
 const MOIS = { ...SEMAINE, periode: 'mois', pouls: { ...SEMAINE.pouls, nouveaux: 51 } }
 const TOUJOURS = { ...SEMAINE, periode: 'toujours', avant: null }
+// Les chiffres du dépôt passent le millier (3 512 lieux, 9 785 énigmes) : le groupement doit être français.
+const GRANDS = { ...SEMAINE, pouls: { ...SEMAINE.pouls, lieux: 3512, enigmes: 9785 } }
 
 const LU_A = Date.parse(SEMAINE.lu_a)
 const MINUTE = 60 * 1000
@@ -119,6 +121,18 @@ for (const surface of SURFACES) {
       ])
       expect((await ui.find({ key: 'valeur-nouveaux' }))?.text).toBe('12')
       expect((await ui.find({ key: 'valeur-enigmes' }))?.text).toBe('89')
+    })
+
+    test('les grands nombres s’écrivent à la française', { options: OPTIONS }, async ($, on) => {
+      const { banc, horloge } = poser(on, DEPOT)
+      banc.repondre = () => reponse(200, GRANDS)
+      await demarrer($)
+      await horloge.settle()
+      const ui = await monter($)
+
+      // Intl.NumberFormat('fr-FR') groupe par l'espace fine insécable, jamais par la virgule anglaise.
+      expect((await ui.find({ key: 'valeur-lieux' }))?.text).toBe('3 512')
+      expect((await ui.find({ key: 'valeur-enigmes' }))?.text).toBe('9 785')
     })
 
     test('chaque tuile écrit son écart comme le Hub', { options: OPTIONS }, async ($, on) => {
