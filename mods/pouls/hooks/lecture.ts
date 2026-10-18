@@ -60,7 +60,9 @@ export async function lire(
       headers: { 'X-Pouls-Secret': options.secret, 'Content-Type': 'application/json' },
       body: JSON.stringify({ periode }),
     })
-    if (!reponse.ok) return { ok: false, raison: 'refus' }
+    // Seul un 401 est un refus du secret ; un 400 ou un 5xx (la base tombée) n'est pas un refus.
+    if (reponse.status === 401) return { ok: false, raison: 'refus' }
+    if (!reponse.ok) return { ok: false, raison: 'reseau' }
 
     const corps = objet(JSON.parse(reponse.text), 'réponse')
     return {

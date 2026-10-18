@@ -48,6 +48,13 @@ test('un 401 devient un refus, pas une erreur réseau', async () => {
   expect(await lire($, OPTIONS, 'semaine')).toEqual({ ok: false, raison: 'refus' })
 })
 
+test('un 503 ou un 400 ne sont pas un refus : la lecture dit réseau', async () => {
+  for (const [status, erreur] of [[503, 'base'], [400, 'periode']] as const) {
+    const { $ } = reseau(async () => reponse(status, JSON.stringify({ erreur })))
+    expect(await lire($, OPTIONS, 'semaine')).toEqual({ ok: false, raison: 'reseau' })
+  }
+})
+
 test('une réponse valide rend les six chiffres et la date de lecture', async () => {
   const { $, appels } = reseau(async () => reponse(200, JSON.stringify(CORPS)))
 
