@@ -17,21 +17,29 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
 })
 
-let cachedSecret: string | null = null
+// Le secret se relit au bout d'une minute : changer la ligne en base révoque l'ancien sans attendre
+// que l'instance soit recyclée (conception §6.1).
+const DUREE_CACHE_MS = 60_000
+let cache: { secret: string; lu_a: number } | null = null
 
 async function loadSecret(): Promise<string | null> {
-  if (cachedSecret) return cachedSecret
+  if (cache && Date.now() - cache.lu_a < DUREE_CACHE_MS) return cache.secret
   const { data, error } = await supabase
     .from('app_settings')
     .select('value')
     .eq('key', 'pouls_secret')
     .maybeSingle()
-  if (error || !data?.value) {
+  if (error) {
     console.error('pouls_secret_lookup_failed', error)
     return null
   }
-  cachedSecret = data.value
-  return cachedSecret
+  if (!data?.value) {
+    console.error('pouls_secret_missing')
+    cache = null
+    return null
+  }
+  cache = { secret: data.value, lu_a: Date.now() }
+  return cache.secret
 }
 
 const reponse = (corps: unknown, status = 200) => new Response(JSON.stringify(corps), {

@@ -12,6 +12,16 @@ Deno.test('toujours : avant reste null', () => {
   assertEquals(r.pouls.actifs, 48)
 })
 
+Deno.test('un avant non nul passe tel quel, sans la clé actifs', () => {
+  const avant = { nouveaux: 10, reactives: 4, lieux: 5, visites: 30, enigmes: 80 }
+  const r = miseEnForme('semaine', { pouls: { nouveaux: 12, reactives: 3, actifs: 40, lieux: 7, visites: 21, enigmes: 89 }, avant }, '2026-10-18T09:00:00Z')
+  assertEquals(r.avant, avant)
+})
+
+Deno.test('un compteur non numérique est une erreur, pas un zéro', () => {
+  assertThrows(() => miseEnForme('semaine', { pouls: { nouveaux: '12', reactives: 3, actifs: 40, lieux: 7, visites: 21, enigmes: 89 }, avant: null }, '2026-10-18T09:00:00Z'))
+})
+
 Deno.test('un jsonb sans la clé pouls est une erreur, pas un objet vide', () => {
   assertThrows(() => miseEnForme('semaine', {}, '2026-10-18T09:00:00Z'))
 })
