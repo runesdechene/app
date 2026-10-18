@@ -15,6 +15,6 @@ export type Lecture = Reussie | { ok: false; raison: Raison }
 declare module 'claude-code' {
   interface PluginState {
     // derniere : la dernière lecture réussie, jamais écrasée par un échec (echec dit pourquoi la suivante a raté).
-    pouls: { derniere: Reussie | null; echec: Raison | null; periode: Periode; replie: boolean }
+    pouls: { derniere: Reussie | null; echec: Raison | null; periode: Periode; replie: boolean; voletPlace: boolean }
   }
 }

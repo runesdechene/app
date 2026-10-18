@@ -17,6 +17,17 @@ const TOUJOURS = { ...SEMAINE, periode: 'toujours', avant: null }
 const LU_A = Date.parse(SEMAINE.lu_a)
 const MINUTE = 60 * 1000
 const DEPOT = { root: 'C:/depot', remote: 'https://github.com/runesdechene/app.git', internal: false, name: null }
+// Le mod suit le dépôt distant, pas un chemin : https, ssh et une session de worktree en sont.
+const DEPOTS_DU_MOD = {
+  'https': DEPOT,
+  'ssh': { ...DEPOT, remote: 'git@github.com:runesdechene/app.git' },
+  'worktree': { ...DEPOT, root: 'C:/depot/.claude/worktrees/mod-pouls' },
+}
+const AUTRES_DEPOTS = {
+  'https': { ...DEPOT, remote: 'https://github.com/autre/projet.git' },
+  'ssh': { ...DEPOT, remote: 'git@github.com:autre/projet.git' },
+  'même propriétaire, autre nom': { ...DEPOT, remote: 'https://github.com/runesdechene/app-autre.git' },
+}
 const PANE = {
   title: 'Pouls',
   isFocused: false,
@@ -40,6 +51,7 @@ type Banc = {
   statuts: (string | undefined)[]
   ouvertures: number
   estPlace: boolean
+  ferme: boolean // le volet a quitté $.ui.panes(), fermé à la main
 }
 
 // Le monde sous le mod : le dépôt, le réseau, l'horloge, le stockage, l'ouverture du volet.
@@ -51,6 +63,7 @@ function poser(on: On, depot: typeof DEPOT, stocke: Record<string, unknown> = {}
     statuts: [],
     ouvertures: 0,
     estPlace: true,
+    ferme: false,
   }
   on('session.start', (_$, e) => ({ cwd: e.cwd }))
   on('session.repo', () => ({ value: depot }))
@@ -64,7 +77,7 @@ function poser(on: On, depot: typeof DEPOT, stocke: Record<string, unknown> = {}
     return { value: banc.estPlace ? { isPlaced: true } : { isPlaced: false, reason: 'trop étroit' } }
   })
   on('ui.panes', () => ({
-    value: [{ id: 'pouls', title: 'Pouls', isShown: true, isFocused: false, isPlaced: banc.estPlace }],
+    value: banc.ferme ? [] : [{ id: 'pouls', title: 'Pouls', isShown: true, isFocused: false, isPlaced: banc.estPlace }],
   }))
   on('ui.status', (_$, e) => {
     banc.statuts.push(e.text)
@@ -256,14 +269,27 @@ for (const surface of SURFACES) {
       expect((await ui.find({ key: 'resume' }))?.text).toContain('51')
     })
 
-    test('hors de ce dépôt, le mod ne fait rien', { options: OPTIONS }, async ($, on) => {
-      const { banc, horloge } = poser(on, { ...DEPOT, remote: 'https://github.com/autre/projet.git' })
-      await demarrer($)
-      await horloge.advance(30 * MINUTE)
+    for (const [forme, depot] of Object.entries(DEPOTS_DU_MOD)) {
+      test(`dans ce dépôt (${forme}), le mod s’ouvre et lit`, { options: OPTIONS }, async ($, on) => {
+        const { banc, horloge } = poser(on, depot)
+        await demarrer($)
+        await horloge.settle()
 
-      expect(banc.ouvertures).toBe(0)
-      expect(banc.periodes).toHaveLength(0)
-    })
+        expect(banc.ouvertures).toBe(1)
+        expect(banc.periodes).toEqual(['semaine'])
+      })
+    }
+
+    for (const [forme, depot] of Object.entries(AUTRES_DEPOTS)) {
+      test(`hors de ce dépôt (${forme}), le mod ne fait rien`, { options: OPTIONS }, async ($, on) => {
+        const { banc, horloge } = poser(on, depot)
+        await demarrer($)
+        await horloge.advance(30 * MINUTE)
+
+        expect(banc.ouvertures).toBe(0)
+        expect(banc.periodes).toHaveLength(0)
+      })
+    }
 
     test('un volet que personne n’a placé se réduit à une ligne de statut', { options: OPTIONS }, async ($, on) => {
       const { banc, horloge } = poser(on, DEPOT)
@@ -274,6 +300,18 @@ for (const surface of SURFACES) {
       const ligne = banc.statuts.at(-1)
       expect(ligne).toContain('12')
       expect(ligne).toContain('89')
+    })
+
+    test('un volet fermé à la main ne revient pas en ligne de statut', { options: OPTIONS }, async ($, on) => {
+      const { banc, horloge } = poser(on, DEPOT)
+      await demarrer($)
+      await horloge.settle()
+      banc.ferme = true // le volet quitte $.ui.panes(), comme après un clic sur la croix
+
+      await horloge.advance(10 * MINUTE) // la relecture des dix minutes passe
+
+      expect(banc.periodes).toEqual(['semaine', 'semaine']) // le test ne passe pas à vide
+      expect(banc.statuts.every(ligne => ligne === undefined)).toBe(true)
     })
   })
 }

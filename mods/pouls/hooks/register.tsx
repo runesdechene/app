@@ -2,7 +2,7 @@
 // Les atomes tiennent les valeurs vivantes, que le dessin lit ; $.store garde la période et le repli d'une session à l'autre.
 
 import { atom, read, update } from 'claude-code'
-import type { EngineInterface, PluginOptions, Register, SessionRepo } from 'claude-code'
+import type { EngineInterface, PluginOptions, Register, SessionRepo, Timer } from 'claude-code'
 
 import type { Options, Periode } from '../types'
 import {
@@ -25,6 +25,7 @@ const derniere = atom({ plugin: 'pouls', key: 'derniere' } as const, null)
 const echec = atom({ plugin: 'pouls', key: 'echec' } as const, null)
 const periodeChoisie = atom({ plugin: 'pouls', key: 'periode' } as const, 'semaine')
 const replie = atom({ plugin: 'pouls', key: 'replie' } as const, false)
+const voletPlace = atom({ plugin: 'pouls', key: 'voletPlace' } as const, false)
 
 const COULEUR_ECART = { hausse: 'success', baisse: 'error', egal: 'inactive' } as const
 
@@ -40,9 +41,11 @@ function lireOptions(options: PluginOptions): Options {
 }
 
 // Faute de volet placé (terminal étroit), le panneau se réduit à une ligne de statut.
+// Un volet qui a été placé puis fermé à la main sort de $.ui.panes() : c'est le départ qui dit s'il a existé,
+// pour que la ligne de statut ne ressuscite pas un panneau que la personne a congédié.
 async function direEnUneLigne($: EngineInterface) {
   const panes = await $.ui.panes()
-  if (panes.some(pane => pane.id === PANE && pane.isPlaced)) {
+  if (panes.some(pane => pane.id === PANE && pane.isPlaced) || (await read($, voletPlace))) {
     $.ui.status(undefined) // le volet parle, une ligne de statut ne ferait que redire des chiffres plus vieux
     return
   }
@@ -67,6 +70,13 @@ async function rafraichir($: EngineInterface, options: Options) {
   $.ui.invalidate('ui.render') // le « il y a » se recalcule au dessin
 }
 
+// Dans un minuteur, un rejet ne doit pas arrêter le panneau sans laisser de trace.
+function rafraichirEnFond($: EngineInterface, options: Options) {
+  rafraichir($, options).catch((err: unknown) => {
+    $.ui.log(`pouls : relecture échouée, ${err instanceof Error ? err.message : String(err)}`)
+  })
+}
+
 async function choisirPeriode($: EngineInterface, options: Options, periode: Periode) {
   await update($, periodeChoisie, () => periode)
   await update($, echec, () => null) // un échec d'une autre période ne répond pas à celle-ci
@@ -80,6 +90,7 @@ async function basculerRepli($: EngineInterface) {
 
 export const register: Register = (on, brutes) => {
   const options = lireOptions(brutes)
+  let minuteur: Timer | undefined
 
   on('session.start', async ($, e, next) => {
     if (!estCeDepot(await $.session.repo())) return next(e)
@@ -89,10 +100,19 @@ export const register: Register = (on, brutes) => {
     const estReplie = (await $.store.get('replie')) === true
     await update($, replie, () => estReplie)
 
-    await $.ui.open({ id: PANE, title: 'Pouls' })
+    const ouvert = await $.ui.open({ id: PANE, title: 'Pouls' })
+    await update($, voletPlace, () => ouvert.isPlaced)
     // La première lecture ne retient pas le démarrage de la session sur le réseau.
-    $.clock.after(0, () => void rafraichir($, options))
-    $.clock.every(DIX_MINUTES, () => void rafraichir($, options))
+    $.clock.after(0, () => rafraichirEnFond($, options))
+    minuteur?.cancel()
+    minuteur = $.clock.every(DIX_MINUTES, () => rafraichirEnFond($, options))
+    return next(e)
+  })
+
+  // Le volet fermé (à la main, le plus souvent), plus personne à renseigner : ni relecture, ni ligne de statut.
+  on('ui.close', { id: PANE }, async ($, e, next) => {
+    minuteur?.cancel()
+    $.ui.status(undefined)
     return next(e)
   })
 

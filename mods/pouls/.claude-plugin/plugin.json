@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "description": "Le pouls de Runes de Chêne dans Claude Code : six chiffres du Hub, par période.",
   "author": { "name": "Runes de Chêne" },
-  "types":"./types/index.d.ts",
+  "types": "./types/index.d.ts",
   "userConfig": {
     "url": {
       "type": "string",
       "title": "URL de la fonction pouls",
-      "description": "L'Edge Function Supabase qui rend les six chiffres.",
+      "description": "L’Edge Function Supabase qui rend les six chiffres.",
       "default": "https://ukpapqssgsxirsgmcvof.supabase.co/functions/v1/pouls"
     },
     "secret": {

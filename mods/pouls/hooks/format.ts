@@ -4,7 +4,7 @@
 import type { Avant, Periode, Pouls, Raison, Reussie } from '../types'
 
 export const PERIODES: { valeur: Periode; nom: string }[] = [
-  { valeur: 'jour', nom: "Aujourd'hui" },
+  { valeur: 'jour', nom: 'Aujourd’hui' },
   { valeur: 'semaine', nom: 'Cette semaine' },
   { valeur: 'mois', nom: 'Ce mois-ci' },
   { valeur: 'toujours', nom: 'Depuis toujours' },
@@ -21,8 +21,8 @@ export const TUILES: { cle: keyof Pouls; libelle: string }[] = [
 ]
 
 export const MESSAGES_ECHEC: Record<Raison, string> = {
-  secret_absent: "Secret absent : l'option « Secret du pouls » du mod pouls est à renseigner.",
-  refus: "Secret refusé : l'option « Secret du pouls » n'est pas la valeur de pouls_secret.",
+  secret_absent: 'Secret absent : l’option « Secret du pouls » du mod pouls est à renseigner.',
+  refus: 'Secret refusé : l’option « Secret du pouls » n’est pas la valeur de pouls_secret.',
   reseau: 'Lecture échouée : le réseau, la base ou la réponse a fait défaut.',
 }
 
@@ -57,7 +57,7 @@ export const formaterNombre = (n: number) => nombre.format(n)
 
 function ecoule(ms: number): string {
   const minutes = Math.floor(ms / 60_000)
-  if (minutes < 1) return "à l'instant"
+  if (minutes < 1) return 'à l’instant'
   if (minutes < 60) return relatif.format(-minutes, 'minute')
   const heures = Math.floor(minutes / 60)
   if (heures < 24) return relatif.format(-heures, 'hour')
