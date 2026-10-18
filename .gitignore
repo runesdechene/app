@@ -68,3 +68,6 @@ scripts/rapatriement-firebase.json
 
 # Mods Claude Code : le moteur écrit lui-même ses types (~22 000 lignes) à chaque chargement du mod depuis son dossier
 mods/*/.claude-plugin/types/
+
+# Généré en lançant les tests Deno des edge functions (pnpm dlx deno test)
+deno.lock
