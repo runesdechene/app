@@ -41,6 +41,8 @@ export function phraseDe(n: Notification): Morceau[] {
         : [t(`${combien} Explorateurs ont foulé `), lieu, t(' aujourd’hui')]
     case 'visite':
       return [qui, t(' a visité '), lieu]
+    case 'souvenir': // « J'y suis allé » (mig 531) : dans la cloche seulement, jamais par push
+      return [qui, t(' a ajouté '), lieu, t(' à ses souvenirs')]
     case 'revendication_reprise':
       return [qui, t(' a revendiqué '), lieu, t(', que tu tenais')]
     case 'milestone_exploration':
@@ -95,6 +97,7 @@ export function phraseDe(n: Notification): Morceau[] {
       if (n.evenement === 'modifie') return [qui, t(' a salué ta modification')]
       if (n.evenement === 'fondation') return [qui, t(' a salué ta nouvelle Compagnie')]
       if (n.evenement === 'enigme') return [qui, t(' a salué ton énigme percée')]
+      if (n.evenement === 'souvenir') return [qui, t(' a salué tes souvenirs')]
       if (n.evenement === 'adhesion') return [qui, t(' a salué ton entrée dans une Compagnie')]
       return [qui, t(' a salué ton arrivée')]
     default:

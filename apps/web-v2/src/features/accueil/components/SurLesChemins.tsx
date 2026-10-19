@@ -8,7 +8,8 @@
  *            l'activité » ouvre le fil entier dans le tiroir (Uriel, 29/09) ; sans salut, le cœur est seul (un « 0 » découragerait). Le cœur plutôt
  *            que la feuille de chêne : compris de tous (Uriel, 28/09). On salue à volonté : chaque
  *            toucher fait s'envoler un petit cœur, pour qu'une rafale devienne une armée. Sous le
- *            titre, le filtre Lieux · Gens · Énigmes (Uriel, 11/10).
+ *            titre, le filtre Lieux · Gens · Énigmes (Uriel, 11/10). Les souvenirs (« J'y suis
+ *            allé », mig 531) : « Marie ajoute 12 souvenirs », avec leurs photos (maquette 649:2092).
  */
 import { Link } from 'react-router'
 import cheminArrivee from '@/assets/ui/chemin-arrivee.svg'
@@ -27,6 +28,7 @@ import { useSaluer } from '../hooks/useSaluer'
 import { filtrerChemins } from '../lib/familles'
 import { FiltreDesChemins } from './FiltreDesChemins'
 import { ilYA } from '@/shared/lib/ilYA'
+import { aLaTaille } from '@/shared/lib/image'
 import { BilleType } from '@/shared/ui/BilleType'
 import { useEnvols } from '@/shared/hooks/useEnvols'
 import { Envols } from '@/shared/ui/Envols'
@@ -42,6 +44,7 @@ const ICONES = {
   fondation: compagnieIcone,
   adhesion: compagnieIcone,
   enigme: enigmeIcone,
+  souvenir: cheminVisite,
 }
 // Les phrases d'Uriel (01/10).
 const VERBES = {
@@ -54,6 +57,16 @@ const VERBES = {
   fondation: 'a fondé',
   adhesion: 'a rejoint',
   enigme: 'a percé une énigme',
+  souvenir: 'ajoute 1 souvenir',
+}
+
+// Une ligne de souvenirs (531) dit combien ; le lieu ne se nomme que s'il est seul (Uriel, 19/10).
+function verbe(chemin: Chemin): string {
+  if (chemin.type === 'enigme' && chemin.nombre > 1)
+    return `a percé ${String(chemin.nombre)} énigmes`
+  if (chemin.type === 'souvenir' && chemin.nombre > 1)
+    return `ajoute ${String(chemin.nombre)} souvenirs`
+  return VERBES[chemin.type]
 }
 const D_ABORD = 5
 
@@ -92,8 +105,16 @@ export function FilDesChemins({ chemins }: { chemins: Chemin[] }) {
 }
 
 function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) => void }) {
-  const { qui, lieu, compagnie, culture } = chemin
-  const ou = [lieu?.region, ilYA(chemin.quand)].filter(Boolean).join(', ')
+  const { qui, compagnie, culture } = chemin
+  const souvenirs = chemin.type === 'souvenir'
+  // Des souvenirs ne mènent pas à un lieu : un seul se nomme dessous, plusieurs se montrent en photos.
+  const lieu = souvenirs ? null : chemin.lieu
+  const ou = souvenirs
+    ? [chemin.nombre === 1 ? chemin.lieu?.nom : null, ilYA(chemin.quand)]
+        .filter(Boolean)
+        .join(' · ')
+    : [lieu?.region, ilYA(chemin.quand)].filter(Boolean).join(', ')
+  const enPlus = chemin.nombre - chemin.photos.length
   const { envols, lancer, finir } = useEnvols()
   return (
     <li
@@ -116,9 +137,7 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
         <Link className={styles.qui} to={`/accueil/explorateur/${qui.id}`}>
           {qui.nom}
         </Link>{' '}
-        {chemin.type === 'enigme' && chemin.nombre > 1
-          ? `a percé ${String(chemin.nombre)} énigmes`
-          : VERBES[chemin.type]}
+        {verbe(chemin)}
         {culture && (
           <>
             {/* La culture, jamais la question ni la réponse (pas de spoiler) ; elle mène à « Les énigmes ». */}
@@ -146,6 +165,14 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
           </>
         )}
         <span className={styles.ou}>{ou}</span>
+        {souvenirs && chemin.nombre > 1 && chemin.photos.length > 0 && (
+          <span className={styles.photos}>
+            {chemin.photos.map((url) => (
+              <img key={url} src={aLaTaille(url, 44)} alt="" loading="lazy" />
+            ))}
+            {enPlus > 0 && <span className={styles.enPlus}>+{enPlus}</span>}
+          </span>
+        )}
       </p>
       {chemin.moi ? (
         chemin.saluts > 0 && (

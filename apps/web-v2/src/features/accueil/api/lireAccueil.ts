@@ -59,6 +59,7 @@ export type TypeDeChemin =
   | 'fondation'
   | 'adhesion'
   | 'enigme' // une énigme percée (migration 449)
+  | 'souvenir' // « J'y suis allé », regroupé par personne et par jour (migration 531)
 export type CultureDuChemin = {
   id: string
   nom: string
@@ -79,6 +80,7 @@ export type Chemin = {
   compagnie: { id: string; nom: string; couleur: string } | null // fondation, adhesion, revendication « pour » (438)
   culture: CultureDuChemin | null // une énigme percée : sa culture, jamais sa réponse (449)
   nombre: number // combien ce jour-là (« a percé 3 énigmes », 449)
+  photos: string[] // les photos des lieux déclarés ce jour-là, quatre au plus (531)
   moi: boolean // ma propre ligne : pas de salut possible
   saluts: number
   salue: boolean
@@ -94,6 +96,7 @@ const TYPES: readonly TypeDeChemin[] = [
   'fondation',
   'adhesion',
   'enigme',
+  'souvenir',
 ]
 
 function typeDeChemin(v: unknown): TypeDeChemin {
@@ -182,6 +185,8 @@ function lireChemin(v: unknown): Chemin {
       }
     })(c.culture ?? null),
     nombre: c.nombre === undefined ? 1 : nombre(c.nombre),
+    // Seulement sur une ligne de souvenirs (531) : ailleurs, aucune.
+    photos: ouNull(liste(chaine))(c.photos ?? null) ?? [],
     moi: booleen(c.moi),
     saluts: nombre(c.saluts),
     salue: booleen(c.salue),

@@ -22,6 +22,7 @@ const FAMILLE_DE: Record<TypeDeChemin, Famille> = {
   revendication: 'lieux',
   enrichi: 'lieux',
   modifie: 'lieux',
+  souvenir: 'lieux',
   arrivee: 'gens',
   fondation: 'gens',
   adhesion: 'gens',

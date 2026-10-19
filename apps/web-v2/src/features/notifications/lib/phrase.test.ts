@@ -135,6 +135,15 @@ test('sous une mise à jour (mig 478) : son titre en ocre, entre guillemets', ()
   })
 })
 
+test('« J’y suis allé » sur ton lieu, et un salut sur ses souvenirs (mig 531)', () => {
+  expect(texte({ ...base, type: 'souvenir' })).toBe(
+    'Kelpie a ajouté Château de Jonjeac à ses souvenirs',
+  )
+  expect(texte({ ...base, type: 'salut', lieu: null, evenement: 'souvenir' })).toBe(
+    'Kelpie a salué tes souvenirs',
+  )
+})
+
 test('un salut sur une énigme percée (mig 481)', () => {
   expect(texte({ ...base, type: 'salut', lieu: null, evenement: 'enigme' })).toBe(
     'Kelpie a salué ton énigme percée',

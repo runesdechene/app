@@ -108,6 +108,27 @@
   font-weight: var(--weight-semi);
 }
 
+/* Une ligne de souvenirs (mig 531) : leurs photos en couleur, puis combien d'autres (maquette 649:2092). */
+.photos {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.photos img {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
+.enPlus {
+  color: var(--color-texte-pale);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}
+
 /* La pastille du salut : un cœur et son compteur ; rose quand je salue. */
 .salut {
   position: relative;

@@ -34,6 +34,7 @@ const VISITE = {
   moi: false,
   saluts: 2,
   salue: false,
+  photos: [],
 }
 
 beforeEach(() => {
@@ -189,6 +190,37 @@ test('une énigme percée se dit avec sa culture, jamais sa réponse ; la cultur
   if (!une) throw new Error('ligne absente')
   await userEvent.click(within(une).getByRole('link', { name: 'Romaine' }))
   expect(router.state.location.pathname).toBe('/accueil/enigmes/romaine')
+})
+
+test('les souvenirs : « ajoute N souvenirs » et leurs photos ; un seul se nomme dessous (531)', async () => {
+  api.fetchChemins.mockResolvedValue([
+    {
+      ...VISITE,
+      id: 'souvenir:u7:2026-10-19',
+      type: 'souvenir',
+      nombre: 12,
+      photos: ['https://x/a.webp', 'https://x/b.webp', 'https://x/c.webp', 'https://x/d.webp'],
+      qui: { ...LUNA, id: 'u7', nom: 'Marie' },
+    },
+    {
+      ...VISITE,
+      id: 'souvenir:u8:2026-10-19',
+      type: 'souvenir',
+      nombre: 1,
+      photos: ['https://x/e.webp'],
+      qui: { ...LUNA, id: 'u8', nom: 'Paul' },
+    },
+  ])
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const [douze, un] = within(fil).getAllByRole('listitem')
+  if (!douze || !un) throw new Error('lignes absentes')
+  expect(douze).toHaveTextContent('Marie ajoute 12 souvenirs')
+  expect(douze).toHaveTextContent('+8')
+  expect(douze.querySelectorAll('img[src*="x/"]')).toHaveLength(4)
+  expect(un).toHaveTextContent('Paul ajoute 1 souvenir')
+  expect(un).toHaveTextContent(VISITE.lieu.nom)
+  expect(within(un).queryByRole('link', { name: VISITE.lieu.nom })).toBeNull()
 })
 
 test('on salue la ligne d’un autre ; la sienne ne se salue pas', async () => {
