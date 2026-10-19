@@ -5,5 +5,6 @@
 - `useEnvie.ts` — « Envie d'y aller » : bascule tout de suite, revient si la base refuse.
 - `usePosition.ts` — ma position suivie tant que la fiche est ouverte, ou pourquoi on ne l'a pas.
 - `useVisite.ts` — visiter en GPS ; une réussite relit la fiche et la carte.
+- `useSouvenir.ts` — « J'y suis allé » : le souvenir, puis le mot au carnet s'il y en a un.
 - `useRevendication.ts` — qui est là, mes noms d'expédition, revendiquer.
 - `useSignalerPresence.ts` — la présence, une fois par minute, position déjà autorisée seulement.

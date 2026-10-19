@@ -1,7 +1,7 @@
 /**
  * QUOI     — /<onglet>/lieu/<id> : la fiche dans le cadre de détail, son bouton de visite, la
- *            fenêtre de revendication (après une visite), et les feuilles « Ce lieu » et
- *            « Partager ce lieu ». Un lieu encore inconnu passe d'abord par sa découverte.
+ *            fenêtre de revendication (après une visite), et les feuilles « Ce lieu », « Partager
+ *            ce lieu » et « J'y suis allé ». Un lieu encore inconnu passe d'abord par sa découverte.
  * POURQUOI — la zone Lieu ne connaît pas la coquille : c'est ici qu'elle reçoit le cadre. Fenêtre
  *            et feuilles sont des moments, pas des adresses : un état local, fermé par le voile ou
  *            Échap. Ouvrir une fiche éteint l'onde du lieu s'il était nouveau (migration 469) : noté en
@@ -18,6 +18,7 @@ import { FenetreRevendication } from '@/features/lieu/components/FenetreRevendic
 import { CarnetDuLieu } from '@/features/lieu/components/CarnetDuLieu'
 import { FeuilleCoeurs } from '@/features/lieu/components/FeuilleCoeurs'
 import { FeuilleHistoire } from '@/features/lieu/components/FeuilleHistoire'
+import { FeuilleJySuisAlle } from '@/features/lieu/components/FeuilleJySuisAlle'
 import { FeuilleOptions } from '@/features/lieu/components/FeuilleOptions'
 import { FeuillePartager } from '@/features/lieu/components/FeuillePartager'
 import { FeuilleSignaler } from '@/features/lieu/components/FeuilleSignaler'
@@ -28,7 +29,8 @@ import { oublierNouveau } from '@/features/carte/hooks/useCarteLieux'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
 
-type Ouvert = 'options' | 'partager' | 'revendiquer' | 'coeurs' | 'histoire' | 'signaler' | null
+type Ouvert =
+  'options' | 'partager' | 'revendiquer' | 'coeurs' | 'histoire' | 'signaler' | 'souvenir' | null
 
 // Un lieu = un état neuf : passer d'un lieu à l'autre efface erreurs, galerie et feuilles ouvertes.
 export function RouteLieu() {
@@ -81,6 +83,9 @@ function Lieu({ id }: { id: string }) {
             onVisite={() => {
               setOuvert('revendiquer')
             }}
+            onSouvenir={() => {
+              setOuvert('souvenir')
+            }}
           />
         )}
       />
@@ -103,6 +108,9 @@ function Lieu({ id }: { id: string }) {
       {fiche && ouvert === 'partager' && <FeuillePartager fiche={fiche} onFermer={fermer} />}
       {fiche && ouvert === 'revendiquer' && (
         <FenetreRevendication fiche={fiche} onFermer={fermer} />
+      )}
+      {fiche && ouvert === 'souvenir' && (
+        <FeuilleJySuisAlle id={id} genre={fiche.moi.genre} onFermer={fermer} />
       )}
     </DetailPane>
   )

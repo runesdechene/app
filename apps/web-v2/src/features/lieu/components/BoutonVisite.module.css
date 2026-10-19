@@ -1,6 +1,7 @@
 /*
  * QUOI     — le bouton de visite (maquette 230:128) : rouge et actif quand on peut agir, grisé
- *            quand le refus est écrit dessus, crème une fois visité. Il change d'état en fondu.
+ *            quand le refus est écrit dessus, crème une fois visité (ou déclaré : « J'y suis
+ *            allé »). Il change d'état en fondu.
  */
 .conteneur {
   display: grid;
@@ -43,6 +44,21 @@
   color: var(--color-fiche-ligne);
 }
 
+/* « J'y suis allé » : un lien discret sous le bouton (maquette 649:1614). */
+.lien {
+  justify-self: center;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  background: none;
+  color: var(--color-fiche-ligne);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
 .aide {
   margin: 0;
   color: var(--color-fiche-aide);
@@ -64,7 +80,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bouton {
+  .bouton,
+  .lien {
     animation: none;
     transition: none;
   }

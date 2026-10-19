@@ -11,20 +11,38 @@ vi.mock('../hooks/useVisite', () => ({ useVisite: visite_ }))
 
 const visiter = vi.fn(() => Promise.resolve())
 const onVisite = vi.fn()
+const onSouvenir = vi.fn()
 
 beforeEach(() => {
   visiter.mockClear()
   onVisite.mockClear()
+  onSouvenir.mockClear()
   visite_.mockReturnValue({ visiter, enCours: false, erreur: null })
 })
 
-function afficher({ lat, lng, visiteLe }: { lat: number; lng: number; visiteLe: string | null }) {
-  const fiche = { id: 'a', lat, lng, moi: { visiteLe, envie: false } } as Pick<
-    FicheLieu,
-    'id' | 'lat' | 'lng' | 'moi'
-  >
-  render(<BoutonVisite fiche={fiche} onVisite={onVisite} />)
+function afficher({
+  lat,
+  lng,
+  visiteLe,
+  souvenirLe = null,
+  genre = 'm',
+}: {
+  lat: number
+  lng: number
+  visiteLe: string | null
+  souvenirLe?: string | null
+  genre?: 'm' | 'f'
+}) {
+  const fiche: Pick<FicheLieu, 'id' | 'lat' | 'lng' | 'moi'> = {
+    id: 'a',
+    lat,
+    lng,
+    moi: { visiteLe, souvenirLe, envie: false, decouvert: true, genre },
+  }
+  render(<BoutonVisite fiche={fiche} onVisite={onVisite} onSouvenir={onSouvenir} />)
 }
+
+const loin = { lat: 47.465, lng: 6 }
 
 test.each([
   ['inconnue', null, 'Me localiser pour visiter', true],
@@ -71,6 +89,33 @@ test('position refusée : l’aide pour l’autoriser est écrite', () => {
   expect(
     screen.getByText('Autorise la localisation dans les réglages du navigateur pour visiter.'),
   ).toBeInTheDocument()
+})
+
+test('jamais visité et trop loin : « J’y suis allé » ouvre la feuille du souvenir', async () => {
+  position_.mockReturnValue({ position: loin, demander: vi.fn() })
+  afficher({ lat: 45, lng: 6, visiteLe: null })
+  await userEvent.click(screen.getByRole('button', { name: 'J’y suis allé' }))
+  expect(onSouvenir).toHaveBeenCalled()
+})
+
+test('le lien s’accorde au genre choisi, et ne s’offre plus à un lieu déjà visité', () => {
+  position_.mockReturnValue({ position: loin, demander: vi.fn() })
+  afficher({ lat: 45, lng: 6, visiteLe: null, genre: 'f' })
+  expect(screen.getByRole('button', { name: 'J’y suis allée' })).toBeInTheDocument()
+  afficher({ lat: 45, lng: 6, visiteLe: '2026-08-03T10:00:00Z' })
+  expect(screen.queryByRole('button', { name: 'J’y suis allé' })).toBeNull()
+})
+
+test('un souvenir : loin le bouton rappelle le mois, sur place on visite (jamais Revendiquer)', () => {
+  position_.mockReturnValue({ position: loin, demander: vi.fn() })
+  afficher({ lat: 45, lng: 6, visiteLe: '2019-08-01T10:00:00Z', souvenirLe: '2019-08-01' })
+  expect(
+    screen.getByRole('button', { name: '✓ J’y suis allé en août 2019 · 274 km' }),
+  ).toBeDisabled()
+  position_.mockReturnValue({ position: { lat: 45.0009, lng: 6 }, demander: vi.fn() })
+  afficher({ lat: 45, lng: 6, visiteLe: '2019-08-01T10:00:00Z', souvenirLe: '2019-08-01' })
+  expect(screen.getByRole('button', { name: 'Marquer ma visite (GPS)' })).toBeEnabled()
+  expect(screen.queryByRole('button', { name: 'Revendiquer' })).toBeNull()
 })
 
 test('« Me localiser pour visiter » demande la position', async () => {

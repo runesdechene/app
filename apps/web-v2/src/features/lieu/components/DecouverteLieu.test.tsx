@@ -38,7 +38,7 @@ const FICHE: Pick<FicheLieu, 'id' | 'nom' | 'photos' | 'type' | 'moi'> = {
   nom: 'Château de Jonjeac',
   photos: [{ url: 'photo.jpg', vignette: 'v.jpg' }],
   type: { nom: 'Château et fortins', icone: null, couleur: null },
-  moi: { visiteLe: null, envie: false, decouvert: false },
+  moi: { visiteLe: null, souvenirLe: null, envie: false, decouvert: false, genre: 'm' },
 }
 
 const PRIX = { max: 10, prochainDans: null, parPoint: 3600, gratuitKm: 80 }

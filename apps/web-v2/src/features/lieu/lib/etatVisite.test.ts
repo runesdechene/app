@@ -15,6 +15,17 @@ test('jamais visité : à portée on visite, loin le bouton dit la distance', ()
   expect(etatVisite(loin, lieu, null)).toEqual({ kind: 'tropLoin', distance: '274 km' })
 })
 
+test('un souvenir : loin le bouton rappelle le mois, de retour sur place on visite', () => {
+  expect(etatVisite(loin, lieu, '2019-08-01T10:00:00Z', '2019-08-01')).toEqual({
+    kind: 'souvenir',
+    mois: 'août 2019',
+    distance: '274 km',
+  })
+  expect(etatVisite(pres, lieu, '2019-08-01T10:00:00Z', '2019-08-01')).toEqual({
+    kind: 'visiter',
+  })
+})
+
 test('déjà visité : de retour on revendique, loin on rappelle la visite', () => {
   expect(etatVisite(pres, lieu, '2026-08-03T10:00:00Z')).toEqual({ kind: 'revendiquer' })
   expect(etatVisite(loin, lieu, '2026-08-03T10:00:00Z')).toEqual({

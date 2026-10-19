@@ -33,6 +33,30 @@ test('une fiche complète se lit', () => {
   })
 })
 
+test('un souvenir (mig 531) se lit avec son mois ; une visite GPS n’en a pas', () => {
+  const souvenir = {
+    ...COMPLET,
+    moi: {
+      visiteLe: '2019-08-01T10:00:00Z',
+      aDistance: true,
+      souvenirLe: '2019-08-01',
+      genre: 'f',
+      envie: false,
+    },
+  }
+  expect(lireFiche(souvenir)?.moi).toMatchObject({ souvenirLe: '2019-08-01', genre: 'f' })
+  const visite = {
+    ...COMPLET,
+    moi: {
+      visiteLe: '2026-10-19T10:00:00Z',
+      aDistance: false,
+      souvenirLe: '2019-08-01',
+      envie: false,
+    },
+  }
+  expect(lireFiche(visite)?.moi).toMatchObject({ souvenirLe: null, genre: 'm' })
+})
+
 test('la fiche lit ses rubriques, son bivouac et qui a écrit le récit', () => {
   const f = lireFiche(COMPLET)
   expect(f?.rubriques).toEqual({ acces: 'Par le sentier', quand: null, bonASavoir: null })

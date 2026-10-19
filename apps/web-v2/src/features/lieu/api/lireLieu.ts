@@ -44,7 +44,15 @@ export type FicheLieu = {
   ajoutADistance: boolean
   // Qui a écrit le récit, par ordre d'arrivée (mig 415) : « Récit partagé de… ».
   recitPar: Personne[]
-  moi: { visiteLe: string | null; envie: boolean; decouvert: boolean }
+  // souvenirLe : le mois d'un « J'y suis allé » tant qu'il n'est qu'un souvenir (mig 531) ;
+  // genre : pour écrire « allé » ou « allée ».
+  moi: {
+    visiteLe: string | null
+    souvenirLe: string | null
+    envie: boolean
+    decouvert: boolean
+    genre: 'm' | 'f'
+  }
 }
 // Ce que rapporte une découverte : son rang, l'expérience gagnée, et la jauge du niveau (0 à 1).
 export type Recompense = {
@@ -115,9 +123,11 @@ export function lireFiche(json: unknown): FicheLieu | null {
     recitPar: liste(lirePersonne)(f.recitPar),
     moi: {
       visiteLe: ouNull(chaine)(moi.visiteLe),
+      souvenirLe: moi.aDistance === true ? ouNull(chaine)(moi.souvenirLe) : null,
       envie: booleen(moi.envie),
       // Absent tant que la base ne le rend pas (migration 367) : la fiche s'ouvre comme avant.
       decouvert: typeof moi.decouvert === 'boolean' ? moi.decouvert : true,
+      genre: moi.genre === 'f' ? 'f' : 'm',
     },
   }
 }
@@ -131,10 +141,6 @@ export function lireRecompense(json: unknown): Recompense {
     avant: nombre(r.avant),
     apres: nombre(r.apres),
   }
-}
-
-export function lireExplorateurs(json: unknown) {
-  return liste((v) => ({ ...lirePersonne(v), visiteLe: chaine(objet(v).visiteLe) }))(json)
 }
 
 export function lireCompagnons(json: unknown): Compagnon[] {

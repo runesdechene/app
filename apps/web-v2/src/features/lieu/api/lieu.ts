@@ -14,7 +14,6 @@ import {
   lireCoutDecouverte,
   lireHistoire,
   lireVersionDetail,
-  lireExplorateurs,
   lireFiche,
   lireRecompense,
 } from './lireLieu'
@@ -23,12 +22,6 @@ export async function fetchFiche(id: string) {
   const { data, error } = await supabase.rpc('fiche_lieu', { p_id: id })
   if (error) throw error
   return lireFiche(data)
-}
-
-export async function fetchExplorateurs(id: string) {
-  const { data, error } = await supabase.rpc('explorateurs_du_lieu', { p_id: id })
-  if (error) throw error
-  return lireExplorateurs(data)
 }
 
 export async function basculerEnvie(id: string) {
@@ -59,6 +52,16 @@ export async function visiterLieu(id: string, lat: number, lng: number) {
   const { data, error } = await supabase.rpc('visiter_lieu', { p_id: id, p_lat: lat, p_lng: lng })
   if (error) throw error
   return chaine(objet(data).visiteLe)
+}
+
+// « J'y suis allé » (mig 531) : un lieu visité avant Explore, au mois près.
+export async function declarerSouvenir(id: string, annee: number, mois: number) {
+  const { error } = await supabase.rpc('declarer_souvenir', {
+    p_id: id,
+    p_annee: annee,
+    p_mois: mois,
+  })
+  if (error) throw error
 }
 
 export async function signalerPresence(lat: number, lng: number) {

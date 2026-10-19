@@ -1,0 +1,123 @@
+/*
+ * QUOI     — la feuille « J'y suis allé » (maquette 649:1678) : titre Bebas, champs bordés au style
+ *            de « Signaler ce lieu », le mois et l'année côte à côte, la photo en pointillé.
+ */
+.titre {
+  margin: 0 0 var(--space-2);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+}
+
+.consigne,
+.etiquette,
+.aide,
+.refus {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-corps);
+  line-height: var(--dense-leading);
+}
+
+.consigne {
+  margin-bottom: var(--space-4);
+  color: var(--color-texte-doux);
+  font-size: var(--sous-titre-size);
+}
+
+.etiquette {
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.aide {
+  margin-top: calc(-1 * var(--space-2));
+  color: var(--color-fiche-aide);
+  font-size: var(--legende-size);
+}
+
+.refus {
+  color: var(--color-accent);
+  font-size: var(--sous-titre-size);
+}
+
+.quand {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-3);
+}
+
+.champ {
+  width: 100%;
+  margin-bottom: var(--space-3);
+  padding: var(--space-3) 14px;
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-feuille);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+textarea.champ {
+  resize: vertical;
+}
+
+.photo {
+  display: block;
+  margin-bottom: var(--space-3);
+  padding: var(--space-4) 14px;
+  border: 1px dashed var(--color-sable);
+  border-radius: var(--radius-carte);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  cursor: pointer;
+  transition: border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.photo:hover {
+  border-color: var(--color-fiche-aide);
+}
+
+.apercu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.apercu img {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
+.retirer {
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  background: none;
+  color: var(--color-fiche-ligne);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apercu {
+    animation: none;
+  }
+
+  .photo {
+    transition: none;
+  }
+}
