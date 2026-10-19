@@ -28,6 +28,7 @@ const T = (id: string, quand: string, o: Partial<Tampon> = {}): Tampon => ({
   departement: 'Alpes-Maritimes',
   pays: 'France',
   quand,
+  aDistance: false,
   ...o,
 })
 

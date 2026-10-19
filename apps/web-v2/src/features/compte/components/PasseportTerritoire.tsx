@@ -1,7 +1,9 @@
 /**
  * QUOI     — un territoire en détail (maquette « Passeport — 3 », 442:272) : le résumé, ses
  *            natures, puis par mois les cartes « Lieux ajoutés » empilées en pleine largeur, le
- *            tampon de la nature posé sur le coin, la date du jour en pastille (pour soi).
+ *            tampon de la nature posé sur le coin, la date du jour en pastille (pour soi). Un
+ *            souvenir (« J'y suis allé », mig 531) : tampon gris barré d'« À distance », « Souvenir
+ *            · août 2019 » en pastille, la photo toujours en couleur (maquette 649:2020).
  * POURQUOI — la photo redevient l'héroïne (Uriel, 07/10), le tampon reste en coin ; les cartes
  *            s'empilent plutôt que de défiler (changement validé le 07/10). Les deux mois
  *            les plus récents sont ouverts, les autres repliés : la page reste courte.
@@ -150,11 +152,18 @@ function Carte({
       position={null}
       avecAuteur={false}
       pleineLargeur
-      pastille={auJour ? dateCourte(tampon.quand, true) : undefined}
+      pastille={
+        tampon.aDistance
+          ? `Souvenir · ${moisLong(tampon.quand.slice(0, 7))}`
+          : auJour
+            ? dateCourte(tampon.quand, true)
+            : undefined
+      }
       coin={
         nature ? (
-          <span aria-hidden="true">
+          <span aria-hidden="true" className={tampon.aDistance ? styles.aDistance : undefined}>
             <TamponNature nature={nature} compte={1} encre="fort" taille="coin" />
+            {tampon.aDistance && <span className={styles.bandeau}>À distance</span>}
           </span>
         ) : undefined
       }

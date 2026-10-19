@@ -15,6 +15,7 @@ const TAMPON = {
   departement: 'Alpes-Maritimes',
   pays: 'France',
   quand: '2026-10-02',
+  aDistance: false,
 }
 
 test('un tampon de nature visitée : son compte et son encre', () => {

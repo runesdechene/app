@@ -114,3 +114,33 @@
     transition: none;
   }
 }
+
+/* Un souvenir (mig 531) : le tampon passe au gris, barré d'un bandeau « À distance » (maquette 649:2020). */
+.aDistance {
+  position: relative;
+  display: inline-grid;
+}
+
+.aDistance > :first-child {
+  filter: grayscale(1);
+}
+
+.bandeau {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  padding: 1px 5px;
+  border: 1px solid var(--color-texte-pale);
+  border-radius: 3px;
+  background: var(--color-feuille);
+  color: var(--color-texte-doux);
+  font-family: var(--font-condensee);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+  translate: -50% 0;
+  rotate: -8deg;
+}

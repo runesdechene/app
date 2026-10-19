@@ -16,6 +16,8 @@ export type Tampon = {
   departement: string | null
   pays: string | null
   quand: string
+  // Un souvenir (« J'y suis allé », mig 531) : un tampon comme un autre, gris dans le détail.
+  aDistance: boolean
 }
 export type Passeport = { auJour: boolean; natures: Nature[]; tampons: Tampon[] }
 
@@ -44,6 +46,7 @@ function tampon(v: unknown): Tampon | null {
       departement: ouNull(chaine)(o.departement),
       pays: ouNull(chaine)(o.pays),
       quand,
+      aDistance: o.aDistance === true,
     }
   } catch {
     return null

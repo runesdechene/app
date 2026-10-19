@@ -15,6 +15,7 @@ const TAMPON = {
   departement: 'Alpes-Maritimes',
   pays: 'France',
   quand: '2026-10-02',
+  aDistance: false,
 }
 
 test('un passeport complet', () => {
@@ -23,6 +24,13 @@ test('un passeport complet', () => {
     natures: [NATURE],
     tampons: [TAMPON],
   })
+})
+
+test('un souvenir (mig 531) se lit ; absent, ce n’en est pas un', () => {
+  const souvenir = { ...TAMPON, aDistance: true }
+  const { aDistance: _, ...ancien } = TAMPON
+  const p = lirePasseport({ auJour: true, natures: [], tampons: [souvenir, ancien] })
+  expect(p?.tampons.map((t) => t.aDistance)).toEqual([true, false])
 })
 
 test('les champs facultatifs à null', () => {
