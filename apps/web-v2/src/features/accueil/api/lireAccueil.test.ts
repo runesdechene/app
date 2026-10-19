@@ -209,21 +209,22 @@ test('une énigme percée se lit avec sa culture et le nombre du jour (migration
   expect(enigme?.nombre).toBe(3)
 })
 
-test('une ligne de souvenirs se lit avec son nombre et ses photos ; les autres n’en ont pas (531)', () => {
+test('une ligne de souvenirs se lit avec son nombre et ses photos ; les autres n’en ont pas (533)', () => {
+  const a = { lieu: 'l1', nom: 'Carnac', url: 'https://x/a.webp' }
   const [souvenirs, visite] = lireChemins([
     {
       ...CHEMIN,
       id: 'souvenir:u1:2026-10-19',
       type: 'souvenir',
       nombre: 12,
-      photos: ['https://x/a.webp', 'https://x/b.webp'],
+      vignettes: [a],
     },
-    { ...CHEMIN, photos: null },
+    { ...CHEMIN, vignettes: null },
   ])
   expect(souvenirs).toMatchObject({ type: 'souvenir', nombre: 12 })
-  expect(souvenirs?.photos).toEqual(['https://x/a.webp', 'https://x/b.webp'])
-  expect(visite?.photos).toEqual([])
-  expect(lireChemins([CHEMIN])[0]?.photos).toEqual([])
+  expect(souvenirs?.vignettes).toEqual([a])
+  expect(visite?.vignettes).toEqual([])
+  expect(lireChemins([CHEMIN])[0]?.vignettes).toEqual([])
 })
 
 test('avant la migration 449, une ligne n’a ni culture ni nombre : aucune, et une', () => {

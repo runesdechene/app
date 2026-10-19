@@ -116,6 +116,10 @@
   margin-top: var(--space-2);
 }
 
+.photos a {
+  display: flex; /* pas d'interligne sous l'image */
+}
+
 .photos img {
   width: 44px;
   height: 44px;

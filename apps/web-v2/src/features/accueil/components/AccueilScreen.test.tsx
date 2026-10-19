@@ -34,7 +34,7 @@ const VISITE = {
   moi: false,
   saluts: 2,
   salue: false,
-  photos: [],
+  vignettes: [],
 }
 
 beforeEach(() => {
@@ -199,7 +199,11 @@ test('les souvenirs : « ajoute N souvenirs » et leurs photos ; un seul se nomm
       id: 'souvenir:u7:2026-10-19',
       type: 'souvenir',
       nombre: 12,
-      photos: ['https://x/a.webp', 'https://x/b.webp', 'https://x/c.webp', 'https://x/d.webp'],
+      vignettes: ['a', 'b', 'c', 'd'].map((l) => ({
+        lieu: l,
+        nom: `Lieu ${l}`,
+        url: `https://x/${l}.webp`,
+      })),
       qui: { ...LUNA, id: 'u7', nom: 'Marie' },
     },
     {
@@ -207,11 +211,11 @@ test('les souvenirs : « ajoute N souvenirs » et leurs photos ; un seul se nomm
       id: 'souvenir:u8:2026-10-19',
       type: 'souvenir',
       nombre: 1,
-      photos: ['https://x/e.webp'],
+      vignettes: [{ lieu: 'e', nom: 'Lieu e', url: 'https://x/e.webp' }],
       qui: { ...LUNA, id: 'u8', nom: 'Paul' },
     },
   ])
-  monter()
+  const router = monter()
   const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
   const [douze, un] = within(fil).getAllByRole('listitem')
   if (!douze || !un) throw new Error('lignes absentes')
@@ -221,6 +225,9 @@ test('les souvenirs : « ajoute N souvenirs » et leurs photos ; un seul se nomm
   expect(un).toHaveTextContent('Paul ajoute 1 souvenir')
   expect(un).toHaveTextContent(VISITE.lieu.nom)
   expect(within(un).queryByRole('link', { name: VISITE.lieu.nom })).toBeNull()
+  // 533 : chaque photo ouvre la fiche de son lieu.
+  await userEvent.click(within(douze).getByRole('link', { name: 'Lieu b' }))
+  expect(router.state.location.pathname).toBe('/accueil/lieu/b')
 })
 
 test('on salue la ligne d’un autre ; la sienne ne se salue pas', async () => {

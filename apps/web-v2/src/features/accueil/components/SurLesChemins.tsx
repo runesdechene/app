@@ -107,14 +107,14 @@ export function FilDesChemins({ chemins }: { chemins: Chemin[] }) {
 function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) => void }) {
   const { qui, compagnie, culture } = chemin
   const souvenirs = chemin.type === 'souvenir'
-  // Des souvenirs ne mènent pas à un lieu : un seul se nomme dessous, plusieurs se montrent en photos.
+  // Des souvenirs : un seul se nomme dessous, plusieurs se montrent en photos, chacune vers sa fiche.
   const lieu = souvenirs ? null : chemin.lieu
   const ou = souvenirs
     ? [chemin.nombre === 1 ? chemin.lieu?.nom : null, ilYA(chemin.quand)]
         .filter(Boolean)
         .join(' · ')
     : [lieu?.region, ilYA(chemin.quand)].filter(Boolean).join(', ')
-  const enPlus = chemin.nombre - chemin.photos.length
+  const enPlus = chemin.nombre - chemin.vignettes.length
   const { envols, lancer, finir } = useEnvols()
   return (
     <li
@@ -165,10 +165,12 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
           </>
         )}
         <span className={styles.ou}>{ou}</span>
-        {souvenirs && chemin.nombre > 1 && chemin.photos.length > 0 && (
+        {souvenirs && chemin.nombre > 1 && chemin.vignettes.length > 0 && (
           <span className={styles.photos}>
-            {chemin.photos.map((url) => (
-              <img key={url} src={aLaTaille(url, 44)} alt="" loading="lazy" />
+            {chemin.vignettes.map(({ lieu, nom, url }) => (
+              <Link key={lieu} to={`/accueil/lieu/${lieu}`}>
+                <img src={aLaTaille(url, 44)} alt={nom} loading="lazy" />
+              </Link>
             ))}
             {enPlus > 0 && <span className={styles.enPlus}>+{enPlus}</span>}
           </span>
