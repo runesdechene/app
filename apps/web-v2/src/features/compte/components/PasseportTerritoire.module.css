@@ -137,8 +137,8 @@
   font-family: var(--font-condensee);
   font-size: var(--micro-size);
   font-weight: var(--weight-gras);
-  letter-spacing: 0.08em;
-  line-height: 1.2;
+  letter-spacing: var(--pilule-tracking);
+  line-height: var(--titre-leading);
   text-transform: uppercase;
   white-space: nowrap;
   translate: -50% 0;
