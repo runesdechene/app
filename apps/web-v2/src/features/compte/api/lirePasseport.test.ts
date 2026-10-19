@@ -28,8 +28,8 @@ test('un passeport complet', () => {
 
 test('un souvenir (mig 531) se lit ; absent, ce n’en est pas un', () => {
   const souvenir = { ...TAMPON, aDistance: true }
-  const { aDistance: _, ...ancien } = TAMPON
-  const p = lirePasseport({ auJour: true, natures: [], tampons: [souvenir, ancien] })
+  const davant = { ...TAMPON, aDistance: undefined } // une base d'avant la 531
+  const p = lirePasseport({ auJour: true, natures: [], tampons: [souvenir, davant] })
   expect(p?.tampons.map((t) => t.aDistance)).toEqual([true, false])
 })
 
