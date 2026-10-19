@@ -192,7 +192,7 @@ test('une énigme percée se dit avec sa culture, jamais sa réponse ; la cultur
   expect(router.state.location.pathname).toBe('/accueil/enigmes/romaine')
 })
 
-test('les souvenirs : « ajoute N souvenirs » et leurs photos ; un seul se nomme dessous (531)', async () => {
+test('les souvenirs : « se souvient avoir été sur N lieux » et leurs photos ; un seul se nomme dessous (531)', async () => {
   api.fetchChemins.mockResolvedValue([
     {
       ...VISITE,
@@ -219,10 +219,10 @@ test('les souvenirs : « ajoute N souvenirs » et leurs photos ; un seul se nomm
   const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
   const [douze, un] = within(fil).getAllByRole('listitem')
   if (!douze || !un) throw new Error('lignes absentes')
-  expect(douze).toHaveTextContent('Marie ajoute 12 souvenirs')
+  expect(douze).toHaveTextContent('Marie se souvient avoir été sur 12 lieux')
   expect(douze).toHaveTextContent('+8')
   expect(douze.querySelectorAll('img[src*="x/"]')).toHaveLength(4)
-  expect(un).toHaveTextContent('Paul ajoute 1 souvenir')
+  expect(un).toHaveTextContent('Paul se souvient avoir été sur 1 lieu')
   expect(un).toHaveTextContent(VISITE.lieu.nom)
   expect(within(un).queryByRole('link', { name: VISITE.lieu.nom })).toBeNull()
   // 533 : chaque photo ouvre la fiche de son lieu.

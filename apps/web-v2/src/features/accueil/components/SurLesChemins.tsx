@@ -9,7 +9,7 @@
  *            que la feuille de chêne : compris de tous (Uriel, 28/09). On salue à volonté : chaque
  *            toucher fait s'envoler un petit cœur, pour qu'une rafale devienne une armée. Sous le
  *            titre, le filtre Lieux · Gens · Énigmes (Uriel, 11/10). Les souvenirs (« J'y suis
- *            allé », mig 531) : « Marie ajoute 12 souvenirs », avec leurs photos (maquette 649:2092).
+ *            allé », mig 531) : « Marie se souvient avoir été sur 12 lieux », avec leurs photos (maquette 649:2092).
  */
 import { Link } from 'react-router'
 import cheminArrivee from '@/assets/ui/chemin-arrivee.svg'
@@ -57,7 +57,7 @@ const VERBES = {
   fondation: 'a fondé',
   adhesion: 'a rejoint',
   enigme: 'a percé une énigme',
-  souvenir: 'ajoute 1 souvenir',
+  souvenir: 'se souvient avoir été sur 1 lieu', // Uriel, 19/10 : « ajoute » se lisait comme un ajout de lieu
 }
 
 // Une ligne de souvenirs (531) dit combien ; le lieu ne se nomme que s'il est seul (Uriel, 19/10).
@@ -65,7 +65,7 @@ function verbe(chemin: Chemin): string {
   if (chemin.type === 'enigme' && chemin.nombre > 1)
     return `a percé ${String(chemin.nombre)} énigmes`
   if (chemin.type === 'souvenir' && chemin.nombre > 1)
-    return `ajoute ${String(chemin.nombre)} souvenirs`
+    return `se souvient avoir été sur ${String(chemin.nombre)} lieux`
   return VERBES[chemin.type]
 }
 const D_ABORD = 5
