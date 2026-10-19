@@ -106,6 +106,14 @@ test('le lien s’accorde au genre choisi, et ne s’offre plus à un lieu déj�
   expect(screen.queryByRole('button', { name: 'J’y suis allé' })).toBeNull()
 })
 
+test('position refusée : le lien seulement sur un lieu jamais visité', () => {
+  position_.mockReturnValue({ position: 'refusee', demander: vi.fn() })
+  afficher({ lat: 45, lng: 6, visiteLe: null })
+  expect(screen.getByRole('button', { name: 'J’y suis allé' })).toBeInTheDocument()
+  afficher({ lat: 45, lng: 6, visiteLe: '2019-08-01T10:00:00Z', souvenirLe: '2019-08-01' })
+  expect(screen.getAllByRole('button', { name: 'J’y suis allé' })).toHaveLength(1)
+})
+
 test('un souvenir : loin le bouton rappelle le mois, sur place on visite (jamais Revendiquer)', () => {
   position_.mockReturnValue({ position: loin, demander: vi.fn() })
   afficher({ lat: 45, lng: 6, visiteLe: '2019-08-01T10:00:00Z', souvenirLe: '2019-08-01' })

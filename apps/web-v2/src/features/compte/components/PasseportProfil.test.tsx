@@ -26,6 +26,7 @@ const T = (id: string, o: Record<string, unknown> = {}) => ({
   pays: 'France',
   quand: '2026-10-01',
   aDistance: false,
+  auMois: false,
   ...o,
 })
 

@@ -23,6 +23,7 @@ const T = (id: string, quand: string, o: Record<string, unknown> = {}) => ({
   pays: 'France',
   quand,
   aDistance: false,
+  auMois: false,
   ...o,
 })
 
@@ -134,6 +135,17 @@ test('page 3 : un souvenir garde sa place, son mois et un tampon « À distance 
   await userEvent.click(await screen.findByRole('button', { name: /août 2019 · 1 tampon/i }))
   expect(screen.getByText('Souvenir · août 2019')).toBeInTheDocument()
   expect(screen.getByText('À distance')).toBeInTheDocument()
+})
+
+test('page 3 : un souvenir devenu visite garde son mois, sans jour inventé (532)', async () => {
+  api.fetchPasseport.mockResolvedValue({
+    ...PASSEPORT,
+    tampons: [...PASSEPORT.tampons, T('s', '2019-08-01', { auMois: true })],
+  })
+  afficher('/compte/explorateur/u1/passeport/Alpes-Maritimes')
+  await userEvent.click(await screen.findByRole('button', { name: /août 2019 · 1 tampon/i }))
+  expect(screen.getByText('août 2019')).toBeInTheDocument()
+  expect(screen.queryByText('À distance')).toBeNull()
 })
 
 test('page 3 : Ailleurs et nom avec apostrophe se rouvrent depuis l’adresse', async () => {

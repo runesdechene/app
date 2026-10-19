@@ -29,6 +29,7 @@ const T = (id: string, quand: string, o: Partial<Tampon> = {}): Tampon => ({
   pays: 'France',
   quand,
   aDistance: false,
+  auMois: false,
   ...o,
 })
 

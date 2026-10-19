@@ -155,9 +155,11 @@ function Carte({
       pastille={
         tampon.aDistance
           ? `Souvenir · ${moisLong(tampon.quand.slice(0, 7))}`
-          : auJour
-            ? dateCourte(tampon.quand, true)
-            : undefined
+          : tampon.auMois // un souvenir devenu visite : sa date d'origine n'a pas de jour
+            ? moisLong(tampon.quand.slice(0, 7))
+            : auJour
+              ? dateCourte(tampon.quand, true)
+              : undefined
       }
       coin={
         nature ? (

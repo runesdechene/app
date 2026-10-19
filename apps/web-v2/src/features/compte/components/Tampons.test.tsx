@@ -16,6 +16,7 @@ const TAMPON = {
   pays: 'France',
   quand: '2026-10-02',
   aDistance: false,
+  auMois: false,
 }
 
 test('un tampon de nature visitée : son compte et son encre', () => {

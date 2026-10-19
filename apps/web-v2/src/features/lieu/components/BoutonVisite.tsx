@@ -57,8 +57,11 @@ export function BoutonVisite({
   const { visiter, enCours, erreur } = useVisite(fiche.id)
   const etat = etatVisite(position, fiche, fiche.moi.visiteLe, fiche.moi.souvenirLe)
   const actif = etat.kind === 'localiser' || etat.kind === 'visiter' || etat.kind === 'revendiquer'
-  // Jamais visité, et pas de visite possible d'ici : on peut dire qu'on y est déjà allé.
-  const souvenirPossible = etat.kind === 'tropLoin' || etat.kind === 'refusee'
+  // Jamais visité, et pas de visite possible d'ici (trop loin, ou sans position) : on peut dire
+  // qu'on y est déjà allé. Sans position, l'état ne dit pas si le lieu est visité : on le vérifie.
+  const souvenirPossible =
+    fiche.moi.visiteLe === null &&
+    (etat.kind === 'tropLoin' || etat.kind === 'refusee' || etat.kind === 'localiser')
 
   function toucher() {
     if (etat.kind === 'localiser') {

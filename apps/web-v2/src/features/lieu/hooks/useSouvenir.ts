@@ -3,7 +3,8 @@
  *            mot (et sa photo) au Carnet de passage.
  * POURQUOI — le souvenir compte d'abord : si le mot ne part pas, le souvenir reste noté et on le
  *            dit (`motPerdu`), au lieu de tout refuser. Une réussite relit la fiche (et son
- *            carnet), la carte, les profils (le passeport) et « Sur les chemins ».
+ *            carnet), la carte, les profils (le passeport), « Sur les chemins » et « À explorer
+ *            près de toi ».
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { PhotoAEnvoyer } from '@/shared/lib/photo'
@@ -40,6 +41,7 @@ export function useSouvenir(id: string) {
       void queryClient.invalidateQueries({ queryKey: ['carte', 'lieux'] })
       void queryClient.invalidateQueries({ queryKey: ['explorateur'] })
       void queryClient.invalidateQueries({ queryKey: cheminsKey })
+      void queryClient.invalidateQueries({ queryKey: ['accueil', 'pres'] }) // il n'est plus « à explorer »
     },
   })
   return {
