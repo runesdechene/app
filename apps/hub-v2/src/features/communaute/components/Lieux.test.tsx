@@ -36,7 +36,7 @@ test('par défaut : à modérer', async () => {
 test('masquer un lieu rafraîchit la liste et la pastille', async () => {
   api.lireLieux.mockResolvedValueOnce({ total: 1, rows: [ligne] }).mockResolvedValue({ total: 0, rows: [] })
   api.lireNatures.mockResolvedValue([{ id: 'dolmens', title: 'Dolmens et mégalithes', color: '#fff', background: '#a94842' }])
-  api.lireLieu.mockResolvedValue({ ...ligne, text: 'Un dolmen.', images: [], visit_count: 0, discovered_count: 2, author_places_count: 31 })
+  api.lireLieu.mockResolvedValue({ ...ligne, text: 'Un dolmen.', photos: [], visit_count: 0, discovered_count: 2, author_places_count: 31 })
   api.masquerLieu.mockResolvedValue(undefined)
   const client = monter('/communaute/lieux/p1')
   const invalider = vi.spyOn(client, 'invalidateQueries')
@@ -54,7 +54,7 @@ test('« Retirer » une photo demande confirmation, seul « Confirmer » la reti
   api.lireLieux.mockResolvedValue({ total: 1, rows: [ligne] })
   api.lireNatures.mockResolvedValue([])
   api.lireLieu.mockResolvedValue({ ...ligne, text: 'Un dolmen.', discovered_count: 2, author_places_count: 31,
-    images: [{ id: 'i1', url: 'https://x/1.webp', thumb: null }, { id: 'i2', url: 'https://x/2.webp', thumb: null }] })
+    photos: [{ url: 'https://x/1.webp', vignette: 'https://x/1.webp' }, { url: 'https://x/2.webp', vignette: 'https://x/2.webp' }] })
   api.retirerPhoto.mockResolvedValue(undefined)
   monter('/communaute/lieux/p1')
   const retirer = await screen.findAllByRole('button', { name: 'Retirer' })
@@ -63,13 +63,13 @@ test('« Retirer » une photo demande confirmation, seul « Confirmer » la reti
   expect(api.retirerPhoto).not.toHaveBeenCalled()
   await userEvent.click((await screen.findAllByRole('button', { name: 'Retirer' }))[1] as HTMLElement)
   await userEvent.click(screen.getByRole('button', { name: 'Confirmer' }))
-  expect(api.retirerPhoto).toHaveBeenCalledWith('p1', 'i2')
+  expect(api.retirerPhoto).toHaveBeenCalledWith('p1', 'https://x/2.webp')
 })
 
 test('un nom vide : pas d’enregistrement', async () => {
   api.lireLieux.mockResolvedValue({ total: 1, rows: [ligne] })
   api.lireNatures.mockResolvedValue([])
-  api.lireLieu.mockResolvedValue({ ...ligne, text: 'Un dolmen.', images: [], discovered_count: 2, author_places_count: 31 })
+  api.lireLieu.mockResolvedValue({ ...ligne, text: 'Un dolmen.', photos: [], discovered_count: 2, author_places_count: 31 })
   monter('/communaute/lieux/p1')
   await userEvent.clear(await screen.findByRole('textbox', { name: 'Nom' }))
   expect(screen.getByText('Le nom ne peut pas être vide.')).toBeInTheDocument()
@@ -87,7 +87,7 @@ test('un lieu inconnu : le tiroir le dit', async () => {
 test('une erreur de la base s’affiche sous son bloc', async () => {
   api.lireLieux.mockResolvedValue({ total: 1, rows: [ligne] })
   api.lireNatures.mockResolvedValue([])
-  api.lireLieu.mockResolvedValue({ ...ligne, text: 'Un dolmen.', images: [], discovered_count: 2, author_places_count: 31 })
+  api.lireLieu.mockResolvedValue({ ...ligne, text: 'Un dolmen.', photos: [], discovered_count: 2, author_places_count: 31 })
   api.verifierLieu.mockRejectedValue(new Error('Réservé à l’équipe'))
   monter('/communaute/lieux/p1')
   await userEvent.click(await screen.findByRole('button', { name: 'Vérifier le lieu' }))

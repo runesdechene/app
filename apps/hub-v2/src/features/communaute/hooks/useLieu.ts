@@ -27,6 +27,6 @@ export function useModeration(id: string) {
     natures: useMutation({ mutationFn: (ids: string[]) => changerNatures(id, ids), onSuccess: rafraichir }),
     verifier: useMutation({ mutationFn: (oui: boolean) => verifierLieu(id, oui), onSuccess: rafraichir }),
     masquer: useMutation({ mutationFn: (oui: boolean) => masquerLieu(id, oui), onSuccess: rafraichir }),
-    photo: useMutation({ mutationFn: (photo: string) => retirerPhoto(id, photo), onSuccess: rafraichir }),
+    photo: useMutation({ mutationFn: (url: string) => retirerPhoto(id, url), onSuccess: rafraichir }),
   }
 }

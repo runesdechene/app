@@ -30,7 +30,7 @@ function monter(adresse = '/communaute/signalements') {
 
 test('la file, le premier choisi, sa raison lisible', async () => {
   sig.lireSignalements.mockResolvedValue([s1])
-  lieux.lireLieu.mockResolvedValue({ id: 'p9', title: 'Source de la Fée', images: [], masked: false })
+  lieux.lireLieu.mockResolvedValue({ id: 'p9', title: 'Source de la Fée', photos: [], masked: false })
   monter()
   expect(await screen.findAllByText('Source de la Fée')).not.toHaveLength(0)
   expect(screen.getAllByText('Lieu privé ou dangereux')).not.toHaveLength(0)
@@ -40,7 +40,7 @@ test('la file, le premier choisi, sa raison lisible', async () => {
 test('« Traité » retire le signalement et fait baisser la pastille', async () => {
   sig.lireSignalements.mockResolvedValue([s1])
   sig.traiterSignalement.mockResolvedValue(undefined)
-  lieux.lireLieu.mockResolvedValue({ id: 'p9', title: 'Source de la Fée', images: [], masked: false })
+  lieux.lireLieu.mockResolvedValue({ id: 'p9', title: 'Source de la Fée', photos: [], masked: false })
   const client = monter()
   const invalider = vi.spyOn(client, 'invalidateQueries')
   await userEvent.click(await screen.findByRole('button', { name: 'Traité' }))
@@ -57,7 +57,7 @@ test('file vide : on le dit', async () => {
 
 test('la sélection est dans l’adresse ; masquer est absent si le lieu l’est déjà', async () => {
   sig.lireSignalements.mockResolvedValue([s1, s2])
-  lieux.lireLieu.mockResolvedValue({ id: 'p3', title: 'Dolmen', images: [], masked: true })
+  lieux.lireLieu.mockResolvedValue({ id: 'p3', title: 'Dolmen', photos: [], masked: true })
   monter('/communaute/signalements?s=42')
   expect(await screen.findByRole('button', { name: 'Traité' })).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Masquer le lieu' })).not.toBeInTheDocument()
@@ -68,7 +68,7 @@ test('la sélection est dans l’adresse ; masquer est absent si le lieu l’est
 test('« Masquer le lieu » masque le lieu du signalement', async () => {
   sig.lireSignalements.mockResolvedValue([s1])
   lieux.masquerLieu.mockResolvedValue(undefined)
-  lieux.lireLieu.mockResolvedValue({ id: 'p9', title: 'Source de la Fée', images: [], masked: false })
+  lieux.lireLieu.mockResolvedValue({ id: 'p9', title: 'Source de la Fée', photos: [], masked: false })
   monter()
   await userEvent.click(await screen.findByRole('button', { name: 'Masquer le lieu' }))
   expect(lieux.masquerLieu).toHaveBeenCalledWith('p9', true)
@@ -83,7 +83,7 @@ test('lecture en échec : le vrai message', async () => {
 test('« Traité » déplace ?s= vers le suivant, puis le retire après le dernier', async () => {
   sig.lireSignalements.mockResolvedValue([s1, s2])
   sig.traiterSignalement.mockResolvedValue(undefined)
-  lieux.lireLieu.mockResolvedValue({ id: 'p9', title: 'x', images: [], masked: false })
+  lieux.lireLieu.mockResolvedValue({ id: 'p9', title: 'x', photos: [], masked: false })
   monter('/communaute/signalements?s=41')
   const traite = await screen.findByRole('button', { name: 'Traité' })
   sig.lireSignalements.mockResolvedValue([s2])

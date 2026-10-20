@@ -1,7 +1,7 @@
 /**
  * QUOI      — les lieux à modérer : la liste (hub_lieux, mig 517), la fiche (mod_get_place) et les
  *             décisions de l'équipe (mod_update_place, mod_set_place_tags, mod_set_verified, mod_set_masked,
- *             mod_retirer_photo — mig 534).
+ *             mod_retirer_photo — migs 534-535).
  * ATTENTION — les mod_* répondent en JSON {error} au lieu de lever : chaque écriture relève cette erreur.
  */
 import { supabase } from '@/shared/supabase/client'
@@ -19,7 +19,8 @@ export type ListeDeLieux = { total: number; rows: LigneDeLieu[] }
 export type FicheDeLieu = Omit<LigneDeLieu, 'tags'> & {
   text: string | null; latitude: number | null; longitude: number | null
   author_id: string | null; author_places_count: number; discovered_count: number
-  images: { id: string; url: string; thumb: string | null }[]
+  /** Celles de la pose puis celles ajoutées par les joueurs, comme sur la fiche de l'appli (mig 535). */
+  photos: { url: string; vignette: string }[]
   /** Ses natures, la principale d'abord (lues dans place_tags : mod_get_place ne les renvoie pas). */
   tags: { id: string; is_primary: boolean }[]
 }
@@ -78,8 +79,8 @@ export async function verifierLieu(id: string, oui: boolean): Promise<void> {
   relever(data)
 }
 
-export async function retirerPhoto(id: string, photo: string): Promise<void> {
-  const { data, error } = await supabase.rpc('mod_retirer_photo', { p_place_id: id, p_image_id: photo })
+export async function retirerPhoto(id: string, url: string): Promise<void> {
+  const { data, error } = await supabase.rpc('mod_retirer_photo', { p_place_id: id, p_url: url })
   if (error) throw error
   relever(data)
 }

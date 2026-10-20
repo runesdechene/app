@@ -21,23 +21,24 @@ const LISTE = '/communaute/lieux'
 function Photos({ fiche }: { fiche: FicheDeLieu }) {
   const { photo } = useModeration(fiche.id)
   const [aRetirer, setARetirer] = useState<string | null>(null)
-  if (fiche.images.length === 0) return null
+  if (fiche.photos.length === 0) return null
   return (
     <>
       <div className={styles.photos}>
-        {fiche.images.map((image) => (
-          <figure key={image.id} className={styles.photo}>
-            <a href={image.url} target="_blank" rel="noreferrer">
-              <img src={image.thumb ?? image.url} alt="" loading="lazy" />
+        {/* Une même adresse peut revenir deux fois (ajouts V1) : le rang tient la clé unique. */}
+        {fiche.photos.map(({ url, vignette }, rang) => (
+          <figure key={`${String(rang)}-${url}`} className={styles.photo}>
+            <a href={url} target="_blank" rel="noreferrer">
+              <img src={vignette} alt="" loading="lazy" />
             </a>
-            {aRetirer === image.id ? (
+            {aRetirer === url ? (
               <span className={styles.confirmation}>
                 <button type="button" className={communaute.boutonContour} disabled={photo.isPending}
-                  onClick={() => { photo.mutate(image.id, { onSettled: () => { setARetirer(null) } }) }}>Confirmer</button>
+                  onClick={() => { photo.mutate(url, { onSettled: () => { setARetirer(null) } }) }}>Confirmer</button>
                 <button type="button" className={communaute.boutonContour} onClick={() => { setARetirer(null) }}>Annuler</button>
               </span>
             ) : (
-              <button type="button" className={communaute.boutonContour} onClick={() => { photo.reset(); setARetirer(image.id) }}>Retirer</button>
+              <button type="button" className={communaute.boutonContour} onClick={() => { photo.reset(); setARetirer(url) }}>Retirer</button>
             )}
           </figure>
         ))}

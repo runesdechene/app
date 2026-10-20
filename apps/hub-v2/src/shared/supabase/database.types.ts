@@ -8195,7 +8195,7 @@ export type Database = {
         Returns: Json
       }
       mod_retirer_photo: {
-        Args: { p_image_id: string; p_place_id: string }
+        Args: { p_place_id: string; p_url: string }
         Returns: Json
       }
       mod_set_masked: {

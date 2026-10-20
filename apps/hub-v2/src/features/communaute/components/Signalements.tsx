@@ -33,11 +33,11 @@ function Lecture({ signalement, onTraite }: { signalement: Signalement; onTraite
       {fiche.isError && (
         <p role="alert">Photos indisponibles. <button type="button" className={communaute.boutonContour} onClick={() => void fiche.refetch()}>Réessayer</button></p>
       )}
-      {fiche.data && fiche.data.images.length > 0 && (
+      {fiche.data && fiche.data.photos.length > 0 && (
         <div className={styles.photos}>
-          {fiche.data.images.map((image) => (
-            <a key={image.url} href={image.url} target="_blank" rel="noreferrer">
-              <img src={image.thumb ?? image.url} alt="" loading="lazy" />
+          {fiche.data.photos.map(({ url, vignette }, rang) => (
+            <a key={`${String(rang)}-${url}`} href={url} target="_blank" rel="noreferrer">
+              <img src={vignette} alt="" loading="lazy" />
             </a>
           ))}
         </div>
