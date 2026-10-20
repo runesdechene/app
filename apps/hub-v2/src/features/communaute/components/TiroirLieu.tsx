@@ -23,28 +23,29 @@ function Photos({ fiche }: { fiche: FicheDeLieu }) {
   const [aRetirer, setARetirer] = useState<string | null>(null)
   if (fiche.photos.length === 0) return null
   return (
-    <>
+    <div className={styles.galerie}>
       <div className={styles.photos}>
         {/* Une même adresse peut revenir deux fois (ajouts V1) : le rang tient la clé unique. */}
         {fiche.photos.map(({ url, vignette }, rang) => (
-          <figure key={`${String(rang)}-${url}`} className={styles.photo}>
+          <div key={`${String(rang)}-${url}`} className={styles.photo} aria-current={aRetirer === url}>
             <a href={url} target="_blank" rel="noreferrer">
               <img src={vignette} alt="" loading="lazy" />
             </a>
-            {aRetirer === url ? (
-              <span className={styles.confirmation}>
-                <button type="button" className={communaute.boutonContour} disabled={photo.isPending}
-                  onClick={() => { photo.mutate(url, { onSettled: () => { setARetirer(null) } }) }}>Confirmer</button>
-                <button type="button" className={communaute.boutonContour} onClick={() => { setARetirer(null) }}>Annuler</button>
-              </span>
-            ) : (
-              <button type="button" className={communaute.boutonContour} onClick={() => { photo.reset(); setARetirer(url) }}>Retirer</button>
-            )}
-          </figure>
+            <button type="button" className={styles.retirer} aria-label="Retirer la photo" title="Retirer la photo"
+              disabled={photo.isPending} onClick={() => { photo.reset(); setARetirer(url) }}>✕</button>
+          </div>
         ))}
       </div>
+      {aRetirer !== null && (
+        <p className={styles.question}>
+          <span>Retirer cette photo ?</span>
+          <button type="button" className={styles.lien} disabled={photo.isPending}
+            onClick={() => { photo.mutate(aRetirer, { onSettled: () => { setARetirer(null) } }) }}>Confirmer</button>
+          <button type="button" className={styles.lien} onClick={() => { setARetirer(null) }}>Annuler</button>
+        </p>
+      )}
       {photo.isError && <p role="alert">{photo.error.message}</p>}
-    </>
+    </div>
   )
 }
 
