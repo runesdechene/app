@@ -9,6 +9,7 @@ import { Link, useLocation, useParams } from 'react-router'
 import { dateCourte } from '@/shared/lib/dates'
 import { ficheDansLAppli } from '@/shared/lib/liens'
 import { Bloc } from '@/shared/ui/Bloc'
+import { Bouton } from '@/shared/ui/Bouton'
 import { Tiroir } from '@/shared/ui/Tiroir'
 import { TitreDeSection } from '@/shared/ui/TitreDeSection'
 import type { FicheDeLieu } from '../api/lieux'
@@ -37,12 +38,12 @@ function Photos({ fiche }: { fiche: FicheDeLieu }) {
         ))}
       </div>
       {aRetirer !== null && (
-        <p className={styles.question}>
-          <span>Retirer cette photo ?</span>
-          <button type="button" className={styles.lien} disabled={photo.isPending}
-            onClick={() => { photo.mutate(aRetirer, { onSettled: () => { setARetirer(null) } }) }}>Confirmer</button>
-          <button type="button" className={styles.lien} onClick={() => { setARetirer(null) }}>Annuler</button>
-        </p>
+        <div className={styles.question}>
+          <p>Retirer cette photo du lieu ?</p>
+          <Bouton disabled={photo.isPending}
+            onClick={() => { photo.mutate(aRetirer, { onSettled: () => { setARetirer(null) } }) }}>Retirer</Bouton>
+          <Bouton sorte="discret" onClick={() => { setARetirer(null) }}>Annuler</Bouton>
+        </div>
       )}
       {photo.isError && <p role="alert">{photo.error.message}</p>}
     </div>

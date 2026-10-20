@@ -7,3 +7,5 @@ Les briques du Hub (spec Hub V2 §6), une par fichier : Bloc, TitreDeSection, Tu
 - `ChampDeRecherche` : la gélule de recherche, qui attend 300 ms de calme avant d’appeler `onChange`.
 
 - `Pages` : « 1 à 50 sur 4 750 » et précédents / suivants.
+
+- `Bouton` : le bouton de l’appli (principal, secondaire, doux, discret), mêmes jetons. Tout bouton du Hub passe par lui.

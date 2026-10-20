@@ -50,7 +50,7 @@ test('masquer un lieu rafraîchit la liste et la pastille', async () => {
   expect(screen.queryByRole('link', { name: /Dolmen de la Pierre Levée/ })).not.toBeInTheDocument()
 })
 
-test('« Retirer » une photo demande confirmation, seul « Confirmer » la retire', async () => {
+test('le ✕ d’une photo demande confirmation, seul « Retirer » la retire', async () => {
   api.lireLieux.mockResolvedValue({ total: 1, rows: [ligne] })
   api.lireNatures.mockResolvedValue([])
   api.lireLieu.mockResolvedValue({ ...ligne, text: 'Un dolmen.', discovered_count: 2, author_places_count: 31,
@@ -62,7 +62,7 @@ test('« Retirer » une photo demande confirmation, seul « Confirmer » la reti
   await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
   expect(api.retirerPhoto).not.toHaveBeenCalled()
   await userEvent.click((await screen.findAllByRole('button', { name: 'Retirer la photo' }))[1] as HTMLElement)
-  await userEvent.click(screen.getByRole('button', { name: 'Confirmer' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Retirer' }))
   expect(api.retirerPhoto).toHaveBeenCalledWith('p1', 'https://x/2.webp')
 })
 

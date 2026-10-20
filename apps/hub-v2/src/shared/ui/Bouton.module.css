@@ -1,0 +1,67 @@
+/*
+ * QUOI     — les quatre sortes de bouton et leur état désactivé, repris du bouton de l'appli.
+ */
+.principal,
+.secondaire,
+.doux {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--cible-tactile);
+  padding: 0 var(--space-6);
+  border-radius: var(--radius);
+  font-family: var(--font-corps);
+  font-size: var(--bouton-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bouton-tracking);
+  cursor: pointer;
+}
+
+.principal {
+  border: 2px solid var(--color-accent-clair);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+  box-shadow: var(--ombre-bouton);
+}
+
+.secondaire {
+  border: 2px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-accent);
+  box-shadow: var(--ombre-bouton);
+}
+
+.doux {
+  border: 2px solid var(--color-desactive-bord);
+  background: var(--color-doux-fond);
+  color: var(--color-brun);
+  box-shadow: 0 0 8px 5px color-mix(in srgb, var(--color-ocre) 15%, transparent);
+}
+
+.discret {
+  min-height: var(--cible-tactile);
+  padding: 0 var(--space-2);
+  border: none;
+  background: none;
+  font-family: var(--font-condensee);
+  font-size: var(--libelle-size);
+  font-weight: var(--weight-gras);
+  color: var(--color-texte-doux);
+  cursor: pointer;
+}
+
+.principal:disabled,
+.secondaire:disabled,
+.doux:disabled {
+  border-color: var(--color-desactive-bord);
+  background: var(--color-desactive-fond);
+  color: var(--color-desactive-texte);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.discret:disabled {
+  color: var(--color-desactive-texte);
+  cursor: not-allowed;
+}

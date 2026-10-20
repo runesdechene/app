@@ -27,3 +27,15 @@ compare à sa maquette Figma (section « Hub V2 — maquette (14/10) ») à 1440
 dit fini.
 
 Voir aussi [[sonde-avant-hypotheses]].
+
+## Un bouton du Hub passe par la brique `Bouton`, jamais par le style du fichier voisin
+
+**Le piège** (20/10/2026, retrait des photos d'un lieu) : le Hub n'avait pas de brique bouton. J'ai
+posé le `boutonContour` de la communauté sous des vignettes de 96 px, puis recopié les liens
+soulignés rouges de « Photos et avis ». Uriel : « les liens soulignés en rouge c'est pas vraiment
+stylisé », et le Hub en a « PLEIN » de ce genre.
+
+**How to apply :** tout bouton du Hub est `shared/ui/Bouton` (principal, secondaire, doux,
+discret : les sortes du `Button` de l'appli, mêmes jetons). Un style trouvé dans un écran voisin
+n'est pas une référence : la référence, c'est l'appli (`apps/web-v2/src/shared/ui`) et la maquette.
+Regarder le rendu (capture) avant de dire fini.
