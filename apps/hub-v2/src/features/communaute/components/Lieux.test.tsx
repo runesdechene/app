@@ -8,7 +8,7 @@ import { TiroirLieu } from './TiroirLieu'
 
 const api = vi.hoisted(() => ({
   lireLieux: vi.fn(), lireLieu: vi.fn(), lireNatures: vi.fn(), modifierLieu: vi.fn(),
-  changerNatures: vi.fn(), verifierLieu: vi.fn(), masquerLieu: vi.fn(),
+  changerNatures: vi.fn(), verifierLieu: vi.fn(), masquerLieu: vi.fn(), retirerPhoto: vi.fn(),
 }))
 vi.mock('../api/lieux', () => api)
 
@@ -48,6 +48,22 @@ test('masquer un lieu rafraîchit la liste et la pastille', async () => {
   expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-signalements'] })
   expect(await screen.findByText('Aucun lieu ne correspond.')).toBeInTheDocument()
   expect(screen.queryByRole('link', { name: /Dolmen de la Pierre Levée/ })).not.toBeInTheDocument()
+})
+
+test('« Retirer » une photo demande confirmation, seul « Confirmer » la retire', async () => {
+  api.lireLieux.mockResolvedValue({ total: 1, rows: [ligne] })
+  api.lireNatures.mockResolvedValue([])
+  api.lireLieu.mockResolvedValue({ ...ligne, text: 'Un dolmen.', discovered_count: 2, author_places_count: 31,
+    images: [{ id: 'i1', url: 'https://x/1.webp', thumb: null }, { id: 'i2', url: 'https://x/2.webp', thumb: null }] })
+  api.retirerPhoto.mockResolvedValue(undefined)
+  monter('/communaute/lieux/p1')
+  const retirer = await screen.findAllByRole('button', { name: 'Retirer' })
+  await userEvent.click(retirer[1] as HTMLElement)
+  await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
+  expect(api.retirerPhoto).not.toHaveBeenCalled()
+  await userEvent.click((await screen.findAllByRole('button', { name: 'Retirer' }))[1] as HTMLElement)
+  await userEvent.click(screen.getByRole('button', { name: 'Confirmer' }))
+  expect(api.retirerPhoto).toHaveBeenCalledWith('p1', 'i2')
 })
 
 test('un nom vide : pas d’enregistrement', async () => {

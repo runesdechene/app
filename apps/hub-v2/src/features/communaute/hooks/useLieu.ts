@@ -1,10 +1,10 @@
 /**
- * QUOI     — la fiche d'un lieu, les natures possibles, et les quatre décisions de l'équipe.
+ * QUOI     — la fiche d'un lieu, les natures possibles, et les décisions de l'équipe.
  * POURQUOI — chaque décision rafraîchit la fiche, la liste, la file des signalements et la pastille
  *            « Lieux à modérer » du menu.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { changerNatures, lireLieu, lireNatures, masquerLieu, modifierLieu, verifierLieu, type Champs } from '../api/lieux'
+import { changerNatures, lireLieu, lireNatures, masquerLieu, modifierLieu, retirerPhoto, verifierLieu, type Champs } from '../api/lieux'
 
 export function useLieu(id: string) {
   return useQuery({ queryKey: ['hub-lieu', id], queryFn: () => lireLieu(id) })
@@ -27,5 +27,6 @@ export function useModeration(id: string) {
     natures: useMutation({ mutationFn: (ids: string[]) => changerNatures(id, ids), onSuccess: rafraichir }),
     verifier: useMutation({ mutationFn: (oui: boolean) => verifierLieu(id, oui), onSuccess: rafraichir }),
     masquer: useMutation({ mutationFn: (oui: boolean) => masquerLieu(id, oui), onSuccess: rafraichir }),
+    photo: useMutation({ mutationFn: (photo: string) => retirerPhoto(id, photo), onSuccess: rafraichir }),
   }
 }

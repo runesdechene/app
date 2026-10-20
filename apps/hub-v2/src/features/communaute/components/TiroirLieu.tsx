@@ -1,5 +1,5 @@
 /**
- * QUOI     — la fiche de modération d'un lieu : ses photos, son récit et son nom (modifiables), ses
+ * QUOI     — la fiche de modération d'un lieu : ses photos (chacune se retire), son récit et son nom (modifiables), ses
  *            natures (1 à 3, la première est la principale), et la décision — vérifier, masquer.
  * POURQUOI — les écritures passent toutes par les mod_* de la base ; chaque refus s'affiche sous son bloc,
  *            sans rien perdre de ce qui a été tapé.
@@ -17,6 +17,35 @@ import communaute from './Communaute.module.css'
 import styles from './Lieux.module.css'
 
 const LISTE = '/communaute/lieux'
+
+function Photos({ fiche }: { fiche: FicheDeLieu }) {
+  const { photo } = useModeration(fiche.id)
+  const [aRetirer, setARetirer] = useState<string | null>(null)
+  if (fiche.images.length === 0) return null
+  return (
+    <>
+      <div className={styles.photos}>
+        {fiche.images.map((image) => (
+          <figure key={image.id} className={styles.photo}>
+            <a href={image.url} target="_blank" rel="noreferrer">
+              <img src={image.thumb ?? image.url} alt="" loading="lazy" />
+            </a>
+            {aRetirer === image.id ? (
+              <span className={styles.confirmation}>
+                <button type="button" className={communaute.boutonContour} disabled={photo.isPending}
+                  onClick={() => { photo.mutate(image.id, { onSettled: () => { setARetirer(null) } }) }}>Confirmer</button>
+                <button type="button" className={communaute.boutonContour} onClick={() => { setARetirer(null) }}>Annuler</button>
+              </span>
+            ) : (
+              <button type="button" className={communaute.boutonContour} onClick={() => { photo.reset(); setARetirer(image.id) }}>Retirer</button>
+            )}
+          </figure>
+        ))}
+      </div>
+      {photo.isError && <p role="alert">{photo.error.message}</p>}
+    </>
+  )
+}
 
 function Texte({ fiche }: { fiche: FicheDeLieu }) {
   const { texte } = useModeration(fiche.id)
@@ -129,15 +158,7 @@ export function TiroirLieu() {
   return (
     <Tiroir titre={data.title} retour={retour}>
       <h1 className={communaute.nomFiche}>{data.title}</h1>
-      {data.images.length > 0 && (
-        <div className={styles.photos}>
-          {data.images.map((image) => (
-            <a key={image.url} href={image.url} target="_blank" rel="noreferrer">
-              <img src={image.thumb ?? image.url} alt="" loading="lazy" />
-            </a>
-          ))}
-        </div>
-      )}
+      <Photos fiche={data} />
       <p className={communaute.calme}>
         Ajouté par {data.author_name ?? 'Un Voyageur'} ({data.author_places_count} lieux) · {dateCourte(data.created_at)} · {data.visit_count} visites · {data.discovered_count} découvertes
       </p>

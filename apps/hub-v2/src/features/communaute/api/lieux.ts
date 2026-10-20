@@ -1,6 +1,7 @@
 /**
  * QUOI      — les lieux à modérer : la liste (hub_lieux, mig 517), la fiche (mod_get_place) et les
- *             quatre décisions de l'équipe (mod_update_place, mod_set_place_tags, mod_set_verified, mod_set_masked).
+ *             décisions de l'équipe (mod_update_place, mod_set_place_tags, mod_set_verified, mod_set_masked,
+ *             mod_retirer_photo — mig 534).
  * ATTENTION — les mod_* répondent en JSON {error} au lieu de lever : chaque écriture relève cette erreur.
  */
 import { supabase } from '@/shared/supabase/client'
@@ -18,14 +19,14 @@ export type ListeDeLieux = { total: number; rows: LigneDeLieu[] }
 export type FicheDeLieu = Omit<LigneDeLieu, 'tags'> & {
   text: string | null; latitude: number | null; longitude: number | null
   author_id: string | null; author_places_count: number; discovered_count: number
-  images: { url: string; thumb: string | null }[]
+  images: { id: string; url: string; thumb: string | null }[]
   /** Ses natures, la principale d'abord (lues dans place_tags : mod_get_place ne les renvoie pas). */
   tags: { id: string; is_primary: boolean }[]
 }
 export type Champs = { titre: string; texte: string; sensible: boolean }
 
 const MESSAGES: Record<string, string> = { not_staff: 'Réservé à l’équipe', place_not_found: 'Lieu introuvable',
-  no_tags: 'Choisis au moins une nature.', invalid_tag: 'Nature inconnue.', too_many_tags: 'Trois natures au plus.',
+  no_tags: 'Choisis au moins une nature.', invalid_tag: 'Nature inconnue.', too_many_tags: 'Trois natures au plus.', image_not_found: 'Photo déjà retirée.',
 }
 
 function relever(reponse: unknown): void {
@@ -73,6 +74,12 @@ export async function changerNatures(id: string, ids: string[]): Promise<void> {
 
 export async function verifierLieu(id: string, oui: boolean): Promise<void> {
   const { data, error } = await supabase.rpc('mod_set_verified', { p_place_id: id, p_verified: oui })
+  if (error) throw error
+  relever(data)
+}
+
+export async function retirerPhoto(id: string, photo: string): Promise<void> {
+  const { data, error } = await supabase.rpc('mod_retirer_photo', { p_place_id: id, p_image_id: photo })
   if (error) throw error
   relever(data)
 }
