@@ -3330,20 +3330,29 @@ export type Database = {
       }
       place_explorers: {
         Row: {
+          a_distance: boolean
+          declare_le: string | null
           id: number
           place_id: string
+          souvenir_le: string | null
           user_id: string
           visited_at: string
         }
         Insert: {
+          a_distance?: boolean
+          declare_le?: string | null
           id?: number
           place_id: string
+          souvenir_le?: string | null
           user_id: string
           visited_at?: string
         }
         Update: {
+          a_distance?: boolean
+          declare_le?: string | null
           id?: number
           place_id?: string
+          souvenir_le?: string | null
           user_id?: string
           visited_at?: string
         }
@@ -6776,6 +6785,14 @@ export type Database = {
         Returns: boolean
       }
       _hasard_fixe: { Args: { p_texte: string }; Returns: number }
+      _hub_bornes: {
+        Args: { p_periode: string }
+        Returns: {
+          avant_debut: string
+          avant_fin: string
+          debut: string
+        }[]
+      }
       _hub_comptes_base: {
         Args: never
         Returns: {
@@ -6795,6 +6812,7 @@ export type Database = {
         }[]
       }
       _hub_pouls: { Args: { p_debut: string; p_fin: string }; Returns: Json }
+      _hub_pouls_periode: { Args: { p_periode: string }; Returns: Json }
       _is_admin: { Args: never; Returns: boolean }
       _is_staff:
         | { Args: never; Returns: boolean }
@@ -7333,6 +7351,10 @@ export type Database = {
       }
       cultures_du_hub: { Args: never; Returns: Json }
       daitch_mokotoff: { Args: { "": string }; Returns: string[] }
+      declarer_souvenir: {
+        Args: { p_annee: number; p_id: string; p_mois: number }
+        Returns: Json
+      }
       decouvrir_lieu: {
         Args: { p_id: string; p_lat?: number; p_lng?: number }
         Returns: Json
