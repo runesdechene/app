@@ -220,3 +220,11 @@ export function lireCoutDecouverte(json: unknown): CoutDecouverte {
     gratuitKm: nombre(c.gratuitKm),
   }
 }
+
+// Ce que rapporte une revendication (mig 537) : le nom qui flotte, à qui on l'a pris, le rang.
+export type Conquete = { nom: string; prisA: string | null; rang: number }
+
+export function lireConquete(json: unknown): Conquete {
+  const c = objet(json)
+  return { nom: chaine(c.nom), prisA: ouNull(chaine)(c.prisA), rang: nombre(c.rang) }
+}
