@@ -26,6 +26,7 @@
 | `explorateurs_du_lieu(text)` | plus aucun client ne l'appelle (la lecture de la V2, jamais branchée, est retirée avec « J'y suis allé ») ; la mig 531 l'a quand même tenue à jour | supprimer | à la prochaine passe | mig 531, 19/10 |
 | `sur_les_chemins` : clé `photos` | remplacée par `vignettes` (chaque photo avec son lieu, mig 533) ; gardée pour la V2 1.25 en ligne, qui la lit | retirer la clé | quand aucune V2 en ligne ne la lit plus | mig 533, 19/10 |
 | `users.password` | vidée par la mig 493 (empreintes de la V1, plus lues) ; encore dans la vue `users_admin` | refaire la vue sans elle, puis supprimer la colonne | après bascule | audit sécurité 11/10 |
+| `mes_noms_d_expedition()` | plus aucun client depuis « Plante ton étendard » (21/10) : les pastilles proposent mon nom et mes Compagnies, plus les anciens noms d'expédition | DROP, vérifié à la main en prod | quand on voudra | spec 2026-10-21-revendiquer-gps |
 
 ## 1bis. En sommeil — ne PAS supprimer
 

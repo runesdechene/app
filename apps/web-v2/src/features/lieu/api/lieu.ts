@@ -3,7 +3,7 @@
  * POURQUOI — chaque fonction rend une donnée typée ou lève : jamais un `{ error }` à vérifier
  *            plus loin. Les fonctions de la base lisent `auth.uid()` : on n'envoie jamais qui on est.
  */
-import { booleen, chaine, liste, objet } from '@/shared/lib/lire'
+import { booleen, chaine, objet } from '@/shared/lib/lire'
 import { supabase } from '@/shared/supabase/client'
 import type { Point } from '@/shared/lib/distance'
 import type { PhotoAEnvoyer } from '@/shared/lib/photo'
@@ -74,12 +74,6 @@ export async function fetchCompagnons(id: string) {
   const { data, error } = await supabase.rpc('compagnons_possibles', { p_id: id })
   if (error) throw error
   return lireCompagnons(data)
-}
-
-export async function fetchNomsExpedition() {
-  const { data, error } = await supabase.rpc('mes_noms_d_expedition')
-  if (error) throw error
-  return liste(chaine)(data)
 }
 
 // `pourCompagnie` : une de mes Compagnies, ou null (migration 422).

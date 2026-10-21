@@ -50,16 +50,6 @@ test('seul : « Revendiquer » n’envoie ni compagnon ni nom', async () => {
   expect(revendiquer).toHaveBeenCalledWith([], null, null)
 })
 
-test('en expédition : je coche un compagnon présent et je choisis un nom passé', async () => {
-  afficher({ compagnons: [REMY], noms: ['Les Loups'] })
-  await userEvent.click(screen.getByRole('radio', { name: 'En expédition' }))
-  expect(screen.getByText('à 40 m')).toBeInTheDocument()
-  await userEvent.click(screen.getByRole('checkbox', { name: /Rémy/ }))
-  await userEvent.click(screen.getByRole('button', { name: 'Les Loups' }))
-  await userEvent.click(screen.getByRole('button', { name: 'Revendiquer' }))
-  expect(revendiquer).toHaveBeenCalledWith(['b'], 'Les Loups', null)
-})
-
 test('en expédition sans nom : « Revendiquer » attend un nom', async () => {
   afficher({ compagnons: [REMY], noms: [] })
   await userEvent.click(screen.getByRole('radio', { name: 'En expédition' }))

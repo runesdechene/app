@@ -30,7 +30,7 @@ export function FenetreRevendication({
   fiche: Pick<FicheLieu, 'id' | 'nom'>
   onFermer: () => void
 }) {
-  const { compagnons, noms, compagnies, revendiquer, enCours, erreur } = useRevendication(
+  const { compagnons, compagnies, revendiquer, enCours, erreur } = useRevendication(
     fiche.id,
     true,
   )
@@ -94,20 +94,6 @@ export function FenetreRevendication({
                 </label>
               ))}
               <Champ libelle="Nom de l’expédition" valeur={nom} onChange={setNom} max={40} />
-              {noms.length > 0 && (
-                <div className={styles.noms}>
-                  {noms.map((n) => (
-                    <PastilleChoix
-                      key={n}
-                      libelle={n}
-                      choisie={n === nom.trim()}
-                      onClick={() => {
-                        setNom(n)
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
             </>
           )}
         </div>
