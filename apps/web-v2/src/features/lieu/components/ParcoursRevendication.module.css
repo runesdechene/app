@@ -1,0 +1,29 @@
+/*
+ * QUOI     — la fête de la visite, pleine page : la photo du lieu au fond, la récompense par-dessus
+ *            (comme la découverte, maquette 682:1720).
+ */
+.visite {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+  background: var(--color-ombre);
+}
+
+.photo,
+.sansPhoto {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.sansPhoto {
+  background:
+    url('../../../assets/ui/fond-fiche.webp') center / cover,
+    var(--color-fond);
+}

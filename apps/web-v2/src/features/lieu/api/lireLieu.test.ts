@@ -140,3 +140,8 @@ test('lireConquete : le nom, à qui on l’a pris, le rang (mig 537)', () => {
 test('lireConquete : un lieu que personne ne tenait', () => {
   expect(lireConquete({ nom: 'Uriel', prisA: null, rang: 1 }).prisA).toBeNull()
 })
+
+test('lireFiche : la nature du lieu (une curiosité ne se revendique pas)', () => {
+  expect(lireFiche(COMPLET)?.nature).toBe('lieu')
+  expect(lireFiche({ ...COMPLET, nature: 'curiosite' })?.nature).toBe('curiosite')
+})

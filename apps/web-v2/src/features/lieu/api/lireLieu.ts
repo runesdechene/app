@@ -20,6 +20,8 @@ export type FicheLieu = {
   id: string
   slug: string | null // la page publique du lieu (/lieu/<slug>), quand elle existe
   nom: string
+  // Une curiosité se visite mais ne se revendique pas (revendiquer_lieu exige un lieu).
+  nature: 'lieu' | 'curiosite'
   recit: string
   adresse: string | null
   lat: number
@@ -98,6 +100,7 @@ export function lireFiche(json: unknown): FicheLieu | null {
     id: chaine(f.id),
     // Absent tant que la base ne le rend pas (migration 366) : pas de page publique, pas d'erreur.
     slug: typeof f.slug === 'string' ? f.slug : null,
+    nature: f.nature === 'curiosite' ? 'curiosite' : 'lieu',
     nom: chaine(f.nom),
     recit: chaine(f.recit),
     adresse: ouNull(chaine)(f.adresse),
