@@ -59,8 +59,7 @@ export function Conquete({
         <p className={styles.lieu}>{lieu}</p>
         {prisA && <p className={styles.pris}>PRIS À {prisA.toLocaleUpperCase('fr')}</p>}
         <p className={styles.phrase}>
-          <strong>« {nom} »</strong> flotte sur ce lieu, jusqu’à ce qu’un autre vienne le
-          reprendre.
+          <strong>« {nom} »</strong> flotte sur ce lieu, jusqu’à ce qu’un autre vienne le reprendre.
         </p>
         <p className={styles.rang}>{phraseRang(rang)}</p>
         <p className={styles.enjeu}>On te préviendra si quelqu’un vient te le reprendre.</p>

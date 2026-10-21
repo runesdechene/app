@@ -37,6 +37,7 @@ import { useFiltresDeCarte } from '../hooks/useFiltresDeCarte'
 import { useMesPinsSurLaCarte } from '../hooks/useMesPinsSurLaCarte'
 import { useEnigmesSurLaCarte, type EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
 import { FeuilleEnigme } from './FeuilleEnigme'
+import { useAPortee, type SurPlace } from '../hooks/useAPortee'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
 import { ajouterCalques, CALQUES_LIEUX, echelleEcran, enGeoJSON, SOURCE } from '../lib/calques'
@@ -71,6 +72,7 @@ type Vue = { lat: number; lng: number; zoom: number }
 
 // `sousLaRecherche` : ce que la coquille pose sous la recherche (la jauge d'énergie) ;
 // `soi` : son portrait, son nom et son titre sur la carte ; `onAjouter` : le « + » qui ouvre l'ajout.
+// `surPlace` (dans le reste) : le bouton « Marquer ma visite » que la coquille pose sur la carte.
 export function CarteScreen({
   sousLaRecherche,
   soi = null,
@@ -80,7 +82,7 @@ export function CarteScreen({
   sousLaRecherche?: ReactNode
   soi?: Soi | null
   onAjouter?: () => void
-} & PinsDeLaCarte) {
+} & PinsDeLaCarte & { surPlace?: SurPlace }) {
   return (
     <CarteVivante
       visiteur={false}
@@ -100,12 +102,14 @@ export function CarteVisiteur() {
 function CarteVivante({
   visiteur,
   sousLaRecherche,
+  surPlace,
   soi = null,
   onAjouter,
   ...pins
 }: {
   visiteur: boolean
   sousLaRecherche?: ReactNode
+  surPlace?: SurPlace | undefined
   soi?: Soi | null
   onAjouter?: (() => void) | undefined
 } & PinsDeLaCarte) {
@@ -117,6 +121,7 @@ function CarteVivante({
   // Le tiroir mesuré : un vol (?centre, l'aperçu du visiteur) l'attend, sinon le décalage du
   // tiroir, posé juste après, couperait le vol (MapLibre ne tient qu'un mouvement à la fois).
   const [tiroirMesure, setTiroirMesure] = useState(false)
+  const signalerAPortee = useAPortee(carte)
   const [couleurs] = useState(() => lireCouleurs(document.documentElement))
   const { lieux, erreur, reessayer } = useCarteLieux(visiteur)
   // La toute première fois (rien de gardé sur l'appareil), la carte dit que les lieux arrivent.
@@ -318,6 +323,7 @@ function CarteVivante({
       <div ref={conteneur} className={styles.carte} data-testid="carte" />
       <div ref={placeDuTiroir} className={styles.placeDuTiroir} aria-hidden="true" />
       {premiereFois && <AttenteLieux finie={lieuxPoses || erreur || marquesEnPanne} />}
+      {lieux && surPlace?.(lieux, signalerAPortee)}
       {(erreur || marquesEnPanne) && (
         <div role="alert" className={styles.bandeau}>
           <span>Les lieux n’ont pas pu être chargés</span>

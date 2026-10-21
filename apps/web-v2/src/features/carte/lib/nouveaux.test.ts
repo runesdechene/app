@@ -4,7 +4,7 @@
  */
 import { expect, test } from 'vitest'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
-import { anneauNouveau, calqueAnneau, calqueGelule, rayonAuZoom } from './nouveaux'
+import { anneauNouveau, calqueAnneau, calqueGelule, filtreAnneau, rayonAuZoom } from './nouveaux'
 
 const c = { encre: '#494841', halo: '#fffaf2' } as CouleursCarte
 
@@ -37,4 +37,16 @@ test('la gélule « NOUVEAU », à l’encre, se pose sous la marque (à la plac
     layout: { 'text-anchor': 'top' },
     paint: { 'icon-color': '#494841', 'text-color': '#fffaf2' },
   })
+})
+
+test('sans lieu à portée, l’anneau ne marque que les lieux neufs', () => {
+  expect(filtreAnneau(null)).toEqual(['==', ['get', 'nouveau'], true])
+})
+
+test('un lieu à portée reçoit aussi l’anneau', () => {
+  expect(filtreAnneau('a')).toEqual([
+    'any',
+    ['==', ['get', 'nouveau'], true],
+    ['==', ['get', 'id'], 'a'],
+  ])
 })

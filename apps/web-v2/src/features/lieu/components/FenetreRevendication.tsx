@@ -30,10 +30,7 @@ export function FenetreRevendication({
   fiche: Pick<FicheLieu, 'id' | 'nom'>
   onFermer: () => void
 }) {
-  const { compagnons, compagnies, revendiquer, enCours, erreur } = useRevendication(
-    fiche.id,
-    true,
-  )
+  const { compagnons, compagnies, revendiquer, enCours, erreur } = useRevendication(fiche.id, true)
   const [pour, setPour] = useState<string | null>(null)
   const [mode, setMode] = useState<Mode>('seul')
   const [coches, setCoches] = useState<ReadonlySet<string>>(new Set())

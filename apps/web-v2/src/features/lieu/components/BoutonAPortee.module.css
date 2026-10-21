@@ -1,0 +1,83 @@
+/*
+ * QUOI     — le bouton « Marquer ma visite » sur la carte (maquette 679:1732) : une gélule d'encre,
+ *            l'étendard en crème, centrée au-dessus des boutons du bas ; elle monte en apparaissant.
+ */
+.aPortee {
+  position: absolute;
+  bottom: calc(var(--space-8) * 2 + var(--cible-tactile));
+  left: 50%;
+  z-index: 5;
+  display: grid;
+  gap: var(--space-2);
+  justify-items: center;
+  max-width: calc(100% - 2 * var(--space-4));
+  translate: -50% 0;
+  animation: monte var(--duree-douce) var(--courbe-douce) both;
+}
+
+.bouton {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  max-width: 100%;
+  padding: var(--space-3) var(--space-6) var(--space-3) var(--space-4);
+  border: none;
+  border-radius: var(--radius-rond);
+  background: var(--color-carte-encre);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-ombre) 40%, transparent);
+  cursor: pointer;
+}
+
+.bouton:disabled {
+  cursor: progress;
+}
+
+.etendard {
+  flex: none;
+  width: 16px;
+  height: 26px;
+  background-color: var(--color-sur-accent);
+  mask: url('../../../assets/ui/etendard.svg') center / contain no-repeat;
+}
+
+.texte {
+  display: grid;
+  min-width: 0;
+  text-align: start;
+}
+
+.action {
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  color: var(--color-sur-accent);
+}
+
+.lieu {
+  overflow: hidden;
+  font-size: var(--legende-size);
+  color: var(--color-pastille);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.erreur {
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-rond);
+  background: var(--color-fond);
+  font-size: var(--legende-size);
+  color: var(--color-accent);
+}
+
+@keyframes monte {
+  from {
+    opacity: 0;
+    translate: -50% 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aPortee {
+    animation: none;
+  }
+}

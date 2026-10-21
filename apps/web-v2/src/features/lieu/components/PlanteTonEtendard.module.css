@@ -9,8 +9,7 @@
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   grid-template-columns: minmax(0, 1fr); /* le défilé des pastilles n'élargit pas l'écran */
-  background: var(--color-fond) url('../../../assets/ui/fond-parchemin.webp') center top / 100%
-    auto;
+  background: var(--color-fond) url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto;
 }
 
 .contenu {

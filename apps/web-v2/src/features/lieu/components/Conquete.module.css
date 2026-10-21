@@ -15,8 +15,7 @@
   padding: calc(var(--space-8) + env(safe-area-inset-top)) var(--space-6)
     calc(var(--space-6) + env(safe-area-inset-bottom));
   overflow: hidden;
-  background: var(--color-fond) url('../../../assets/ui/fond-parchemin.webp') center top / 100%
-    auto;
+  background: var(--color-fond) url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto;
 }
 
 .fermer {
