@@ -1,0 +1,10 @@
+/*
+ * QUOI     — la fiche d'un lieu, pendant le parcours de la visite et de la revendication.
+ * POURQUOI — comme la découverte (DecouverteLieu.module.css) : le parcours remplace la fiche, à la
+ *            hauteur de l'écran, au lieu de se poser dans le contenu qui défile.
+ */
+.parcours {
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+}

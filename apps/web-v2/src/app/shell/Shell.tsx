@@ -73,6 +73,10 @@ const SCREENS: Record<TabId, () => ReactNode> = {
 const CarteScreen = lazy(() =>
   import('@/features/carte/components/CarteScreen').then((m) => ({ default: m.CarteScreen })),
 )
+// Sur place, « Marquer ma visite » et le parcours de la revendication (zone lieu) : chargés avec la carte.
+const BoutonAPortee = lazy(() =>
+  import('@/features/lieu/components/BoutonAPortee').then((m) => ({ default: m.BoutonAPortee })),
+)
 
 // La carte de la coquille : la jauge d'énergie sous la recherche, soi (portrait, nom, premier
 // titre porté, comme les autres Explorateurs), et le « + »
@@ -106,6 +110,19 @@ function CarteDeLaCoquille() {
           )
         }}
         sousLaRecherche={<JaugeEnergie />}
+        surPlace={(lieux, signaler) => (
+          // Son propre Suspense : le bouton qui se charge ne cache pas la carte.
+          <Suspense fallback={null}>
+            <BoutonAPortee
+              lieux={lieux}
+              monNom={profil?.nom ?? ''}
+              onAPortee={signaler}
+              onVoirLeLieu={(id) => {
+                void navigate(`/carte/lieu/${id}`)
+              }}
+            />
+          </Suspense>
+        )}
         soi={
           profil
             ? { nom: profil.nom, avatar: profil.avatarUrl, titre: profil.titres[0]?.nom ?? null }

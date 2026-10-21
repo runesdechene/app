@@ -1,0 +1,160 @@
+/*
+ * QUOI     — « Plante ton étendard » sur le parchemin de l'appli (maquette 679:1676) : le formulaire
+ *            apparaît en cascade, le pied (planter, revenir) reste bloqué en bas.
+ */
+.ecran {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr); /* le défilé des pastilles n'élargit pas l'écran */
+  justify-items: center;
+  background: var(--color-fond) url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto;
+}
+
+.contenu {
+  width: min(100%, 480px); /* sur grand écran, une colonne de feuille */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  align-content: start;
+  justify-items: center;
+  padding: calc(var(--space-8) * 2 + env(safe-area-inset-top)) var(--space-6) var(--space-4);
+  overflow-y: auto;
+  text-align: center;
+}
+
+.contenu > * {
+  margin: 0;
+  animation: monte 0.4s ease-out both;
+}
+
+.lieu {
+  font-family: var(--font-inscription);
+  font-size: var(--titre-detail-size);
+  font-style: italic;
+  color: var(--color-carte-encre);
+  animation-delay: 0.05s;
+}
+
+.etendard {
+  width: 92px;
+  height: 150px;
+  background-color: var(--color-carte-encre);
+  mask: url('../../../assets/ui/etendard.svg') center / contain no-repeat;
+  animation-delay: 0.1s;
+}
+
+.titre {
+  font-family: var(--font-titre);
+  font-size: var(--etendard-titre-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+  color: var(--color-accent);
+  animation-delay: 0.25s;
+}
+
+.phrase {
+  max-width: 300px;
+  font-size: var(--sous-titre-size);
+  color: var(--color-encre);
+  animation-delay: 0.4s;
+}
+
+.champ {
+  justify-self: stretch;
+  text-align: start;
+  animation-delay: 0.55s;
+}
+
+/* Les pastilles défilent de côté et glissent depuis la droite, comme un indice. */
+.pastilles {
+  display: flex;
+  justify-self: stretch;
+  animation: glisse 0.4s ease-out 0.7s both;
+}
+
+.defile {
+  display: flex;
+  flex: 1;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.defile > * {
+  flex: 0 0 auto;
+}
+
+.avecToi {
+  display: grid;
+  gap: var(--space-2);
+  justify-self: stretch;
+  text-align: start;
+  animation-delay: 0.8s;
+}
+
+.libelle {
+  margin: 0;
+  font-family: var(--font-condensee);
+  font-size: var(--surtitre-size);
+  font-weight: var(--weight-gras);
+  color: var(--color-texte);
+}
+
+.compagnon {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.nom {
+  flex: 1;
+  font-size: var(--corps-size);
+  color: var(--color-texte);
+}
+
+.pied {
+  width: min(100%, 480px);
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom));
+  animation: monte-du-bas 0.4s ease-out 0.85s both;
+}
+
+.erreur {
+  margin: 0;
+  font-size: var(--flux-size);
+  color: var(--color-accent);
+  text-align: center;
+}
+
+@keyframes monte {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes glisse {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+
+@keyframes monte-du-bas {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contenu > *,
+  .pastilles,
+  .pied {
+    animation: none;
+  }
+}

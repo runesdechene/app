@@ -32,6 +32,18 @@ const DE_PLUS_PRES = 7 // la gélule s'affiche dès l'échelle d'une région (9 
 
 const estNouveau: FilterSpecification = ['==', ['get', 'nouveau'], true]
 
+// Le lieu que la carte propose de visiter, sur place (revendiquer par GPS, 21/10), reçoit le même
+// anneau : on le repère par le mouvement, comme un lieu neuf.
+export function filtreAnneau(aPortee: string | null): FilterSpecification {
+  if (aPortee === null) return estNouveau
+  return ['any', ['==', ['get', 'nouveau'], true], ['==', ['get', 'id'], aPortee]]
+}
+
+export function montrerAPortee(map: Carte, aPortee: string | null) {
+  if (map.getLayer(CALQUE_ANNEAU_NOUVEAUX))
+    map.setFilter(CALQUE_ANNEAU_NOUVEAUX, filtreAnneau(aPortee))
+}
+
 export function rayonAuZoom(rayon: number): ExpressionSpecification {
   return [
     'interpolate',

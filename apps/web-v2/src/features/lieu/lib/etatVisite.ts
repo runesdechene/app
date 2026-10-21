@@ -8,7 +8,7 @@
 import { distanceM, libelleDistance, PORTEE_M } from './distance'
 import { moisDuSouvenir } from './souvenir'
 
-export type Position = 'inconnue' | 'refusee' | { lat: number; lng: number }
+import type { Position } from '@/shared/hooks/usePosition'
 
 export type EtatVisite =
   | { kind: 'localiser' }

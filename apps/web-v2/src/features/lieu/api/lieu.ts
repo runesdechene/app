@@ -3,7 +3,7 @@
  * POURQUOI — chaque fonction rend une donnée typée ou lève : jamais un `{ error }` à vérifier
  *            plus loin. Les fonctions de la base lisent `auth.uid()` : on n'envoie jamais qui on est.
  */
-import { booleen, chaine, liste, objet } from '@/shared/lib/lire'
+import { booleen, chaine, objet } from '@/shared/lib/lire'
 import { supabase } from '@/shared/supabase/client'
 import type { Point } from '@/shared/lib/distance'
 import type { PhotoAEnvoyer } from '@/shared/lib/photo'
@@ -15,6 +15,7 @@ import {
   lireHistoire,
   lireVersionDetail,
   lireFiche,
+  lireConquete,
   lireRecompense,
 } from './lireLieu'
 
@@ -51,7 +52,7 @@ export async function fetchCoutDecouverte(id: string, position: Point | null) {
 export async function visiterLieu(id: string, lat: number, lng: number) {
   const { data, error } = await supabase.rpc('visiter_lieu', { p_id: id, p_lat: lat, p_lng: lng })
   if (error) throw error
-  return chaine(objet(data).visiteLe)
+  return lireRecompense(data) // mig 537 : la fête de la visite
 }
 
 // « J'y suis allé » (mig 531) : un lieu visité avant Explore, au mois près.
@@ -75,12 +76,6 @@ export async function fetchCompagnons(id: string) {
   return lireCompagnons(data)
 }
 
-export async function fetchNomsExpedition() {
-  const { data, error } = await supabase.rpc('mes_noms_d_expedition')
-  if (error) throw error
-  return liste(chaine)(data)
-}
-
 // `pourCompagnie` : une de mes Compagnies, ou null (migration 422).
 export async function revendiquerLieu(
   id: string,
@@ -95,7 +90,7 @@ export async function revendiquerLieu(
     ...(pourCompagnie !== null && { p_pour_compagnie: pourCompagnie }),
   })
   if (error) throw error
-  return chaine(objet(data).nom)
+  return lireConquete(data)
 }
 
 // Qui regarde : son identifiant, et s'il est admin (le rôle voyage dans le jeton, mig 179).

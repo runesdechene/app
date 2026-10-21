@@ -6,10 +6,11 @@ import { BoutonVisite } from './BoutonVisite'
 
 const position_ = vi.hoisted(() => vi.fn())
 const visite_ = vi.hoisted(() => vi.fn())
-vi.mock('../hooks/usePosition', () => ({ usePosition: position_ }))
+vi.mock('@/shared/hooks/usePosition', () => ({ usePosition: position_ }))
 vi.mock('../hooks/useVisite', () => ({ useVisite: visite_ }))
 
-const visiter = vi.fn(() => Promise.resolve())
+const VISITE = { rang: 18, gain: 3, niveau: 12, avant: 0.6, apres: 0.64 }
+const visiter = vi.fn(() => Promise.resolve(VISITE))
 const onVisite = vi.fn()
 const onSouvenir = vi.fn()
 
@@ -64,7 +65,7 @@ test('à portée, toucher marque la visite puis ouvre la revendication', async (
   afficher({ lat: 45, lng: 6, visiteLe: null })
   await userEvent.click(screen.getByRole('button', { name: 'Marquer ma visite (GPS)' }))
   expect(visiter).toHaveBeenCalledWith({ lat: 45.0009, lng: 6 })
-  expect(onVisite).toHaveBeenCalled()
+  expect(onVisite).toHaveBeenCalledWith(VISITE) // la récompense ouvre la fête de la visite
 })
 
 test('refus du serveur : le message s’écrit sous le bouton, pas de fenêtre', async () => {
@@ -132,4 +133,12 @@ test('« Me localiser pour visiter » demande la position', async () => {
   afficher({ lat: 45, lng: 6, visiteLe: null })
   await userEvent.click(screen.getByRole('button', { name: 'Me localiser pour visiter' }))
   expect(demander).toHaveBeenCalled()
+})
+
+test('un double toucher ne marque qu’une visite', async () => {
+  visiter.mockReturnValueOnce(new Promise<typeof VISITE>(() => undefined))
+  position_.mockReturnValue({ position: { lat: 45.0009, lng: 6 }, demander: vi.fn() })
+  afficher({ lat: 45, lng: 6, visiteLe: null })
+  await userEvent.dblClick(screen.getByRole('button', { name: 'Marquer ma visite (GPS)' }))
+  expect(visiter).toHaveBeenCalledOnce()
 })

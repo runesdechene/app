@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { lireCompagnons, lireFiche, lireRecompense } from './lireLieu'
+import { lireCompagnons, lireConquete, lireFiche, lireRecompense } from './lireLieu'
 
 const COMPLET = {
   id: 'a',
@@ -127,4 +127,21 @@ test('la revendication dit pour quelle Compagnie ; absente, null', () => {
     couleur: '#5f6f86',
   })
   expect(lireFiche(COMPLET)?.revendication?.pourCompagnie).toBeNull()
+})
+
+test('lireConquete : le nom, à qui on l’a pris, le rang (mig 537)', () => {
+  expect(lireConquete({ nom: 'La Garde du Comté', prisA: 'Remy', rang: 4 })).toEqual({
+    nom: 'La Garde du Comté',
+    prisA: 'Remy',
+    rang: 4,
+  })
+})
+
+test('lireConquete : un lieu que personne ne tenait', () => {
+  expect(lireConquete({ nom: 'Uriel', prisA: null, rang: 1 }).prisA).toBeNull()
+})
+
+test('lireFiche : la nature du lieu (une curiosité ne se revendique pas)', () => {
+  expect(lireFiche(COMPLET)?.nature).toBe('lieu')
+  expect(lireFiche({ ...COMPLET, nature: 'curiosite' })?.nature).toBe('curiosite')
 })

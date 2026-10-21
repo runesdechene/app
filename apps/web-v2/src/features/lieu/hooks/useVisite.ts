@@ -25,9 +25,7 @@ export function useVisite(id: string) {
       : 'La visite n’a pas pu être enregistrée. Réessaie dans un instant.'
     : null
   return {
-    visiter: async (p: { lat: number; lng: number }) => {
-      await mutation.mutateAsync(p)
-    },
+    visiter: (p: { lat: number; lng: number }) => mutation.mutateAsync(p),
     enCours: mutation.isPending,
     erreur,
   }

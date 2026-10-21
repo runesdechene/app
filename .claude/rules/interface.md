@@ -296,11 +296,16 @@ Les détails backend restent dans : commentaires SQL, docs/ specs, mémoire XO, 
 
 ## Une maquette part des visuels de la marque, jamais d'un dessin vectoriel maison (21/10/2026)
 
-L'appli tient sa beauté de vraies images : photos des lieux, gravures, bannières peintes. Un drapeau,
-une butte ou un halo dessinés en formes Figma font « IA générée » (Uriel, 21/10 : « tu me fais du
-vectoriel, du basique, les boutons sont trop gros, ce n'est pas audacieux »). Avant de dessiner une
-illustration, chercher sur le NAS : `\EGIDE\Runes de Chêne\VISUELS\` — `LA CARTE` (bannières
-peintes par culture, `etendard.svg`, `rune.svg`, icônes), `Ressources Mei\Ressources diverses`
-(fonds parchemin, `Fond section`, drapeau). Un moment fort se joue en plein écran sur la photo du
-lieu, texte clair sur l'image, boutons fins (pas de pleine largeur). Un panneau reprend les valeurs
-d'un écran validé (feuille : fond `#fff9f0`, rayon 22, ni bordure ni ombre, voile encre 35 %).
+L'appli tient sa beauté de vraies images : photos des lieux, gravures, parchemin, et les dessins au
+pinceau de la marque. Un drapeau, une butte ou un halo dessinés en formes Figma font « IA générée »
+(Uriel, 21/10 : « tu me fais du vectoriel, du basique, les boutons sont trop gros, ce n'est pas
+audacieux ») ; les bannières peintes de `LA CARTE` sont celles de la V1, plus utilisées.
+
+**How to apply :** avant de dessiner quoi que ce soit, partir des écrans validés du Figma « App v2 »
+(recopiés, pas imités : « Découvrir pleine page », la récompense, l'onboarding sur parchemin) et des
+visuels du NAS `\\EGIDE\Runes de Chêne\VISUELS\` — `LA CARTE` (`etendard.svg`, `rune.svg`, les icônes
+au pinceau de la carte), `Ressources Mei\Ressources diverses` (fonds parchemin, drapeau). Demander
+lesquels sont encore en usage avant d'en prendre un. La photo d'accueil (deux explorateurs au
+sommet) ne va jamais dans l'interface. Un panneau reprend les valeurs d'un écran validé (feuille :
+fond `#fff9f0`, rayon 22, ni bordure ni ombre, voile encre 35 %). Pour du mouvement, Figma anime
+(images clés, skill `figma-use-motion`) : une planche animée vaut mieux qu'une suite d'écrans figés.
