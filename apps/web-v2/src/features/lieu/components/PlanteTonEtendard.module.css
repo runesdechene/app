@@ -9,10 +9,12 @@
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   grid-template-columns: minmax(0, 1fr); /* le défilé des pastilles n'élargit pas l'écran */
+  justify-items: center;
   background: var(--color-fond) url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto;
 }
 
 .contenu {
+  width: min(100%, 480px); /* sur grand écran, une colonne de feuille */
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-3);
@@ -114,6 +116,7 @@
 }
 
 .pied {
+  width: min(100%, 480px);
   display: grid;
   gap: var(--space-2);
   padding: var(--space-4) var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom));

@@ -38,17 +38,20 @@ export function BoutonAPortee({
 
   if (parcours)
     return (
-      <ParcoursRevendication
-        id={parcours.id}
-        recompense={parcours.recompense}
-        monNom={monNom}
-        onFermer={() => {
-          setParcours(null)
-        }}
-        onVoirLeLieu={() => {
-          onVoirLeLieu(parcours.id)
-        }}
-      />
+      // Sur PC, le calque laisse le tiroir à sa place (la carte passe dessous).
+      <div className={styles.calque}>
+        <ParcoursRevendication
+          id={parcours.id}
+          recompense={parcours.recompense}
+          monNom={monNom}
+          onFermer={() => {
+            setParcours(null)
+          }}
+          onVoirLeLieu={() => {
+            onVoirLeLieu(parcours.id)
+          }}
+        />
+      </div>
     )
 
   if (!proche || typeof position === 'string') return null

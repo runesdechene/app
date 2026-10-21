@@ -5,7 +5,7 @@
 .aPortee {
   position: absolute;
   bottom: calc(var(--space-8) * 2 + var(--cible-tactile));
-  left: 50%;
+  left: calc(50% + var(--decalage-carte, 0px) / 2); /* au milieu de la carte visible */
   z-index: 5;
   display: grid;
   gap: var(--space-2);
@@ -67,6 +67,12 @@
   background: var(--color-fond);
   font-size: var(--legende-size);
   color: var(--color-accent);
+}
+
+.calque {
+  position: absolute;
+  inset: 0 0 0 var(--decalage-carte, 0);
+  z-index: 20;
 }
 
 @keyframes monte {

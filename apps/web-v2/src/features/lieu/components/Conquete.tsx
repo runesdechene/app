@@ -8,7 +8,6 @@
  * ATTENTION — mouvement réduit : rien ne bouge, tout est déjà à sa place, pas de vibration.
  */
 import { useEffect } from 'react'
-import croix from '@/assets/ui/croix.svg'
 import type { Conquete as ConqueteFaite } from '../api/lireLieu'
 import styles from './Conquete.module.css'
 
@@ -44,7 +43,7 @@ export function Conquete({
   return (
     <div className={styles.conquete}>
       <button type="button" className={styles.fermer} aria-label="Fermer" onClick={onFermer}>
-        <img src={croix} alt="" width={24} height={24} />
+        <span className={styles.croix} aria-hidden="true" />
       </button>
 
       <div className={styles.scene} aria-hidden="true">
