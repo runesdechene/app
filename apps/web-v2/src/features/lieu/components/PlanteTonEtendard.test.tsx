@@ -131,3 +131,13 @@ test('« Pas maintenant » revient à la carte', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Pas maintenant — revenir à la carte' }))
   expect(onFermer).toHaveBeenCalledOnce()
 })
+
+test('un refus du serveur coupe le bruitage', async () => {
+  const couper = vi
+    .spyOn(window.HTMLMediaElement.prototype, 'pause')
+    .mockImplementation(() => undefined)
+  revendiquer.mockRejectedValueOnce(new Error('Pas sur place'))
+  afficher({ erreur: null })
+  await userEvent.click(planter())
+  expect(couper).toHaveBeenCalledOnce()
+})

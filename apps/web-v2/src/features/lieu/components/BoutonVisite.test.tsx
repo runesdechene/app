@@ -134,3 +134,11 @@ test('« Me localiser pour visiter » demande la position', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Me localiser pour visiter' }))
   expect(demander).toHaveBeenCalled()
 })
+
+test('un double toucher ne marque qu’une visite', async () => {
+  visiter.mockReturnValueOnce(new Promise<typeof VISITE>(() => undefined))
+  position_.mockReturnValue({ position: { lat: 45.0009, lng: 6 }, demander: vi.fn() })
+  afficher({ lat: 45, lng: 6, visiteLe: null })
+  await userEvent.dblClick(screen.getByRole('button', { name: 'Marquer ma visite (GPS)' }))
+  expect(visiter).toHaveBeenCalledOnce()
+})

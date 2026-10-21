@@ -75,6 +75,11 @@
   z-index: 20;
 }
 
+/* Tant que la fiche du lieu arrive, le parcours ne rend rien : le calque ne bloque pas la carte. */
+.calque:empty {
+  display: none;
+}
+
 @keyframes monte {
   from {
     opacity: 0;

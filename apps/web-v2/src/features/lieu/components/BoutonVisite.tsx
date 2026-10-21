@@ -8,6 +8,7 @@
  *            serveur exige une visite de moins de 30 minutes pour revendiquer. Un souvenir
  *            (mig 531) ne se revendique pas : sur place, on le visite d'abord.
  */
+import { useState } from 'react'
 import type { FicheLieu, Recompense } from '../api/lireLieu'
 import { usePosition } from '@/shared/hooks/usePosition'
 import { useVisite } from '../hooks/useVisite'
@@ -55,6 +56,7 @@ export function BoutonVisite({
 }) {
   const { position, demander } = usePosition()
   const { visiter, enCours, erreur } = useVisite(fiche.id)
+  const [envoye, setEnvoye] = useState(false) // un double toucher ne marque qu'une visite
   const etat = etatVisite(position, fiche, fiche.moi.visiteLe, fiche.moi.souvenirLe)
   const actif = etat.kind === 'localiser' || etat.kind === 'visiter' || etat.kind === 'revendiquer'
   // Jamais visité, et pas de visite possible d'ici (trop loin, ou sans position) : on peut dire
@@ -69,7 +71,16 @@ export function BoutonVisite({
       return
     }
     if (typeof position === 'string') return
-    visiter(position).then(onVisite, () => undefined) // l'échec est déjà écrit par `erreur`
+    setEnvoye(true)
+    visiter(position).then(
+      (recompense) => {
+        setEnvoye(false)
+        onVisite(recompense)
+      },
+      () => {
+        setEnvoye(false) // l'échec est déjà écrit par `erreur`
+      },
+    )
   }
 
   return (
@@ -78,7 +89,7 @@ export function BoutonVisite({
         key={etat.kind}
         type="button"
         className={[styles.bouton, STYLE[etat.kind]].filter(Boolean).join(' ')}
-        disabled={!actif || enCours}
+        disabled={!actif || enCours || envoye}
         onClick={toucher}
       >
         {libelle(etat, fiche.moi.genre)}

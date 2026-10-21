@@ -31,6 +31,7 @@ import { noterLieuVu } from '@/features/lieu/api/lieu'
 import { oublierNouveau } from '@/features/carte/hooks/useCarteLieux'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
+import styles from './lieu.module.css'
 
 type Ouvert = 'options' | 'partager' | 'coeurs' | 'histoire' | 'signaler' | 'souvenir' | null
 
@@ -62,6 +63,26 @@ function Lieu({ id }: { id: string }) {
     return (
       <DetailPane title="Un lieu inconnu" surImage>
         <DecouverteLieu fiche={fiche} onFermer={fermerDetail} />
+      </DetailPane>
+    )
+  }
+
+  // Après une visite sur place, le parcours prend la place de la fiche (comme la découverte).
+  if (fiche && visite) {
+    const fini = () => {
+      setVisite(null)
+    }
+    return (
+      <DetailPane title={fiche.nom} surImage>
+        <div className={styles.parcours}>
+          <ParcoursRevendication
+            id={id}
+            recompense={visite}
+            monNom={profil?.nom ?? ''}
+            onFermer={fini}
+            onVoirLeLieu={fini}
+          />
+        </div>
       </DetailPane>
     )
   }
@@ -109,19 +130,6 @@ function Lieu({ id }: { id: string }) {
       {ouvert === 'histoire' && <FeuilleHistoire id={id} onFermer={fermer} />}
       {ouvert === 'signaler' && <FeuilleSignaler id={id} onFermer={fermer} />}
       {fiche && ouvert === 'partager' && <FeuillePartager fiche={fiche} onFermer={fermer} />}
-      {visite && (
-        <ParcoursRevendication
-          id={id}
-          recompense={visite}
-          monNom={profil?.nom ?? ''}
-          onFermer={() => {
-            setVisite(null)
-          }}
-          onVoirLeLieu={() => {
-            setVisite(null)
-          }}
-        />
-      )}
       {fiche && ouvert === 'souvenir' && (
         <FeuilleJySuisAlle id={id} genre={fiche.moi.genre} onFermer={fermer} />
       )}

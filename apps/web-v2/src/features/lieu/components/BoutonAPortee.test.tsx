@@ -10,7 +10,11 @@ vi.mock('@/shared/hooks/usePosition', () => ({ usePosition: position_ }))
 const visite_ = vi.hoisted(() => vi.fn())
 vi.mock('../hooks/useVisite', () => ({ useVisite: visite_ }))
 vi.mock('./ParcoursRevendication', () => ({
-  ParcoursRevendication: ({ id }: { id: string }) => <p>parcours de {id}</p>,
+  ParcoursRevendication: ({ id, onVoirLeLieu }: { id: string; onVoirLeLieu: () => void }) => (
+    <button type="button" onClick={onVoirLeLieu}>
+      parcours de {id}
+    </button>
+  ),
 }))
 
 const ICI = { lat: 43.8, lng: 7.3 }
@@ -66,4 +70,29 @@ test('une visite refusée : le message, pas de parcours', async () => {
   await userEvent.click(screen.getByRole('button', { name: /Marquer ma visite/ }))
   expect(screen.getByRole('alert')).toHaveTextContent('Tu es encore trop loin')
   expect(screen.queryByText(/parcours de/)).not.toBeInTheDocument()
+})
+
+test('« Voir le lieu » ferme le parcours avant d’ouvrir la fiche', async () => {
+  const onVoirLeLieu = vi.fn()
+  position_.mockReturnValue({ position: ICI, demander: vi.fn() })
+  visite_.mockReturnValue({ visiter, enCours: false, erreur: null })
+  render(
+    <BoutonAPortee
+      lieux={[COARAZE]}
+      monNom="Uriel"
+      onAPortee={onAPortee}
+      onVoirLeLieu={onVoirLeLieu}
+    />,
+  )
+  await userEvent.click(screen.getByRole('button', { name: /Marquer ma visite/ }))
+  await userEvent.click(screen.getByRole('button', { name: 'parcours de coaraze' }))
+  expect(onVoirLeLieu).toHaveBeenCalledWith('coaraze')
+  expect(screen.queryByText('parcours de coaraze')).not.toBeInTheDocument()
+})
+
+test('un double toucher ne marque qu’une visite', async () => {
+  visiter.mockReturnValueOnce(new Promise<Recompense>(() => undefined))
+  afficher(ICI)
+  await userEvent.dblClick(screen.getByRole('button', { name: /Marquer ma visite/ }))
+  expect(visiter).toHaveBeenCalledOnce()
 })

@@ -31,6 +31,7 @@ export function BoutonAPortee({
   const { visiter, enCours, erreur } = useVisite(id ?? '')
   // Le parcours garde son lieu, même si l'on s'éloigne pendant qu'il est ouvert.
   const [parcours, setParcours] = useState<{ id: string; recompense: Recompense } | null>(null)
+  const [envoye, setEnvoye] = useState(false) // un double toucher ne marque qu'une visite
 
   useEffect(() => {
     onAPortee(id)
@@ -48,6 +49,7 @@ export function BoutonAPortee({
             setParcours(null)
           }}
           onVoirLeLieu={() => {
+            setParcours(null) // la fiche s'ouvre sur la carte : le calque ne doit pas rester dessous
             onVoirLeLieu(parcours.id)
           }}
         />
@@ -57,11 +59,15 @@ export function BoutonAPortee({
   if (!proche || typeof position === 'string') return null
 
   function marquer(lieu: string, ici: { lat: number; lng: number }) {
+    setEnvoye(true)
     visiter(ici).then(
       (recompense) => {
+        setEnvoye(false)
         setParcours({ id: lieu, recompense })
       },
-      () => undefined, // le refus est écrit par `erreur`
+      () => {
+        setEnvoye(false) // le refus est écrit par `erreur`
+      },
     )
   }
 
@@ -75,7 +81,7 @@ export function BoutonAPortee({
       <button
         type="button"
         className={styles.bouton}
-        disabled={enCours}
+        disabled={enCours || envoye}
         onClick={() => {
           marquer(proche.lieu.id, position)
         }}

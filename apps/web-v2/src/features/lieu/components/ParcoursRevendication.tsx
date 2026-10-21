@@ -5,7 +5,7 @@
  *            une cérémonie à part ; le même parcours part du bouton de la carte et de la fiche.
  * ATTENTION — un calque posé sur l'écran de départ (comme la découverte) : fermer y ramène.
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { aLaTaille } from '@/shared/lib/image'
 import { Recompense } from '@/shared/ui/Recompense'
 import type { Conquete as ConqueteFaite, Recompense as RecompenseVisite } from '../api/lireLieu'
@@ -32,9 +32,13 @@ export function ParcoursRevendication({
   onFermer: () => void
   onVoirLeLieu: () => void
 }) {
-  const { fiche } = useFiche(id)
+  const { fiche, erreur } = useFiche(id)
   const [conquete, setConquete] = useState<ConqueteFaite | null>(null)
   const [etendard, setEtendard] = useState(false)
+  // Une fiche qui ne vient pas : on referme, plutôt qu'un calque vide sans issue.
+  useEffect(() => {
+    if (erreur) onFermer()
+  }, [erreur, onFermer])
   if (!fiche) return null
 
   if (conquete)

@@ -61,8 +61,10 @@ export function PlanteTonEtendard({
 
   function planter() {
     setEnvoye(true)
-    void new Audio(BRUITAGE).play().catch(() => undefined) // téléphone en silencieux : tant pis
+    const son = new Audio(BRUITAGE)
+    void son.play().catch(() => undefined) // téléphone en silencieux : tant pis
     revendiquer(choisis, nom.trim() || null, pour).then(onConquis, () => {
+      son.pause() // pas d'applaudissements sur un refus
       setEnvoye(false) // le refus est écrit par `erreur`
     })
   }

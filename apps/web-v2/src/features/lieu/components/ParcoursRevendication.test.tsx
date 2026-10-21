@@ -92,3 +92,17 @@ test('« Revenir à la carte » ferme le parcours', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Revenir à la carte' }))
   expect(onFermer).toHaveBeenCalledOnce()
 })
+
+test('une fiche qui ne se charge pas ferme le parcours (jamais de calque vide)', () => {
+  fiche_.mockReturnValue({ fiche: undefined, erreur: true, reessayer: vi.fn() })
+  render(
+    <ParcoursRevendication
+      id="a"
+      recompense={VISITE}
+      monNom="Uriel"
+      onFermer={onFermer}
+      onVoirLeLieu={onVoirLeLieu}
+    />,
+  )
+  expect(onFermer).toHaveBeenCalledOnce()
+})
