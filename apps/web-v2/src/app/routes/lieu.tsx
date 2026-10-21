@@ -11,10 +11,13 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { BoutonVisite } from '@/features/lieu/components/BoutonVisite'
+import { ParcoursRevendication } from '@/features/lieu/components/ParcoursRevendication'
+import type { Recompense } from '@/features/lieu/api/lireLieu'
+import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
+import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { ModifierFiche } from '@/features/ajout/components/ModifierFiche'
 import { QuestionAbandon } from '@/features/ajout/components/QuestionAbandon'
 import { DecouverteLieu } from '@/features/lieu/components/DecouverteLieu'
-import { FenetreRevendication } from '@/features/lieu/components/FenetreRevendication'
 import { CarnetDuLieu } from '@/features/lieu/components/CarnetDuLieu'
 import { FeuilleCoeurs } from '@/features/lieu/components/FeuilleCoeurs'
 import { FeuilleHistoire } from '@/features/lieu/components/FeuilleHistoire'
@@ -29,8 +32,7 @@ import { oublierNouveau } from '@/features/carte/hooks/useCarteLieux'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
 
-type Ouvert =
-  'options' | 'partager' | 'revendiquer' | 'coeurs' | 'histoire' | 'signaler' | 'souvenir' | null
+type Ouvert = 'options' | 'partager' | 'coeurs' | 'histoire' | 'signaler' | 'souvenir' | null
 
 // Un lieu = un état neuf : passer d'un lieu à l'autre efface erreurs, galerie et feuilles ouvertes.
 export function RouteLieu() {
@@ -46,6 +48,9 @@ function Lieu({ id }: { id: string }) {
     oublierNouveau(client, id)
   }, [client, id])
   const [ouvert, setOuvert] = useState<Ouvert>(null)
+  // Après une visite sur place : la fête, puis l'étendard (le même parcours que sur la carte).
+  const [visite, setVisite] = useState<Recompense | null>(null)
+  const { profil } = useExplorateur(useMonIdentifiant())
   const fermerDetail = useFermerDetail()
   const navigate = useNavigate()
   const fermer = () => {
@@ -80,9 +85,7 @@ function Lieu({ id }: { id: string }) {
         boutonVisite={(f) => (
           <BoutonVisite
             fiche={f}
-            onVisite={() => {
-              setOuvert('revendiquer')
-            }}
+            onVisite={setVisite}
             onSouvenir={() => {
               setOuvert('souvenir')
             }}
@@ -106,8 +109,18 @@ function Lieu({ id }: { id: string }) {
       {ouvert === 'histoire' && <FeuilleHistoire id={id} onFermer={fermer} />}
       {ouvert === 'signaler' && <FeuilleSignaler id={id} onFermer={fermer} />}
       {fiche && ouvert === 'partager' && <FeuillePartager fiche={fiche} onFermer={fermer} />}
-      {fiche && ouvert === 'revendiquer' && (
-        <FenetreRevendication fiche={fiche} onFermer={fermer} />
+      {visite && (
+        <ParcoursRevendication
+          id={id}
+          recompense={visite}
+          monNom={profil?.nom ?? ''}
+          onFermer={() => {
+            setVisite(null)
+          }}
+          onVoirLeLieu={() => {
+            setVisite(null)
+          }}
+        />
       )}
       {fiche && ouvert === 'souvenir' && (
         <FeuilleJySuisAlle id={id} genre={fiche.moi.genre} onFermer={fermer} />

@@ -8,7 +8,7 @@
  *            serveur exige une visite de moins de 30 minutes pour revendiquer. Un souvenir
  *            (mig 531) ne se revendique pas : sur place, on le visite d'abord.
  */
-import type { FicheLieu } from '../api/lireLieu'
+import type { FicheLieu, Recompense } from '../api/lireLieu'
 import { usePosition } from '@/shared/hooks/usePosition'
 import { useVisite } from '../hooks/useVisite'
 import { etatVisite, type EtatVisite } from '../lib/etatVisite'
@@ -50,7 +50,7 @@ export function BoutonVisite({
   onSouvenir,
 }: {
   fiche: Pick<FicheLieu, 'id' | 'lat' | 'lng' | 'moi'>
-  onVisite: () => void
+  onVisite: (recompense: Recompense) => void // la fête de la visite, puis la revendication
   onSouvenir: () => void
 }) {
   const { position, demander } = usePosition()
