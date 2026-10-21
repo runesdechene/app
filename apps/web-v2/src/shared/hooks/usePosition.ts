@@ -1,11 +1,14 @@
 /**
- * QUOI     — ma position, suivie tant que la fiche est ouverte ; ou pourquoi on ne l'a pas.
+ * QUOI     — ma position, suivie tant que l'écran qui la lit est ouvert (fiche, carte) ; ou pourquoi
+ *            on ne l'a pas.
  * POURQUOI — le bouton de visite change d'état quand on s'approche, sans recharger. On ne
  *            demande la position que sur un geste (« Me localiser pour visiter ») ; déjà
  *            autorisée, on la suit tout de suite.
  */
 import { useCallback, useEffect, useState } from 'react'
-import type { Position } from '../lib/etatVisite'
+
+// Ma position, ou pourquoi on ne l'a pas.
+export type Position = 'inconnue' | 'refusee' | { lat: number; lng: number }
 
 export function usePosition(): { position: Position; demander: () => void } {
   // Sans géolocalisation du tout, on le sait dès le départ.

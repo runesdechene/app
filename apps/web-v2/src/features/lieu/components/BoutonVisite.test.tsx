@@ -6,7 +6,7 @@ import { BoutonVisite } from './BoutonVisite'
 
 const position_ = vi.hoisted(() => vi.fn())
 const visite_ = vi.hoisted(() => vi.fn())
-vi.mock('../hooks/usePosition', () => ({ usePosition: position_ }))
+vi.mock('@/shared/hooks/usePosition', () => ({ usePosition: position_ }))
 vi.mock('../hooks/useVisite', () => ({ useVisite: visite_ }))
 
 const visiter = vi.fn(() => Promise.resolve())

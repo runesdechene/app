@@ -9,7 +9,7 @@
  *            (mig 531) ne se revendique pas : sur place, on le visite d'abord.
  */
 import type { FicheLieu } from '../api/lireLieu'
-import { usePosition } from '../hooks/usePosition'
+import { usePosition } from '@/shared/hooks/usePosition'
 import { useVisite } from '../hooks/useVisite'
 import { etatVisite, type EtatVisite } from '../lib/etatVisite'
 import { jySuisAlle } from '../lib/souvenir'
