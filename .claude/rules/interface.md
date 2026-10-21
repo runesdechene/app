@@ -293,3 +293,14 @@ Le 2026-05-02, j'avais réécrit la modale "Couronnes de Chêne" pour expliquer 
 - Si je sens le besoin d'expliquer l'algo, c'est probablement que la mécanique elle-même est trop compliquée — alerte
 
 Les détails backend restent dans : commentaires SQL, docs/ specs, mémoire XO, jamais en user-facing.
+
+## Une maquette part des visuels de la marque, jamais d'un dessin vectoriel maison (21/10/2026)
+
+L'appli tient sa beauté de vraies images : photos des lieux, gravures, bannières peintes. Un drapeau,
+une butte ou un halo dessinés en formes Figma font « IA générée » (Uriel, 21/10 : « tu me fais du
+vectoriel, du basique, les boutons sont trop gros, ce n'est pas audacieux »). Avant de dessiner une
+illustration, chercher sur le NAS : `\EGIDE\Runes de Chêne\VISUELS\` — `LA CARTE` (bannières
+peintes par culture, `etendard.svg`, `rune.svg`, icônes), `Ressources Mei\Ressources diverses`
+(fonds parchemin, `Fond section`, drapeau). Un moment fort se joue en plein écran sur la photo du
+lieu, texte clair sur l'image, boutons fins (pas de pleine largeur). Un panneau reprend les valeurs
+d'un écran validé (feuille : fond `#fff9f0`, rayon 22, ni bordure ni ombre, voile encre 35 %).
