@@ -88,9 +88,9 @@ export function calqueGelule(c: CouleursCarte): AddLayerObject {
     layout: {
       'text-field': 'NOUVEAU',
       'text-font': ['Noto Sans Bold'],
-      // Rapetisse avec la marque en dézoomant (Uriel, 22/10) : 8 de près (taille 1,15). Le décalage,
-      // en em, la suit tout seul et la garde collée sous la marque.
-      'text-size': taille(8 / 1.15),
+      // Rapetisse avec la marque en dézoomant (Uriel, 22/10) : 9 de près (taille 1,15). Le décalage,
+      // en em, la suit tout seul et la garde collée sous la marque ; la marge de la gélule aussi.
+      'text-size': taille(9 / 1.15),
       'text-letter-spacing': 0.08,
       // Sous la marque, à la place du nom de qui l'a revendiqué (calques.ts ne le montre pas sur un
       // lieu neuf) : jamais les deux empilés.
@@ -98,7 +98,15 @@ export function calqueGelule(c: CouleursCarte): AddLayerObject {
       'text-offset': [0, 2.1],
       'icon-image': 'pilule-nouveau',
       'icon-text-fit': 'both',
-      'icon-text-fit-padding': [2, 5, 2, 5],
+      'icon-text-fit-padding': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        ...PALIERS.flatMap(([z, t]): [number, ExpressionSpecification] => {
+          const p = (n: number) => Math.round((n * t * 10) / 1.15) / 10
+          return [z, ['literal', [p(2), p(5), p(2), p(5)]]]
+        }),
+      ],
       // Deux lieux neufs voisins : une seule gélule, pour ne pas les empiler (l'anneau reste aux deux).
       'text-allow-overlap': false,
       'icon-allow-overlap': false,
