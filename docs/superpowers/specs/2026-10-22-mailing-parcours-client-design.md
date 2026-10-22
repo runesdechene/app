@@ -138,7 +138,7 @@ L'anniversaire se demande aussi à la création du compte au stand et dans l'app
 - **Désabonnement en un clic** : lien signé dans chaque e-mail et en-têtes `List-Unsubscribe` et
   `List-Unsubscribe-Post` (exigés par Gmail et Yahoo pour les envois en nombre). Un désabonnement
   coupe aussi l'accord côté Shopify.
-- **Un sous-domaine dédié, `lettres.runesdechene.com`** (nom à confirmer), pour l'envoi **et** la
+- **Un sous-domaine dédié, `missives.runesdechene.com`** (validé par Uriel le 22/10), pour l'envoi **et** la
   réception des réponses, authentifié chez Resend (SPF, DKIM, DMARC) avant le premier envoi groupé.
   Le domaine principal n'est pas touché : sa boîte est chez Proton (MX `mail.protonmail.ch`), Shopify
   y envoie. Les DNS sont chez **o2switch** (`ns1.o2switch.net`, vérifié le 22/10).
