@@ -104,6 +104,7 @@ export const DA_SHOWCASED = [
   'Recompense',
   'Segments',
   'Text',
+  'TexteAvecLiens',
 ] as const
 
 export const SPACE_TOKENS = [

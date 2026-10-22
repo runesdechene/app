@@ -40,6 +40,7 @@ import { enrichisseurs, liaison } from '../lib/credit'
 import { ligneDeFaits } from '../lib/faits'
 import { CarnetDuLieu } from './CarnetDuLieu'
 import { PastilleCoeurs } from '@/shared/ui/PastilleCoeurs'
+import { TexteAvecLiens } from '@/shared/ui/TexteAvecLiens'
 import { CoeursDesAuteurs } from './CoeursLieu'
 import styles from './FicheLieu.module.css'
 
@@ -242,7 +243,9 @@ export function FicheLieu({
         {fiche.recit && (
           <section className={styles.recit} aria-label="Le récit">
             <h3 className={styles.rubrique}>Le récit</h3>
-            <p className={styles.texte}>{fiche.recit}</p>
+            <p className={styles.texte}>
+              <TexteAvecLiens texte={fiche.recit} />
+            </p>
           </section>
         )}
 
@@ -330,7 +333,9 @@ function InfosEnPlus({ rubriques, bivouac }: { rubriques: Fiche['rubriques']; bi
           <img className={styles.iconeInfo} src={r.icone} alt="" />
           <div>
             <h4 className={styles.titreInfo}>{r.titre}</h4>
-            <p className={styles.texteInfo}>{rubriques[r.cle]}</p>
+            <p className={styles.texteInfo}>
+              <TexteAvecLiens texte={rubriques[r.cle] ?? ''} />
+            </p>
           </div>
         </div>
       ))}

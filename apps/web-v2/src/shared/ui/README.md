@@ -22,3 +22,5 @@ Supabase ; aucune n'écrit une valeur visuelle en dur (Stylelint).
   champ d'écriture : sous la fiche d'un lieu et sous une mise à jour. Il reçoit le carnet et les actions.
 - `PastilleCoeurs`, `FeuilleDesCoeurs` — les cœurs à volonté et la feuille de ceux qui en ont envoyé :
   un lieu et une mise à jour.
+- `TexteAvecLiens` — un texte d'Explorateur, ses liens https et @mentions cliquables (présentation
+  d'un profil, récit et infos d'un lieu).

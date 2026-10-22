@@ -16,9 +16,9 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { Feuille } from '@/shared/ui/Feuille'
 import { Text } from '@/shared/ui/Text'
+import { TexteAvecLiens } from '@/shared/ui/TexteAvecLiens'
 import type { ExplorateurProfile, TitrePorte } from '../api/lireProfil'
 import { explorateur, phraseAttache } from '../lib/accord'
-import { decouperBio } from '../lib/bio'
 import { phraseCondition } from '@/shared/lib/conditionTitre'
 import { sousLeSigne } from '@/shared/lib/signe'
 import { pseudoInstagram } from '../lib/instagram'
@@ -81,15 +81,7 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
 
         {profil.bio && (
           <p className={styles.bio}>
-            {decouperBio(profil.bio).map((m, i) =>
-              m.type === 'lien' ? (
-                <a key={i} href={m.href} target="_blank" rel="noreferrer">
-                  {m.valeur}
-                </a>
-              ) : (
-                m.valeur
-              ),
-            )}
+            <TexteAvecLiens texte={profil.bio} />
           </p>
         )}
 

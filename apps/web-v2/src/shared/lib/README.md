@@ -19,3 +19,5 @@
 - `adresse.ts` — l'endroit en mots (adresse lisible d'une position) : l'ajout d'un lieu et les pins le partagent.
 - `carnet.ts` — un carnet (mots, réponses) et des cœurs, lus du JSON, et le cœur d'un mot qui bascule :
   le Carnet de passage d'un lieu et celui d'une mise à jour (Nouveautés) le partagent.
+- `liens.ts` — découpe un texte d'Explorateur en texte, liens `https://` et mentions `@instagram`
+  (`TexteAvecLiens`).

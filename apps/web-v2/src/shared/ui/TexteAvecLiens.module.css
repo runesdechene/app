@@ -1,0 +1,7 @@
+/* Le lien garde la couleur du texte qui l'entoure ; une longue adresse se coupe plutôt que déborder. */
+.lien {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}

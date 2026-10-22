@@ -109,12 +109,6 @@
   white-space: pre-line;
 }
 
-.bio a {
-  color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
 .details {
   display: grid;
   justify-items: center;

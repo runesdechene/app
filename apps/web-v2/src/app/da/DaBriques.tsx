@@ -33,6 +33,7 @@ import { PlanSatellite } from '@/shared/ui/PlanSatellite'
 import { Recompense } from '@/shared/ui/Recompense'
 import { Segments } from '@/shared/ui/Segments'
 import { Text } from '@/shared/ui/Text'
+import { TexteAvecLiens } from '@/shared/ui/TexteAvecLiens'
 import { DaSection } from './DaSection'
 import styles from './DaPage.module.css'
 
@@ -120,6 +121,12 @@ export function DaBriques() {
         <p className={styles.tailleNom}>Uriel — --nom-profil-size</p>
         <p className={styles.tailleRangee}>Ses fragments — --rangee-size</p>
         <p className={styles.tailleBio}>Chevalier errant à temps partiel — --bio-size</p>
+      </DaSection>
+
+      <DaSection name="TexteAvecLiens">
+        <p className={styles.tailleBio}>
+          <TexteAvecLiens texte="Le récit continue sur https://runesdechene.com, photos par @runesdechene." />
+        </p>
       </DaSection>
 
       <DaSection name="Button">
