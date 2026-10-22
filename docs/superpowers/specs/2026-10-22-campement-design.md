@@ -39,6 +39,8 @@ que la marque n'honore pas.
 
 - **Un onglet**, pas un interrupteur (écarté : personne ne pense à le toucher).
   Barre : **Explore · Carte · Campement · Messages · Compte**. `/campement` ouvre l'onglet.
+- **Les Compagnies quittent la barre** : sur téléphone, elles passent dans le menu dépliant du
+  Compte (`MenuDuProfil`) (Uriel, 22/10). *[mon choix : pareil sur PC]*
 - L'appli s'ouvre sur Explore sans Fragment, sur le Campement dès qu'on en a un (08/10).
 - **Téléphone** : un écran, comme les autres onglets.
 - **PC** : l'onglet Campement prend **la place de la carte** (la coquille garde aujourd'hui la
@@ -59,7 +61,8 @@ De haut en bas :
      déjà produits pour l'Accueil]*
 3. **L'entrée du Codex** (téléphone ; sur PC il est dans la colonne de gauche).
 
-**Un seul geste partout : lever sa chope** — sur une découverte, un rendez-vous, une activité.
+**Un seul geste partout : lever sa chope** — comme le salut de l'Accueil : un compteur, l'auteur
+prévenu, pas de liste de noms. *[mon choix]* Il s'applique sur une découverte, un rendez-vous, une activité.
 *[mon choix : pas de second geste ; « saluer » et sa feuille restent à l'Accueil Explore]*
 
 ## 5. La découverte — « lever sa chope »
@@ -70,7 +73,12 @@ Pline l'Ancien qu'il veut partager à toute la communauté.
 - **Le contenu est un fond de story** : du texte, une photo, un audio, une vidéo — et toute
   combinaison (une photo et un audio, avec du texte).
 - La mise en scène dit le toast, pas le post : « Uriel lève sa chope : … », gravure de chope.
-- **Le tour de table** : la discussion sous la découverte, où chacun donne son avis.
+- **Le tour de table** : la discussion sous la découverte, où chacun donne son avis. *[mon choix :
+  son propre fil par découverte, sur le modèle de `mission_messages` ; distinct du canal des
+  Porteurs de Messages, qui est à créer dans `chat_messages`]*
+- **La découverte reste** : « story » est le format, pas l'éphémère. Photo, vidéo, audio se
+  prennent ou se choisissent avec les outils du téléphone ; limites de durée et de poids au
+  builder. *[mon choix]*
 - Tout Porteur en poste ; le geste doit être aussi léger qu'une story.
 
 ## 6. Le rendez-vous
@@ -80,6 +88,8 @@ Exemple d'Uriel : nomade, il passe dans une région et veut y retrouver ses fans
 - Tout Porteur peut en lancer un : un **lieu de la Carte**, des dates, « J'y serai ».
 - *[mon choix]* C'est l'**appel de type rendez-vous** déjà prévu (§6 de la spec V2) : table
   `missions` (+ `kind`, lien vers un lieu), son salon `mission_messages`. Lancé par un Porteur.
+- **Public ou réservé**, au choix de celui qui le lance (Uriel, 22/10). Public : un non-Porteur le
+  voit **seulement sur la Carte**, jamais au Campement. Réservé : Porteurs seuls.
 - Prévenir d'abord les Porteurs de la zone : voir §10.
 
 ## 7. Le vote
@@ -89,11 +99,17 @@ prochains festivals. **L'e-mail l'annonce, on vote au Campement.** Règles repri
 spec V2 : un choix entre des candidats, jamais une question ouverte ; un Porteur, une voix ; totaux
 publics, voix anonymes ; le score se découvre après avoir voté ; l'engagement de la marque écrit
 dans l'écran ; **l'archive** garde les décisions et les refus motivés.
+**Les initiatives à seuil** (§9 de la V2) ne montent pas au lancement : l'archive ne garde que
+les votes. *[mon choix]*
+**Le Hub** a ses écrans dès la première version : créer un vote (candidats, échéance, texte
+d'engagement), publier une annonce ou une vente privée, écrire la décision. *[mon choix]*
 À voir en base : `territory_name_proposals` / `territory_name_votes` (gelées, mig 274).
 
 ## 8. Ce qui appartient au Porteur
 
-- **Le Codex** : §8 de la spec V2 (registre de ce que tu as, rangées à trous). Une zone entière,
+- **Le Codex** : la décision du 22/10 remplace « le Codex a quitté Explore, il vit dans la
+  boutique » (28/09, cité dans `features/compte`). **Lot à part, après le cœur du Campement.**
+  *[mon choix : l'ordre]* Contenu : §8 de la spec V2 (registre de ce que tu as, rangées à trous). Une zone entière,
   **pas dans le Compte**, déjà plein.
 - **Les Couronnes** et **le code de parrainage** : au Compte. Barème du 28/09 (`_État.md`).
   Tables V1 `user_crowns` gardées avec leurs soldes (`docs/v2/purge-back.md`) ; les gains V1
