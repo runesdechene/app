@@ -19,7 +19,7 @@ produits, un seul compte**, et c'est la marque qui guide le client.
 - **Runes de Chêne Explore** (`apps/web-v2`) — la carte des lieux, **offerte** à la communauté.
   On la termine, puis on l'entretient sans la développer. « Explore » s'entend comme l'impératif :
   *va, et explore*.
-- **Le Campement** — plus tard, **sur la boutique** : un bouton flottant qui ouvre, dans un tiroir
+- **Le Campement** — *révisé le 22/10 : un onglet d'Explore, voir `2026-10-22-campement-design.md` ; ce qui suit est l'idée d'origine.* Plus tard, **sur la boutique** : un bouton flottant qui ouvre, dans un tiroir
   (web app en iframe, même domaine), *Mes Fragments* (le Codex : récit, audio, Anecdotes réservées
   aux acheteurs), *Mes Couronnes* (réductions), *Mon compte*. Spec à part, **après** Explore.
 
@@ -828,6 +828,10 @@ Aucun ne fait le travail d'un autre, aucun ne se répète.
   lecture *Le temps* de la Carte (§7).
 
 ## 9. Campement — VALIDÉ (structure)
+
+> **Remplacé le 22/10/2026** par `2026-10-22-campement-design.md` pour la place (un onglet
+> d'Explore), l'accès (tout réservé aux Porteurs) et le contenu. Restent valables ici : les règles
+> du vote, l'archive, la porte.
 
 Maquette de structure : artefact **« Le Campement »**.
 
