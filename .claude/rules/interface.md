@@ -336,3 +336,9 @@ version suivante, des italiques partout : pour lui, **l'italique est un marqueur
 **Alegreya SC** espacée pour nommer, **Bebas Neue** pour un seul mot, un rouge de sceau pour ce
 qu'on touche, la gravure du site (`Fond_section`, frise et pins) sur un vélin. Ni encart, ni pilule,
 ni italique. Référence (en relecture le 22/10) : Figma « App v2 », page « Hub Emails », section « Encre & Vélin ».
+
+**Ce qui sonne « IA basique »** (Uriel, 22/10, même chantier) : un cadre double avec une fiche
+technique clé/valeur, un médaillon en pointillés qui attend une image, un gros bouton noir pleine
+largeur, et en général tout habillage posé sur un objet **qui n'a pas encore de dessin**. Sans vraie
+image, on écrit deux phrases et un lien, et on attend la gravure. Une photo est éditoriale : pleine
+largeur, d'un bord à l'autre de l'e-mail, légèrement penchée, sans arrondi ni cadre.
