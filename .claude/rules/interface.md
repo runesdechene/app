@@ -342,3 +342,8 @@ technique clé/valeur, un médaillon en pointillés qui attend une image, un gro
 largeur, et en général tout habillage posé sur un objet **qui n'a pas encore de dessin**. Sans vraie
 image, on écrit deux phrases et un lien, et on attend la gravure. Une photo est éditoriale : pleine
 largeur, d'un bord à l'autre de l'e-mail, légèrement penchée, sans arrondi ni cadre.
+
+**Un e-mail de la marque montre la marque** (Uriel, 22/10 : « pourquoi tu mets des images de
+l'application alors qu'on est en train de vendre la marque ? ») : un Fragment, son illustration,
+quelqu'un qui le porte, l'atelier, le stand. Les photos de lieux du Figma (`549:*`, `566:*`, `211:*`)
+sont celles des Explorateurs : elles appartiennent à l'appli, jamais à un e-mail de vente.
