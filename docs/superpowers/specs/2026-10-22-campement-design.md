@@ -88,8 +88,9 @@ Exemple d'Uriel : nomade, il passe dans une région et veut y retrouver ses fans
 - Tout Porteur peut en lancer un : un **lieu de la Carte**, des dates, « J'y serai ».
 - *[mon choix]* C'est l'**appel de type rendez-vous** déjà prévu (§6 de la spec V2) : table
   `missions` (+ `kind`, lien vers un lieu), son salon `mission_messages`. Lancé par un Porteur.
-- **Public ou réservé**, au choix de celui qui le lance (Uriel, 22/10). Public : un non-Porteur le
-  voit **seulement sur la Carte**, jamais au Campement. Réservé : Porteurs seuls.
+- **Seule la marque peut le rendre public** ; un rendez-vous lancé par un Porteur reste entre
+  Porteurs (Uriel, 22/10). Public : un non-Porteur le voit **seulement sur la Carte**, jamais au
+  Campement.
 - Prévenir d'abord les Porteurs de la zone : voir §10.
 
 ## 7. Le vote
