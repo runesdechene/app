@@ -335,4 +335,4 @@ version suivante, des italiques partout : pour lui, **l'italique est un marqueur
 **Alegreya** justifiée pour la voix (la police des récits du thème, `custom_google_font_fragment`),
 **Alegreya SC** espacée pour nommer, **Bebas Neue** pour un seul mot, un rouge de sceau pour ce
 qu'on touche, la gravure du site (`Fond_section`, frise et pins) sur un vélin. Ni encart, ni pilule,
-ni italique. Référence validée : Figma « App v2 », page « Hub Emails », section « Encre & Vélin ».
+ni italique. Référence (en relecture le 22/10) : Figma « App v2 », page « Hub Emails », section « Encre & Vélin ».
