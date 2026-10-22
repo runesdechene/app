@@ -324,3 +324,15 @@ Et un vote porte sur une illustration **qui n'existe pas encore** : rien à mont
 **How to apply :** dans Figma, `clone()` les nœuds des écrans validés (en-tête, intertitres et leur
 icône au pinceau, lignes « Sur les chemins », cartes photo, barre, Messages) et ne changer que les
 textes et l'agencement. Aucune couleur qui ne soit dans `tokens.css`, aucun effet.
+
+## Un e-mail de la marque se compose comme une page de livre, jamais comme une newsletter (22/10/2026)
+
+**Le piège** : pour le mailing du Hub, j'ai livré un gabarit standard (logo centré, titres rouges,
+encarts arrondis, boutons-pilules). Uriel : « on dirait que ça date de l'an 2000 ». Puis, sur la
+version suivante, des italiques partout : pour lui, **l'italique est un marqueur d'IA**.
+
+**How to apply :** partir du bloc « L'histoire derrière ce Fragment » des fiches produit du site :
+**Alegreya** justifiée pour la voix (la police des récits du thème, `custom_google_font_fragment`),
+**Alegreya SC** espacée pour nommer, **Bebas Neue** pour un seul mot, un rouge de sceau pour ce
+qu'on touche, la gravure du site (`Fond_section`, frise et pins) sur un vélin. Ni encart, ni pilule,
+ni italique. Référence validée : Figma « App v2 », page « Hub Emails », section « Encre & Vélin ».
