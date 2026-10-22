@@ -19,7 +19,7 @@ import type {
   Map as Carte,
 } from 'maplibre-gl'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
-import { PALIERS, SOURCE } from './calques'
+import { PALIERS, SOURCE, taille } from './calques'
 
 export const CALQUE_ANNEAU_NOUVEAUX = 'nouveaux-anneau'
 export const CALQUE_GELULE_NOUVEAUX = 'nouveaux-gelule'
@@ -28,7 +28,6 @@ const PERIODE = 3000 // ms : plus lent que les énigmes (2 200), pour qu'on ne l
 const RAYON = 13 // le rayon d'une marque à la taille 1 (sceau de 26 px)
 const ELAN = 4 // de combien l'anneau s'élargit au-delà de la marque (réduit de moitié, Uriel 08/10)
 const TRAIT = 1.2 // l'épaisseur de l'anneau
-const SOUS_LA_MARQUE = 2.1 // le décalage de la gélule (em) sous une marque à la taille 1,15 (de près)
 
 const estNouveau: FilterSpecification = ['==', ['get', 'nouveau'], true]
 
@@ -89,21 +88,14 @@ export function calqueGelule(c: CouleursCarte): AddLayerObject {
     layout: {
       'text-field': 'NOUVEAU',
       'text-font': ['Noto Sans Bold'],
-      'text-size': 8,
+      // Rapetisse avec la marque en dézoomant (Uriel, 22/10) : 8 de près (taille 1,15). Le décalage,
+      // en em, la suit tout seul et la garde collée sous la marque.
+      'text-size': taille(8 / 1.15),
       'text-letter-spacing': 0.08,
       // Sous la marque, à la place du nom de qui l'a revendiqué (calques.ts ne le montre pas sur un
       // lieu neuf) : jamais les deux empilés.
       'text-anchor': 'top',
-      // La marque rapetisse en dézoomant : la gélule la suit pour rester collée dessous.
-      'text-offset': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        ...PALIERS.flatMap(([z, t]): [number, ExpressionSpecification] => [
-          z,
-          ['literal', [0, Math.round((SOUS_LA_MARQUE * t * 100) / 1.15) / 100]],
-        ]),
-      ],
+      'text-offset': [0, 2.1],
       'icon-image': 'pilule-nouveau',
       'icon-text-fit': 'both',
       'icon-text-fit-padding': [2, 5, 2, 5],
