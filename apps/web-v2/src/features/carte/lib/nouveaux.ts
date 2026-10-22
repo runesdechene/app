@@ -1,8 +1,8 @@
 /**
  * QUOI     — les nouveaux lieux sur la carte (Figma 525:740, piste 2 « l'encre », Uriel 08/10) : autour
  *            de la marque d'un lieu ajouté depuis moins de 14 jours et pas encore ouvert, un fin anneau
- *            d'encre qui s'élargit et s'efface, en boucle lente ; de plus près, une gélule d'encre
- *            « NOUVEAU » sous la marque. Le lieu lui-même reste à sa place parmi les autres (Uriel,
+ *            d'encre qui s'élargit et s'efface, en boucle lente ; et une gélule d'encre
+ *            « NOUVEAU » sous la marque, à tous les zooms. Le lieu lui-même reste à sa place parmi les autres (Uriel,
  *            08/10 : l'anneau suffit à le signaler).
  * POURQUOI — les couleurs par nature faisaient « pêle-mêle » (Uriel, 08/10) : une seule encre, un contour
  *            seul. On le remarque par le mouvement, pas par la couleur. L'anneau est plus lent que l'onde
@@ -28,7 +28,7 @@ const PERIODE = 3000 // ms : plus lent que les énigmes (2 200), pour qu'on ne l
 const RAYON = 13 // le rayon d'une marque à la taille 1 (sceau de 26 px)
 const ELAN = 4 // de combien l'anneau s'élargit au-delà de la marque (réduit de moitié, Uriel 08/10)
 const TRAIT = 1.2 // l'épaisseur de l'anneau
-const DE_PLUS_PRES = 7 // la gélule s'affiche dès l'échelle d'une région (9 → 7, Uriel 08/10) ; plus loin, l'anneau suffit
+const SOUS_LA_MARQUE = 2.1 // le décalage de la gélule (em) sous une marque à la taille 1,15 (de près)
 
 const estNouveau: FilterSpecification = ['==', ['get', 'nouveau'], true]
 
@@ -84,7 +84,7 @@ export function calqueGelule(c: CouleursCarte): AddLayerObject {
     id: CALQUE_GELULE_NOUVEAUX,
     type: 'symbol',
     source: SOURCE,
-    minzoom: DE_PLUS_PRES,
+    // À tous les zooms, même de très loin (Uriel, 22/10) : un lieu neuf doit se voir sur la France entière.
     filter: estNouveau,
     layout: {
       'text-field': 'NOUVEAU',
@@ -94,7 +94,16 @@ export function calqueGelule(c: CouleursCarte): AddLayerObject {
       // Sous la marque, à la place du nom de qui l'a revendiqué (calques.ts ne le montre pas sur un
       // lieu neuf) : jamais les deux empilés.
       'text-anchor': 'top',
-      'text-offset': [0, 2.1],
+      // La marque rapetisse en dézoomant : la gélule la suit pour rester collée dessous.
+      'text-offset': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        ...PALIERS.flatMap(([z, t]): [number, ExpressionSpecification] => [
+          z,
+          ['literal', [0, Math.round((SOUS_LA_MARQUE * t * 100) / 1.15) / 100]],
+        ]),
+      ],
       'icon-image': 'pilule-nouveau',
       'icon-text-fit': 'both',
       'icon-text-fit-padding': [2, 5, 2, 5],
