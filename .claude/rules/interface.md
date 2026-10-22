@@ -309,3 +309,18 @@ lesquels sont encore en usage avant d'en prendre un. La photo d'accueil (deux ex
 sommet) ne va jamais dans l'interface. Un panneau reprend les valeurs d'un écran validé (feuille :
 fond `#fff9f0`, rayon 22, ni bordure ni ombre, voile encre 35 %). Pour du mouvement, Figma anime
 (images clés, skill `figma-use-motion`) : une planche animée vaut mieux qu'une suite d'écrans figés.
+
+## Une maquette neuve se construit en clonant les écrans validés, jamais en inventant une palette (22/10/2026)
+
+**Le piège** : pour le Campement, « audacieux, moderne, pas IA » m'a fait inventer une version nuit
+(fond brun, braise), des dégradés, des ombres portées et des cartes partout. Uriel : « tu viens de me
+refaire une foule IA… Tu ne prends pas notre direction artistique. » La DA est **plat, parcheminé,
+aventure, doux** (`docs/v2/decisions/007-da-fixee.md`) : pas d'ombre, pas de palette hors
+`tokens.css`, les lignes d'un fil **à nu sur le parchemin** (spec V2 §5). Audacieux veut dire une
+mise en page éditoriale forte — la taille des titres, les filets, l'air — pas une autre matière.
+Et un vote porte sur une illustration **qui n'existe pas encore** : rien à montrer, le vote est
+éditorial (le sujet, les candidats en mots).
+
+**How to apply :** dans Figma, `clone()` les nœuds des écrans validés (en-tête, intertitres et leur
+icône au pinceau, lignes « Sur les chemins », cartes photo, barre, Messages) et ne changer que les
+textes et l'agencement. Aucune couleur qui ne soit dans `tokens.css`, aucun effet.
