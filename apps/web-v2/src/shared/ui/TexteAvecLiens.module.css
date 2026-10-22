@@ -1,7 +1,26 @@
-/* Le lien garde la couleur du texte qui l'entoure ; une longue adresse se coupe plutôt que déborder. */
+/* Le lien à l'encre d'accent, souligné d'un filet clair qui s'affirme au survol. Une longue
+   adresse se coupe plutôt que déborder. */
 .lien {
-  color: inherit;
+  color: var(--color-accent);
+  font-weight: var(--weight-semi);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-color: var(--color-accent-clair);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
   overflow-wrap: anywhere;
+  transition:
+    text-decoration-color var(--duree-douce) var(--courbe-douce),
+    text-underline-offset var(--duree-douce) var(--courbe-douce);
+}
+
+.lien:hover,
+.lien:focus-visible {
+  text-decoration-color: currentcolor;
+  text-underline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lien {
+    transition: none;
+  }
 }

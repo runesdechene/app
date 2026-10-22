@@ -18,7 +18,7 @@ test('une mention devient un lien vers Instagram', () => {
 test('un lien https devient cliquable', () => {
   expect(decouperLiens('Voir https://runesdechene.com ici')).toEqual([
     { type: 'texte', valeur: 'Voir ' },
-    { type: 'lien', valeur: 'https://runesdechene.com', href: 'https://runesdechene.com' },
+    { type: 'lien', valeur: 'runesdechene.com', href: 'https://runesdechene.com' },
     { type: 'texte', valeur: ' ici' },
   ])
 })
@@ -26,8 +26,18 @@ test('un lien https devient cliquable', () => {
 test('la ponctuation qui finit la phrase reste hors du lien', () => {
   expect(decouperLiens('(voir https://x.fr/a?b=1).')).toEqual([
     { type: 'texte', valeur: '(voir ' },
-    { type: 'lien', valeur: 'https://x.fr/a?b=1', href: 'https://x.fr/a?b=1' },
+    { type: 'lien', valeur: 'x.fr', href: 'https://x.fr/a?b=1' },
     { type: 'texte', valeur: ').' },
+  ])
+})
+
+test('une adresse se lit par son site, sans « www. »', () => {
+  expect(decouperLiens('https://www.monuments-nationaux.fr/chateau')).toEqual([
+    {
+      type: 'lien',
+      valeur: 'monuments-nationaux.fr',
+      href: 'https://www.monuments-nationaux.fr/chateau',
+    },
   ])
 })
 

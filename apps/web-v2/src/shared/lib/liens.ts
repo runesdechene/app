@@ -17,8 +17,12 @@ export function decouperLiens(texte: string): Morceau[] {
     .split(LIEN_OU_MENTION)
     .map((valeur, i): Morceau => {
       if (i % 2 === 0) return { type: 'texte', valeur }
-      const href = valeur.startsWith('@') ? `https://www.instagram.com/${valeur.slice(1)}/` : valeur
-      return { type: 'lien', valeur, href }
+      if (valeur.startsWith('@')) {
+        return { type: 'lien', valeur, href: `https://www.instagram.com/${valeur.slice(1)}/` }
+      }
+      // Une adresse se lit par son site (« runesdechene.com ») ; le lien garde l'adresse entière.
+      if (!URL.canParse(valeur)) return { type: 'texte', valeur }
+      return { type: 'lien', valeur: new URL(valeur).hostname.replace(/^www\./, ''), href: valeur }
     })
     .filter((morceau) => morceau.valeur !== '')
 }
