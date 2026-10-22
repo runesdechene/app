@@ -1,14 +1,14 @@
 /**
  * QUOI     — les nouveaux lieux sur la carte (Figma 525:740, piste 2 « l'encre », Uriel 08/10) : autour
  *            de la marque d'un lieu ajouté depuis moins de 14 jours et pas encore ouvert, un fin anneau
- *            d'encre qui s'élargit et s'efface, en boucle lente ; et une gélule d'encre
- *            « NOUVEAU » sous la marque, à tous les zooms. Le lieu lui-même reste à sa place parmi les autres (Uriel,
- *            08/10 : l'anneau suffit à le signaler).
+ *            d'encre qui s'élargit et s'efface, en boucle lente ; et une gélule d'encre « NOUVEAU »
+ *            sous la marque, à tous les zooms. Le lieu lui-même reste à sa place parmi les autres
+ *            (Uriel, 08/10 : l'anneau suffit à le signaler).
  * POURQUOI — les couleurs par nature faisaient « pêle-mêle » (Uriel, 08/10) : une seule encre, un contour
  *            seul. On le remarque par le mouvement, pas par la couleur. L'anneau est plus lent que l'onde
  *            des énigmes, pour ne pas les confondre. Calques MapLibre sur la source des lieux : la
  *            propriété `nouveau` (migration 469) suffit.
- * ATTENTION — la taille suit la courbe des marques (PALIERS, calques.ts), au premier niveau de l'expression de zoom ;
+ * ATTENTION — la taille de l'anneau suit la courbe des marques (PALIERS, calques.ts), au premier niveau de l'expression de zoom ;
  *            l'anneau s'anime image par image (comme `fairePulser` des énigmes). Animations réduites :
  *            un anneau fixe.
  */
@@ -19,7 +19,7 @@ import type {
   Map as Carte,
 } from 'maplibre-gl'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
-import { PALIERS, SOURCE, taille } from './calques'
+import { PALIERS, SOURCE } from './calques'
 
 export const CALQUE_ANNEAU_NOUVEAUX = 'nouveaux-anneau'
 export const CALQUE_GELULE_NOUVEAUX = 'nouveaux-gelule'
@@ -28,6 +28,7 @@ const PERIODE = 3000 // ms : plus lent que les énigmes (2 200), pour qu'on ne l
 const RAYON = 13 // le rayon d'une marque à la taille 1 (sceau de 26 px)
 const ELAN = 4 // de combien l'anneau s'élargit au-delà de la marque (réduit de moitié, Uriel 08/10)
 const TRAIT = 1.2 // l'épaisseur de l'anneau
+const DE_PLUS_PRES = 7 // la gélule a sa pleine taille dès l'échelle d'une région
 
 const estNouveau: FilterSpecification = ['==', ['get', 'nouveau'], true]
 
@@ -78,40 +79,25 @@ export function calqueAnneau(c: CouleursCarte, ecran: number): AddLayerObject {
   }
 }
 
-export function calqueGelule(c: CouleursCarte): AddLayerObject {
+// La gélule « NOUVEAU », dessinée d'un bloc avec son mot (sceaux.ts). À tous les zooms, même de très
+// loin (Uriel, 22/10) : un lieu neuf doit se voir sur la France entière. Pleine taille dès l'échelle
+// d'une région, plus petite seulement de très loin.
+export function calqueGelule(): AddLayerObject {
   return {
     id: CALQUE_GELULE_NOUVEAUX,
     type: 'symbol',
     source: SOURCE,
-    // À tous les zooms, même de très loin (Uriel, 22/10) : un lieu neuf doit se voir sur la France entière.
     filter: estNouveau,
     layout: {
-      'text-field': 'NOUVEAU',
-      'text-font': ['Noto Sans Bold'],
-      // Rapetisse avec la marque en dézoomant (Uriel, 22/10) : 9 de près (taille 1,15). Le décalage,
-      // en em, la suit tout seul et la garde collée sous la marque ; la marge de la gélule aussi.
-      'text-size': taille(9 / 1.15),
-      'text-letter-spacing': 0.08,
+      'icon-image': 'gelule-nouveau',
+      'icon-size': ['interpolate', ['linear'], ['zoom'], 4, 0.55, DE_PLUS_PRES, 1],
       // Sous la marque, à la place du nom de qui l'a revendiqué (calques.ts ne le montre pas sur un
-      // lieu neuf) : jamais les deux empilés.
-      'text-anchor': 'top',
-      'text-offset': [0, 2.1],
-      'icon-image': 'pilule-nouveau',
-      'icon-text-fit': 'both',
-      'icon-text-fit-padding': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        ...PALIERS.flatMap(([z, t]): [number, ExpressionSpecification] => {
-          const p = (n: number) => Math.round((n * t * 10) / 1.15) / 10
-          return [z, ['literal', [p(2), p(5), p(2), p(5)]]]
-        }),
-      ],
+      // lieu neuf) : jamais les deux empilés. Le décalage grandit avec la gélule (× icon-size).
+      'icon-anchor': 'top',
+      'icon-offset': [0, 16],
       // Deux lieux neufs voisins : une seule gélule, pour ne pas les empiler (l'anneau reste aux deux).
-      'text-allow-overlap': false,
       'icon-allow-overlap': false,
     },
-    paint: { 'text-color': c.halo, 'icon-color': c.encre },
   }
 }
 
@@ -119,7 +105,7 @@ export function calqueGelule(c: CouleursCarte): AddLayerObject {
 // la gélule par-dessus tout ; puis l'anneau s'anime.
 export function poserNouveaux(map: Carte, c: CouleursCarte, ecran: number): () => void {
   map.addLayer(calqueAnneau(c, ecran), 'survol')
-  map.addLayer(calqueGelule(c))
+  map.addLayer(calqueGelule())
   return faireRayonner(map, ecran)
 }
 
