@@ -137,6 +137,16 @@ BEGIN
 END;
 $function$;
 
+-- Enfin, les demandes de lien depuis la page publique (sans lien personnel) : une adresse au plus toutes
+-- les 10 minutes. Écrit et lu par la fonction Netlify seule.
+CREATE TABLE public.questionnaire_demandes (
+  email text NOT NULL,
+  le    timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX questionnaire_demandes_email ON public.questionnaire_demandes (email, le);
+ALTER TABLE public.questionnaire_demandes ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.questionnaire_demandes FROM anon, authenticated;
+
 REVOKE ALL ON FUNCTION public.questionnaire_repondre(varchar, jsonb) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.questionnaire_repondre(varchar, jsonb) TO service_role;
 REVOKE ALL ON FUNCTION public.hub_qui_sont_ils(text), public.hub_ses_missives(varchar) FROM PUBLIC, anon;

@@ -14,7 +14,7 @@
     "lint": "eslint . --max-warnings 0 && stylelint \"src/**/*.css\"",
     "test": "vitest run",
     "gen:types": "pnpm dlx supabase gen types typescript --linked --schema public > src/shared/supabase/database.types.ts",
-    "build:fonctions": "esbuild netlify/missives/missives-envoyer.ts netlify/missives/missives-essai.ts --bundle --platform=node --format=esm --outdir=netlify/functions --out-extension:.js=.mjs --log-level=warning \"--banner:js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);\""
+    "build:fonctions": "esbuild netlify/missives/missives-envoyer.ts netlify/missives/missives-essai.ts netlify/missives/questionnaire.ts --bundle --platform=node --format=esm --outdir=netlify/functions --out-extension:.js=.mjs --log-level=warning \"--banner:js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);\""
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "1.1.0",

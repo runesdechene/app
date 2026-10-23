@@ -18,6 +18,7 @@ sauf `flyer-create-account`, appelée sans session par `/flyercadeau` (`src/publ
 | `shopify-client-webhook` | webhooks `customers/create` et `customers/update` : l'accord aux nouvelles suit Shopify (le plus récent gagne, `lib/accord.ts`), fiche créée pour un inscrit inconnu · Shopify | signature HMAC obligatoire |
 | `missives-envoyer` | envoie les Missives programmées, un lot de 250 par réveil, par Resend (`lib/resend.ts`) ; lien de désabonnement signé (`lib/jeton.ts`) · `pg_cron` toutes les 5 min (`_reveiller_missives`, mig 541) | en-tête `X-Missives-Secret` = `MISSIVES_SECRET` |
 | `missives-essai` | « M'envoyer un essai » : la Missive enregistrée part tout de suite à l'admin connecté, objet « [Essai] … » · écran Écrire | admin (`lib/admin.ts`) |
+| `questionnaire` | « Dis-nous qui tu es » (/qui-es-tu) : lire, répondre, demander son lien par e-mail · page publique | lien signé, usage « questionnaire » (`lib/jeton.ts`) |
 | `missives-desabonnement` | retire l'accord aux nouvelles (fiche puis Shopify) · page `/desabonnement` et le désabonnement en un clic des boîtes de réception (RFC 8058) | publique : jeton signé (`lib/jeton.ts`), sinon 400 sans rien écrire |
 | `resend-webhook` | ouvertures, clics, rebonds et plaintes des Missives (`missive_envois`) ; un rebond ou une plainte retire l'accord · Resend | signature Svix, `RESEND_WEBHOOK_SECRET` |
 | `flyer-create-account` | un e-mail contre le code promo `FLYER_PROMO_CODE` : client Shopify (boutique fixe) et compte de l'appli · page `/flyercadeau` | publique : 15 demandes par heure et par IP (`flyer_signup_log`), sinon 429 ; aucune erreur ne renvoie l'e-mail ni le texte de Shopify ou de Supabase |
@@ -27,7 +28,7 @@ Variables d'environnement lues (sans aucune valeur ici) : `VITE_SUPABASE_URL`,
 `SHOPIFY_CLIENT_SECRET`, `SHOPIFY_SHOP`, `FLYER_PROMO_CODE`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `MISSIVES_SECRET` (le même que le secret `missives_secret` de Supabase Vault, jamais dans `app_settings`, lisible sans compte), `MISSIVES_JETON_SECRET` (la clé des liens de désabonnement, dans Netlify seulement) (`flyer-create-account`, qui lit aussi
 `VITE_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` et `SHOPIFY_ACCESS_TOKEN`).
 
-`missives-envoyer` et `missives-essai` rendent des e-mails avec `@runes/missives` (React Email). Leurs sources vivent dans `../missives/` : l'empaqueteur de Netlify, devant les liens de pnpm, mettait dans le zip des raccourcis vers React au lieu du code, et la fonction ne démarrait pas (« Failed to wait for function to become active », 23/10). `pnpm build` les empaquette donc en un seul fichier complet ici (`build:fonctions`, esbuild) ; ces `.mjs` sont générés, jamais versionnés.
+`missives-envoyer`, `missives-essai` et `questionnaire` importent `@runes/missives` (React Email). Leurs sources vivent dans `../missives/` : l'empaqueteur de Netlify, devant les liens de pnpm, mettait dans le zip des raccourcis vers React au lieu du code, et la fonction ne démarrait pas (« Failed to wait for function to become active », 23/10). `pnpm build` les empaquette donc en un seul fichier complet ici (`build:fonctions`, esbuild) ; ces `.mjs` sont générés, jamais versionnés.
 
 `lib/` n'est pas une fonction : les aides partagées (`accord.ts`, `admin.ts`, `jeton.ts`, `missive.ts`, `resend.ts`, signature Shopify dans `shopify.ts`).
 

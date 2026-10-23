@@ -5,9 +5,9 @@ import { rendre, type Envoi } from '@runes/missives'
 import { signer } from './jeton'
 import type { MessageResend } from './resend'
 
-const EXPEDITEUR = 'Uriel · Runes de Chêne <uriel@missives.runesdechene.com>'
-const REPONSES = 'uriel@missives.runesdechene.com'
-const HUB = 'https://hub.runesdechene.com'
+export const EXPEDITEUR = 'Uriel · Runes de Chêne <uriel@missives.runesdechene.com>'
+export const REPONSES = 'uriel@missives.runesdechene.com'
+export const HUB = 'https://hub.runesdechene.com'
 
 export type Missive = Envoi & { id: number; objet: string }
 
