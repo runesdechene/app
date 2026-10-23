@@ -1,0 +1,270 @@
+/*
+ * QUOI     — « Écrire une Missive » (Figma 753:2529) : la colonne des réglages (340 px) et l'e-mail à 600 px.
+ * ÉCARTS   — les cartes des réglages reprennent la brique Bloc (fond, filet sable, coins de 15 px) ;
+ *            au téléphone, les réglages passent au-dessus et l'e-mail défile en travers dans son cadre.
+ */
+.ecran {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.atelier {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.reglages {
+  position: sticky;
+  top: var(--space-4);
+  display: grid;
+  gap: var(--space-4);
+  max-height: calc(100dvh - 2 * var(--space-4));
+  overflow-y: auto;
+}
+
+.carte {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-bloc);
+}
+
+.rubrique {
+  margin: 0;
+  padding: 0;
+  color: var(--color-texte-pale);
+  font-family: var(--font-condensee);
+  font-size: var(--pilule-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--pilule-tracking);
+  text-transform: uppercase;
+}
+
+.pastilles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.pastilles legend {
+  margin-bottom: var(--space-2);
+}
+
+.pastille input {
+  position: absolute;
+  opacity: 0;
+}
+
+.pastilleTexte {
+  display: block;
+  padding: 6px var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  background: var(--color-sur-accent);
+  color: var(--color-encre);
+  font-size: var(--legende-size);
+  cursor: pointer;
+}
+
+.pastille input:checked + .pastilleTexte {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+}
+
+.pastille input:focus-visible + .pastilleTexte {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.compte {
+  opacity: 0.75;
+}
+
+.vignette {
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: var(--radius-vignette);
+  background: var(--fond);
+}
+
+.vignetteTitre,
+.vignetteBande {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+
+.vignetteTitre {
+  top: 8px;
+  left: 7px;
+  width: 20px;
+  height: 4px;
+  background: var(--titres);
+}
+
+.vignetteBande {
+  top: 26px;
+  height: 9px;
+  background: var(--rupture);
+}
+
+.couleur {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-petit);
+  background: var(--color-sur-accent);
+  color: var(--color-encre);
+  font-size: var(--sous-titre-size);
+}
+
+.couleur input {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.couleur code {
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.qui {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.aide {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.alerte {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: var(--legende-size);
+}
+
+.champ {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.champ input {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-petit);
+  background: var(--color-sur-accent);
+  color: var(--color-encre);
+  font: inherit;
+  font-size: var(--sous-titre-size);
+}
+
+.champ input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.nouvelles {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nouvelles li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-encre);
+  font-size: var(--legende-size);
+}
+
+.nouvelleTitre {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nouvelles button,
+.ajouter {
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-petit);
+  background: none;
+  color: var(--color-texte-doux);
+  font: inherit;
+  cursor: pointer;
+}
+
+.nouvelles button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.ajouter {
+  justify-self: start;
+  color: var(--color-accent);
+  font-size: var(--legende-size);
+}
+
+.actions {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.lettre {
+  justify-self: center;
+  width: 600px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Ce qui se touche pour se changer : un pointillé au survol, comme sur la maquette. */
+.lettre [contenteditable] {
+  outline: none;
+  cursor: text;
+}
+
+.lettre img[data-zone] {
+  cursor: pointer;
+}
+
+.lettre [contenteditable]:hover,
+.lettre [contenteditable]:focus,
+.lettre img[data-zone]:hover {
+  outline: 1px dashed var(--color-accent);
+  outline-offset: 3px;
+}
+
+
+@container app (width < 900px) {
+  .atelier {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .reglages {
+    position: static;
+    max-height: none;
+  }
+}

@@ -91,6 +91,8 @@ describe('shopify-order-webhook', () => {
 const APRES_LA_GARDE: [string, string, number][] = [
   ['shopify-batch-tags', '{"items":[]}', 200],
   ['shopify-sync-tags', '{}', 400],
+  // Sans Missive désignée, l'essai refuse : 400.
+  ['missives-essai', '{}', 400],
 ]
 
 describe.each(APRES_LA_GARDE)('%s : réservé aux admins', (nom, corps, statutAdmin) => {
@@ -493,5 +495,36 @@ describe('flyer-create-account : la case des nouvelles', () => {
     const fiche = appels.find((a) => a.methode === 'POST' && a.url.includes('/rest/v1/users'))
     expect(fiche?.url).toContain('on_conflict=id')
     expect(fiche?.corps).toMatchObject({ id: 'shopify-42', accord_nouvelles: true, accord_nouvelles_porte: 'flyer' })
+  })
+})
+
+describe('missives-essai : la Missive part tout de suite, à l’admin seulement', () => {
+  test('l’admin la reçoit à son adresse, objet préfixé « [Essai] »', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_cle')
+    vi.stubEnv('MISSIVES_SECRET', 'secret')
+    const { EXEMPLES } = await import('@runes/missives')
+    const envois: { to: string[]; subject: string }[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
+      if (url.includes('/auth/v1/user')) return Promise.resolve(Response.json({ id: 'u0' }))
+      if (url.includes('/rest/v1/users?select=role')) return Promise.resolve(Response.json([{ role: 'admin' }]))
+      if (url.includes('/rest/v1/users?select=email_address')) {
+        return Promise.resolve(Response.json([{ email_address: 'uriel@exemple.fr', first_name: 'Uriel' }]))
+      }
+      if (url.includes('/rest/v1/missives?')) {
+        return Promise.resolve(Response.json([{
+          id: 7, modele: 'carnet', objet: 'Sur la route', apercu: 'Le camion repart',
+          couleurs: { fond: '#1e231b', titres: '#d8bc8a', rupture: '#8a4528' }, contenu: EXEMPLES.carnet,
+        }]))
+      }
+      if (url === 'https://api.resend.com/emails/batch') {
+        envois.push(...(JSON.parse(String(init?.body)) as typeof envois))
+        return Promise.resolve(Response.json({ data: [{ id: 're_1' }] }))
+      }
+      return Promise.resolve(new Response('{}', { status: 500 }))
+    }))
+    const handler = await charger('missives-essai')
+    const r = await handler(post('{"id":7}', { Authorization: 'Bearer jwt' }))
+    expect(r.status).toBe(200)
+    expect(envois).toEqual([expect.objectContaining({ to: ['uriel@exemple.fr'], subject: '[Essai] Sur la route' })])
   })
 })
