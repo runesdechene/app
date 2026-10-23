@@ -54,7 +54,7 @@ function Pieces({ contenu }: { contenu: ContenuFragment }) {
         {contenu.pieces.map((piece, i) => (
           <Column key={i} className="pile" width="244" style={{ verticalAlign: 'top', paddingLeft: i === 0 ? 0 : '16px' }}>
             <Img src={piece.photo} alt={piece.nom} width="244" data-zone={`pieces.${i}.photo`} style={{ display: 'block', height: 'auto' }} />
-            <Text style={{ fontFamily: ALEGREYA, fontWeight: 500, fontSize: '15px', color: c.texte, margin: '10px 0 0' }}>
+            <Text style={{ fontFamily: ALEGREYA, fontWeight: 500, fontSize: '15px', color: c.texte, margin: '10px 0 0', textAlign: 'center' }}>
               <Zone nom={`pieces.${i}.nom`} valeur={piece.nom} />
               {' · '}
               <span style={{ fontWeight: 400, color: c.titres }}>
