@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PALETTES } from './couleurs';
+import { PALETTES, VELIN } from './couleurs';
 import { EXEMPLES } from './exemples';
 import { rendre } from './rendre';
 import type { Lettre } from './types';
@@ -61,5 +61,18 @@ describe('la page autour de la lettre', () => {
     const body = /<body[^>]*style="([^"]*)"/.exec(html)?.[1] ?? '';
     expect(body).not.toContain(PALETTES.hiver.fond);
     expect(html).toMatch(new RegExp(`max-width:600px[^"]*background-color:${PALETTES.hiver.fond}|background-color:${PALETTES.hiver.fond}[^"]*max-width:600px`));
+  });
+});
+
+describe('la couleur autour de la lettre', () => {
+  it('se règle dans le brouillon', async () => {
+    const { html } = await rendre({ ...envoi(lettres[0]!), couleurs: { ...PALETTES.hiver, autour: '#d9d2c3' } }, destinataire);
+    expect(html).toContain('background-color:#d9d2c3');
+    expect(html).not.toContain('background-color:#ece5d8');
+  });
+
+  it('sans réglage, c’est le vélin', async () => {
+    const { html } = await rendre(envoi(lettres[0]!), destinataire);
+    expect(html).toContain(`background-color:${VELIN}`);
   });
 });

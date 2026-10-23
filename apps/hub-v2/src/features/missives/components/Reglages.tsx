@@ -2,7 +2,7 @@
  * QUOI     — la colonne des réglages de l'écran Écrire (maquette 753:2529) : le modèle, les couleurs, à qui,
  *            l'objet, quand, les liens et les nouvelles. Elle ne garde rien : tout vit dans le brouillon.
  */
-import { PALETTES, contrasteSuffisant, type Couleurs, type Modele } from '@runes/missives'
+import { PALETTES, VELIN, contrasteSuffisant, type Couleurs, type Modele } from '@runes/missives'
 import type { CSSProperties } from 'react'
 import { Choix, type OptionDeChoix } from '@/shared/ui/Choix'
 import type { LigneDeListe, Liste } from '../api/listes'
@@ -43,9 +43,10 @@ const NOMS_DES_PALETTES: Record<keyof typeof PALETTES, string> = {
 }
 
 const COULEURS: { cle: keyof Couleurs; nom: string; role: string }[] = [
-  { cle: 'fond', nom: 'Fond', role: 'toute la page' },
+  { cle: 'fond', nom: 'Fond', role: 'toute la lettre' },
   { cle: 'titres', nom: 'Titres', role: 'grand titre, chiffres, liens' },
   { cle: 'rupture', nom: 'Rupture', role: 'la bande et la lettrine' },
+  { cle: 'autour', nom: 'Autour', role: 'la page autour de la lettre' },
 ]
 
 const memePalette = (a: Couleurs, b: Couleurs) => a.fond === b.fond && a.titres === b.titres && a.rupture === b.rupture
@@ -79,16 +80,17 @@ export function Reglages({ b, onChange, listes }: {
           options={(Object.keys(PALETTES) as (keyof typeof PALETTES)[]).map((p) => ({ valeur: p, libelle: NOMS_DES_PALETTES[p] }))}
           choisi={palette}
           onChoix={(p) => {
-            onChange({ ...b, couleurs: PALETTES[p] })
+            // Une palette règle la lettre ; la couleur autour reste celle choisie.
+            onChange({ ...b, couleurs: { ...PALETTES[p], ...(b.couleurs.autour && { autour: b.couleurs.autour }) } })
           }}
         />
-        <h3 className={styles.rubrique}>Les trois couleurs</h3>
+        <h3 className={styles.rubrique}>Les couleurs</h3>
         {COULEURS.map((c) => (
           <label key={c.cle} className={styles.couleur}>
             <input
               type="color"
               aria-label={c.nom}
-              value={b.couleurs[c.cle]}
+              value={b.couleurs[c.cle] ?? VELIN}
               onChange={(e) => {
                 onChange({ ...b, couleurs: { ...b.couleurs, [c.cle]: e.target.value } })
               }}
@@ -97,7 +99,7 @@ export function Reglages({ b, onChange, listes }: {
               {c.nom}
               <span className={styles.aide}>{c.role}</span>
             </span>
-            <code>{b.couleurs[c.cle].toUpperCase()}</code>
+            <code>{(b.couleurs[c.cle] ?? VELIN).toUpperCase()}</code>
           </label>
         ))}
         {contrasteSuffisant(b.couleurs) ? (

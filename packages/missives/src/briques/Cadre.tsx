@@ -2,12 +2,9 @@
 
 import { Body, Container, Head, Html, Link, Preview, Section, Text } from '@react-email/components';
 import type { ReactNode } from 'react';
-import { deduireCouleurs, type Couleurs } from '../couleurs';
+import { deduireCouleurs, VELIN, type Couleurs } from '../couleurs';
 import type { Destinataire, Edition, TitreEnImage } from '../types';
 import { ADRESSE, ADRESSE_DANS_LE_HUB, ALEGREYA, FournisseurEncre } from './encre';
-
-// Autour de la colonne, un vélin neutre : la lettre reste une page posée au centre, quel que soit son thème.
-const VELIN = '#ece5d8';
 
 const polices = (adresse: string) => `
 @font-face { font-family: 'Bebas Neue'; font-weight: 400; src: url(${adresse}/polices/bebas-neue-latin-400-normal.woff2) format('woff2'); }
@@ -29,6 +26,7 @@ type Props = {
 export function Cadre({ couleurs, apercu, destinataire, edition, titres, children }: Props) {
   const c = deduireCouleurs(couleurs);
   const adresse = edition ? ADRESSE_DANS_LE_HUB : ADRESSE;
+  const autour = couleurs.autour ?? VELIN;
   const colonne = (
     <Container style={{ maxWidth: '600px', width: '100%', backgroundColor: c.fond, paddingTop: '40px' }}>
       {children}
@@ -50,7 +48,7 @@ export function Cadre({ couleurs, apercu, destinataire, edition, titres, childre
     <FournisseurEncre value={{ couleurs: c, destinataire, edition, adresse, titres }}>
       {edition ? (
         // Dans le Hub, l'e-mail vit dans la page : la même colonne, sans l'enveloppe <html>.
-        <div style={{ backgroundColor: c.fond }}>
+        <div style={{ backgroundColor: autour, padding: '24px' }}>
           <style>{polices(adresse)}</style>
           {colonne}
         </div>
@@ -61,8 +59,8 @@ export function Cadre({ couleurs, apercu, destinataire, edition, titres, childre
           </Head>
           <Preview>{apercu}</Preview>
           {/* Gmail ignore le fond du <body> : c'est une table pleine largeur qui porte le vélin. */}
-          <Body style={{ margin: 0, backgroundColor: VELIN }}>
-            <Section style={{ backgroundColor: VELIN, padding: '24px 0' }}>{colonne}</Section>
+          <Body style={{ margin: 0, backgroundColor: autour }}>
+            <Section style={{ backgroundColor: autour, padding: '24px 0' }}>{colonne}</Section>
           </Body>
         </Html>
       )}

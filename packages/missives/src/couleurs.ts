@@ -1,6 +1,10 @@
 // Les trois couleurs d'une Missive, et tout ce qui s'en déduit (spec mailing, « Trois couleurs fondamentales »).
 
-export type Couleurs = { fond: string; titres: string; rupture: string };
+/** `autour` : la page autour de la colonne de 600 px (le vélin si rien n'est réglé). */
+export type Couleurs = { fond: string; titres: string; rupture: string; autour?: string };
+
+// Le vélin neutre autour de la lettre : elle reste une page posée au centre, quel que soit son thème.
+export const VELIN = '#ece5d8';
 
 export type CouleursDeduites = Couleurs & {
   texte: string;
