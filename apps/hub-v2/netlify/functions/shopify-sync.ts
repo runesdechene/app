@@ -1,7 +1,7 @@
 // Netlify Function : synchro initiale Shopify → Supabase
 // Utilise l'API REST Supabase directement (pas le SDK, pour éviter les problèmes de bundling)
 // L'accord aux nouvelles suit Shopify quand son choix y est plus récent (lib/accord.ts).
-import { appliquerAccord, colonnesAccord } from './lib/accord'
+import { appliquerAccord, choixDeShopify, colonnesAccord } from './lib/accord'
 
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
@@ -42,9 +42,8 @@ interface ShopifyCustomer {
 
 function choixShopify(customer: ShopifyCustomer) {
   return {
-    accord: customer.email_marketing_consent?.state === 'subscribed',
     // Les abonnés anciens n'ont souvent pas de date de consentement : la création du client la tient.
-    le: customer.email_marketing_consent?.consent_updated_at ?? customer.created_at,
+    ...choixDeShopify(customer.email_marketing_consent, customer.created_at),
     porte: 'shopify' as const,
   }
 }

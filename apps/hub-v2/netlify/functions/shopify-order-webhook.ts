@@ -158,7 +158,7 @@ export default async function handler(request: Request) {
     name?: string
     order_number?: number
     email: string
-    customer?: { id: number; email: string; first_name?: string; last_name?: string; tags?: string }
+    customer?: { id: number; email: string; first_name?: string; last_name?: string; tags?: string; created_at?: string }
     line_items?: Array<{ product_id: number; title: string; tags?: string }>
   }
 
@@ -169,6 +169,8 @@ export default async function handler(request: Request) {
   }
 
   const email = order.email || order.customer?.email
+  // Depuis quand la personne est cliente : un client d'avant la mise en route n'entre pas dans « Après le premier achat » (mig 552).
+  const clientDepuis = order.customer?.created_at ?? null
   if (!email) {
     return json({ error: 'No email in order' }, 200) // 200 pour que Shopify ne retry pas
   }
@@ -266,6 +268,7 @@ export default async function handler(request: Request) {
           await supabasePost('purchase_log', {
             email: email.toLowerCase(),
             shopify_order_id: orderId,
+            client_depuis: clientDepuis,
             shopify_tag: unlock.shopify_tag,
             unlock_type: 'fragment',
             unlock_ref_id: unlock.unlock_ref_id,
@@ -286,6 +289,7 @@ export default async function handler(request: Request) {
       await supabasePost('purchase_log', {
         email: email.toLowerCase(),
         shopify_order_id: orderId,
+        client_depuis: clientDepuis,
         shopify_tag: debugInfo.slice(0, 100),
         user_id: existingUser ? existingUser.id : userId,
         status: productTags.length === 0 ? 'no_tags' : 'no_match',

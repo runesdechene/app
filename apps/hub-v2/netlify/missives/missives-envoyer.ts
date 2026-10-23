@@ -53,17 +53,23 @@ export default async function handler(request: Request) {
       // Lot par lot, et chaque résultat noté aussitôt : une panne au lot suivant n'efface pas celui-ci.
       for (let i = 0; i < lot.length; i += TAILLE_DU_LOT_RESEND) {
         const tranche = lot.slice(i, i + TAILLE_DU_LOT_RESEND)
+        // Un e-mail de suite retiré pendant l'envoi n'a plus de Missive : noté en échec, le reste part.
+        const retires = tranche.filter((d) => !parId.has(d.missive_id))
+        const partants = tranche.filter((d) => parId.has(d.missive_id))
         const aEnvoyer = await Promise.all(
-          tranche.map(async (d) => ({ message: await message(parId.get(d.missive_id)!, d), cle: `${String(d.missive_id)}-${d.user_id}` })),
+          partants.map(async (d) => ({ message: await message(parId.get(d.missive_id)!, d), cle: `${String(d.missive_id)}-${d.user_id}` })),
         )
-        const resultats = await envoyerLot(aEnvoyer, cle)
+        const resultats = aEnvoyer.length > 0 ? await envoyerLot(aEnvoyer, cle) : []
         await supabase('rpc/missives_noter', {
-          p_resultats: tranche.map((d, j) => {
-            const r = resultats[j] ?? { erreur: 'sans réponse de Resend' }
-            return 'id' in r
-              ? { missive_id: d.missive_id, user_id: d.user_id, resend_id: r.id }
-              : { missive_id: d.missive_id, user_id: d.user_id, erreur: r.erreur }
-          }),
+          p_resultats: [
+            ...partants.map((d, j) => {
+              const r = resultats[j] ?? { erreur: 'sans réponse de Resend' }
+              return 'id' in r
+                ? { missive_id: d.missive_id, user_id: d.user_id, resend_id: r.id }
+                : { missive_id: d.missive_id, user_id: d.user_id, erreur: r.erreur }
+            }),
+            ...retires.map((d) => ({ missive_id: d.missive_id, user_id: d.user_id, erreur: 'Missive retirée' })),
+          ],
         })
       }
     }

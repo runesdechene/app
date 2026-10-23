@@ -67,8 +67,8 @@ export function Ecrire({ id = null }: { id?: number | null }) {
   }
   const personnes = listes.data?.find((l) => l.cle === b.liste)?.avecAccord ?? 0
   const restes = indicationsRestantes(b.lettre)
-  const pret =
-    contrasteSuffisant(b.couleurs) && restes.length === 0 && b.liste !== null && b.objet.trim() !== '' && (quand === 'maintenant' || heure !== '')
+  const lettrePrete = contrasteSuffisant(b.couleurs) && restes.length === 0 && b.objet.trim() !== ''
+  const pret = lettrePrete && b.liste !== null && (quand === 'maintenant' || heure !== '')
   const etape = b.etape
   const enCours = missive.programmer.isPending || missive.essai.isPending || missive.enregistrer.isPending || retirer.isPending
   // Préparer la lettre qui part (photos penchées, titres photographiés) prend quelques secondes.
@@ -114,7 +114,7 @@ export function Ecrire({ id = null }: { id?: number | null }) {
     <div className={styles.boutons}>
       <Bouton
         sorte="secondaire"
-        disabled={enCours}
+        disabled={enCours || (etape !== null && !lettrePrete)}
         onClick={() => {
           missive.enregistrer.mutate({ b, titres }, { onSuccess: () => { setMessage(etape === null ? 'Brouillon enregistré.' : 'Enregistré : c’est lui qui partira.') } })
         }}

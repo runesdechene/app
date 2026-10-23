@@ -148,7 +148,8 @@ test('un e-mail de suite n’a ni liste ni Programmer : on l’enregistre tel qu
   const { EXEMPLES } = await import('@runes/missives')
   mockLire.mockResolvedValue({
     data: {
-      id: 40, modele: 'missive', contenu: { ...EXEMPLES.missive, titre: 'BIENVENUE' }, couleurs: { fond: '#3f3024', titres: '#c49a5a', rupture: '#a94842' },
+      // Une lettre déjà écrite : plus aucune indication « {…} » à remplacer.
+      id: 40, modele: 'missive', contenu: { ...(JSON.parse(JSON.stringify(EXEMPLES.missive).replace(/\{[^{}"]*\}/g, 'écrit')) as typeof EXEMPLES.missive), titre: 'BIENVENUE' }, couleurs: { fond: '#3f3024', titres: '#c49a5a', rupture: '#a94842' },
       objet: 'Une lettre d’Uriel', apercu: '', liste: null, suite_etapes: { id: 9 },
     },
     error: null,
@@ -172,4 +173,24 @@ test('un e-mail de suite n’a ni liste ni Programmer : on l’enregistre tel qu
   await userEvent.click(screen.getByRole('button', { name: 'Retirer de la suite' }))
   expect(mockRpc).toHaveBeenCalledWith('hub_retirer_etape', { p_id: 9 })
   await screen.findByText('Les suites')
+})
+
+test('un e-mail de suite sans objet ne s’enregistre pas : il pourrait partir vide', async () => {
+  mockRpc.mockResolvedValue({ data: 41, error: null })
+  const { EXEMPLES } = await import('@runes/missives')
+  mockLire.mockResolvedValue({
+    data: {
+      id: 41, modele: 'missive', contenu: { ...EXEMPLES.missive, titre: 'JOUR TROIS' }, couleurs: { fond: '#3f3024', titres: '#c49a5a', rupture: '#a94842' },
+      objet: '', apercu: '', liste: null, suite_etapes: { id: 10 },
+    },
+    error: null,
+  })
+  const router = createMemoryRouter([{ path: '/missives/ecrire/:id', Component: EcrireMissive }], { initialEntries: ['/missives/ecrire/41'] })
+  render(
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  expect(await screen.findByText('JOUR TROIS')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Enregistrer' })).toBeDisabled()
 })

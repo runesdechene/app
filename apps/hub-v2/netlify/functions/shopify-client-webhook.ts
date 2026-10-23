@@ -3,7 +3,7 @@
 // ici. Ensuite, le choix le plus récent gagne entre Shopify et le Hub (lib/accord.ts).
 // Signature HMAC obligatoire, comme shopify-order-webhook.
 
-import { appliquerAccord, colonnesAccord, type Porte } from './lib/accord'
+import { appliquerAccord, choixDeShopify, colonnesAccord, type Porte } from './lib/accord'
 import { signatureShopifyValide } from './lib/shopify'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
@@ -53,9 +53,8 @@ export default async function handler(request: Request) {
 
   const consentement = client.email_marketing_consent
   const recu = {
-    accord: consentement?.state === 'subscribed',
     // Les abonnés anciens n'ont souvent pas de date de consentement : la dernière mise à jour du client la tient.
-    le: consentement?.consent_updated_at ?? client.updated_at ?? client.created_at ?? null,
+    ...choixDeShopify(consentement, client.updated_at ?? client.created_at ?? null),
     // Une création vient du formulaire de la newsletter du site ; une mise à jour, de la boutique.
     porte: (request.headers.get('x-shopify-topic') === 'customers/create' ? 'site' : 'shopify') as Porte,
   }

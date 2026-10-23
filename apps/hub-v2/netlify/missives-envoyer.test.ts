@@ -141,6 +141,15 @@ describe('missives-envoyer', () => {
     expect(rpc.slice(0, 3)).toEqual(['missives_preparer', 'suites_preparer', 'missives_prendre_lot'])
   })
 
+  test('une Missive retirée pendant l’envoi : ses destinataires sont notés en échec, le reste part', async () => {
+    const lot = [...personnes(2), { missive_id: 99, user_id: 'u-retire', email: 'r@exemple.fr', prenom: null }]
+    const { envoyes, notes } = simuler(lot)
+    const handler = await charger()
+    expect((await handler(reveil())).status).toBe(200)
+    expect(envoyes).toHaveLength(2)
+    expect(notes).toContainEqual({ missive_id: 99, user_id: 'u-retire', erreur: 'Missive retirée' })
+  })
+
   test('deux réveils qui se croisent : chacun reçoit la Missive une seule fois', async () => {
     const { envoyes } = simuler(personnes(3))
     const handler = await charger()
