@@ -26,6 +26,19 @@ test('jamais plus de 2 000 px, et les autres adresses restent telles quelles', (
   expect(aLaTaille(null, 100)).toBeNull()
 })
 
+test('une photo de lieu, déjà réduite à l’envoi, est servie telle quelle : sa vignette en petit, la grande sinon', () => {
+  const grande = `${BASE}/object/public/place-images/places/u1/abc.webp`
+  const vignette = `${BASE}/object/public/place-images/places/u1/abc_thumb.webp`
+  expect(aLaTaille(grande, 56)).toBe(vignette)
+  expect(aLaTaille(vignette, 56)).toBe(vignette)
+  expect(aLaTaille(grande, 1000)).toBe(grande)
+  expect(aLaTaille(`${BASE}/object/public/place-images/rapatrie/x.webp`, 300)).toBe(
+    `${BASE}/object/public/place-images/rapatrie/x_thumb.webp`,
+  )
+  // Pas encore rattrapée (JPEG) : redimensionnée comme avant.
+  expect(aLaTaille(`${BASE}/object/public/place-images/rapatrie/x.jpeg`, 300)).toContain('/render/image/')
+})
+
 test('une image de Shopify est redimensionnée par son CDN, au double de la taille affichée', () => {
   expect(aLaTaille('https://cdn.shopify.com/s/files/1/0728/files/illu.webp?v=17', 48)).toBe(
     'https://cdn.shopify.com/s/files/1/0728/files/illu.webp?v=17&width=96',
