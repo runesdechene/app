@@ -98,13 +98,55 @@ export function Ecrire({ id = null }: { id?: number | null }) {
     }
   }
 
+  const boutons = (
+    <div className={styles.boutons}>
+      <Bouton
+        sorte="secondaire"
+        disabled={enCours}
+        onClick={() => {
+          missive.enregistrer.mutate(b, { onSuccess: () => { setMessage('Brouillon enregistré.') } })
+        }}
+      >
+        Enregistrer le brouillon
+      </Bouton>
+      <Bouton
+        sorte="secondaire"
+        disabled={enCours}
+        onClick={() => {
+          missive.essai.mutate(b, { onSuccess: () => { setMessage('L’essai est parti vers ta boîte.') } })
+        }}
+      >
+        M’envoyer un essai
+      </Bouton>
+      <Bouton
+        disabled={!pret || enCours}
+        onClick={() => {
+          missive.programmer.mutate(
+            { b, quand: quand === 'maintenant' ? null : new Date(heure).toISOString() },
+            { onSuccess: () => { setMessage(quand === 'maintenant' ? 'Elle part dans les cinq minutes.' : 'Programmée.') } },
+          )
+        }}
+      >
+        {`Programmer pour ${nombre.format(personnes)} personne${personnes > 1 ? 's' : ''}`}
+      </Bouton>
+    </div>
+  )
+
   return (
     <div className={styles.ecran}>
       <EnTeteDePage
         surtitre="Missives"
         titre="Écrire une Missive"
         phrase="Tu écris directement dans l’e-mail : touche un titre, un texte ou une photo pour le changer."
+        aDroite={boutons}
       />
+      {(restes.length > 0 || message || erreur) && (
+        <div className={styles.etat}>
+          {restes.length > 0 && <p className={styles.aide}>Reste à remplacer : {restes.join(', ')}.</p>}
+          {message && <p className={styles.aide} role="status">{message}</p>}
+          {erreur && <p className={styles.alerte} role="alert">{erreur.message}</p>}
+        </div>
+      )}
       <div className={styles.atelier}>
         <aside className={styles.reglages}>
           <Reglages b={b} onChange={changer} listes={listes.data} />
@@ -122,40 +164,6 @@ export function Ecrire({ id = null }: { id?: number | null }) {
               </label>
             )}
           </section>
-          <div className={styles.actions}>
-            <Bouton
-              disabled={!pret || enCours}
-              onClick={() => {
-                missive.programmer.mutate(
-                  { b, quand: quand === 'maintenant' ? null : new Date(heure).toISOString() },
-                  { onSuccess: () => { setMessage(quand === 'maintenant' ? 'Elle part dans les cinq minutes.' : 'Programmée.') } },
-                )
-              }}
-            >
-              {`Programmer pour ${nombre.format(personnes)} personne${personnes > 1 ? 's' : ''}`}
-            </Bouton>
-            <Bouton
-              sorte="secondaire"
-              disabled={enCours}
-              onClick={() => {
-                missive.essai.mutate(b, { onSuccess: () => { setMessage('L’essai est parti vers ta boîte.') } })
-              }}
-            >
-              M’envoyer un essai
-            </Bouton>
-            <Bouton
-              sorte="discret"
-              disabled={enCours}
-              onClick={() => {
-                missive.enregistrer.mutate(b, { onSuccess: () => { setMessage('Brouillon gardé.') } })
-              }}
-            >
-              Garder le brouillon
-            </Bouton>
-            {restes.length > 0 && <p className={styles.aide}>Reste à remplacer : {restes.join(', ')}.</p>}
-            {message && <p className={styles.aide} role="status">{message}</p>}
-            {erreur && <p className={styles.alerte} role="alert">{erreur.message}</p>}
-          </div>
         </aside>
         <div className={styles.lettre} onClickCapture={toucher}>
           <Lettre b={b} edition={edition} />

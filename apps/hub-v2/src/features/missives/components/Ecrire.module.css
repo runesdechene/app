@@ -228,9 +228,17 @@
   font-size: var(--legende-size);
 }
 
-.actions {
-  display: grid;
+/* Les gestes en haut à droite, dans l'en-tête (Uriel, 23/10) : la colonne de gauche garde toute sa hauteur. */
+.boutons {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
+  align-self: end;
+}
+
+.etat {
+  display: grid;
+  gap: var(--space-1);
 }
 
 .lettre {
