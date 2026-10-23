@@ -375,3 +375,16 @@ vivre dans l'application, la phrase ! »
 l'appli écrit la phrase et son accord (`features/compte/lib/accord.ts`). Un article officiel ou un
 nom accordé rangé dans une table (`geo_departements.de_nom`, les titres masculin/féminin) est une
 donnée : il a le droit de sortir de la base. Reste à traiter : `hub_compte` écrit « Énigme n° … ».
+
+## Le redimensionnement d'images se paie à l'image : jamais pour les photos de lieux
+
+**Le piège** (payé le 23/10/2026) : `/storage/v1/render/image/` facture chaque image d'origine
+différente transformée dans le mois, 100 incluses dans le Pro, puis 5 $ les 1 000. Passer toutes les
+photos de lieux par `aLaTaille` (01/10) a fait 9 327 transformations en trois semaines : les robots
+visitent toutes les fiches SEO. Ces photos sont pourtant déjà réduites à l'envoi (grande 1920 px +
+`_thumb.webp` 400 px).
+
+**How to apply :** une image nombreuse (photos de lieux, tout ce qui grossit avec les contributions)
+se réduit **à l'envoi**, et `aLaTaille` sert la grande ou sa vignette telle quelle. Le
+redimensionnement à la volée reste pour les images rares (bannières, emblèmes, avatars). Quota :
+Dashboard → Organization → Usage → *Storage Image Transformations*.
