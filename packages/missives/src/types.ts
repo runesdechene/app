@@ -54,7 +54,8 @@ export type Lettre =
   | { modele: 'fragment'; contenu: ContenuFragment }
   | { modele: 'carnet'; contenu: ContenuCarnet };
 
-export type Destinataire = { prenom: string | null; lienDesabonnement: string };
+/** `lienQuestionnaire` : le lien personnel du questionnaire, qui remplace `{questionnaire}` dans les liens. */
+export type Destinataire = { prenom: string | null; lienDesabonnement: string; lienQuestionnaire?: string };
 
 /** Le Hub passe `edition` pour rendre chaque zone de texte modifiable sur place. */
 export type Edition = { onChange(zone: string, valeur: string): void };

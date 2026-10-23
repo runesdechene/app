@@ -17,7 +17,12 @@ export async function message(
   objet = missive.objet,
 ): Promise<MessageResend> {
   const jeton = signer(d.user_id)
-  const { html, texte } = await rendre(missive, { prenom: d.prenom, lienDesabonnement: `${HUB}/desabonnement?j=${jeton}` })
+  const { html, texte } = await rendre(missive, {
+    prenom: d.prenom,
+    lienDesabonnement: `${HUB}/desabonnement?j=${jeton}`,
+    // Le questionnaire a son propre jeton : un lien de la lettre ne désabonne jamais, et l'inverse (lib/jeton.ts).
+    lienQuestionnaire: `${HUB}/qui-es-tu?j=${encodeURIComponent(signer(d.user_id, 'questionnaire'))}`,
+  })
   return {
     from: EXPEDITEUR,
     to: [d.email],

@@ -150,6 +150,18 @@ describe('missives-envoyer', () => {
     expect(notes).toContainEqual({ missive_id: 99, user_id: 'u-retire', erreur: 'Missive retirée' })
   })
 
+  test('le lien {questionnaire} de chaque e-mail porte le jeton de sa personne, jamais celui d’une autre', async () => {
+    const { envoyes } = simuler(personnes(2))
+    const handler = await charger()
+    const { EXEMPLES } = await import('@runes/missives')
+    MISSIVE.contenu = { ...EXEMPLES.missive, rupture: { ...EXEMPLES.missive.rupture, appel: { texte: 'Réponds', lien: '{questionnaire}' } } }
+    await handler(reveil())
+    const pour = (u: string) => envoyes.find((m) => m.to[0] === `p${u.slice(1)}@exemple.fr`)?.html ?? ''
+    expect(pour('u0')).toContain(`qui-es-tu?j=${encodeURIComponent(signer('u0', 'questionnaire'))}`)
+    expect(pour('u0')).not.toContain(encodeURIComponent(signer('u1', 'questionnaire')))
+    expect(pour('u1')).toContain(encodeURIComponent(signer('u1', 'questionnaire')))
+  })
+
   test('deux réveils qui se croisent : chacun reçoit la Missive une seule fois', async () => {
     const { envoyes } = simuler(personnes(3))
     const handler = await charger()

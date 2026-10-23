@@ -76,3 +76,26 @@ describe('la couleur autour de la lettre', () => {
     expect(html).toContain(`background-color:${VELIN}`);
   });
 });
+
+describe('le lien {questionnaire}', () => {
+  const lettre: Lettre = {
+    modele: 'missive',
+    contenu: { ...EXEMPLES.missive, rupture: { ...EXEMPLES.missive.rupture, appel: { texte: 'Les Celtes', lien: '{questionnaire}?epoque=celtes' } } },
+  };
+
+  it('devient le lien de chaque personne, l’époque derrière', async () => {
+    const kelpie = { ...destinataire, lienQuestionnaire: 'https://hub.runesdechene.com/qui-es-tu?j=kelpie.sig' };
+    const brann = { ...destinataire, lienQuestionnaire: 'https://hub.runesdechene.com/qui-es-tu?j=brann.sig' };
+    const [a, b] = await Promise.all([rendre(envoi(lettre), kelpie), rendre(envoi(lettre), brann)]);
+    expect(a.html).toContain('https://hub.runesdechene.com/qui-es-tu?j=kelpie.sig&amp;epoque=celtes');
+    expect(a.texte).toContain('https://hub.runesdechene.com/qui-es-tu?j=kelpie.sig&epoque=celtes');
+    expect(a.html).not.toContain('brann.sig');
+    expect(b.html).toContain('j=brann.sig');
+    expect(a.html).not.toContain('{questionnaire}');
+  });
+
+  it('sans lien personnel, mène à la page sans jeton', async () => {
+    const { html } = await rendre(envoi(lettre), destinataire);
+    expect(html).toContain('https://hub.runesdechene.com/qui-es-tu?epoque=celtes');
+  });
+});
