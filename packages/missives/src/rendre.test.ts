@@ -54,3 +54,12 @@ describe('le prénom', () => {
     expect(html).not.toContain('{prénom}');
   });
 });
+
+describe('la page autour de la lettre', () => {
+  it('reste neutre : la couleur du thème ne remplit que la colonne de 600 px', async () => {
+    const { html } = await rendre(envoi(lettres[0]!), destinataire);
+    const body = /<body[^>]*style="([^"]*)"/.exec(html)?.[1] ?? '';
+    expect(body).not.toContain(PALETTES.hiver.fond);
+    expect(html).toMatch(new RegExp(`max-width:600px[^"]*background-color:${PALETTES.hiver.fond}|background-color:${PALETTES.hiver.fond}[^"]*max-width:600px`));
+  });
+});

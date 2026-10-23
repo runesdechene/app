@@ -10,6 +10,10 @@ const mockRpc = vi.hoisted(() => vi.fn())
 const mockLire = vi.hoisted(() => vi.fn())
 // jsdom n'a pas de canvas : la photo « penchée » est un simple Blob, et le dépôt rend une adresse lisible.
 vi.mock('../lib/pencher', () => ({ pencher: () => Promise.resolve(new Blob(['photo'])) }))
+// jsdom ne sait pas photographier un élément : le titre « photographié » est donné d'avance.
+vi.mock('../lib/titres', () => ({
+  photographierTitres: () => Promise.resolve({ titre: { src: 'https://stockage.test/titre.png', largeur: 520, hauteur: 230 } }),
+}))
 vi.mock('@/shared/supabase/client', () => ({
   supabase: {
     rpc: mockRpc,
@@ -51,7 +55,7 @@ function monter() {
 // Ce que la Missive enregistrée contient, au dernier enregistrement.
 function enregistree() {
   const appel = mockRpc.mock.calls.filter(([nom]) => nom === 'hub_enregistrer_missive').at(-1) as
-    | [string, { p: { contenu: { titre: string; photo: { url: string } }; contenu_envoi: { photo: { url: string } } | null; couleurs: Record<string, string>; liste: string | null } }]
+    | [string, { p: { contenu: { titre: string; photo: { url: string } }; contenu_envoi: { photo: { url: string }; titresEnImages?: Record<string, { src: string }> } | null; couleurs: Record<string, string>; liste: string | null } }]
     | undefined
   return appel?.[1].p
 }
@@ -82,6 +86,8 @@ test('écrire dans le titre change la Missive qui part en essai', async () => {
   // Ce qui part : la photo penchée, préparée à l'instant ; le brouillon garde l'originale, droite.
   expect(enregistree()?.contenu_envoi?.photo.url).toMatch(/^https:\/\/stockage\.test\/missives\//)
   expect(enregistree()?.contenu.photo.url).toMatch(/\/missives\/exemples\//)
+  // Et ses titres en Bebas, photographiés : Gmail ignorerait la police.
+  expect(enregistree()?.contenu_envoi?.titresEnImages?.titre?.src).toBe('https://stockage.test/titre.png')
 })
 
 test('une palette remplit les trois couleurs', async () => {

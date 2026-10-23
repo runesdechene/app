@@ -4,7 +4,7 @@ import { Column, Link, Row, Section, Text } from '@react-email/components';
 import { Cadre } from '../briques/Cadre';
 import { Photo } from '../briques/Photo';
 import { INCLINAISONS } from '../photos';
-import { ALEGREYA, BEBAS, styleCorps, styleRubrique, useEncre, Zone } from '../briques/encre';
+import { ALEGREYA, BEBAS, EnImage, styleCorps, styleRubrique, useEncre, Zone } from '../briques/encre';
 import { EnTete, Planche } from '../briques/EnTete';
 import { Lettrine } from '../briques/Lettrine';
 import { Appel, Rupture, TitreRupture } from '../briques/Rupture';
@@ -15,7 +15,7 @@ const CHIFFRES = ['I', 'II', 'III', 'IV', 'V'];
 
 export function Missive({ contenu, couleurs, apercu, destinataire, edition }: ProprietesModele<ContenuMissive>) {
   return (
-    <Cadre couleurs={couleurs} apercu={apercu} destinataire={destinataire} edition={edition}>
+    <Cadre couleurs={couleurs} apercu={apercu} destinataire={destinataire} edition={edition} titres={contenu.titresEnImages}>
       <EnTete enTete={contenu.enTete} titre={contenu.titre} sousTitre={contenu.sousTitre} taille={84} />
       <Planche photo={contenu.photo} />
       <Lettrine ouverture={contenu.ouverture} corps={contenu.corps} />
@@ -36,11 +36,17 @@ function Nouvelles({ rubrique, nouvelles }: { rubrique: string; nouvelles: Nouve
       {nouvelles.map((nouvelle, i) => (
         <Row key={i} style={{ borderTop: `1px solid ${c.filet}` }}>
           <Column width="58" style={{ verticalAlign: 'top', padding: '18px 0' }}>
-            <Text style={{ fontFamily: BEBAS, fontSize: '34px', lineHeight: '32px', color: c.titres, margin: 0 }}>{CHIFFRES[i]}</Text>
+            <Text style={{ fontFamily: BEBAS, fontSize: '34px', lineHeight: '32px', color: c.titres, margin: 0 }}>
+              <EnImage zone={`nouvelles.${String(i)}.chiffre`} texte={CHIFFRES[i] ?? ''}>
+                {CHIFFRES[i]}
+              </EnImage>
+            </Text>
           </Column>
           <Column style={{ verticalAlign: 'top', padding: '18px 0' }}>
             <Text style={{ fontFamily: BEBAS, fontSize: '28px', lineHeight: '28px', letterSpacing: '0.02em', color: c.texte, margin: '0 0 6px' }}>
-              <Zone nom={`nouvelles.${i}.titre`} valeur={nouvelle.titre} />
+              <EnImage zone={`nouvelles.${String(i)}.titre`} texte={nouvelle.titre}>
+                <Zone nom={`nouvelles.${i}.titre`} valeur={nouvelle.titre} />
+              </EnImage>
             </Text>
             <Text style={{ fontFamily: ALEGREYA, fontSize: '17px', lineHeight: '27px', color: c.texte, margin: '0 0 6px' }}>
               <Zone nom={`nouvelles.${i}.texte`} valeur={nouvelle.texte} />

@@ -1,9 +1,9 @@
 // Ce que toutes les briques partagent : les couleurs, le destinataire, le mode édition du Hub, les polices.
 
-import { Text } from '@react-email/components';
-import { createContext, useContext, type CSSProperties } from 'react';
+import { Img, Text } from '@react-email/components';
+import { createContext, useContext, type CSSProperties, type ReactNode } from 'react';
 import type { CouleursDeduites } from '../couleurs';
-import type { Destinataire, Edition } from '../types';
+import type { Destinataire, Edition, TitreEnImage } from '../types';
 
 type Encre = {
   couleurs: CouleursDeduites;
@@ -11,6 +11,8 @@ type Encre = {
   edition: Edition | undefined;
   /** Où trouver logo, portrait et polices. */
   adresse: string;
+  /** Les titres photographiés par le Hub, pour l'e-mail ; absents dans l'éditeur. */
+  titres: Record<string, TitreEnImage> | undefined;
 };
 
 const ContexteEncre = createContext<Encre | null>(null);
@@ -71,6 +73,32 @@ export function Paragraphes({ nom, valeur, style }: { nom: string; valeur: strin
       <Zone nom={nom} valeur={paragraphe} />
     </Text>
   ));
+}
+
+/**
+ * Un titre en Bebas. Dans l'éditeur, il est marqué (`data-titre`) pour que le Hub le photographie à l'envoi,
+ * tel qu'il s'affiche, avec la vraie police. Dans l'e-mail, sa photo le remplace, son texte en description.
+ */
+export function EnImage({ zone, texte, centre = false, children }: { zone: string; texte: string; centre?: boolean; children: ReactNode }) {
+  const { edition, titres } = useEncre();
+  if (edition) {
+    return (
+      <span data-titre={zone} style={{ display: 'inline-block' }}>
+        {children}
+      </span>
+    );
+  }
+  const image = titres?.[zone];
+  if (!image) return <>{children}</>;
+  return (
+    <Img
+      src={image.src}
+      alt={texte}
+      width={String(image.largeur)}
+      height={String(image.hauteur)}
+      style={{ display: centre ? 'block' : 'inline-block', margin: centre ? '0 auto' : 0, border: 0 }}
+    />
+  );
 }
 
 function personnaliser(valeur: string, destinataire: Destinataire | undefined): string {

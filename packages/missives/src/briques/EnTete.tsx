@@ -3,7 +3,7 @@
 import { Column, Heading, Img, Row, Section, Text } from '@react-email/components';
 import type { Photo as PhotoContenu } from '../types';
 import { Photo } from './Photo';
-import { BEBAS, styleRubrique, useEncre, Zone } from './encre';
+import { BEBAS, EnImage, styleRubrique, useEncre, Zone } from './encre';
 
 type Props = {
   enTete: { gauche: string; droite: string };
@@ -47,7 +47,9 @@ export function EnTete({ enTete, titre, sousTitre, taille }: Props) {
           wordBreak: 'break-word',
         }}
       >
-        <Zone nom="titre" valeur={titre} />
+        <EnImage zone="titre" texte={titre} centre>
+          <Zone nom="titre" valeur={titre} />
+        </EnImage>
       </Heading>
       <Text style={{ ...styleRubrique(c.texte, 14), letterSpacing: '0.22em', textAlign: 'center', margin: '10px 0 30px' }}>
         <Zone nom="sousTitre" valeur={sousTitre} />

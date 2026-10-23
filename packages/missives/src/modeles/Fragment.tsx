@@ -11,7 +11,7 @@ import type { ContenuFragment, ProprietesModele } from '../types';
 
 export function Fragment({ contenu, couleurs, apercu, destinataire, edition }: ProprietesModele<ContenuFragment>) {
   return (
-    <Cadre couleurs={couleurs} apercu={apercu} destinataire={destinataire} edition={edition}>
+    <Cadre couleurs={couleurs} apercu={apercu} destinataire={destinataire} edition={edition} titres={contenu.titresEnImages}>
       <EnTete enTete={contenu.enTete} titre={contenu.titre} sousTitre={contenu.sousTitre} taille={176} />
       <Planche photo={contenu.photo} />
       <Lettrine ouverture={contenu.ouverture} corps={contenu.corps} />

@@ -3,7 +3,7 @@
 import { Link, Section, Text } from '@react-email/components';
 import type { CSSProperties, ReactNode } from 'react';
 import type { Appel as AppelContenu } from '../types';
-import { BEBAS, useEncre, Zone } from './encre';
+import { BEBAS, EnImage, useEncre, Zone } from './encre';
 
 export function Rupture({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   const { couleurs: c } = useEncre();
@@ -24,7 +24,9 @@ export function TitreRupture({ nom, valeur, taille }: { nom: string; valeur: str
         wordBreak: 'break-word',
       }}
     >
-      <Zone nom={nom} valeur={valeur} />
+      <EnImage zone={nom} texte={valeur}>
+        <Zone nom={nom} valeur={valeur} />
+      </EnImage>
     </Text>
   );
 }
@@ -46,7 +48,9 @@ export function Appel({ nom, appel, couleur }: { nom: string; appel: AppelConten
           borderBottom: `3px solid ${couleur}`,
         }}
       >
-        <Zone nom={`${nom}.texte`} valeur={appel.texte} /> →
+        <EnImage zone={nom} texte={`${appel.texte} →`}>
+          <Zone nom={`${nom}.texte`} valeur={appel.texte} /> →
+        </EnImage>
       </Link>
     </Text>
   );

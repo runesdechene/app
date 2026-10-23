@@ -4,7 +4,7 @@ import { Column, Link, Row, Section, Text } from '@react-email/components';
 import { Cadre } from '../briques/Cadre';
 import { Photo } from '../briques/Photo';
 import { INCLINAISONS } from '../photos';
-import { ALEGREYA, BEBAS, styleCorps, styleRubrique, useEncre, Zone } from '../briques/encre';
+import { ALEGREYA, BEBAS, EnImage, styleCorps, styleRubrique, useEncre, Zone } from '../briques/encre';
 import { EnTete, Planche } from '../briques/EnTete';
 import { Lettrine } from '../briques/Lettrine';
 import { Appel, Rupture, TitreRupture } from '../briques/Rupture';
@@ -13,7 +13,7 @@ import type { ContenuCarnet, ProprietesModele } from '../types';
 
 export function Carnet({ contenu, couleurs, apercu, destinataire, edition }: ProprietesModele<ContenuCarnet>) {
   return (
-    <Cadre couleurs={couleurs} apercu={apercu} destinataire={destinataire} edition={edition}>
+    <Cadre couleurs={couleurs} apercu={apercu} destinataire={destinataire} edition={edition} titres={contenu.titresEnImages}>
       <EnTete enTete={contenu.enTete} titre={contenu.titre} sousTitre={contenu.sousTitre} taille={116} />
       <Planche photo={contenu.photo} />
       <Lettrine ouverture={contenu.ouverture} corps={contenu.corps} />
@@ -55,7 +55,9 @@ function Haltes({ rupture }: { rupture: ContenuCarnet['rupture'] }) {
       {rupture.haltes.map((halte, i) => (
         <Row key={i} style={{ borderTop: `1px solid ${c.titresRupture}` }}>
           <Column width="128" style={{ padding: '13px 0', fontFamily: BEBAS, fontSize: '26px', lineHeight: '26px', color: c.titresRupture }}>
-            <Zone nom={`rupture.haltes.${i}.date`} valeur={halte.date} />
+            <EnImage zone={`rupture.haltes.${String(i)}.date`} texte={halte.date}>
+              <Zone nom={`rupture.haltes.${i}.date`} valeur={halte.date} />
+            </EnImage>
           </Column>
           <Column style={{ padding: '13px 0', fontFamily: ALEGREYA, fontSize: '18px', color: c.texte }}>
             <Zone nom={`rupture.haltes.${i}.lieu`} valeur={halte.lieu} />

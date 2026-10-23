@@ -8,6 +8,9 @@ export type Modele = 'missive' | 'fragment' | 'carnet';
 export type Photo = { url: string; legende: string; inclinaison: number };
 export type Appel = { texte: string; lien: string };
 
+/** Un titre en Bebas photographié par le Hub à l'envoi : Gmail et Outlook ignorent les polices web. */
+export type TitreEnImage = { src: string; largeur: number; hauteur: number };
+
 type Commun = {
   enTete: { gauche: string; droite: string };
   titre: string;
@@ -15,6 +18,8 @@ type Commun = {
   photo: Photo;
   ouverture: string;
   corps: string;
+  /** Posé par le Hub dans la lettre qui part (contenu_envoi), jamais dans le brouillon. Clé : la zone du titre. */
+  titresEnImages?: Record<string, TitreEnImage>;
 };
 
 export type Nouvelle = { titre: string; texte: string; appel: Appel };

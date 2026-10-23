@@ -14,6 +14,7 @@ import { verifierFichier } from '@/shared/lib/envoi'
 import { Bouton } from '@/shared/ui/Bouton'
 import { EnTeteDePage } from '@/shared/ui/EnTeteDePage'
 import { deposerPhoto } from '../api/missives'
+import { photographierTitres } from '../lib/titres'
 import { useListes } from '../hooks/useListes'
 import { useMissive } from '../hooks/useMissive'
 import { changerZone, indicationsRestantes, type Brouillon } from '../lib/brouillon'
@@ -45,6 +46,7 @@ export function Ecrire({ id = null }: { id?: number | null }) {
   const [heure, setHeure] = useState('')
   const [message, setMessage] = useState<string | null>(null)
   const choixDePhoto = useRef<HTMLInputElement>(null)
+  const lettreAffichee = useRef<HTMLDivElement>(null)
   const zoneDePhoto = useRef<string | null>(null)
   const b = missive.brouillon
 
@@ -65,7 +67,15 @@ export function Ecrire({ id = null }: { id?: number | null }) {
   const pret =
     contrasteSuffisant(b.couleurs) && restes.length === 0 && b.liste !== null && b.objet.trim() !== '' && (quand === 'maintenant' || heure !== '')
   const enCours = missive.programmer.isPending || missive.essai.isPending || missive.enregistrer.isPending
+  // Préparer la lettre qui part (photos penchées, titres photographiés) prend quelques secondes.
+  const prepare = missive.programmer.isPending || missive.essai.isPending
   const erreur = missive.programmer.error ?? missive.essai.error ?? missive.enregistrer.error
+
+  // Les titres se photographient tels qu'affichés : sans curseur ni pointillé d'édition dessus.
+  const titres = () => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+    return lettreAffichee.current ? photographierTitres(lettreAffichee.current, deposerPhoto) : Promise.resolve({})
+  }
 
   // Dans l'e-mail, un lien ne mène nulle part (son adresse se règle à gauche) ; une photo se remplace.
   function toucher(e: MouseEvent) {
@@ -111,7 +121,7 @@ export function Ecrire({ id = null }: { id?: number | null }) {
         sorte="secondaire"
         disabled={enCours}
         onClick={() => {
-          missive.essai.mutate(b, { onSuccess: () => { setMessage('L’essai est parti vers ta boîte.') } })
+          missive.essai.mutate({ b, titres }, { onSuccess: () => { setMessage('L’essai est parti vers ta boîte.') } })
         }}
       >
         M’envoyer un essai
@@ -120,7 +130,7 @@ export function Ecrire({ id = null }: { id?: number | null }) {
         disabled={!pret || enCours}
         onClick={() => {
           missive.programmer.mutate(
-            { b, quand: quand === 'maintenant' ? null : new Date(heure).toISOString() },
+            { b, quand: quand === 'maintenant' ? null : new Date(heure).toISOString(), titres },
             { onSuccess: () => { setMessage(quand === 'maintenant' ? 'Elle part dans les cinq minutes.' : 'Programmée.') } },
           )
         }}
@@ -138,8 +148,9 @@ export function Ecrire({ id = null }: { id?: number | null }) {
         phrase="Tu écris directement dans l’e-mail : touche un titre, un texte ou une photo pour le changer."
         aDroite={boutons}
       />
-      {(restes.length > 0 || message || erreur) && (
+      {(restes.length > 0 || message || erreur || prepare) && (
         <div className={styles.etat}>
+          {prepare && <p className={styles.aide} role="status">La lettre se prépare : photos et titres, quelques secondes…</p>}
           {restes.length > 0 && <p className={styles.aide}>Reste à remplacer : {restes.join(', ')}.</p>}
           {message && <p className={styles.aide} role="status">{message}</p>}
           {erreur && <p className={styles.alerte} role="alert">{erreur.message}</p>}
@@ -163,7 +174,7 @@ export function Ecrire({ id = null }: { id?: number | null }) {
             )}
           </section>
         </aside>
-        <div className={styles.lettre} onClickCapture={toucher}>
+        <div ref={lettreAffichee} className={styles.lettre} onClickCapture={toucher}>
           <Lettre b={b} edition={edition} />
         </div>
       </div>

@@ -3,8 +3,11 @@
 import { Body, Container, Head, Html, Link, Preview, Section, Text } from '@react-email/components';
 import type { ReactNode } from 'react';
 import { deduireCouleurs, type Couleurs } from '../couleurs';
-import type { Destinataire, Edition } from '../types';
+import type { Destinataire, Edition, TitreEnImage } from '../types';
 import { ADRESSE, ADRESSE_DANS_LE_HUB, ALEGREYA, FournisseurEncre } from './encre';
+
+// Autour de la colonne, un vélin neutre : la lettre reste une page posée au centre, quel que soit son thème.
+const VELIN = '#ece5d8';
 
 const polices = (adresse: string) => `
 @font-face { font-family: 'Bebas Neue'; font-weight: 400; src: url(${adresse}/polices/bebas-neue-latin-400-normal.woff2) format('woff2'); }
@@ -19,10 +22,11 @@ type Props = {
   apercu: string;
   destinataire: Destinataire | undefined;
   edition: Edition | undefined;
+  titres: Record<string, TitreEnImage> | undefined;
   children: ReactNode;
 };
 
-export function Cadre({ couleurs, apercu, destinataire, edition, children }: Props) {
+export function Cadre({ couleurs, apercu, destinataire, edition, titres, children }: Props) {
   const c = deduireCouleurs(couleurs);
   const adresse = edition ? ADRESSE_DANS_LE_HUB : ADRESSE;
   const colonne = (
@@ -43,7 +47,7 @@ export function Cadre({ couleurs, apercu, destinataire, edition, children }: Pro
   );
 
   return (
-    <FournisseurEncre value={{ couleurs: c, destinataire, edition, adresse }}>
+    <FournisseurEncre value={{ couleurs: c, destinataire, edition, adresse, titres }}>
       {edition ? (
         // Dans le Hub, l'e-mail vit dans la page : la même colonne, sans l'enveloppe <html>.
         <div style={{ backgroundColor: c.fond }}>
@@ -56,7 +60,10 @@ export function Cadre({ couleurs, apercu, destinataire, edition, children }: Pro
             <style>{polices(adresse)}</style>
           </Head>
           <Preview>{apercu}</Preview>
-          <Body style={{ margin: 0, backgroundColor: c.fond }}>{colonne}</Body>
+          {/* Gmail ignore le fond du <body> : c'est une table pleine largeur qui porte le vélin. */}
+          <Body style={{ margin: 0, backgroundColor: VELIN }}>
+            <Section style={{ backgroundColor: VELIN, padding: '24px 0' }}>{colonne}</Section>
+          </Body>
         </Html>
       )}
     </FournisseurEncre>
