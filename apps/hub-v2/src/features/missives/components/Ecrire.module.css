@@ -234,7 +234,7 @@
 }
 
 .lettre {
-  justify-self: center;
+  justify-self: start;
   width: 600px;
   max-width: 100%;
   overflow-x: auto;

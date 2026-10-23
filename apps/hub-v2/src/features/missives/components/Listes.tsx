@@ -68,7 +68,9 @@ function Ambassadeurs() {
     <Bloc>
       <div className={styles.entete}>
         <TitreDeSection titre="Ambassadeurs et égéries" />
-        <ChampDeRecherche valeur={recherche} onChange={setRecherche} etiquette="Ajouter : un nom, un e-mail…" />
+        <div className={styles.recherche}>
+          <ChampDeRecherche valeur={recherche} onChange={setRecherche} etiquette="Ajouter : un nom, un e-mail…" />
+        </div>
       </div>
       {proposes.length > 0 && (
         <ul className={styles.personnes} aria-label="Comptes trouvés">
