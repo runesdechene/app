@@ -1,5 +1,5 @@
 // Source : `pnpm build` l'empaquette en un seul fichier dans netlify/functions (build:fonctions, voir le README).
-// Réveillée par pg_cron toutes les 5 minutes (_reveiller_missives, mig 541) quand une Missive est à envoyer.
+// Réveillée par pg_cron toutes les 5 minutes (_reveiller_missives, mig 541 et 550) quand une Missive ou une étape de suite est à envoyer.
 // Un réveil prépare les Missives arrivées à échéance, prend un lot de destinataires, rend chaque e-mail et
 // l'envoie par Resend, puis note chaque résultat. La base garantit qu'un destinataire n'est pris qu'une fois,
 // même si deux réveils se croisent ; ce qui reste part au réveil suivant.
@@ -39,6 +39,7 @@ export default async function handler(request: Request) {
 
   try {
     await supabase('rpc/missives_preparer', {})
+    await supabase('rpc/suites_preparer', {}) // les étapes dues des suites (mig 550)
     const lot = (await (await supabase('rpc/missives_prendre_lot', { p_taille: TAILLE_DU_LOT })).json()) as Destinataire[]
 
     if (lot.length > 0) {

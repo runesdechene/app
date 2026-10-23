@@ -133,6 +133,14 @@ describe('missives-envoyer', () => {
     expect(fetch).not.toHaveBeenCalled()
   })
 
+  test('les suites posent leurs étapes avant que le lot soit pris', async () => {
+    simuler(personnes(1))
+    const handler = await charger()
+    await handler(reveil())
+    const rpc = vi.mocked(fetch).mock.calls.map(([url]) => String(url)).filter((u) => u.includes('/rpc/')).map((u) => u.split('/rpc/')[1])
+    expect(rpc.slice(0, 3)).toEqual(['missives_preparer', 'suites_preparer', 'missives_prendre_lot'])
+  })
+
   test('deux réveils qui se croisent : chacun reçoit la Missive une seule fois', async () => {
     const { envoyes } = simuler(personnes(3))
     const handler = await charger()
