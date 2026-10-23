@@ -4,7 +4,8 @@
  * POURQUOI — la maquette pose ses photos d'un bord à l'autre, légèrement penchées, les coins débordant
  *            du cadre : le dessin est un peu plus large que l'image rendue, et ses coins sont coupés.
  * ATTENTION — le fond est cuit dans les coins : on ne penche qu'au moment de l'envoi (lib/envoi), avec les
- *             couleurs finales. Au dépôt, la photo est seulement réduite (0°).
+ *             couleurs finales. Au dépôt, la photo est seulement réduite (0°), et une photo détourée garde sa
+ *             transparence : le fond de la lettre passe dessous et suit la palette (bug relevé par Uriel, 23/10).
  */
 
 const LARGEUR_MAX = 1200
@@ -27,7 +28,13 @@ export function mesuresPenchees(largeurSource: number, hauteurSource: number, de
   return { largeur, hauteur, dessinLargeur, dessinHauteur }
 }
 
+/** Une photo droite détourée reste en PNG, transparente ; tout le reste part en JPEG, plus léger. */
+export function formatDeSortie(typeSource: string, degres: number): 'image/png' | 'image/jpeg' {
+  return degres === 0 && typeSource !== 'image/jpeg' ? 'image/png' : 'image/jpeg'
+}
+
 export async function pencher(photo: Blob, degres: number, fond: string): Promise<Blob> {
+  const format = formatDeSortie(photo.type, degres)
   const image = await createImageBitmap(photo)
   const m = mesuresPenchees(image.width, image.height, degres)
   const toile = document.createElement('canvas')
@@ -35,8 +42,10 @@ export async function pencher(photo: Blob, degres: number, fond: string): Promis
   toile.height = m.hauteur
   const crayon = toile.getContext('2d')
   if (!crayon) throw new Error('Ce navigateur ne sait pas préparer la photo.')
-  crayon.fillStyle = fond
-  crayon.fillRect(0, 0, m.largeur, m.hauteur)
+  if (format === 'image/jpeg') {
+    crayon.fillStyle = fond
+    crayon.fillRect(0, 0, m.largeur, m.hauteur)
+  }
   crayon.translate(m.largeur / 2, m.hauteur / 2)
   crayon.rotate((degres * Math.PI) / 180)
   crayon.drawImage(image, -m.dessinLargeur / 2, -m.dessinHauteur / 2, m.dessinLargeur, m.dessinHauteur)
@@ -44,6 +53,6 @@ export async function pencher(photo: Blob, degres: number, fond: string): Promis
     toile.toBlob((blob) => {
       if (blob) resolve(blob)
       else reject(new Error('La photo n’a pas pu être préparée.'))
-    }, 'image/jpeg', 0.85)
+    }, format, 0.85)
   })
 }

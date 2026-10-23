@@ -47,8 +47,8 @@ export async function programmerMissive(id: number, quand: string | null): Promi
 }
 
 export async function deposerPhoto(photo: Blob): Promise<string> {
-  const nom = `${crypto.randomUUID()}.jpg`
-  return envoyerFichier('missives', nom, new File([photo], nom, { type: 'image/jpeg' }))
+  const nom = `${crypto.randomUUID()}.${photo.type === 'image/png' ? 'png' : 'jpg'}`
+  return envoyerFichier('missives', nom, new File([photo], nom, { type: photo.type }))
 }
 
 /** Une photo du brouillon, penchée sur la couleur de ses coins, puis déposée : son adresse. */
