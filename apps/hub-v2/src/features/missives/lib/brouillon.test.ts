@@ -1,5 +1,7 @@
 import { PALETTES } from '@runes/missives'
-import { ajouterNouvelle, brouillonVide, changerModele, changerZone, deplacerNouvelle, supprimerNouvelle } from './brouillon'
+import {
+  ajouterNouvelle, brouillonVide, changerModele, changerZone, deplacerNouvelle, indicationsRestantes, supprimerNouvelle,
+} from './brouillon'
 
 test('une Missive neuve part du modèle et de ses trois nouvelles, aux couleurs de la marque', () => {
   const b = brouillonVide('missive')
@@ -38,4 +40,30 @@ test('changer de modèle garde l’objet, l’aperçu, la liste et les couleurs'
   const apres = changerModele(b, 'fragment')
   expect(apres.lettre.modele).toBe('fragment')
   expect(apres).toMatchObject({ objet: 'Hécate est là', apercu: 'Le drop de novembre', liste: 'porteurs', couleurs: PALETTES.hiver })
+})
+
+test('une lettre neuve garde ses indications et ses photos d’exemple : elle ne part pas telle quelle', () => {
+  const restes = indicationsRestantes(brouillonVide('missive').lettre)
+  expect(restes).toContain('{ville}')
+  expect(restes).toContain('les photos d’exemple')
+  expect(restes).not.toContain('{prénom}')
+})
+
+// Chaque texte de la lettre, remplacé comme le ferait Uriel en écrivant.
+function remplir(valeur: unknown): unknown {
+  if (typeof valeur === 'string') return valeur.replace(/\{(?!prénom\})[^{}]*\}/g, 'x').replace('/missives/exemples/', '/photos/')
+  if (Array.isArray(valeur)) return valeur.map(remplir)
+  if (typeof valeur === 'object' && valeur !== null) return Object.fromEntries(Object.entries(valeur).map(([k, v]) => [k, remplir(v)]))
+  return valeur
+}
+
+test('une lettre sans accolade ni photo d’exemple est prête', () => {
+  const b = brouillonVide('carnet')
+  const lettre = { ...b.lettre, contenu: remplir(b.lettre.contenu) } as typeof b.lettre
+  expect(indicationsRestantes(lettre)).toEqual([])
+})
+
+test('rechoisir le même modèle ne touche à rien', () => {
+  const b = changerZone(brouillonVide('missive'), 'titre', 'MON TITRE')
+  expect(changerModele(b, 'missive')).toBe(b)
 })

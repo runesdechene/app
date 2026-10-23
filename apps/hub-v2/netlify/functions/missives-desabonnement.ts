@@ -6,10 +6,10 @@
 
 import { colonnesAccord } from './lib/accord'
 import { verifier } from './lib/jeton'
+import { desabonnerChezShopify } from './lib/shopify'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const BOUTIQUE = 'runes-de-chene.myshopify.com'
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } })
@@ -36,25 +36,15 @@ export default async function handler(request: Request) {
 
   try {
     const le = new Date().toISOString()
-    const id = encodeURIComponent(userId)
-    await supabase(`users?id=eq.${id}`, {
+    const r = await supabase(`users?id=eq.${encodeURIComponent(userId)}`, {
       method: 'PATCH',
       body: JSON.stringify(colonnesAccord({ accord: false, le, porte: 'desabonnement' })),
     })
-
-    const fiches = (await (await supabase(`users?id=eq.${id}&select=shopify_customer_id`)).json()) as { shopify_customer_id: number | null }[]
-    const client = fiches[0]?.shopify_customer_id
-    const jeton = process.env.SHOPIFY_ACCESS_TOKEN
-    if (client && jeton) {
-      const r = await fetch(`https://${BOUTIQUE}/admin/api/2026-01/customers/${String(client)}.json`, {
-        method: 'PUT',
-        headers: { 'X-Shopify-Access-Token': jeton, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customer: { id: client, email_marketing_consent: { state: 'unsubscribed', opt_in_level: 'single_opt_in', consent_updated_at: le } },
-        }),
-      })
-      if (!r.ok) console.error('missives-desabonnement : Shopify a refusé, HTTP', r.status)
+    if (!r.ok) {
+      console.error('missives-desabonnement : la fiche a refusé, HTTP', r.status)
+      return json({ error: 'Le désabonnement n’a pas pu s’écrire, réessaie dans un instant.' }, 500)
     }
+    await desabonnerChezShopify(userId, le)
     return json({ ok: true })
   } catch {
     return json({ error: 'Unexpected error' }, 500)

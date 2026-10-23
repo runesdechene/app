@@ -15,6 +15,8 @@ type Client = {
   email?: string | null
   first_name?: string | null
   last_name?: string | null
+  created_at?: string
+  updated_at?: string
   email_marketing_consent?: { state?: string; consent_updated_at?: string | null } | null
 }
 
@@ -52,16 +54,18 @@ export default async function handler(request: Request) {
   const consentement = client.email_marketing_consent
   const recu = {
     accord: consentement?.state === 'subscribed',
-    le: consentement?.consent_updated_at ?? null,
+    // Les abonnés anciens n'ont souvent pas de date de consentement : la dernière mise à jour du client la tient.
+    le: consentement?.consent_updated_at ?? client.updated_at ?? client.created_at ?? null,
     // Une création vient du formulaire de la newsletter du site ; une mise à jour, de la boutique.
     porte: (request.headers.get('x-shopify-topic') === 'customers/create' ? 'site' : 'shopify') as Porte,
   }
 
   try {
-    const fiches = await (await supabase(
-      `users?email_address=eq.${encodeURIComponent(email)}&select=id,accord_nouvelles,accord_nouvelles_le&limit=1`,
-    )).json() as Fiche[]
-    const fiche = fiches[0]
+    // Par le client Shopify d'abord : une centaine de fiches gardent un e-mail en casse mixte.
+    const colonnes = 'select=id,accord_nouvelles,accord_nouvelles_le&limit=1'
+    const parClient = await (await supabase(`users?shopify_customer_id=eq.${String(client.id)}&${colonnes}`)).json() as Fiche[]
+    const fiche = parClient[0]
+      ?? (await (await supabase(`users?email_address=eq.${encodeURIComponent(email)}&${colonnes}`)).json() as Fiche[])[0]
 
     if (!fiche) {
       const choix = appliquerAccord({ accord: false, le: null }, recu)

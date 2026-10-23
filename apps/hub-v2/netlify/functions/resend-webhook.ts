@@ -1,17 +1,23 @@
 // Webhook de Resend : ce qu'il advient de chaque Missive envoyée (missive_envois, retrouvé par resend_id).
 // Ouverture et clic : la première date. Rebond : l'adresse ne reçoit plus rien (accord retiré, porte
-// « rebond »). Plainte (marquée comme indésirable) : l'accord est retiré aussi.
+// « rebond »). Plainte (marquée comme indésirable) : l'accord est retiré, jusque chez Shopify.
+// Un rebond ou une plainte arrivé avant que l'envoi soit noté répond 503 : Resend le renverra.
 // Signature Svix obligatoire : HMAC-SHA256 de « id.horodatage.corps », clé = RESEND_WEBHOOK_SECRET décodé.
 
 import crypto from 'crypto'
 import { colonnesAccord, type Porte } from './lib/accord'
+import { desabonnerChezShopify } from './lib/shopify'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
 // Au-delà, une requête signée est une requête rejouée.
 const TOLERANCE_S = 5 * 60
 
-type Evenement = { type: string; created_at: string; data: { email_id: string } }
+type Evenement = { type: string; created_at: string; data?: { email_id?: string; from?: string } }
+
+// Le même compte Resend envoie les e-mails de service de l'appli (mail.runesdechene.com) : seuls ceux des
+// Missives nous regardent. Les autres répondent 200, pour que Resend ne les relance jamais.
+const DOMAINE = '@missives.runesdechene.com'
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } })
@@ -44,14 +50,17 @@ function signatureValide(request: Request, corps: string, secret: string): boole
   })
 }
 
-async function retirerAccord(envoi: string, statut: 'rebond' | 'plainte', porte: Porte, le: string) {
+/** `false` quand l'envoi n'est pas (encore) noté. */
+async function retirerAccord(envoi: string, statut: 'rebond' | 'plainte', porte: Porte, le: string): Promise<boolean> {
   const lignes = (await (await supabase(envoi, { method: 'PATCH', body: JSON.stringify({ statut }) })).json()) as { user_id: string }[]
   const userId = lignes[0]?.user_id
-  if (!userId) return
+  if (!userId) return false
   await supabase(`users?id=eq.${encodeURIComponent(userId)}`, {
     method: 'PATCH',
     body: JSON.stringify(colonnesAccord({ accord: false, le, porte })),
   })
+  if (statut === 'plainte') await desabonnerChezShopify(userId, le)
+  return true
 }
 
 export default async function handler(request: Request) {
@@ -67,7 +76,9 @@ export default async function handler(request: Request) {
   } catch {
     return json({ error: 'Invalid JSON' }, 400)
   }
-  const envoi = `missive_envois?resend_id=eq.${encodeURIComponent(evenement.data.email_id)}`
+  const emailId = evenement.data?.email_id
+  if (!emailId || !evenement.data?.from?.includes(DOMAINE)) return json({ ok: true, ignore: 'hors Missives' })
+  const envoi = `missive_envois?resend_id=eq.${encodeURIComponent(emailId)}`
   const le = evenement.created_at
 
   try {
@@ -79,10 +90,10 @@ export default async function handler(request: Request) {
         await supabase(`${envoi}&clique_le=is.null`, { method: 'PATCH', body: JSON.stringify({ clique_le: le }) })
         break
       case 'email.bounced':
-        await retirerAccord(envoi, 'rebond', 'rebond', le)
+        if (!(await retirerAccord(envoi, 'rebond', 'rebond', le))) return json({ error: 'Envoi pas encore noté' }, 503)
         break
       case 'email.complained':
-        await retirerAccord(envoi, 'plainte', 'desabonnement', le)
+        if (!(await retirerAccord(envoi, 'plainte', 'desabonnement', le))) return json({ error: 'Envoi pas encore noté' }, 503)
         break
     }
     return json({ ok: true })

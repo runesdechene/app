@@ -1,10 +1,14 @@
-// Le jeton du lien de désabonnement : la personne, signée avec MISSIVES_SECRET. Sans compte ni session,
-// il prouve que le lien vient bien d'une Missive envoyée à cette personne.
+// Le jeton du lien de désabonnement : la personne, signée avec MISSIVES_JETON_SECRET. Sans compte ni session,
+// il prouve que le lien vient bien d'une Missive envoyée à cette personne. Sa clé ne vit que dans Netlify,
+// à part du secret du réveil (qui, lui, est aussi rangé dans la base).
 
 import crypto from 'crypto'
 
 function signature(userId: string): string {
-  return crypto.createHmac('sha256', process.env.MISSIVES_SECRET ?? '').update(userId).digest('base64url')
+  const cle = process.env.MISSIVES_JETON_SECRET
+  // Une clé vide signerait des jetons que n'importe qui pourrait fabriquer.
+  if (!cle) throw new Error('MISSIVES_JETON_SECRET manquant')
+  return crypto.createHmac('sha256', cle).update(userId).digest('base64url')
 }
 
 export function signer(userId: string): string {

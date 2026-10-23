@@ -16,7 +16,10 @@ export function useMissive(id: number | null) {
 
   async function enregistrer(b: Brouillon): Promise<number> {
     const nouvelId = await enregistrerMissive(b)
-    setEcrit({ ...b, id: nouvelId })
+    const enregistre = { ...b, id: nouvelId }
+    setEcrit(enregistre)
+    // Rouverte depuis Envois, la Missive montre ce qui vient d'être enregistré, pas une lecture plus ancienne.
+    client.setQueryData(['missive', nouvelId], enregistre)
     await client.invalidateQueries({ queryKey: ['missives-envois'] })
     return nouvelId
   }

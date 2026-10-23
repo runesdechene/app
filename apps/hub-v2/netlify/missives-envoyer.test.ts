@@ -35,11 +35,18 @@ function reveil(secret: string | null = SECRET) {
  * La base et Resend simulés. `lot` : ce que missives_prendre_lot rend, une seule fois (comme SKIP LOCKED).
  * `refus` : les adresses que Resend refuse.
  */
-function simuler(lot: Destinataire[], refus: string[] = []) {
+function simuler(
+  lot: Destinataire[],
+  refus: string[] = [],
+  panne: { lot?: Response | 'reseau'; aPartirDuLot?: number; noter?: number } = {},
+) {
   let restant = [...lot]
+  let lots = 0
   const envoyes: { to: string[]; headers: Record<string, string>; html: string }[] = []
   const notes: unknown[] = []
+  const cles: (string | null)[] = []
   vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
+    if (url.startsWith('https://api.resend.com')) cles.push(new Headers(init?.headers).get('Idempotency-Key'))
     const corps = init?.body ? JSON.parse(String(init.body)) : null
     if (url.endsWith('/rpc/missives_prendre_lot')) {
       const pris = restant.slice(0, corps.p_taille)
@@ -47,11 +54,17 @@ function simuler(lot: Destinataire[], refus: string[] = []) {
       return Response.json(pris)
     }
     if (url.endsWith('/rpc/missives_noter')) {
+      if (panne.noter) return new Response('{}', { status: panne.noter })
       notes.push(...corps.p_resultats)
       return new Response(null, { status: 204 })
     }
     if (url.includes('/rest/v1/missives?')) return Response.json([MISSIVE])
     if (url === 'https://api.resend.com/emails/batch') {
+      lots += 1
+      if (panne.lot && lots >= (panne.aPartirDuLot ?? 1)) {
+        if (panne.lot === 'reseau') throw new TypeError('fetch failed')
+        return panne.lot.clone()
+      }
       const messages = corps as (typeof envoyes)[number][]
       if (messages.some((m) => refus.includes(m.to[0] ?? ''))) {
         return Response.json({ statusCode: 422, message: 'Invalid `to` field.' }, { status: 422 })
@@ -66,7 +79,7 @@ function simuler(lot: Destinataire[], refus: string[] = []) {
     }
     return new Response(null, { status: 204 })
   }))
-  return { envoyes, notes }
+  return { envoyes, notes, cles }
 }
 
 function personnes(n: number): Destinataire[] {
@@ -78,6 +91,7 @@ beforeEach(() => {
   vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service')
   vi.stubEnv('RESEND_API_KEY', 're_cle')
   vi.stubEnv('MISSIVES_SECRET', SECRET)
+  vi.stubEnv('MISSIVES_JETON_SECRET', 'cle-des-jetons')
 })
 afterEach(() => {
   vi.unstubAllEnvs()
@@ -86,17 +100,27 @@ afterEach(() => {
 
 describe('le jeton de désabonnement', () => {
   test('un jeton signé se vérifie et rend la personne', () => {
-    vi.stubEnv('MISSIVES_SECRET', SECRET)
     expect(verifier(signer('shopify-42'))).toBe('shopify-42')
   })
 
-  test('un jeton retouché, ou signé avec un autre secret, est refusé', () => {
-    vi.stubEnv('MISSIVES_SECRET', SECRET)
+  test('un jeton retouché, ou signé avec une autre clé, est refusé', () => {
     const jeton = signer('u1')
     expect(verifier(jeton.replace('u1', 'u2'))).toBeNull()
     expect(verifier('u1')).toBeNull()
-    vi.stubEnv('MISSIVES_SECRET', 'autre')
+    vi.stubEnv('MISSIVES_JETON_SECRET', 'autre')
     expect(verifier(jeton)).toBeNull()
+  })
+
+  test('sans clé de jeton, rien ne se signe : une clé vide se forgerait', () => {
+    vi.stubEnv('MISSIVES_JETON_SECRET', '')
+    expect(() => signer('u1')).toThrow()
+    expect(() => verifier('u1.abc')).toThrow()
+  })
+
+  test('la clé des jetons n’est pas le secret du réveil', () => {
+    const jeton = signer('u1')
+    vi.stubEnv('MISSIVES_SECRET', 'autre-reveil')
+    expect(verifier(jeton)).toBe('u1')
   })
 })
 
@@ -126,6 +150,38 @@ describe('missives-envoyer', () => {
     expect(notes).toHaveLength(5)
     expect(notes.filter((n) => (n as { resend_id?: string }).resend_id)).toHaveLength(3)
     expect(notes).toContainEqual({ missive_id: 7, user_id: 'u1', erreur: 'Invalid `to` field.' })
+  })
+
+  test('un lot que Resend n’a pas pu prendre (500) n’est pas renvoyé un par un : noté en échec', async () => {
+    const { envoyes, notes } = simuler(personnes(5), [], { lot: new Response('{}', { status: 500 }) })
+    const handler = await charger()
+    await handler(reveil())
+    expect(envoyes).toHaveLength(0)
+    expect(notes).toHaveLength(5)
+    expect(notes.every((n) => typeof (n as { erreur?: string }).erreur === 'string')).toBe(true)
+  })
+
+  test('chaque appel à Resend porte une clé d’idempotence : un renvoi ne part pas deux fois', async () => {
+    const { cles } = simuler(personnes(5), ['p1@exemple.fr'])
+    const handler = await charger()
+    await handler(reveil())
+    expect(cles.length).toBeGreaterThan(1)
+    expect(cles.every((c) => typeof c === 'string' && c.length > 0)).toBe(true)
+    expect(new Set(cles).size).toBe(cles.length)
+  })
+
+  test('une panne au second lot n’efface pas le premier : ses résultats sont déjà notés', async () => {
+    const { notes } = simuler(personnes(150), [], { lot: 'reseau', aPartirDuLot: 2 })
+    const handler = await charger()
+    const r = await handler(reveil())
+    expect(r.status).toBe(500)
+    expect(notes.filter((n) => (n as { resend_id?: string }).resend_id)).toHaveLength(100)
+  })
+
+  test('si la base refuse de noter, le réveil le dit (500)', async () => {
+    simuler(personnes(2), [], { noter: 500 })
+    const handler = await charger()
+    expect((await handler(reveil())).status).toBe(500)
   })
 
   test('chaque e-mail porte le désabonnement en un clic et le prénom manquant devient « Explorateur »', async () => {

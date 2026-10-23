@@ -16,7 +16,7 @@ import { EnTeteDePage } from '@/shared/ui/EnTeteDePage'
 import { deposerPhoto } from '../api/missives'
 import { useListes } from '../hooks/useListes'
 import { useMissive } from '../hooks/useMissive'
-import { changerZone, type Brouillon } from '../lib/brouillon'
+import { changerZone, indicationsRestantes, type Brouillon } from '../lib/brouillon'
 import { placeDePhoto } from '../lib/liens'
 import { pencher } from '../lib/pencher'
 import styles from './Ecrire.module.css'
@@ -33,9 +33,14 @@ function Lettre({ b, edition }: { b: Brouillon; edition: Edition }) {
   return <Carnet {...props} contenu={b.lettre.contenu} />
 }
 
-export function Ecrire() {
+/** Une adresse, une Missive : changer d'adresse repart de zéro, sans garder la lettre précédente en mémoire. */
+export function EcrireMissive() {
   const { id } = useParams()
-  const missive = useMissive(id ? Number(id) : null)
+  return <Ecrire key={id ?? 'neuve'} id={id ? Number(id) : null} />
+}
+
+export function Ecrire({ id = null }: { id?: number | null }) {
+  const missive = useMissive(id)
   const listes = useListes()
   const [quand, setQuand] = useState<'maintenant' | 'plus-tard'>('maintenant')
   const [heure, setHeure] = useState('')
@@ -57,7 +62,9 @@ export function Ecrire() {
     },
   }
   const personnes = listes.data?.find((l) => l.cle === b.liste)?.avecAccord ?? 0
-  const pret = contrasteSuffisant(b.couleurs) && b.liste !== null && b.objet.trim() !== '' && (quand === 'maintenant' || heure !== '')
+  const restes = indicationsRestantes(b.lettre)
+  const pret =
+    contrasteSuffisant(b.couleurs) && restes.length === 0 && b.liste !== null && b.objet.trim() !== '' && (quand === 'maintenant' || heure !== '')
   const enCours = missive.programmer.isPending || missive.essai.isPending || missive.enregistrer.isPending
   const erreur = missive.programmer.error ?? missive.essai.error ?? missive.enregistrer.error
 
@@ -145,6 +152,7 @@ export function Ecrire() {
             >
               Garder le brouillon
             </Bouton>
+            {restes.length > 0 && <p className={styles.aide}>Reste à remplacer : {restes.join(', ')}.</p>}
             {message && <p className={styles.aide} role="status">{message}</p>}
             {erreur && <p className={styles.alerte} role="alert">{erreur.message}</p>}
           </div>

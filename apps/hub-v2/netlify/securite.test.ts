@@ -215,6 +215,25 @@ describe('shopify-sync : liaison des clients existants', () => {
     })
   })
 
+  test('un abonné Shopify sans date de consentement est repris, daté de la création du client', async () => {
+    const corpsPatch: Record<string, unknown> = {}
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
+      if (url.includes('/auth/v1/user')) return Promise.resolve(Response.json({ id: 'u0' }))
+      if (url.includes('/rest/v1/users?select=role')) return Promise.resolve(Response.json([{ role: 'admin' }]))
+      if (url.includes('/admin/api/')) {
+        return Promise.resolve(Response.json({ customers: [{ ...clients[0], email_marketing_consent: { state: 'subscribed', consent_updated_at: null } }] }))
+      }
+      if (init?.method === 'PATCH') {
+        corpsPatch[url] = JSON.parse(String(init.body))
+        return Promise.resolve(new Response(null, { status: 204 }))
+      }
+      return Promise.resolve(Response.json([{ ...comptes[0], shopify_customer_id: 1, accord_nouvelles: false, accord_nouvelles_le: null }]))
+    }))
+    const handler = await charger('shopify-sync')
+    await handler(post('{}', { Authorization: 'Bearer jwt' }))
+    expect(corpsPatch['http://supabase.test/rest/v1/users?id=eq.u1']).toMatchObject({ accord_nouvelles: true, accord_nouvelles_le: '2026-01-01' })
+  })
+
   test('une page de comptes qui n’est pas une liste : 500 explicite, rien n’est lié', async () => {
     simuler({ message: 'JWT expired' }, () => new Response(null, { status: 204 }))
     const handler = await charger('shopify-sync')
@@ -398,11 +417,12 @@ describe('flyer-create-account : publique, donc freinée', () => {
 describe('shopify-client-webhook : l’accord aux nouvelles venu de Shopify', () => {
   type Appel = { url: string; methode: string; corps: unknown }
 
-  // `fiches` : ce que la base rend pour l'e-mail du client.
-  function simuler(fiches: unknown[]) {
+  // `fiches` : ce que la base rend pour l'e-mail du client ; `parClient` : pour son identifiant Shopify.
+  function simuler(fiches: unknown[], parClient: unknown[] = []) {
     const appels: Appel[] = []
     vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
       appels.push({ url, methode: init?.method ?? 'GET', corps: init?.body ? JSON.parse(String(init.body)) : null })
+      if (url.includes('/rest/v1/users?shopify_customer_id')) return Promise.resolve(Response.json(parClient))
       if (url.includes('/rest/v1/users?email_address')) return Promise.resolve(Response.json(fiches))
       return Promise.resolve(new Response(null, { status: 201 }))
     }))
@@ -414,6 +434,8 @@ describe('shopify-client-webhook : l’accord aux nouvelles venu de Shopify', ()
       id: 42,
       email: 'Claire@Exemple.fr',
       first_name: 'Claire',
+      created_at: '2025-03-01T10:00:00Z',
+      updated_at: '2026-10-20T10:00:00Z',
       email_marketing_consent: { state: etat, opt_in_level: 'single_opt_in', consent_updated_at: le },
     })
   }
@@ -470,6 +492,25 @@ describe('shopify-client-webhook : l’accord aux nouvelles venu de Shopify', ()
     })
   })
 
+  test('une fiche à l’e-mail en casse mixte se retrouve par son client Shopify : pas de seconde fiche', async () => {
+    const appels = simuler([], [{ id: 'u1', accord_nouvelles: false, accord_nouvelles_le: null }])
+    const handler = await charger('shopify-client-webhook')
+    await handler(recevoir(client('subscribed', '2026-10-23T10:00:00Z'), 'customers/update'))
+    expect(appels.some((a) => a.methode === 'POST')).toBe(false)
+    expect(appels.find((a) => a.methode === 'PATCH')?.url).toContain('id=eq.u1')
+  })
+
+  test('un abonné Shopify sans date de consentement est repris, daté de sa dernière mise à jour', async () => {
+    const appels = simuler([{ id: 'u1', accord_nouvelles: false, accord_nouvelles_le: null }])
+    const handler = await charger('shopify-client-webhook')
+    await handler(recevoir(client('subscribed', null), 'customers/update'))
+    expect(appels.find((a) => a.methode === 'PATCH')?.corps).toEqual({
+      accord_nouvelles: true,
+      accord_nouvelles_le: '2026-10-20T10:00:00Z',
+      accord_nouvelles_porte: 'shopify',
+    })
+  })
+
   test('un choix Shopify plus ancien que celui de la fiche ne change rien', async () => {
     const appels = simuler([{ id: 'u1', accord_nouvelles: false, accord_nouvelles_le: '2026-10-23T10:00:00Z' }])
     const handler = await charger('shopify-client-webhook')
@@ -501,7 +542,7 @@ describe('flyer-create-account : la case des nouvelles', () => {
 describe('missives-essai : la Missive part tout de suite, à l’admin seulement', () => {
   test('l’admin la reçoit à son adresse, objet préfixé « [Essai] »', async () => {
     vi.stubEnv('RESEND_API_KEY', 're_cle')
-    vi.stubEnv('MISSIVES_SECRET', 'secret')
+    vi.stubEnv('MISSIVES_JETON_SECRET', 'cle-des-jetons')
     const { EXEMPLES } = await import('@runes/missives')
     const envois: { to: string[]; subject: string }[] = []
     vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {

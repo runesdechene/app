@@ -43,7 +43,8 @@ interface ShopifyCustomer {
 function choixShopify(customer: ShopifyCustomer) {
   return {
     accord: customer.email_marketing_consent?.state === 'subscribed',
-    le: customer.email_marketing_consent?.consent_updated_at ?? null,
+    // Les abonnés anciens n'ont souvent pas de date de consentement : la création du client la tient.
+    le: customer.email_marketing_consent?.consent_updated_at ?? customer.created_at,
     porte: 'shopify' as const,
   }
 }

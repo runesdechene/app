@@ -24,7 +24,7 @@ sauf `flyer-create-account`, appelée sans session par `/flyercadeau` (`src/publ
 
 Variables d'environnement lues (sans aucune valeur ici) : `VITE_SUPABASE_URL`,
 `SUPABASE_SERVICE_ROLE_KEY`, `SHOPIFY_ACCESS_TOKEN`, `SHOPIFY_WEBHOOK_SECRET`, `SHOPIFY_CLIENT_ID`,
-`SHOPIFY_CLIENT_SECRET`, `SHOPIFY_SHOP`, `FLYER_PROMO_CODE`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `MISSIVES_SECRET` (`flyer-create-account`, qui lit aussi
+`SHOPIFY_CLIENT_SECRET`, `SHOPIFY_SHOP`, `FLYER_PROMO_CODE`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `MISSIVES_SECRET` (le même que le secret `missives_secret` de Supabase Vault, jamais dans `app_settings`, lisible sans compte), `MISSIVES_JETON_SECRET` (la clé des liens de désabonnement, dans Netlify seulement) (`flyer-create-account`, qui lit aussi
 `VITE_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` et `SHOPIFY_ACCESS_TOKEN`).
 
 `lib/` n'est pas une fonction : les aides partagées (`accord.ts`, `admin.ts`, `jeton.ts`, `missive.ts`, `resend.ts`, signature Shopify dans `shopify.ts`).

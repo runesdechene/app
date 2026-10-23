@@ -1,5 +1,8 @@
-// L'envoi par Resend : par lots de 100 (le maximum de l'API). Un lot refusé l'est en entier ; ses messages
-// repartent alors un par un, pour que chaque refus soit noté avec sa raison et que les autres partent.
+// L'envoi par Resend, un lot de 100 au plus (le maximum de l'API). Chaque appel porte une clé
+// d'idempotence : si un réveil renvoie ce que Resend a déjà pris, Resend l'ignore (24 h).
+// Un lot refusé pour un message invalide (422) l'est en entier ; ses messages repartent alors un par un,
+// pour noter chaque refus et laisser partir les autres. Toute autre panne (5xx, 429) ne renvoie rien :
+// le lot est noté en échec, plutôt que de risquer un double envoi.
 
 export type MessageResend = {
   from: string
@@ -11,35 +14,37 @@ export type MessageResend = {
   headers: Record<string, string>
 }
 
+/** `cle` : la clé d'idempotence de ce message, stable d'un réveil à l'autre (« missive-personne »). */
+export type AEnvoyer = { message: MessageResend; cle: string }
 export type Resultat = { id: string } | { erreur: string }
+
+export const TAILLE_DU_LOT_RESEND = 100
 
 const API = 'https://api.resend.com'
 
-export async function envoyerParLots(messages: MessageResend[], cle: string): Promise<Resultat[]> {
-  const resultats: Resultat[] = []
-  for (let i = 0; i < messages.length; i += 100) {
-    const lot = messages.slice(i, i + 100)
-    const r = await appeler('/emails/batch', lot, cle)
-    if (r.ok) {
-      const { data } = (await r.json()) as { data: { id: string }[] }
-      resultats.push(...data)
-    } else {
-      for (const message of lot) resultats.push(await envoyerSeul(message, cle))
-    }
+export async function envoyerLot(lot: AEnvoyer[], cleApi: string): Promise<Resultat[]> {
+  const cleDuLot = `lot-${lot[0]?.cle ?? ''}-${lot.at(-1)?.cle ?? ''}-${String(lot.length)}`
+  const r = await appeler('/emails/batch', lot.map((m) => m.message), cleApi, cleDuLot)
+  if (r.ok) {
+    const { data } = (await r.json()) as { data: { id: string }[] }
+    return data
   }
+  if (r.status !== 422) return lot.map(() => ({ erreur: `Resend indisponible (HTTP ${String(r.status)})` }))
+  const resultats: Resultat[] = []
+  for (const m of lot) resultats.push(await envoyerSeul(m, cleApi))
   return resultats
 }
 
-async function envoyerSeul(message: MessageResend, cle: string): Promise<Resultat> {
-  const r = await appeler('/emails', message, cle)
+async function envoyerSeul(m: AEnvoyer, cleApi: string): Promise<Resultat> {
+  const r = await appeler('/emails', m.message, cleApi, m.cle)
   const corps = (await r.json().catch(() => ({}))) as { id?: string; message?: string }
   return r.ok && corps.id ? { id: corps.id } : { erreur: corps.message ?? `HTTP ${String(r.status)}` }
 }
 
-function appeler(chemin: string, corps: unknown, cle: string) {
+function appeler(chemin: string, corps: unknown, cleApi: string, idempotence: string) {
   return fetch(`${API}${chemin}`, {
     method: 'POST',
-    headers: { 'Authorization': `Bearer ${cle}`, 'Content-Type': 'application/json' },
+    headers: { 'Authorization': `Bearer ${cleApi}`, 'Content-Type': 'application/json', 'Idempotency-Key': idempotence },
     body: JSON.stringify(corps),
   })
 }

@@ -202,8 +202,8 @@
 ### Task 10: Mise en route (Uriel et moi)
 
 - [ ] **Step 1 (Uriel)** : créer le domaine `missives.runesdechene.com` dans Resend (compte pro), puis copier ses enregistrements (SPF, DKIM, MX de retour, DMARC) dans la zone DNS chez o2switch. Je prépare la liste exacte des enregistrements ; Uriel les saisit et entre lui-même la clé d'API.
-- [ ] **Step 2 (Uriel)** : variables Netlify du site `rdc-hub-v2` : `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `MISSIVES_SECRET` ; webhook Resend vers `https://hub.runesdechene.com/.netlify/functions/resend-webhook` ; webhook client Shopify (tâche 2).
-- [ ] **Step 3 (moi)** : `app_settings` `missives_envoi_url` et `missives_secret` ; vérifier le domaine « Verified » dans Resend.
+- [ ] **Step 2 (Uriel)** : variables Netlify du site `rdc-hub-v2` : `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `MISSIVES_SECRET`, `MISSIVES_JETON_SECRET` (relecture du 23/10) ; webhook Resend vers `https://hub.runesdechene.com/.netlify/functions/resend-webhook` ; webhook client Shopify (tâche 2).
+- [ ] **Step 3 (moi)** : `app_settings.missives_envoi_url`, et le secret `missives_secret` dans Supabase Vault (`vault.create_secret`), jamais dans `app_settings` qui se lit sans compte (mig 545) ; vérifier le domaine « Verified » dans Resend.
 - [ ] **Step 4** : `pnpm --filter hub-v2 build` puis déploiement manuel du Hub (`.claude/rules/deploiement.md`).
 
 ### Task 11: L'essai réel

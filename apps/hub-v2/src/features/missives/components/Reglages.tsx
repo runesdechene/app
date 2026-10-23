@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react'
 import { Choix, type OptionDeChoix } from '@/shared/ui/Choix'
 import type { LigneDeListe, Liste } from '../api/listes'
 import {
-  ajouterNouvelle, changerModele, changerZone, deplacerNouvelle, supprimerNouvelle, type Brouillon,
+  ajouterNouvelle, changerModele, changerZone, deplacerNouvelle, lettreEcrite, supprimerNouvelle, type Brouillon,
 } from '../lib/brouillon'
 import { liensDe } from '../lib/liens'
 import { LISTES } from '../lib/listes'
@@ -66,6 +66,9 @@ export function Reglages({ b, onChange, listes }: {
           valeur={b.lettre.modele}
           options={MODELES}
           onChange={(m) => {
+            // Un autre modèle repart de son texte : ce qui est écrit se perdrait.
+            if (m === b.lettre.modele) return
+            if (lettreEcrite(b) && !window.confirm('Changer de modèle remplace ce que tu as écrit. Continuer ?')) return
             onChange(changerModele(b, m))
           }}
           recherche="Chercher un modèle…"

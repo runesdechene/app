@@ -29,8 +29,32 @@ export function brouillonVide(modele: Modele): Brouillon {
   return { id: null, lettre: contenuNeuf(modele), couleurs: PALETTES.marque, objet: '', apercu: '', liste: null }
 }
 
+/** Le même modèle ne change rien : rechoisir l'actuel n'efface pas la lettre. */
 export function changerModele(b: Brouillon, modele: Modele): Brouillon {
-  return { ...b, lettre: contenuNeuf(modele) }
+  return modele === b.lettre.modele ? b : { ...b, lettre: contenuNeuf(modele) }
+}
+
+/** La lettre a-t-elle été écrite, ou est-elle encore celle du modèle ? */
+export function lettreEcrite(b: Brouillon): boolean {
+  return JSON.stringify(b.lettre) !== JSON.stringify(contenuNeuf(b.lettre.modele))
+}
+
+function textes(valeur: unknown): string[] {
+  if (typeof valeur === 'string') return [valeur]
+  if (Array.isArray(valeur)) return valeur.flatMap(textes)
+  if (typeof valeur === 'object' && valeur !== null) return Object.values(valeur).flatMap(textes)
+  return []
+}
+
+/**
+ * Ce qui vient encore du modèle et ne doit pas partir : les indications « {…} » (sauf « {prénom} », remplacé
+ * à l'envoi) et les photos d'exemple.
+ */
+export function indicationsRestantes(lettre: Lettre): string[] {
+  const tous = textes(lettre.contenu)
+  const indications = tous.flatMap((t) => t.match(/\{(?!prénom\})[^{}]+\}/g) ?? [])
+  const photos = tous.some((t) => t.includes('/missives/exemples/')) ? ['les photos d’exemple'] : []
+  return [...new Set([...indications, ...photos])]
 }
 
 /** `zone` est un chemin pointé du contenu : « titre », « nouvelles.1.titre », « rupture.appel.lien ». */

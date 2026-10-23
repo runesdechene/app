@@ -3,7 +3,7 @@
 
 import { exigerAdmin } from './lib/admin'
 import { message, type Missive } from './lib/missive'
-import { envoyerParLots } from './lib/resend'
+import { envoyerLot } from './lib/resend'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -54,7 +54,7 @@ export default async function handler(request: Request) {
       { user_id: auth.userId, email: moi.email_address, prenom: moi.first_name },
       `[Essai] ${missive.objet}`,
     )
-    const [resultat] = await envoyerParLots([essai], cle)
+    const [resultat] = await envoyerLot([{ message: essai, cle: `essai-${String(missive.id)}-${String(Date.now())}` }], cle)
     // Le texte de Resend peut citer l'adresse : il ne quitte pas la fonction.
     if (!resultat || 'erreur' in resultat) return json({ error: 'Resend a refusé l’essai : le domaine est-il vérifié ?' }, 502)
     return json({ ok: true })

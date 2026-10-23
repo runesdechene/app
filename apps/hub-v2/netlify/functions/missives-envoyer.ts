@@ -5,7 +5,7 @@
 // Garde : l'en-tête X-Missives-Secret, partagé avec app_settings.missives_secret.
 
 import { message, type Missive } from './lib/missive'
-import { envoyerParLots } from './lib/resend'
+import { envoyerLot, TAILLE_DU_LOT_RESEND } from './lib/resend'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -19,12 +19,15 @@ function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } })
 }
 
-function supabase(chemin: string, corps?: unknown) {
-  return fetch(`${SUPABASE_URL}/rest/v1/${chemin}`, {
+/** Un appel à la base qui échoue s'arrête là : le réveil répond 500 au lieu de croire qu'il a fini. */
+async function supabase(chemin: string, corps?: unknown): Promise<Response> {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${chemin}`, {
     method: corps === undefined ? 'GET' : 'POST',
     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
     body: corps === undefined ? undefined : JSON.stringify(corps),
   })
+  if (!r.ok) throw new Error(`base : ${chemin.split('?')[0] ?? ''} HTTP ${String(r.status)}`)
+  return r
 }
 
 export default async function handler(request: Request) {
@@ -44,16 +47,22 @@ export default async function handler(request: Request) {
       )).json()) as Missive[]
       const parId = new Map(missives.map((m) => [m.id, m]))
 
-      const messages = await Promise.all(lot.map((d) => message(parId.get(d.missive_id)!, d)))
-      const resultats = await envoyerParLots(messages, cle)
-      await supabase('rpc/missives_noter', {
-        p_resultats: lot.map((d, i) => {
-          const r = resultats[i] ?? { erreur: 'sans réponse de Resend' }
-          return 'id' in r
-            ? { missive_id: d.missive_id, user_id: d.user_id, resend_id: r.id }
-            : { missive_id: d.missive_id, user_id: d.user_id, erreur: r.erreur }
-        }),
-      })
+      // Lot par lot, et chaque résultat noté aussitôt : une panne au lot suivant n'efface pas celui-ci.
+      for (let i = 0; i < lot.length; i += TAILLE_DU_LOT_RESEND) {
+        const tranche = lot.slice(i, i + TAILLE_DU_LOT_RESEND)
+        const aEnvoyer = await Promise.all(
+          tranche.map(async (d) => ({ message: await message(parId.get(d.missive_id)!, d), cle: `${String(d.missive_id)}-${d.user_id}` })),
+        )
+        const resultats = await envoyerLot(aEnvoyer, cle)
+        await supabase('rpc/missives_noter', {
+          p_resultats: tranche.map((d, j) => {
+            const r = resultats[j] ?? { erreur: 'sans réponse de Resend' }
+            return 'id' in r
+              ? { missive_id: d.missive_id, user_id: d.user_id, resend_id: r.id }
+              : { missive_id: d.missive_id, user_id: d.user_id, erreur: r.erreur }
+          }),
+        })
+      }
     }
 
     await supabase('rpc/missives_terminer', {})
