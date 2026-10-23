@@ -18,6 +18,7 @@ const api = vi.hoisted(() => ({
   verifierCode: vi.fn(),
   reclamerFragments: vi.fn(),
   signerCharte: vi.fn(),
+  donnerAccordNouvelles: vi.fn(),
   nommer: vi.fn(),
   changerAvatar: vi.fn(),
   fetchEntree: vi.fn(),
@@ -41,6 +42,7 @@ beforeEach(() => {
   api.verifierCode.mockResolvedValue('u9')
   api.reclamerFragments.mockResolvedValue(2)
   api.signerCharte.mockResolvedValue(undefined)
+  api.donnerAccordNouvelles.mockResolvedValue(undefined)
   api.nommer.mockResolvedValue(undefined)
   api.changerAvatar.mockResolvedValue('https://exemple.fr/avatar.webp')
   api.fetchEntree.mockResolvedValue({ nom: null, numero: 4979, fragments: 2, charteSignee: true })
@@ -94,6 +96,8 @@ test('du Préambule à la bienvenue : l’e-mail, le code, puis la Charte', asyn
   await waitFor(() => {
     expect(conditions.accepterConditions).toHaveBeenCalledWith('2026-10-11')
   })
+  // La case des nouvelles n'est pas cochée par défaut : aucun accord ne part.
+  expect(api.donnerAccordNouvelles).not.toHaveBeenCalled()
   expect(await screen.findByRole('heading', { name: 'Comment on t’appelle ?' })).toBeInTheDocument()
   expect(screen.getByText('Deux Fragments t’attendent')).toBeInTheDocument()
 
@@ -245,5 +249,22 @@ test('un calendrier déjà enregistré est celui qui est coché, et Suivant le g
   await userEvent.click(screen.getByRole('button', { name: /Suivant/ }))
   await waitFor(() => {
     expect(calendrier.reglerCalendrier.mock.calls[0]?.[0]).toBe('rome')
+  })
+})
+
+test('la case des nouvelles, cochée en signant, donne l’accord', async () => {
+  api.fetchEntree.mockResolvedValue({ nom: null, numero: 4979, fragments: 0, charteSignee: false })
+  monter('/bienvenue/email')
+  await userEvent.type(screen.getByLabelText('Ton e-mail'), 'claire@exemple.fr')
+  await userEvent.click(screen.getByRole('button', { name: 'Recevoir mon code' }))
+  await userEvent.type(await screen.findByLabelText('Ton code'), '481205')
+  expect(await screen.findByRole('heading', { name: 'La Charte' })).toBeInTheDocument()
+
+  const nouvelles = screen.getByRole('checkbox', { name: /nouvelles de Runes de Chêne/ })
+  expect(nouvelles).not.toBeChecked()
+  fireEvent.click(nouvelles)
+  await signerLaCharte()
+  await waitFor(() => {
+    expect(api.donnerAccordNouvelles).toHaveBeenCalled()
   })
 })

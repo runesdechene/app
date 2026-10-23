@@ -39,6 +39,12 @@ export async function signerCharte() {
   if (error) throw error
 }
 
+// L'accord aux nouvelles de Runes de Chêne (les Missives), donné en signant la Charte.
+export async function donnerAccordNouvelles() {
+  const { error } = await supabase.rpc('donner_accord_nouvelles', { p_accord: true })
+  if (error) throw error
+}
+
 export async function nommer(nom: string) {
   const { error } = await supabase.rpc('nommer_explorateur', { p_nom: nom })
   if (error) throw error

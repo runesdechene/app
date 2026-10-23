@@ -69,10 +69,14 @@ export function Charte() {
   const [appui, setAppui] = useState(false)
   // Les conditions et la politique de confidentialité s'acceptent en signant (Uriel, 11/10).
   const [accepte, setAccepte] = useState(false)
+  // Les nouvelles de la marque : un choix libre, jamais coché d'avance.
+  const [nouvelles, setNouvelles] = useState(false)
   const { repere, lu } = useLuJusquauBout()
   // La Charte se signe connecté, quand elle manque au compte ; sans connexion, on la demande.
   if (!parcours.connecte) return <Navigate to="/bienvenue/email" replace />
-  const signer = signerPuisEntrer
+  const signer = () => {
+    signerPuisEntrer(nouvelles)
+  }
   const appuyer = () => {
     if (mouvementReduit()) signer()
     else setAppui(true)
@@ -104,6 +108,16 @@ export function Charte() {
               </a>
               .
             </span>
+          </label>
+          <label className={styles.conditions}>
+            <input
+              type="checkbox"
+              checked={nouvelles}
+              onChange={(e) => {
+                setNouvelles(e.target.checked)
+              }}
+            />
+            <span>Recevoir les nouvelles de Runes de Chêne.</span>
           </label>
           <p className={styles.consigne}>
             <span className={styles.mot}>Signer</span>

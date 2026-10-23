@@ -10,7 +10,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { VERSION_DES_CONDITIONS } from '@/shared/lib/conditions'
 import { accepterConditions } from '@/shared/supabase/conditions'
-import { fetchEntree, reclamerFragments, signerCharte, verifierCode } from '../api/entree'
+import { donnerAccordNouvelles, fetchEntree, reclamerFragments, signerCharte, verifierCode } from '../api/entree'
 import type { Entree } from '../api/lireEntree'
 import { useParcours } from './useParcours'
 
@@ -37,10 +37,12 @@ export function useEntrer() {
   })
 
   // Connecté, la Charte manquait : on la signe avec les conditions (case cochée), puis on reprend.
+  // L'accord aux nouvelles, s'il est coché, ne bloque jamais l'entrée.
   const signerPuisEntrer = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (nouvelles: boolean) => {
       await signerCharte()
       await accepterConditions(VERSION_DES_CONDITIONS)
+      if (nouvelles) await donnerAccordNouvelles().catch(() => undefined)
       return fetchEntree()
     },
     onSuccess: (entree) => {
@@ -54,8 +56,8 @@ export function useEntrer() {
     },
     enCours: entrer.isPending,
     codeRefuse: entrer.isError,
-    signerPuisEntrer: () => {
-      signerPuisEntrer.mutate()
+    signerPuisEntrer: (nouvelles: boolean) => {
+      signerPuisEntrer.mutate(nouvelles)
     },
   }
 }

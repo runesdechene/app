@@ -156,6 +156,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ambassadeurs: {
+        Row: {
+          ajoute_le: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          ajoute_le?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          ajoute_le?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ambassadeurs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ambassadeurs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       announcement_comment_likes: {
         Row: {
           comment_id: number
@@ -2773,6 +2806,103 @@ export type Database = {
           starts_at?: string | null
           status?: string
           title?: string
+        }
+        Relationships: []
+      }
+      missive_envois: {
+        Row: {
+          clique_le: string | null
+          envoye_le: string | null
+          erreur: string | null
+          missive_id: number
+          ouvert_le: string | null
+          resend_id: string | null
+          statut: string
+          user_id: string
+        }
+        Insert: {
+          clique_le?: string | null
+          envoye_le?: string | null
+          erreur?: string | null
+          missive_id: number
+          ouvert_le?: string | null
+          resend_id?: string | null
+          statut?: string
+          user_id: string
+        }
+        Update: {
+          clique_le?: string | null
+          envoye_le?: string | null
+          erreur?: string | null
+          missive_id?: number
+          ouvert_le?: string | null
+          resend_id?: string | null
+          statut?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missive_envois_missive_id_fkey"
+            columns: ["missive_id"]
+            isOneToOne: false
+            referencedRelation: "missives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missive_envois_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missive_envois_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      missives: {
+        Row: {
+          apercu: string | null
+          contenu: Json
+          couleurs: Json
+          cree_le: string
+          envoyee_le: string | null
+          id: number
+          liste: string | null
+          modele: string
+          objet: string
+          programmee_le: string | null
+          statut: string
+        }
+        Insert: {
+          apercu?: string | null
+          contenu: Json
+          couleurs: Json
+          cree_le?: string
+          envoyee_le?: string | null
+          id?: never
+          liste?: string | null
+          modele: string
+          objet: string
+          programmee_le?: string | null
+          statut?: string
+        }
+        Update: {
+          apercu?: string | null
+          contenu?: Json
+          couleurs?: Json
+          cree_le?: string
+          envoyee_le?: string | null
+          id?: never
+          liste?: string | null
+          modele?: string
+          objet?: string
+          programmee_le?: string | null
+          statut?: string
         }
         Relationships: []
       }
@@ -5487,6 +5617,9 @@ export type Database = {
       }
       users: {
         Row: {
+          accord_nouvelles: boolean
+          accord_nouvelles_le: string | null
+          accord_nouvelles_porte: string | null
           account_source: string | null
           active_banner_switched_at: string | null
           active_company_id: string | null
@@ -5559,6 +5692,9 @@ export type Database = {
           xp_total: number
         }
         Insert: {
+          accord_nouvelles?: boolean
+          accord_nouvelles_le?: string | null
+          accord_nouvelles_porte?: string | null
           account_source?: string | null
           active_banner_switched_at?: string | null
           active_company_id?: string | null
@@ -5631,6 +5767,9 @@ export type Database = {
           xp_total?: number
         }
         Update: {
+          accord_nouvelles?: boolean
+          accord_nouvelles_le?: string | null
+          accord_nouvelles_porte?: string | null
           account_source?: string | null
           active_banner_switched_at?: string | null
           active_company_id?: string | null
@@ -6822,6 +6961,12 @@ export type Database = {
       _lieu_public: { Args: { p_id: string }; Returns: boolean }
       _lieu_visible: { Args: { p_id: string }; Returns: boolean }
       _lieux_compagnie: { Args: { p_id: string }; Returns: number }
+      _liste_membres: {
+        Args: { p_liste: string }
+        Returns: {
+          user_id: string
+        }[]
+      }
       _member_gold_coupe: {
         Args: {
           p_faction_id: string
@@ -6934,6 +7079,7 @@ export type Database = {
         Args: { p_min_level: number; p_user_id: string }
         Returns: Json
       }
+      _reveiller_missives: { Args: never; Returns: undefined }
       _revendiquer: {
         Args: {
           p_id: string
@@ -7421,6 +7567,10 @@ export type Database = {
       distance_multiplier: { Args: { distance_km: number }; Returns: number }
       dmetaphone: { Args: { "": string }; Returns: string }
       dmetaphone_alt: { Args: { "": string }; Returns: string }
+      donner_accord_nouvelles: {
+        Args: { p_accord: boolean }
+        Returns: undefined
+      }
       ecrire_au_carnet: {
         Args: {
           p_id: string
@@ -8015,6 +8165,7 @@ export type Database = {
         }
         Returns: Json
       }
+      hub_listes: { Args: never; Returns: Json }
       hub_modifier_compagnie: {
         Args: {
           p_couleur: string
@@ -8183,6 +8334,18 @@ export type Database = {
         Returns: Json
       }
       mises_a_jour_publiees: { Args: never; Returns: Json }
+      missives_noter: { Args: { p_resultats: Json }; Returns: undefined }
+      missives_prendre_lot: {
+        Args: { p_taille: number }
+        Returns: {
+          email: string
+          missive_id: number
+          prenom: string
+          user_id: string
+        }[]
+      }
+      missives_preparer: { Args: never; Returns: undefined }
+      missives_terminer: { Args: never; Returns: undefined }
       mod_get_place: { Args: { p_place_id: string }; Returns: Json }
       mod_list_places: {
         Args: {
@@ -8192,6 +8355,10 @@ export type Database = {
           p_search?: string
           p_tag_id?: string
         }
+        Returns: Json
+      }
+      mod_retirer_photo: {
+        Args: { p_place_id: string; p_url: string }
         Returns: Json
       }
       mod_set_masked: {
