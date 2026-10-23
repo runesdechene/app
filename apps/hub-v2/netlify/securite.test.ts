@@ -168,24 +168,42 @@ describe('shopify-sync : liaison des clients existants', () => {
   const clients = [1, 2, 3].map((n) => ({ id: n, email: `c${String(n)}@x.fr`, first_name: null, last_name: null, orders_count: 0, tags: '', created_at: '2026-01-01' }))
   const comptes = [1, 2, 3].map((n) => ({ id: `u${String(n)}`, email_address: `c${String(n)}@x.fr`, shopify_customer_id: null, account_source: 'app' }))
 
-  // Shopify donne trois clients, la base trois comptes à relier ; `pageDesComptes` et `patch` règlent les pannes.
-  function simuler(pageDesComptes: unknown, patch: (url: string) => Response) {
+  const LIER = '/rest/v1/rpc/synchro_lier_clients'
+
+  // Shopify donne trois clients, la base trois comptes à relier ; `pageDesComptes` et `lier` règlent les pannes.
+  function simuler(pageDesComptes: unknown, lier: (lignes: unknown[]) => Response) {
+    const lots: unknown[][] = []
     vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
       if (url.includes('/auth/v1/user')) return Promise.resolve(Response.json({ id: 'u0' }))
       if (url.includes('/rest/v1/users?select=role')) return Promise.resolve(Response.json([{ role: 'admin' }]))
       if (url.includes('/admin/api/')) return Promise.resolve(Response.json({ customers: clients }))
-      if (init?.method === 'PATCH') return Promise.resolve(patch(url))
+      if (url.endsWith(LIER)) {
+        const lignes = (JSON.parse(String(init?.body)) as { p: unknown[] }).p
+        lots.push(lignes)
+        return Promise.resolve(lier(lignes))
+      }
       return Promise.resolve(Response.json(pageDesComptes))
     }))
+    return lots
   }
 
-  test('seules les réponses ok comptent : un refus est compté en moins et nommé dans les journaux', async () => {
-    simuler(comptes, (url) => (url.endsWith('id=eq.u2') ? new Response('permission denied', { status: 403 }) : new Response(null, { status: 204 })))
+  test('toutes les fiches à relier partent en un seul appel, et le compte rendu dit combien', async () => {
+    const lots = simuler(comptes, (lignes) => Response.json(lignes.length))
     const handler = await charger('shopify-sync')
-    const r = await handler(post('{}', { Authorization: 'Bearer jwt' }))
-    const corps = (await r.json()) as { updated: number; toUpdateCount: number; logs: string[] }
+    const corps = (await (await handler(post('{}', { Authorization: 'Bearer jwt' }))).json()) as { updated: number }
+    expect(lots).toHaveLength(1)
+    expect(lots[0]).toEqual([
+      { id: 'u1', shopify_customer_id: 1 }, { id: 'u2', shopify_customer_id: 2 }, { id: 'u3', shopify_customer_id: 3 },
+    ])
+    expect(corps.updated).toBe(3)
+  })
+
+  test('un lot refusé n’est pas compté et l’erreur est nommée dans les journaux', async () => {
+    simuler(comptes, () => new Response('permission denied', { status: 403 }))
+    const handler = await charger('shopify-sync')
+    const corps = (await (await handler(post('{}', { Authorization: 'Bearer jwt' }))).json()) as { updated: number; toUpdateCount: number; logs: string[] }
     expect(corps.toUpdateCount).toBe(3)
-    expect(corps.updated).toBe(2)
+    expect(corps.updated).toBe(0)
     expect(corps.logs.some((l) => l.startsWith('❌') && l.includes('403'))).toBe(true)
   })
 
@@ -198,15 +216,16 @@ describe('shopify-sync : liaison des clients existants', () => {
       if (url.includes('/admin/api/')) {
         return Promise.resolve(Response.json({ customers: [{ ...clients[0], email_marketing_consent: abonne }] }))
       }
-      if (init?.method === 'PATCH') {
-        corpsPatch[url] = JSON.parse(String(init.body))
-        return Promise.resolve(new Response(null, { status: 204 }))
+      if (url.endsWith(LIER)) {
+        for (const ligne of (JSON.parse(String(init?.body)) as { p: { id: string }[] }).p) corpsPatch[ligne.id] = ligne
+        return Promise.resolve(Response.json(1))
       }
       return Promise.resolve(Response.json([{ ...comptes[0], shopify_customer_id: 1, accord_nouvelles: false, accord_nouvelles_le: null }]))
     }))
     const handler = await charger('shopify-sync')
     await handler(post('{}', { Authorization: 'Bearer jwt' }))
-    expect(corpsPatch['http://supabase.test/rest/v1/users?id=eq.u1']).toEqual({
+    expect(corpsPatch.u1).toEqual({
+      id: 'u1',
       accord_nouvelles: true,
       accord_nouvelles_le: '2026-10-23T10:00:00Z',
       accord_nouvelles_porte: 'shopify',
@@ -221,19 +240,19 @@ describe('shopify-sync : liaison des clients existants', () => {
       if (url.includes('/admin/api/')) {
         return Promise.resolve(Response.json({ customers: [{ ...clients[0], email_marketing_consent: { state: 'subscribed', consent_updated_at: null } }] }))
       }
-      if (init?.method === 'PATCH') {
-        corpsPatch[url] = JSON.parse(String(init.body))
-        return Promise.resolve(new Response(null, { status: 204 }))
+      if (url.endsWith(LIER)) {
+        for (const ligne of (JSON.parse(String(init?.body)) as { p: { id: string }[] }).p) corpsPatch[ligne.id] = ligne
+        return Promise.resolve(Response.json(1))
       }
       return Promise.resolve(Response.json([{ ...comptes[0], shopify_customer_id: 1, accord_nouvelles: false, accord_nouvelles_le: null }]))
     }))
     const handler = await charger('shopify-sync')
     await handler(post('{}', { Authorization: 'Bearer jwt' }))
-    expect(corpsPatch['http://supabase.test/rest/v1/users?id=eq.u1']).toMatchObject({ accord_nouvelles: true, accord_nouvelles_le: '2026-01-01' })
+    expect(corpsPatch.u1).toMatchObject({ accord_nouvelles: true, accord_nouvelles_le: '2026-01-01' })
   })
 
   test('une page de comptes qui n’est pas une liste : 500 explicite, rien n’est lié', async () => {
-    simuler({ message: 'JWT expired' }, () => new Response(null, { status: 204 }))
+    simuler({ message: 'JWT expired' }, () => Response.json(0))
     const handler = await charger('shopify-sync')
     const r = await handler(post('{}', { Authorization: 'Bearer jwt' }))
     expect(r.status).toBe(500)

@@ -215,36 +215,33 @@ export default async function handler(request: Request) {
       }
     }
 
-    // 4. Batch update (lier les existants, accord aux nouvelles) — par lots de 50
+    // Étape 4 : relier les existants et poser l'accord aux nouvelles, une requête par lot de 1 000 (mig 553).
+    //    Une requête par fiche dépassait les 60 s de la fonction dès quelques milliers de fiches.
     let updated = 0
     const updateErrors: string[] = []
-    for (let i = 0; i < toUpdate.length; i += 50) {
-      const batch = toUpdate.slice(i, i + 50)
-      const responses = await Promise.all(batch.map(u =>
-        fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${u.id}`, {
-          method: 'PATCH',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(u.patch),
-        })
-      ))
-      for (const [j, resp] of responses.entries()) {
-        if (resp.ok) {
-          updated++
-        } else if (updateErrors.length < 3) {
-          updateErrors.push(`Lien ${batch[j].id}: ${resp.status} — ${(await resp.text()).slice(0, 200)}`)
-        }
+    for (let i = 0; i < toUpdate.length; i += 1000) {
+      const lignes = toUpdate.slice(i, i + 1000).map(u => ({ id: u.id, ...u.patch }))
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/synchro_lier_clients`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ p: lignes }),
+      })
+      if (resp.ok) {
+        updated += await resp.json() as number
+      } else if (updateErrors.length < 3) {
+        updateErrors.push(`Lot ${i}: ${resp.status} — ${(await resp.text()).slice(0, 200)}`)
       }
     }
 
-    // 5. Batch create (nouveaux profils Shopify) — par lots de 50
+    // Étape 5 : créer les profils des nouveaux clients Shopify, par lots de 500
     let created = 0
     const createErrors: string[] = []
-    for (let i = 0; i < toCreate.length; i += 50) {
-      const batch = toCreate.slice(i, i + 50)
+    for (let i = 0; i < toCreate.length; i += 500) {
+      const batch = toCreate.slice(i, i + 500)
       const resp = await fetch(`${SUPABASE_URL}/rest/v1/users`, {
         method: 'POST',
         headers: {
