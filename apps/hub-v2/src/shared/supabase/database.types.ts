@@ -2868,6 +2868,7 @@ export type Database = {
         Row: {
           apercu: string | null
           contenu: Json
+          contenu_envoi: Json | null
           couleurs: Json
           cree_le: string
           envoyee_le: string | null
@@ -2881,6 +2882,7 @@ export type Database = {
         Insert: {
           apercu?: string | null
           contenu: Json
+          contenu_envoi?: Json | null
           couleurs: Json
           cree_le?: string
           envoyee_le?: string | null
@@ -2894,6 +2896,7 @@ export type Database = {
         Update: {
           apercu?: string | null
           contenu?: Json
+          contenu_envoi?: Json | null
           couleurs?: Json
           cree_le?: string
           envoyee_le?: string | null
@@ -5062,6 +5065,112 @@ export type Database = {
           },
         ]
       }
+      suite_etapes: {
+        Row: {
+          id: number
+          jour: number
+          missive_id: number
+          suite: string
+        }
+        Insert: {
+          id?: never
+          jour: number
+          missive_id: number
+          suite: string
+        }
+        Update: {
+          id?: never
+          jour?: number
+          missive_id?: number
+          suite?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suite_etapes_missive_id_fkey"
+            columns: ["missive_id"]
+            isOneToOne: true
+            referencedRelation: "missives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suite_etapes_suite_fkey"
+            columns: ["suite"]
+            isOneToOne: false
+            referencedRelation: "suites"
+            referencedColumns: ["cle"]
+          },
+        ]
+      }
+      suite_inscriptions: {
+        Row: {
+          arretee_le: string | null
+          inscrit_le: string
+          jour_fait: number | null
+          prochaine_le: string | null
+          suite: string
+          user_id: string
+        }
+        Insert: {
+          arretee_le?: string | null
+          inscrit_le?: string
+          jour_fait?: number | null
+          prochaine_le?: string | null
+          suite: string
+          user_id: string
+        }
+        Update: {
+          arretee_le?: string | null
+          inscrit_le?: string
+          jour_fait?: number | null
+          prochaine_le?: string | null
+          suite?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suite_inscriptions_suite_fkey"
+            columns: ["suite"]
+            isOneToOne: false
+            referencedRelation: "suites"
+            referencedColumns: ["cle"]
+          },
+          {
+            foreignKeyName: "suite_inscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suite_inscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suites: {
+        Row: {
+          active: boolean
+          cle: string
+          exige_accord: boolean
+          nom: string
+        }
+        Insert: {
+          active?: boolean
+          cle: string
+          exige_accord: boolean
+          nom: string
+        }
+        Update: {
+          active?: boolean
+          cle?: string
+          exige_accord?: boolean
+          nom?: string
+        }
+        Relationships: []
+      }
       tag_gauge_mapping: {
         Row: {
           gauge: string
@@ -6952,6 +7061,10 @@ export type Database = {
       }
       _hub_pouls: { Args: { p_debut: string; p_fin: string }; Returns: Json }
       _hub_pouls_periode: { Args: { p_periode: string }; Returns: Json }
+      _inscrire: {
+        Args: { p_suite: string; p_user: string }
+        Returns: undefined
+      }
       _is_admin: { Args: never; Returns: boolean }
       _is_staff:
         | { Args: never; Returns: boolean }
@@ -7110,6 +7223,10 @@ export type Database = {
       }
       _silhouette: { Args: { p_geom: unknown }; Returns: Json }
       _succession: { Args: { p_id: string }; Returns: undefined }
+      _suite_permet: {
+        Args: { p_missive: number; p_user: string }
+        Returns: boolean
+      }
       _top_user_for_place: { Args: { p_place_id: string }; Returns: string }
       _total_connaissance: { Args: { p_theme: string }; Returns: number }
       _unlike_contribution_internal: {
@@ -8081,6 +8198,14 @@ export type Database = {
         Args: { p_active: boolean; p_id: number }
         Returns: undefined
       }
+      hub_activer_suite: {
+        Args: { p_active: boolean; p_cle: string }
+        Returns: undefined
+      }
+      hub_ajouter_etape: {
+        Args: { p: Json; p_cle: string; p_jour: number }
+        Returns: number
+      }
       hub_ambassadeur: {
         Args: { p_role: string; p_user: string }
         Returns: undefined
@@ -8188,11 +8313,17 @@ export type Database = {
         Args: { p_id: number; p_quand: string }
         Returns: undefined
       }
+      hub_regler_etape: {
+        Args: { p_id: number; p_jour: number }
+        Returns: undefined
+      }
       hub_retirer_ambassadeur: { Args: { p_user: string }; Returns: undefined }
+      hub_retirer_etape: { Args: { p_id: number }; Returns: undefined }
       hub_retirer_fragment: {
         Args: { p_fragment: number; p_user: string }
         Returns: undefined
       }
+      hub_suites: { Args: never; Returns: Json }
       increment_community_quest: {
         Args: {
           p_amount?: number
@@ -8857,6 +8988,7 @@ export type Database = {
       }
       signer_charte: { Args: never; Returns: undefined }
       soundex: { Args: { "": string }; Returns: string }
+      suites_preparer: { Args: never; Returns: undefined }
       supprimer_mise_a_jour: { Args: { p_id: number }; Returns: Json }
       supprimer_mon_compte: { Args: never; Returns: undefined }
       sur_les_chemins: { Args: { p_limite?: number }; Returns: Json }
