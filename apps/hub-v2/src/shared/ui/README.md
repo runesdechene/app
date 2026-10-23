@@ -9,3 +9,5 @@ Les briques du Hub (spec Hub V2 §6), une par fichier : Bloc, TitreDeSection, Tu
 - `Pages` : « 1 à 50 sur 4 750 » et précédents / suivants.
 
 - `Bouton` : le bouton de l’appli (principal, secondaire, doux, discret), mêmes jetons. Tout bouton du Hub passe par lui.
+
+- `Choix` : un choix dans une longue liste groupée, avec vignettes et recherche (le modèle d'une Missive) ; clavier du motif « listbox ».
