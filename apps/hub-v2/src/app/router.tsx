@@ -47,6 +47,7 @@ export const routes: RouteObject[] = [
   // `lazy` en fonction, pas en objet : la forme objet ne charge qu'une fois par définition de
   // route ; un second routeur bâti sur ces mêmes routes (les tests) répond alors 404.
   { path: 'soumettre-contenu', lazy: async () => ({ Component: (await import('@/public/soumettre/PageSoumettre')).PageSoumettre }) },
+  { path: 'desabonnement', lazy: async () => ({ Component: (await import('@/public/desabonnement/PageDesabonnement')).PageDesabonnement }) },
   // Le cadre commun de /flyer et /flyercadeau : la photo et le parchemin restent, seule la page change.
   {
     lazy: async () => ({ Component: (await import('@/public/flyer/CadreFlyer')).CadreFlyer }),

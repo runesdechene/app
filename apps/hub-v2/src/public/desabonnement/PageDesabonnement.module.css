@@ -1,0 +1,49 @@
+/*
+ * QUOI     — /desabonnement : la colonne de /flyercadeau (mêmes jetons), sans formulaire.
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding-top: var(--space-8);
+  text-align: center;
+}
+
+.titre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+  letter-spacing: var(--titre-tracking);
+}
+
+.surtitre {
+  color: var(--color-texte-doux);
+  font-size: var(--vitrine-surtitre-size);
+  letter-spacing: var(--bouton-tracking);
+}
+
+.texte {
+  max-width: 400px;
+  margin: 0;
+  color: var(--color-texte);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+.pied {
+  margin: 0;
+  font-size: var(--legende-size);
+  line-height: var(--corps-leading);
+}
+
+.pied a {
+  color: var(--color-texte-doux);
+}

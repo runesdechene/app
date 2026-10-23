@@ -17,11 +17,13 @@ sauf `flyer-create-account`, appelée sans session par `/flyercadeau` (`src/publ
 | `shopify-order-webhook` | webhook `orders/paid` : profil et Fragments · Shopify | signature HMAC obligatoire |
 | `shopify-client-webhook` | webhooks `customers/create` et `customers/update` : l'accord aux nouvelles suit Shopify (le plus récent gagne, `lib/accord.ts`), fiche créée pour un inscrit inconnu · Shopify | signature HMAC obligatoire |
 | `missives-envoyer` | envoie les Missives programmées, un lot de 250 par réveil, par Resend (`lib/resend.ts`) ; lien de désabonnement signé (`lib/jeton.ts`) · `pg_cron` toutes les 5 min (`_reveiller_missives`, mig 541) | en-tête `X-Missives-Secret` = `MISSIVES_SECRET` |
+| `missives-desabonnement` | retire l'accord aux nouvelles (fiche puis Shopify) · page `/desabonnement` et le désabonnement en un clic des boîtes de réception (RFC 8058) | publique : jeton signé (`lib/jeton.ts`), sinon 400 sans rien écrire |
+| `resend-webhook` | ouvertures, clics, rebonds et plaintes des Missives (`missive_envois`) ; un rebond ou une plainte retire l'accord · Resend | signature Svix, `RESEND_WEBHOOK_SECRET` |
 | `flyer-create-account` | un e-mail contre le code promo `FLYER_PROMO_CODE` : client Shopify (boutique fixe) et compte de l'appli · page `/flyercadeau` | publique : 15 demandes par heure et par IP (`flyer_signup_log`), sinon 429 ; aucune erreur ne renvoie l'e-mail ni le texte de Shopify ou de Supabase |
 
 Variables d'environnement lues (sans aucune valeur ici) : `VITE_SUPABASE_URL`,
 `SUPABASE_SERVICE_ROLE_KEY`, `SHOPIFY_ACCESS_TOKEN`, `SHOPIFY_WEBHOOK_SECRET`, `SHOPIFY_CLIENT_ID`,
-`SHOPIFY_CLIENT_SECRET`, `SHOPIFY_SHOP`, `FLYER_PROMO_CODE`, `RESEND_API_KEY`, `MISSIVES_SECRET` (`flyer-create-account`, qui lit aussi
+`SHOPIFY_CLIENT_SECRET`, `SHOPIFY_SHOP`, `FLYER_PROMO_CODE`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `MISSIVES_SECRET` (`flyer-create-account`, qui lit aussi
 `VITE_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` et `SHOPIFY_ACCESS_TOKEN`).
 
 `lib/` n'est pas une fonction : les aides partagées (`accord.ts`, `jeton.ts`, `resend.ts`, signature Shopify dans `shopify.ts`).
