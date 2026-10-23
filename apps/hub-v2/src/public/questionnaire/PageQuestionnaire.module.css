@@ -1,0 +1,42 @@
+/*
+ * QUOI     — /qui-es-tu (maquette 750:2520) : la colonne de /flyercadeau, une question par bloc, ses cases
+ *            dessous ; les champs reprennent la carte de Public/Champ.
+ */
+.formulaire {
+  display: grid;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.question {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.intitule {
+  margin: 0 0 var(--space-1);
+  padding: 0;
+  color: var(--color-encre);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+}
+
+.aide {
+  margin: calc(-1 * var(--space-2)) 0 0;
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.texte {
+  resize: vertical;
+  font: inherit;
+}
+
+.anniversaire {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}

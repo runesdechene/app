@@ -52,6 +52,7 @@ export const routes: RouteObject[] = [
   // route ; un second routeur bâti sur ces mêmes routes (les tests) répond alors 404.
   { path: 'soumettre-contenu', lazy: async () => ({ Component: (await import('@/public/soumettre/PageSoumettre')).PageSoumettre }) },
   { path: 'desabonnement', lazy: async () => ({ Component: (await import('@/public/desabonnement/PageDesabonnement')).PageDesabonnement }) },
+  { path: 'qui-es-tu', lazy: async () => ({ Component: (await import('@/public/questionnaire/PageQuestionnaire')).PageQuestionnaire }) },
   // Le cadre commun de /flyer et /flyercadeau : la photo et le parchemin restent, seule la page change.
   {
     lazy: async () => ({ Component: (await import('@/public/flyer/CadreFlyer')).CadreFlyer }),
