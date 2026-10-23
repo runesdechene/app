@@ -31,6 +31,7 @@ import { Enigmes } from '@/features/jeu/components/Enigmes'
 import { EnigmesSignalees } from '@/features/jeu/components/EnigmesSignalees'
 import { Blog } from '@/features/joueurs/components/Blog'
 import { Ecrire } from '@/features/missives/components/Ecrire'
+import { Envois } from '@/features/missives/components/Envois'
 import { Listes } from '@/features/missives/components/Listes'
 import { TiroirArticle } from '@/features/joueurs/components/TiroirArticle'
 import { Notifications } from '@/features/joueurs/components/Notifications'
@@ -87,6 +88,7 @@ export const routes: RouteObject[] = [
       { path: 'boutique/synchro', Component: Synchro },
       { path: 'missives/ecrire', Component: Ecrire },
       { path: 'missives/ecrire/:id', Component: Ecrire },
+      { path: 'missives/envois', Component: Envois },
       { path: 'missives/listes', Component: Listes },
       { path: 'joueurs/mises-a-jour', Component: MisesAJour, children: [{ path: 'nouvelle', Component: TiroirMiseAJour }, { path: ':id', Component: TiroirMiseAJour }] },
       { path: 'joueurs/notifications', Component: Notifications },

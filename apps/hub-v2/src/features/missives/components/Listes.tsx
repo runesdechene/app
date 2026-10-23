@@ -22,7 +22,7 @@ const nombre = new Intl.NumberFormat('fr-FR')
 
 function Tableau({ lignes }: { lignes: LigneDeListe[] }) {
   return (
-    <Bloc>
+    <Bloc className={styles.defile ?? ''}>
       <table className={styles.tableau}>
         <thead>
           <tr>

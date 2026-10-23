@@ -49,6 +49,7 @@ export const MENU: Domaine[] = [
     icone: 'missives',
     liens: [
       { libelle: 'Écrire', chemin: '/missives/ecrire' },
+      { libelle: 'Envois', chemin: '/missives/envois' },
       { libelle: 'Listes', chemin: '/missives/listes' },
     ],
   },
