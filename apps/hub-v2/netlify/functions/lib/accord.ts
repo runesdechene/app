@@ -1,7 +1,7 @@
 // L'accord aux nouvelles, entre le Hub et Shopify : la dernière action gagne (spec mailing, « Fiche unique »).
 // Une fonction pure, partagée par les portes (stand, flyer, synchro et webhook Shopify, désabonnement).
 
-export type Porte = 'stand' | 'flyer' | 'site' | 'appli' | 'shopify' | 'hub' | 'desabonnement' | 'rebond'
+export type Porte = 'stand' | 'flyer' | 'site' | 'appli' | 'shopify' | 'hub' | 'desabonnement' | 'rebond' | 'import'
 
 export type Accord = { accord: boolean; le: string | null }
 export type ChoixRecu = { accord: boolean; le: string | null; porte: Porte }
