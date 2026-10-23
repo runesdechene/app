@@ -18,7 +18,8 @@ export function useSuites() {
       onSuccess: relire,
     }),
     regler: useMutation({
-      mutationFn: ({ id, jour }: { id: number; jour: number }) => reglerEtape(id, jour),
+      // `cle` dit à l'écran de quelle suite vient une erreur.
+      mutationFn: ({ id, jour }: { id: number; jour: number; cle: CleSuite }) => reglerEtape(id, jour),
       onSuccess: relire,
     }),
     retirer: useMutation({ mutationFn: (id: number) => retirerEtape(id), onSuccess: relire }),

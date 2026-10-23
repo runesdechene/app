@@ -14,6 +14,8 @@ export type Brouillon = {
   objet: string
   apercu: string
   liste: Liste | null
+  /** L'étape de suite que cette Missive porte (mig 548), sinon null : elle part alors à une liste. */
+  etape: number | null
 }
 
 const NOUVELLES_MAX = 5
@@ -26,7 +28,7 @@ function contenuNeuf(modele: Modele): Lettre {
 }
 
 export function brouillonVide(modele: Modele): Brouillon {
-  return { id: null, lettre: contenuNeuf(modele), couleurs: PALETTES.marque, objet: '', apercu: '', liste: null }
+  return { id: null, lettre: contenuNeuf(modele), couleurs: PALETTES.marque, objet: '', apercu: '', liste: null, etape: null }
 }
 
 /** Le même modèle ne change rien : rechoisir l'actuel n'efface pas la lettre. */

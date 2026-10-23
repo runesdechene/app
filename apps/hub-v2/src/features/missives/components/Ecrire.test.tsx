@@ -141,3 +141,35 @@ test('quitter une Missive rouverte pour « Écrire » ouvre une lettre neuve, pa
   })
   expect(screen.getByLabelText('L’objet')).toHaveValue('')
 })
+
+test('un e-mail de suite n’a ni liste ni Programmer : on l’enregistre tel qu’il partira, ou on le retire', async () => {
+  mockRpc.mockResolvedValue({ data: 40, error: null })
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(Response.json({ ok: true }))))
+  const { EXEMPLES } = await import('@runes/missives')
+  mockLire.mockResolvedValue({
+    data: {
+      id: 40, modele: 'missive', contenu: { ...EXEMPLES.missive, titre: 'BIENVENUE' }, couleurs: { fond: '#3f3024', titres: '#c49a5a', rupture: '#a94842' },
+      objet: 'Une lettre d’Uriel', apercu: '', liste: null, suite_etapes: { id: 9 },
+    },
+    error: null,
+  })
+  const router = createMemoryRouter(
+    [{ path: '/missives/ecrire/:id', Component: EcrireMissive }, { path: '/missives/automatisations', element: <p>Les suites</p> }],
+    { initialEntries: ['/missives/ecrire/40'] },
+  )
+  render(
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  expect(await screen.findByText('BIENVENUE')).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: /Programmer/ })).not.toBeInTheDocument()
+  expect(screen.queryByText('À qui')).not.toBeInTheDocument()
+
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+  await waitFor(() => { expect(enregistree()?.contenu_envoi).not.toBeNull() })
+
+  await userEvent.click(screen.getByRole('button', { name: 'Retirer de la suite' }))
+  expect(mockRpc).toHaveBeenCalledWith('hub_retirer_etape', { p_id: 9 })
+  await screen.findByText('Les suites')
+})

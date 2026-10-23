@@ -1,0 +1,78 @@
+/*
+ * QUOI     — l'écran « Automatisations » (maquette 766:2584) : un bloc par suite. Les lignes reprennent celles
+ *            des ambassadeurs (Missives.module.css), le jour en Bebas à la place du portrait.
+ */
+.suite {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.suite p {
+  margin: 0;
+}
+
+.etat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.chiffres {
+  color: var(--color-encre);
+  font-size: var(--sous-titre-size);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Le jour se touche pour se changer : un bouton qui a l'air d'un titre. */
+.jour {
+  flex: none;
+  min-width: 72px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  letter-spacing: var(--titre-tracking);
+  text-align: start;
+  cursor: pointer;
+}
+
+.champJour {
+  width: 72px;
+  font: inherit;
+  font-family: var(--font-corps);
+}
+
+.etiquette {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+}
+
+.ajout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+}
+
+.lien {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-texte-doux);
+  font-family: var(--font-condensee);
+  font-size: var(--libelle-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}
+
+.lien:hover {
+  color: var(--color-accent);
+}

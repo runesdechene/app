@@ -9,7 +9,7 @@
  */
 import { Carnet, Fragment, Missive, contrasteSuffisant, type Edition } from '@runes/missives'
 import { useRef, useState, type MouseEvent } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { verifierFichier } from '@/shared/lib/envoi'
 import { Bouton } from '@/shared/ui/Bouton'
 import { EnTeteDePage } from '@/shared/ui/EnTeteDePage'
@@ -17,6 +17,7 @@ import { deposerPhoto } from '../api/missives'
 import { photographierTitres } from '../lib/titres'
 import { useListes } from '../hooks/useListes'
 import { useMissive } from '../hooks/useMissive'
+import { useSuites } from '../hooks/useSuites'
 import { changerZone, indicationsRestantes, type Brouillon } from '../lib/brouillon'
 import { pencher } from '../lib/pencher'
 import styles from './Ecrire.module.css'
@@ -42,6 +43,8 @@ export function EcrireMissive() {
 export function Ecrire({ id = null }: { id?: number | null }) {
   const missive = useMissive(id)
   const listes = useListes()
+  const { retirer } = useSuites()
+  const navigate = useNavigate()
   const [quand, setQuand] = useState<'maintenant' | 'plus-tard'>('maintenant')
   const [heure, setHeure] = useState('')
   const [message, setMessage] = useState<string | null>(null)
@@ -66,10 +69,11 @@ export function Ecrire({ id = null }: { id?: number | null }) {
   const restes = indicationsRestantes(b.lettre)
   const pret =
     contrasteSuffisant(b.couleurs) && restes.length === 0 && b.liste !== null && b.objet.trim() !== '' && (quand === 'maintenant' || heure !== '')
-  const enCours = missive.programmer.isPending || missive.essai.isPending || missive.enregistrer.isPending
+  const etape = b.etape
+  const enCours = missive.programmer.isPending || missive.essai.isPending || missive.enregistrer.isPending || retirer.isPending
   // Préparer la lettre qui part (photos penchées, titres photographiés) prend quelques secondes.
-  const prepare = missive.programmer.isPending || missive.essai.isPending
-  const erreur = missive.programmer.error ?? missive.essai.error ?? missive.enregistrer.error
+  const prepare = missive.programmer.isPending || missive.essai.isPending || (etape !== null && missive.enregistrer.isPending)
+  const erreur = missive.programmer.error ?? missive.essai.error ?? missive.enregistrer.error ?? retirer.error
 
   // Les titres se photographient tels qu'affichés : sans curseur ni pointillé d'édition dessus.
   const titres = () => {
@@ -112,10 +116,10 @@ export function Ecrire({ id = null }: { id?: number | null }) {
         sorte="secondaire"
         disabled={enCours}
         onClick={() => {
-          missive.enregistrer.mutate(b, { onSuccess: () => { setMessage('Brouillon enregistré.') } })
+          missive.enregistrer.mutate({ b, titres }, { onSuccess: () => { setMessage(etape === null ? 'Brouillon enregistré.' : 'Enregistré : c’est lui qui partira.') } })
         }}
       >
-        Enregistrer le brouillon
+        {etape === null ? 'Enregistrer le brouillon' : 'Enregistrer'}
       </Bouton>
       <Bouton
         sorte="secondaire"
@@ -126,6 +130,17 @@ export function Ecrire({ id = null }: { id?: number | null }) {
       >
         M’envoyer un essai
       </Bouton>
+      {etape !== null ? (
+        <Bouton
+          sorte="discret"
+          disabled={enCours}
+          onClick={() => {
+            retirer.mutate(etape, { onSuccess: () => { void navigate('/missives/automatisations') } })
+          }}
+        >
+          Retirer de la suite
+        </Bouton>
+      ) : (
       <Bouton
         disabled={!pret || enCours}
         onClick={() => {
@@ -137,6 +152,7 @@ export function Ecrire({ id = null }: { id?: number | null }) {
       >
         {`Programmer pour ${nombre.format(personnes)} personne${personnes > 1 ? 's' : ''}`}
       </Bouton>
+      )}
     </div>
   )
 
@@ -144,7 +160,7 @@ export function Ecrire({ id = null }: { id?: number | null }) {
     <div className={styles.ecran}>
       <EnTeteDePage
         surtitre="Missives"
-        titre="Écrire une Missive"
+        titre={etape === null ? 'Écrire une Missive' : 'Un e-mail de suite'}
         phrase="Tu écris directement dans l’e-mail : touche un titre, un texte ou une photo pour le changer."
         aDroite={boutons}
       />
@@ -159,6 +175,7 @@ export function Ecrire({ id = null }: { id?: number | null }) {
       <div className={styles.atelier}>
         <aside className={styles.reglages}>
           <Reglages b={b} onChange={changer} listes={listes.data} />
+          {etape === null && (
           <section className={styles.carte}>
             <Pastilles
               nom="Quand"
@@ -173,6 +190,7 @@ export function Ecrire({ id = null }: { id?: number | null }) {
               </label>
             )}
           </section>
+          )}
         </aside>
         <div ref={lettreAffichee} className={styles.lettre} onClickCapture={toucher}>
           <Lettre b={b} edition={edition} />

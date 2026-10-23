@@ -14,7 +14,7 @@ import type { Liste } from './listes'
 export async function lireMissive(id: number): Promise<Brouillon> {
   const { data, error } = await supabase
     .from('missives')
-    .select('id, modele, contenu, couleurs, objet, apercu, liste')
+    .select('id, modele, contenu, couleurs, objet, apercu, liste, suite_etapes(id)')
     .eq('id', id)
     .single()
   if (error) throw error
@@ -25,6 +25,7 @@ export async function lireMissive(id: number): Promise<Brouillon> {
     objet: data.objet,
     apercu: data.apercu ?? '',
     liste: data.liste as Liste | null,
+    etape: data.suite_etapes?.id ?? null,
   }
 }
 

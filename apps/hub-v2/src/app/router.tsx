@@ -31,6 +31,7 @@ import { Enigmes } from '@/features/jeu/components/Enigmes'
 import { EnigmesSignalees } from '@/features/jeu/components/EnigmesSignalees'
 import { Blog } from '@/features/joueurs/components/Blog'
 import { EcrireMissive } from '@/features/missives/components/Ecrire'
+import { Automatisations } from '@/features/missives/components/Automatisations'
 import { Envois } from '@/features/missives/components/Envois'
 import { Listes } from '@/features/missives/components/Listes'
 import { TiroirArticle } from '@/features/joueurs/components/TiroirArticle'
@@ -90,6 +91,7 @@ export const routes: RouteObject[] = [
       { path: 'missives/ecrire/:id', Component: EcrireMissive },
       { path: 'missives/envois', Component: Envois },
       { path: 'missives/listes', Component: Listes },
+      { path: 'missives/automatisations', Component: Automatisations },
       { path: 'joueurs/mises-a-jour', Component: MisesAJour, children: [{ path: 'nouvelle', Component: TiroirMiseAJour }, { path: ':id', Component: TiroirMiseAJour }] },
       { path: 'joueurs/notifications', Component: Notifications },
       { path: 'joueurs/blog', Component: Blog, children: [{ path: 'nouveau', Component: TiroirArticle }, { path: ':id', Component: TiroirArticle }] },

@@ -110,14 +110,17 @@ export function Reglages({ b, onChange, listes }: {
       </section>
 
       <section className={styles.carte}>
-        <Pastilles
-          nom="À qui"
-          options={(listes ?? []).map((l) => ({ valeur: l.cle, libelle: LISTES[l.cle].nom, detail: nombre.format(l.avecAccord) }))}
-          choisi={b.liste}
-          onChoix={(liste: Liste) => {
-            onChange({ ...b, liste })
-          }}
-        />
+        {/* Un e-mail de suite part à ceux que la suite accueille, pas à une liste. */}
+        {b.etape === null && (
+          <Pastilles
+            nom="À qui"
+            options={(listes ?? []).map((l) => ({ valeur: l.cle, libelle: LISTES[l.cle].nom, detail: nombre.format(l.avecAccord) }))}
+            choisi={b.liste}
+            onChoix={(liste: Liste) => {
+              onChange({ ...b, liste })
+            }}
+          />
+        )}
         <label className={styles.champ}>
           <span className={styles.rubrique}>L’objet</span>
           <input

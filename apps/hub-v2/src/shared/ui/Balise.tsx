@@ -6,6 +6,7 @@ import styles from './Balise.module.css'
 
 export type Teinte =
   | 'nouveau' | 'reactive' | 'sommeil' | 'porteur' | 'admin'
+  | 'actif' | 'pause'
   | 'compte' | 'lieu' | 'visite' | 'enigme' | 'boutique' | 'photo' | 'message' | 'moderation' | 'notification'
 
 export function Balise({ texte, teinte }: { texte: string; teinte: Teinte }) {

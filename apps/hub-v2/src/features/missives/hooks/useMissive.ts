@@ -52,7 +52,11 @@ export function useMissive(id: number | null) {
     chargement: lue.isPending && id !== null,
     erreurDeLecture: lue.error,
     changer: setEcrit,
-    enregistrer: useMutation({ mutationFn: (b: Brouillon) => enregistrer(b) }),
+    // Un e-mail de suite n'a pas de moment « Programmer » : il s'enregistre déjà tel qu'il partira.
+    enregistrer: useMutation({
+      mutationFn: async ({ b, titres }: { b: Brouillon; titres: Photographier }) =>
+        enregistrer(b, b.etape === null ? null : await lettreQuiPart(b, titres)),
+    }),
     programmer: useMutation({
       mutationFn: async ({ b, quand, titres }: { b: Brouillon; quand: string | null; titres: Photographier }) => {
         await programmerMissive(await enregistrer(b, await lettreQuiPart(b, titres)), quand)

@@ -11,7 +11,8 @@
 }
 
 .balise[data-teinte='nouveau'],
-.balise[data-teinte='visite'] {
+.balise[data-teinte='visite'],
+.balise[data-teinte='actif'] {
   background: var(--color-succes-fond);
   color: var(--color-succes);
 }
@@ -28,7 +29,8 @@
 }
 
 .balise[data-teinte='porteur'],
-.balise[data-teinte='photo'] {
+.balise[data-teinte='photo'],
+.balise[data-teinte='pause'] {
   background: var(--color-choisie);
   color: var(--color-brun);
 }
