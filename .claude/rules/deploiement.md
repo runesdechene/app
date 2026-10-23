@@ -224,3 +224,10 @@ puis `node_modules/react`, de simples liens pnpm de quelques octets — le code 
 `apps/hub-v2/netlify/missives/` et `pnpm build` l'empaquette en un `.mjs` complet dans `netlify/functions`
 (script `build:fonctions`). Vérifier avant de déployer : `netlify functions:build --src netlify/functions
 --functions <dossier>` puis lister le zip : aucun `node_modules/` dedans.
+
+## Une fonction Netlify qui écrit des milliers de lignes écrit par lots, jamais ligne par ligne
+
+Payé le 23/10/2026 : `shopify-sync` faisait un PATCH par fiche ; à 3 000 fiches elle dépassait ses 60 s,
+Netlify la coupait sans réponse, l'écran n'affichait rien et la moitié des accords manquait. Une écriture
+de masse passe par une RPC qui prend un tableau jsonb (`jsonb_to_recordset`, ex. `synchro_lier_clients`,
+mig 553), par lots de 1 000.
