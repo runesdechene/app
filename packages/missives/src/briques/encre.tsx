@@ -96,7 +96,7 @@ export function EnImage({ zone, texte, centre = false, children }: { zone: strin
       alt={texte}
       width={String(image.largeur)}
       height={String(image.hauteur)}
-      style={{ display: centre ? 'block' : 'inline-block', margin: centre ? '0 auto' : 0, border: 0 }}
+      style={{ display: 'block', margin: centre ? '0 auto' : 0, border: 0 }}
     />
   );
 }

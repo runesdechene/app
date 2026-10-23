@@ -36,3 +36,11 @@ describe('la version texte', () => {
     expect(texte).toContain('HÉCATE');
   });
 });
+
+describe('la place d’un titre en image', () => {
+  it('est un bloc : la ligne du texte ne lui ajoute pas d’espace dessous', async () => {
+    const contenu = { ...EXEMPLES.fragment, titresEnImages: { 'rupture.titre': { src: 'https://stockage/r.png', largeur: 300, hauteur: 66 } } };
+    const { html } = await rendre({ modele: 'fragment', contenu, couleurs: PALETTES.hiver, apercu: '' }, destinataire);
+    expect(html).toMatch(/<img[^>]*src="https:\/\/stockage\/r.png"[^>]*style="display:block/);
+  });
+});

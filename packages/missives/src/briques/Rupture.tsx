@@ -46,6 +46,7 @@ export function Appel({ nom, appel, couleur }: { nom: string; appel: AppelConten
           color: couleur,
           textDecoration: 'none',
           borderBottom: `3px solid ${couleur}`,
+          display: 'inline-block',
         }}
       >
         <EnImage zone={nom} texte={`${appel.texte} →`}>
