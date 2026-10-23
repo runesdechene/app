@@ -58,15 +58,20 @@ export function indicationsRestantes(lettre: Lettre): string[] {
 }
 
 /** `zone` est un chemin pointé du contenu : « titre », « nouvelles.1.titre », « rupture.appel.lien ». */
-export function changerZone(b: Brouillon, zone: string, valeur: string): Brouillon {
-  const contenu: unknown = structuredClone(b.lettre.contenu)
+export function changerZoneDeLettre(lettre: Lettre, zone: string, valeur: string): Lettre {
+  const contenu: unknown = structuredClone(lettre.contenu)
   const cles = zone.split('.')
   const derniere = cles.pop()
   let ici = contenu
   for (const cle of cles) ici = (ici as Record<string, unknown>)[cle]
-  if (derniere === undefined || typeof ici !== 'object' || ici === null) return b
+  if (derniere === undefined || typeof ici !== 'object' || ici === null) return lettre
   ;(ici as Record<string, unknown>)[derniere] = valeur
-  return { ...b, lettre: { ...b.lettre, contenu } as Lettre }
+  return { ...lettre, contenu } as Lettre
+}
+
+export function changerZone(b: Brouillon, zone: string, valeur: string): Brouillon {
+  const lettre = changerZoneDeLettre(b.lettre, zone, valeur)
+  return lettre === b.lettre ? b : { ...b, lettre }
 }
 
 function avecNouvelles(b: Brouillon, changer: (n: Nouvelle[]) => Nouvelle[]): Brouillon {

@@ -28,12 +28,3 @@ export function liensDe(lettre: Lettre): LienDeLettre[] {
     { zone: 'rupture.appel.lien', texte: c.rupture.appel.texte, adresse: c.rupture.appel.lien },
   ]
 }
-
-/** L'inclinaison et le fond d'une photo selon sa place (maquettes 748:2533, 745:2491, 748:2580). */
-export function placeDePhoto(lettre: Lettre, zone: string): { degres: number; sur: 'fond' | 'rupture' } {
-  if (zone === 'photo.url') return { degres: lettre.contenu.photo.inclinaison, sur: 'fond' }
-  if (zone === 'rupture.photo') return { degres: 3, sur: 'rupture' }
-  if (zone === 'tirages.gauche') return { degres: -3, sur: 'fond' }
-  if (zone === 'tirages.droite') return { degres: 2.5, sur: 'fond' }
-  return { degres: 0, sur: 'fond' }
-}

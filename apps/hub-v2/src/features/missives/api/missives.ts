@@ -4,6 +4,7 @@
  *            mig 543, qui refusent de toucher une Missive déjà partie.
  */
 import type { Couleurs, Lettre } from '@runes/missives'
+import { pencher } from '../lib/pencher'
 import { envoyerFichier } from '@/shared/lib/envoi'
 import { appelerFonction, lireReponse } from '@/shared/lib/fonctions'
 import { supabase } from '@/shared/supabase/client'
@@ -27,10 +28,13 @@ export async function lireMissive(id: number): Promise<Brouillon> {
   }
 }
 
-/** Rend l'id de la Missive, neuve ou déjà là. */
-export async function enregistrerMissive(b: Brouillon): Promise<number> {
+/** Rend l'id de la Missive, neuve ou déjà là. `envoi` : la lettre telle qu'elle part (photos penchées). */
+export async function enregistrerMissive(b: Brouillon, envoi: Lettre | null = null): Promise<number> {
   const { data, error } = await supabase.rpc('hub_enregistrer_missive', {
-    p: { id: b.id, modele: b.lettre.modele, contenu: b.lettre.contenu, couleurs: b.couleurs, objet: b.objet, apercu: b.apercu, liste: b.liste },
+    p: {
+      id: b.id, modele: b.lettre.modele, contenu: b.lettre.contenu, contenu_envoi: envoi?.contenu ?? null,
+      couleurs: b.couleurs, objet: b.objet, apercu: b.apercu, liste: b.liste,
+    },
   })
   if (error) throw error
   return data
@@ -45,6 +49,13 @@ export async function programmerMissive(id: number, quand: string | null): Promi
 export async function deposerPhoto(photo: Blob): Promise<string> {
   const nom = `${crypto.randomUUID()}.jpg`
   return envoyerFichier('missives', nom, new File([photo], nom, { type: 'image/jpeg' }))
+}
+
+/** Une photo du brouillon, penchée sur la couleur de ses coins, puis déposée : son adresse. */
+export async function cuirePhoto(url: string, degres: number, couleur: string): Promise<string> {
+  const r = await fetch(url)
+  if (!r.ok) throw new Error(`Une photo de la lettre n’a pas pu être lue (HTTP ${String(r.status)}).`)
+  return deposerPhoto(await pencher(await r.blob(), degres, couleur))
 }
 
 export async function envoyerEssai(id: number): Promise<void> {

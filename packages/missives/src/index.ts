@@ -5,3 +5,4 @@ export { rendre, type Envoi } from './rendre';
 export { Missive } from './modeles/Missive';
 export { Fragment } from './modeles/Fragment';
 export { Carnet } from './modeles/Carnet';
+export { INCLINAISONS, photosPenchees, type PhotoPenchee } from './photos';

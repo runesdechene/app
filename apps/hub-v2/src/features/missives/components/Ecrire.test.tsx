@@ -8,9 +8,17 @@ import { Ecrire, EcrireMissive } from './Ecrire'
 const mockRpc = vi.hoisted(() => vi.fn())
 // Une Missive déjà enregistrée, rouverte par son adresse : /missives/ecrire/5.
 const mockLire = vi.hoisted(() => vi.fn())
+// jsdom n'a pas de canvas : la photo « penchée » est un simple Blob, et le dépôt rend une adresse lisible.
+vi.mock('../lib/pencher', () => ({ pencher: () => Promise.resolve(new Blob(['photo'])) }))
 vi.mock('@/shared/supabase/client', () => ({
   supabase: {
     rpc: mockRpc,
+    storage: {
+      from: () => ({
+        upload: (chemin: string) => Promise.resolve({ data: { path: chemin }, error: null }),
+        getPublicUrl: (chemin: string) => ({ data: { publicUrl: `https://stockage.test/missives/${chemin}` } }),
+      }),
+    },
     from: () => ({ select: () => ({ eq: () => ({ single: mockLire }) }) }),
     auth: { getSession: () => Promise.resolve({ data: { session: { access_token: 'jwt' } } }) },
   },
@@ -43,7 +51,7 @@ function monter() {
 // Ce que la Missive enregistrée contient, au dernier enregistrement.
 function enregistree() {
   const appel = mockRpc.mock.calls.filter(([nom]) => nom === 'hub_enregistrer_missive').at(-1) as
-    | [string, { p: { contenu: { titre: string }; couleurs: Record<string, string>; liste: string | null } }]
+    | [string, { p: { contenu: { titre: string; photo: { url: string } }; contenu_envoi: { photo: { url: string } } | null; couleurs: Record<string, string>; liste: string | null } }]
     | undefined
   return appel?.[1].p
 }
@@ -71,6 +79,9 @@ test('écrire dans le titre change la Missive qui part en essai', async () => {
     expect(f).toHaveBeenCalledWith('/.netlify/functions/missives-essai', expect.objectContaining({ method: 'POST' }))
   })
   expect(enregistree()?.contenu.titre).toBe('LA NEIGE EST LÀ')
+  // Ce qui part : la photo penchée, préparée à l'instant ; le brouillon garde l'originale, droite.
+  expect(enregistree()?.contenu_envoi?.photo.url).toMatch(/^https:\/\/stockage\.test\/missives\//)
+  expect(enregistree()?.contenu.photo.url).toMatch(/\/missives\/exemples\//)
 })
 
 test('une palette remplit les trois couleurs', async () => {

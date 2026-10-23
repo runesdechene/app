@@ -1,7 +1,8 @@
 // Le haut de la lettre : les deux mentions, le logo, le grand titre et son sous-titre.
 
 import { Column, Heading, Img, Row, Section, Text } from '@react-email/components';
-import type { Photo } from '../types';
+import type { Photo as PhotoContenu } from '../types';
+import { Photo } from './Photo';
 import { BEBAS, styleRubrique, useEncre, Zone } from './encre';
 
 type Props = {
@@ -56,11 +57,11 @@ export function EnTete({ enTete, titre, sousTitre, taille }: Props) {
 }
 
 /** Une photo d'un bord à l'autre, déjà penchée par le Hub, et sa légende. */
-export function Planche({ photo, nom = 'photo' }: { photo: Photo; nom?: string }) {
+export function Planche({ photo, nom = 'photo' }: { photo: PhotoContenu; nom?: string }) {
   const { couleurs: c } = useEncre();
   return (
     <>
-      <Img src={photo.url} alt="" width="600" data-zone={`${nom}.url`} style={{ display: 'block', width: '100%', height: 'auto' }} />
+      <Photo src={photo.url} zone={`${nom}.url`} largeur={600} degres={photo.inclinaison} style={{ width: '100%' }} />
       <Text style={{ ...styleRubrique(c.rubriques, 11), padding: '10px 48px 0' }}>
         <Zone nom={`${nom}.legende`} valeur={photo.legende} />
       </Text>

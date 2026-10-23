@@ -3,8 +3,8 @@
  *            la photo part donc déjà inclinée, sur le fond de la lettre (JPEG, 1 200 px de large au plus).
  * POURQUOI — la maquette pose ses photos d'un bord à l'autre, légèrement penchées, les coins débordant
  *            du cadre : le dessin est un peu plus large que l'image rendue, et ses coins sont coupés.
- * ATTENTION — shortcut: le fond est cuit dans les coins ; changer les couleurs après coup demande de
- *             reposer la photo. À reprendre si Uriel change souvent de palette en cours d'écriture.
+ * ATTENTION — le fond est cuit dans les coins : on ne penche qu'au moment de l'envoi (lib/envoi), avec les
+ *             couleurs finales. Au dépôt, la photo est seulement réduite (0°).
  */
 
 const LARGEUR_MAX = 1200
@@ -27,8 +27,8 @@ export function mesuresPenchees(largeurSource: number, hauteurSource: number, de
   return { largeur, hauteur, dessinLargeur, dessinHauteur }
 }
 
-export async function pencher(fichier: File, degres: number, fond: string): Promise<Blob> {
-  const image = await createImageBitmap(fichier)
+export async function pencher(photo: Blob, degres: number, fond: string): Promise<Blob> {
+  const image = await createImageBitmap(photo)
   const m = mesuresPenchees(image.width, image.height, degres)
   const toile = document.createElement('canvas')
   toile.width = m.largeur

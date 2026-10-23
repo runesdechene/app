@@ -1,7 +1,9 @@
 // Le Carnet de route : nouvelles du stand nomade et prochaines haltes (maquette Figma 745:2464).
 
-import { Column, Img, Link, Row, Section, Text } from '@react-email/components';
+import { Column, Link, Row, Section, Text } from '@react-email/components';
 import { Cadre } from '../briques/Cadre';
+import { Photo } from '../briques/Photo';
+import { INCLINAISONS } from '../photos';
 import { ALEGREYA, BEBAS, styleCorps, styleRubrique, useEncre, Zone } from '../briques/encre';
 import { EnTete, Planche } from '../briques/EnTete';
 import { Lettrine } from '../briques/Lettrine';
@@ -29,10 +31,10 @@ function Tirages({ tirages }: { tirages: ContenuCarnet['tirages'] }) {
     <Section style={{ padding: '36px 44px 0' }}>
       <Row>
         <Column className="pile" width="256" style={{ verticalAlign: 'top' }}>
-          <Img src={tirages.gauche} alt="" width="256" data-zone="tirages.gauche" style={{ display: 'block', height: 'auto' }} />
+          <Photo src={tirages.gauche} zone="tirages.gauche" largeur={256} degres={INCLINAISONS.tirageGauche} />
         </Column>
         <Column className="pile" width="256" style={{ verticalAlign: 'top', paddingTop: '34px' }}>
-          <Img src={tirages.droite} alt="" width="256" data-zone="tirages.droite" style={{ display: 'block', height: 'auto' }} />
+          <Photo src={tirages.droite} zone="tirages.droite" largeur={256} degres={INCLINAISONS.tirageDroite} />
         </Column>
       </Row>
       <Text style={{ ...styleRubrique(c.rubriques, 11), padding: '8px 4px 0' }}>

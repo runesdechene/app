@@ -47,7 +47,11 @@ export default async function handler(request: Request) {
     const [moi] = await lire<{ email_address: string; first_name: string | null }>(
       `users?select=email_address,first_name&id=eq.${encodeURIComponent(auth.userId)}`,
     )
-    const [missive] = await lire<Missive>(`missives?id=eq.${String(corps.id)}&select=id,modele,contenu,couleurs,apercu,objet`)
+    const [lue] = await lire<Missive & { contenu_envoi: Missive['contenu'] | null }>(
+      `missives?id=eq.${String(corps.id)}&select=id,modele,contenu,contenu_envoi,couleurs,apercu,objet`,
+    )
+    // La lettre telle qu'elle part (photos penchées par le Hub), sinon le brouillon.
+    const missive = lue && ({ ...lue, contenu: lue.contenu_envoi ?? lue.contenu } as Missive)
     if (!moi || !missive) return json({ error: 'Missive ou compte introuvable' }, 404)
 
     const essai = await message(

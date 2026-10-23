@@ -44,9 +44,10 @@ export default async function handler(request: Request) {
     if (lot.length > 0) {
       const ids = [...new Set(lot.map((d) => d.missive_id))]
       const missives = (await (await supabase(
-        `missives?id=in.(${ids.join(',')})&select=id,modele,contenu,couleurs,apercu,objet`,
-      )).json()) as Missive[]
-      const parId = new Map(missives.map((m) => [m.id, m]))
+        `missives?id=in.(${ids.join(',')})&select=id,modele,contenu,contenu_envoi,couleurs,apercu,objet`,
+      )).json()) as (Missive & { contenu_envoi: Missive['contenu'] | null })[]
+      // La lettre telle qu'elle part (photos penchées par le Hub), sinon le brouillon.
+      const parId = new Map(missives.map((m) => [m.id, { ...m, contenu: m.contenu_envoi ?? m.contenu } as Missive]))
 
       // Lot par lot, et chaque résultat noté aussitôt : une panne au lot suivant n'efface pas celui-ci.
       for (let i = 0; i < lot.length; i += TAILLE_DU_LOT_RESEND) {

@@ -1,7 +1,9 @@
 // La Missive : les nouvelles du mois (maquette Figma 748:2521).
 
-import { Column, Img, Link, Row, Section, Text } from '@react-email/components';
+import { Column, Link, Row, Section, Text } from '@react-email/components';
 import { Cadre } from '../briques/Cadre';
+import { Photo } from '../briques/Photo';
+import { INCLINAISONS } from '../photos';
 import { ALEGREYA, BEBAS, styleCorps, styleRubrique, useEncre, Zone } from '../briques/encre';
 import { EnTete, Planche } from '../briques/EnTete';
 import { Lettrine } from '../briques/Lettrine';
@@ -71,7 +73,7 @@ function RuptureMissive({ rupture }: { rupture: ContenuMissive['rupture'] }) {
         </Column>
         {rupture.photo && (
           <Column className="pile" width="204" style={{ verticalAlign: 'middle', paddingLeft: '24px' }}>
-            <Img src={rupture.photo} alt="" width="180" data-zone="rupture.photo" style={{ display: 'block', height: 'auto' }} />
+            <Photo src={rupture.photo} zone="rupture.photo" largeur={180} degres={INCLINAISONS.rupture} />
           </Column>
         )}
       </Row>

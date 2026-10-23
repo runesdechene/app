@@ -4,10 +4,10 @@
  *            se changer. En bas des réglages : programmer, s'envoyer un essai, garder le brouillon.
  * POURQUOI — Uriel veut écrire dans le modèle entier, pas remplir un formulaire (22/10). L'e-mail affiché
  *            est le composant même que rend l'envoi (@runes/missives), en mode édition.
- * ATTENTION — une photo se penche et se pose sur le fond du moment (lib/pencher) : changer les couleurs
- *             après coup demande de la reposer.
+ * ATTENTION — une photo reste droite dans le brouillon ; elle n'est penchée, aux couleurs finales, qu'à l'essai
+ *             ou à la programmation (lib/envoi).
  */
-import { Carnet, Fragment, Missive, contrasteSuffisant, deduireCouleurs, type Edition } from '@runes/missives'
+import { Carnet, Fragment, Missive, contrasteSuffisant, type Edition } from '@runes/missives'
 import { useRef, useState, type MouseEvent } from 'react'
 import { useParams } from 'react-router'
 import { verifierFichier } from '@/shared/lib/envoi'
@@ -17,7 +17,6 @@ import { deposerPhoto } from '../api/missives'
 import { useListes } from '../hooks/useListes'
 import { useMissive } from '../hooks/useMissive'
 import { changerZone, indicationsRestantes, type Brouillon } from '../lib/brouillon'
-import { placeDePhoto } from '../lib/liens'
 import { pencher } from '../lib/pencher'
 import styles from './Ecrire.module.css'
 import { Pastilles } from './Pastilles'
@@ -89,9 +88,8 @@ export function Ecrire({ id = null }: { id?: number | null }) {
     }
     setMessage('La photo se prépare…')
     try {
-      const place = placeDePhoto(b.lettre, zone)
-      const couleurs = deduireCouleurs(b.couleurs)
-      const url = await deposerPhoto(await pencher(fichier, place.degres, place.sur === 'rupture' ? couleurs.rupture : couleurs.fond))
+      // Droite et réduite : elle penche à l'écran, et ne sera penchée pour de bon qu'à l'envoi (lib/envoi).
+      const url = await deposerPhoto(await pencher(fichier, 0, b.couleurs.fond))
       changer(changerZone(b, zone, url))
     } catch (err) {
       setMessage(err instanceof Error ? err.message : 'La photo n’a pas pu être posée.')
