@@ -30,7 +30,8 @@ export const ADRESSE = 'https://hub.runesdechene.com/missives';
 export const ADRESSE_DANS_LE_HUB = '/missives';
 
 export const BEBAS = "'Bebas Neue', 'Arial Narrow', Arial, sans-serif";
-export const ALEGREYA = 'Alegreya, Georgia, serif';
+// Gmail et Outlook ignorent Alegreya : Palatino la remplace (choix d'Uriel, 23/10), Georgia en dernier recours.
+export const ALEGREYA = "Alegreya, 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif";
 export const CABIN = "'Cabin Condensed', 'Arial Narrow', Arial, sans-serif";
 
 /** Les petites capitales espacées des rubriques, de l'en-tête et des légendes. */
