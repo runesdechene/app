@@ -12,6 +12,10 @@
 [functions."shopify-sync"]
   timeout = 60
 
+# Un réveil rend et envoie un lot de Missives (250) : il lui faut plus que les 10 s par défaut.
+[functions."missives-envoyer"]
+  timeout = 60
+
 [functions."shopify-callback"]
   timeout = 15
 

@@ -16,14 +16,15 @@ sauf `flyer-create-account`, appelée sans session par `/flyercadeau` (`src/publ
 | `shopify-callback` | échange le code OAuth contre un jeton (affiché, à copier à la main), boutique fixe · redirection Shopify | publique (sans code : 400) |
 | `shopify-order-webhook` | webhook `orders/paid` : profil et Fragments · Shopify | signature HMAC obligatoire |
 | `shopify-client-webhook` | webhooks `customers/create` et `customers/update` : l'accord aux nouvelles suit Shopify (le plus récent gagne, `lib/accord.ts`), fiche créée pour un inscrit inconnu · Shopify | signature HMAC obligatoire |
+| `missives-envoyer` | envoie les Missives programmées, un lot de 250 par réveil, par Resend (`lib/resend.ts`) ; lien de désabonnement signé (`lib/jeton.ts`) · `pg_cron` toutes les 5 min (`_reveiller_missives`, mig 541) | en-tête `X-Missives-Secret` = `MISSIVES_SECRET` |
 | `flyer-create-account` | un e-mail contre le code promo `FLYER_PROMO_CODE` : client Shopify (boutique fixe) et compte de l'appli · page `/flyercadeau` | publique : 15 demandes par heure et par IP (`flyer_signup_log`), sinon 429 ; aucune erreur ne renvoie l'e-mail ni le texte de Shopify ou de Supabase |
 
 Variables d'environnement lues (sans aucune valeur ici) : `VITE_SUPABASE_URL`,
 `SUPABASE_SERVICE_ROLE_KEY`, `SHOPIFY_ACCESS_TOKEN`, `SHOPIFY_WEBHOOK_SECRET`, `SHOPIFY_CLIENT_ID`,
-`SHOPIFY_CLIENT_SECRET`, `SHOPIFY_SHOP`, `FLYER_PROMO_CODE` (`flyer-create-account`, qui lit aussi
+`SHOPIFY_CLIENT_SECRET`, `SHOPIFY_SHOP`, `FLYER_PROMO_CODE`, `RESEND_API_KEY`, `MISSIVES_SECRET` (`flyer-create-account`, qui lit aussi
 `VITE_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` et `SHOPIFY_ACCESS_TOKEN`).
 
-`lib/` n'est pas une fonction : les aides partagées (`accord.ts`, signature Shopify dans `shopify.ts`).
+`lib/` n'est pas une fonction : les aides partagées (`accord.ts`, `jeton.ts`, `resend.ts`, signature Shopify dans `shopify.ts`).
 
 Le webhook `orders/paid` de Shopify pointe vers `hub.runesdechene.com` : il suit le domaine, passé au Hub V2 le 16/10.
 `shopify-create-customer` ne déménage pas (spec §3) ; `flyer-create-account` a déménagé au plan 5, avec `/flyercadeau`.
