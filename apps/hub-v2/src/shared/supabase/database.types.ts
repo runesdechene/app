@@ -8081,6 +8081,11 @@ export type Database = {
         Args: { p_active: boolean; p_id: number }
         Returns: undefined
       }
+      hub_ambassadeur: {
+        Args: { p_role: string; p_user: string }
+        Returns: undefined
+      }
+      hub_ambassadeurs: { Args: never; Returns: Json }
       hub_associer_achat: {
         Args: { p_achat: number; p_fragment: number }
         Returns: undefined
@@ -8154,6 +8159,8 @@ export type Database = {
         }
         Returns: undefined
       }
+      hub_enregistrer_missive: { Args: { p: Json }; Returns: number }
+      hub_envois: { Args: never; Returns: Json }
       hub_est_admin: { Args: never; Returns: boolean }
       hub_lieux: {
         Args: {
@@ -8177,6 +8184,11 @@ export type Database = {
         Returns: undefined
       }
       hub_ouverture: { Args: { p_periode: string }; Returns: Json }
+      hub_programmer_missive: {
+        Args: { p_id: number; p_quand: string }
+        Returns: undefined
+      }
+      hub_retirer_ambassadeur: { Args: { p_user: string }; Returns: undefined }
       hub_retirer_fragment: {
         Args: { p_fragment: number; p_user: string }
         Returns: undefined

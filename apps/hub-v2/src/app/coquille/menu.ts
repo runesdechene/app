@@ -5,7 +5,7 @@
  */
 export type CleAttente = 'photos' | 'lieux' | 'signalementsLieu' | 'signalementsEnigme' | 'achats'
 export type Lien = { libelle: string; chemin: string; file?: CleAttente }
-export type IconeDomaine = 'communaute' | 'jeu' | 'boutique' | 'joueurs' | 'reglages'
+export type IconeDomaine = 'communaute' | 'jeu' | 'boutique' | 'missives' | 'joueurs' | 'reglages'
 export type Domaine = { titre: string | null; icone?: IconeDomaine; liens: Lien[] }
 
 export const MENU: Domaine[] = [
@@ -43,6 +43,11 @@ export const MENU: Domaine[] = [
       { libelle: 'Synchro Shopify', chemin: '/boutique/synchro' },
       { libelle: 'Écoutes audio', chemin: '/boutique/audio' },
     ],
+  },
+  {
+    titre: 'Missives',
+    icone: 'missives',
+    liens: [{ libelle: 'Listes', chemin: '/missives/listes' }],
   },
   {
     titre: 'Parler aux joueurs',

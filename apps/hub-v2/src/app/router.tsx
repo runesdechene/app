@@ -30,6 +30,7 @@ import { Energie } from '@/features/jeu/components/Energie'
 import { Enigmes } from '@/features/jeu/components/Enigmes'
 import { EnigmesSignalees } from '@/features/jeu/components/EnigmesSignalees'
 import { Blog } from '@/features/joueurs/components/Blog'
+import { Listes } from '@/features/missives/components/Listes'
 import { TiroirArticle } from '@/features/joueurs/components/TiroirArticle'
 import { Notifications } from '@/features/joueurs/components/Notifications'
 import { MisesAJour } from '@/features/joueurs/components/MisesAJour'
@@ -83,6 +84,7 @@ export const routes: RouteObject[] = [
       { path: 'boutique/photos', Component: Photos },
       { path: 'boutique/audio', Component: Ecoutes },
       { path: 'boutique/synchro', Component: Synchro },
+      { path: 'missives/listes', Component: Listes },
       { path: 'joueurs/mises-a-jour', Component: MisesAJour, children: [{ path: 'nouvelle', Component: TiroirMiseAJour }, { path: ':id', Component: TiroirMiseAJour }] },
       { path: 'joueurs/notifications', Component: Notifications },
       { path: 'joueurs/blog', Component: Blog, children: [{ path: 'nouveau', Component: TiroirArticle }, { path: ':id', Component: TiroirArticle }] },

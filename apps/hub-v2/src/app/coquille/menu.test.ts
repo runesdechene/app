@@ -6,7 +6,7 @@ test('chaque adresse du menu est unique', () => {
 })
 
 test('le menu suit les domaines de la spec', () => {
-  expect(MENU.map((d) => d.titre)).toEqual([null, 'Communauté', 'Le jeu', 'Fragments et boutique', 'Parler aux joueurs', 'Réglages'])
+  expect(MENU.map((d) => d.titre)).toEqual([null, 'Communauté', 'Le jeu', 'Fragments et boutique', 'Missives', 'Parler aux joueurs', 'Réglages'])
 })
 
 test('chaque onglet du téléphone mène à une adresse du menu', () => {
