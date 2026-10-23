@@ -3,6 +3,8 @@
 // puis user Supabase fantôme (id = "shopify-{customer.id}", account_source = 'stand').
 // Si Shopify échoue, rien n'est inséré → retry propre.
 // La newsletter seulement si le client l'a accepté à voix haute (case cochée par l'équipe, L34-5 CPCE).
+import { colonnesAccord } from './lib/accord'
+
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
@@ -92,6 +94,14 @@ export default async function handler(request: Request) {
   )
   const existingRows = await existingResp.json() as Array<{ id: string; first_name: string | null; email_address: string; avatar_url: string | null; shopify_customer_id: number | null; account_source: string | null }>
   if (existingRows.length > 0) {
+    // La case cochée aujourd'hui est le choix le plus récent : il s'écrit sur la fiche existante.
+    if (newsletter) {
+      await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${encodeURIComponent(existingRows[0].id)}`, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(colonnesAccord({ accord: true, le: new Date().toISOString(), porte: 'stand' })),
+      })
+    }
     return json({ success: true, action: 'already_exists', user: existingRows[0] })
   }
 
@@ -179,15 +189,17 @@ export default async function handler(request: Request) {
       rank: '',
       biography: '',
       created_at: new Date().toISOString(),
+      ...(newsletter ? colonnesAccord({ accord: true, le: new Date().toISOString(), porte: 'stand' }) : {}),
     }
 
-    const insertResp = await fetch(`${SUPABASE_URL}/rest/v1/users`, {
+    // Le webhook client de Shopify peut avoir créé la même fiche à l'instant : le stand la complète.
+    const insertResp = await fetch(`${SUPABASE_URL}/rest/v1/users?on_conflict=id`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
         'Content-Type': 'application/json',
-        'Prefer': 'return=representation',
+        'Prefer': 'resolution=merge-duplicates,return=representation',
       },
       body: JSON.stringify(newUser),
     })

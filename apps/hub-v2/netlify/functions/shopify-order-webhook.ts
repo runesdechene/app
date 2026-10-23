@@ -1,7 +1,7 @@
 // Netlify Function : webhook Shopify orders/paid
 // Reçoit une notification à chaque achat, crée/lie le profil et attribue les fragments
 
-import crypto from 'crypto'
+import { signatureShopifyValide } from './lib/shopify'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -149,10 +149,7 @@ export default async function handler(request: Request) {
   if (!hmacHeader) {
     return json({ error: 'Missing HMAC signature' }, 401)
   }
-  const attendu = Buffer.from(crypto.createHmac('sha256', SHOPIFY_SECRET).update(rawBody).digest('base64'))
-  const recu = Buffer.from(hmacHeader)
-  // Comparaison en temps constant ; des longueurs différentes sont déjà un refus (timingSafeEqual les rejette).
-  if (attendu.length !== recu.length || !crypto.timingSafeEqual(attendu, recu)) {
+  if (!signatureShopifyValide(rawBody, hmacHeader, SHOPIFY_SECRET)) {
     return json({ error: 'Invalid HMAC signature' }, 401)
   }
 

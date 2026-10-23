@@ -1,5 +1,8 @@
 // Netlify Function : synchro initiale Shopify → Supabase
 // Utilise l'API REST Supabase directement (pas le SDK, pour éviter les problèmes de bundling)
+// L'accord aux nouvelles suit Shopify quand son choix y est plus récent (lib/accord.ts).
+import { appliquerAccord, colonnesAccord } from './lib/accord'
+
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -34,6 +37,15 @@ interface ShopifyCustomer {
   orders_count: number
   tags: string
   created_at: string
+  email_marketing_consent?: { state?: string; consent_updated_at?: string | null } | null
+}
+
+function choixShopify(customer: ShopifyCustomer) {
+  return {
+    accord: customer.email_marketing_consent?.state === 'subscribed',
+    le: customer.email_marketing_consent?.consent_updated_at ?? null,
+    porte: 'shopify' as const,
+  }
 }
 
 async function requireAdmin(request: Request): Promise<{ userId: string } | { error: string; status: number }> {
@@ -103,7 +115,7 @@ export default async function handler(request: Request) {
   try {
     // 1. Fetch tous les clients Shopify (paginé)
     const allCustomers: ShopifyCustomer[] = []
-    let nextUrl: string | null = `https://${shop}/admin/api/2026-01/customers.json?limit=250&fields=id,email,first_name,last_name,orders_count,tags,created_at`
+    let nextUrl: string | null = `https://${shop}/admin/api/2026-01/customers.json?limit=250&fields=id,email,first_name,last_name,orders_count,tags,created_at,email_marketing_consent`
 
     while (nextUrl) {
       const resp = await fetch(nextUrl, {
@@ -133,12 +145,14 @@ export default async function handler(request: Request) {
       email_address: string
       shopify_customer_id: number | null
       account_source: string | null
+      accord_nouvelles: boolean
+      accord_nouvelles_le: string | null
     }> = []
 
     let offset = 0
     const PAGE_SIZE = 1000
     while (true) {
-      const resp = await fetch(`${SUPABASE_URL}/rest/v1/users?select=id,email_address,shopify_customer_id,account_source&limit=${PAGE_SIZE}&offset=${offset}`, {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/users?select=id,email_address,shopify_customer_id,account_source,accord_nouvelles,accord_nouvelles_le&limit=${PAGE_SIZE}&offset=${offset}`, {
         headers: {
           'apikey': SUPABASE_KEY,
           'Authorization': `Bearer ${SUPABASE_KEY}`,
@@ -160,7 +174,7 @@ export default async function handler(request: Request) {
     }
 
     // 3. Croiser
-    const toUpdate: Array<{ id: string; shopify_customer_id: number }> = []
+    const toUpdate: Array<{ id: string; patch: Record<string, unknown> }> = []
     const toCreate: Array<Record<string, unknown>> = []
     let skipped = 0
 
@@ -170,12 +184,18 @@ export default async function handler(request: Request) {
       const existing = emailToUser.get(email)
 
       if (existing) {
-        if (!existing.shopify_customer_id) {
-          toUpdate.push({ id: existing.id, shopify_customer_id: customer.id })
+        const choix = appliquerAccord({ accord: existing.accord_nouvelles, le: existing.accord_nouvelles_le }, choixShopify(customer))
+        const patch = {
+          ...(existing.shopify_customer_id ? {} : { shopify_customer_id: customer.id }),
+          ...(choix ? colonnesAccord(choix) : {}),
+        }
+        if (Object.keys(patch).length > 0) {
+          toUpdate.push({ id: existing.id, patch })
         } else {
           skipped++
         }
       } else {
+        const choix = appliquerAccord({ accord: false, le: null }, choixShopify(customer))
         toCreate.push({
           id: `shopify-${customer.id}`,
           email_address: customer.email,
@@ -187,11 +207,15 @@ export default async function handler(request: Request) {
           role: 'user',
           rank: '',
           biography: '',
+          // Un insert groupé de PostgREST veut les mêmes clés sur chaque ligne : l'accord est toujours écrit.
+          accord_nouvelles: choix?.accord ?? false,
+          accord_nouvelles_le: choix?.le ?? null,
+          accord_nouvelles_porte: choix?.porte ?? null,
         })
       }
     }
 
-    // 4. Batch update (lier les existants) — par lots de 50
+    // 4. Batch update (lier les existants, accord aux nouvelles) — par lots de 50
     let updated = 0
     const updateErrors: string[] = []
     for (let i = 0; i < toUpdate.length; i += 50) {
@@ -204,7 +228,7 @@ export default async function handler(request: Request) {
             'Authorization': `Bearer ${SUPABASE_KEY}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ shopify_customer_id: u.shopify_customer_id }),
+          body: JSON.stringify(u.patch),
         })
       ))
       for (const [j, resp] of responses.entries()) {
@@ -252,7 +276,7 @@ export default async function handler(request: Request) {
       logs: [
         `Shopify: ${allCustomers.length} clients récupérés`,
         `Supabase: ${existingUsers.length} users récupérés (${Math.ceil(existingUsers.length / PAGE_SIZE)} pages)`,
-        `Croisement: ${toUpdate.length} à lier, ${toCreate.length} à créer, ${skipped} déjà à jour`,
+        `Croisement: ${toUpdate.length} à lier ou dont l'accord aux nouvelles change, ${toCreate.length} à créer, ${skipped} déjà à jour`,
         `Updates: ${updated} liés avec succès`,
         toUpdate.length > updated ? `⚠️ ${toUpdate.length - updated} liens refusés sur ${toUpdate.length}` : null,
         ...updateErrors.map(e => `❌ ${e}`),

@@ -189,6 +189,30 @@ describe('shopify-sync : liaison des clients existants', () => {
     expect(corps.logs.some((l) => l.startsWith('❌') && l.includes('403'))).toBe(true)
   })
 
+  test('l’accord aux nouvelles suit Shopify quand il y est plus récent, même pour un compte déjà relié', async () => {
+    const abonne = { state: 'subscribed', consent_updated_at: '2026-10-23T10:00:00Z' }
+    const corpsPatch: Record<string, unknown> = {}
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
+      if (url.includes('/auth/v1/user')) return Promise.resolve(Response.json({ id: 'u0' }))
+      if (url.includes('/rest/v1/users?select=role')) return Promise.resolve(Response.json([{ role: 'admin' }]))
+      if (url.includes('/admin/api/')) {
+        return Promise.resolve(Response.json({ customers: [{ ...clients[0], email_marketing_consent: abonne }] }))
+      }
+      if (init?.method === 'PATCH') {
+        corpsPatch[url] = JSON.parse(String(init.body))
+        return Promise.resolve(new Response(null, { status: 204 }))
+      }
+      return Promise.resolve(Response.json([{ ...comptes[0], shopify_customer_id: 1, accord_nouvelles: false, accord_nouvelles_le: null }]))
+    }))
+    const handler = await charger('shopify-sync')
+    await handler(post('{}', { Authorization: 'Bearer jwt' }))
+    expect(corpsPatch['http://supabase.test/rest/v1/users?id=eq.u1']).toEqual({
+      accord_nouvelles: true,
+      accord_nouvelles_le: '2026-10-23T10:00:00Z',
+      accord_nouvelles_porte: 'shopify',
+    })
+  })
+
   test('une page de comptes qui n’est pas une liste : 500 explicite, rien n’est lié', async () => {
     simuler({ message: 'JWT expired' }, () => new Response(null, { status: 204 }))
     const handler = await charger('shopify-sync')
@@ -366,5 +390,108 @@ describe('flyer-create-account : publique, donc freinée', () => {
     const r = await handler(demander('{"email":"claire@exemple.fr"}'))
     expect(r.status).toBe(500)
     expect(await r.json()).toEqual({ error: 'Unexpected error' })
+  })
+})
+
+describe('shopify-client-webhook : l’accord aux nouvelles venu de Shopify', () => {
+  type Appel = { url: string; methode: string; corps: unknown }
+
+  // `fiches` : ce que la base rend pour l'e-mail du client.
+  function simuler(fiches: unknown[]) {
+    const appels: Appel[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
+      appels.push({ url, methode: init?.method ?? 'GET', corps: init?.body ? JSON.parse(String(init.body)) : null })
+      if (url.includes('/rest/v1/users?email_address')) return Promise.resolve(Response.json(fiches))
+      return Promise.resolve(new Response(null, { status: 201 }))
+    }))
+    return appels
+  }
+
+  function client(etat: string, le: string | null) {
+    return JSON.stringify({
+      id: 42,
+      email: 'Claire@Exemple.fr',
+      first_name: 'Claire',
+      email_marketing_consent: { state: etat, opt_in_level: 'single_opt_in', consent_updated_at: le },
+    })
+  }
+
+  function recevoir(corps: string, sujet: string, signature = signer(corps)) {
+    return post(corps, { 'x-shopify-hmac-sha256': signature, 'x-shopify-topic': sujet })
+  }
+
+  beforeEach(() => vi.stubEnv('SHOPIFY_WEBHOOK_SECRET', SECRET))
+
+  test('sans signature : 401, rien n’est appelé', async () => {
+    const appels = simuler([])
+    const handler = await charger('shopify-client-webhook')
+    const r = await handler(post(client('subscribed', '2026-10-23T10:00:00Z'), { 'x-shopify-topic': 'customers/create' }))
+    expect(r.status).toBe(401)
+    expect(appels).toEqual([])
+  })
+
+  test('signature fausse : 401', async () => {
+    simuler([])
+    const handler = await charger('shopify-client-webhook')
+    const r = await handler(recevoir(client('subscribed', '2026-10-23T10:00:00Z'), 'customers/create', signer('autre')))
+    expect(r.status).toBe(401)
+  })
+
+  test('un inscrit à la newsletter du site, inconnu : sa fiche naît avec l’accord, porte « site »', async () => {
+    const appels = simuler([])
+    const handler = await charger('shopify-client-webhook')
+    const r = await handler(recevoir(client('subscribed', '2026-10-23T10:00:00Z'), 'customers/create'))
+    expect(r.status).toBe(200)
+    const creation = appels.find((a) => a.methode === 'POST')
+    // Le stand et le flyer créent la même fiche au même moment : la première arrivée garde la place.
+    expect(creation?.url).toContain('on_conflict=id')
+    expect(creation?.corps).toMatchObject({
+      id: 'shopify-42',
+      email_address: 'claire@exemple.fr',
+      account_source: 'shopify',
+      accord_nouvelles: true,
+      accord_nouvelles_le: '2026-10-23T10:00:00Z',
+      accord_nouvelles_porte: 'site',
+    })
+  })
+
+  test('un désabonnement Shopify plus récent que l’accord de la fiche l’emporte', async () => {
+    const appels = simuler([{ id: 'u1', accord_nouvelles: true, accord_nouvelles_le: '2026-10-01T10:00:00Z' }])
+    const handler = await charger('shopify-client-webhook')
+    await handler(recevoir(client('unsubscribed', '2026-10-23T10:00:00Z'), 'customers/update'))
+    const maj = appels.find((a) => a.methode === 'PATCH')
+    expect(maj?.url).toContain('id=eq.u1')
+    expect(maj?.corps).toEqual({
+      accord_nouvelles: false,
+      accord_nouvelles_le: '2026-10-23T10:00:00Z',
+      accord_nouvelles_porte: 'shopify',
+    })
+  })
+
+  test('un choix Shopify plus ancien que celui de la fiche ne change rien', async () => {
+    const appels = simuler([{ id: 'u1', accord_nouvelles: false, accord_nouvelles_le: '2026-10-23T10:00:00Z' }])
+    const handler = await charger('shopify-client-webhook')
+    const r = await handler(recevoir(client('subscribed', '2026-10-01T10:00:00Z'), 'customers/update'))
+    expect(r.status).toBe(200)
+    expect(appels.some((a) => a.methode !== 'GET')).toBe(false)
+  })
+})
+
+describe('flyer-create-account : la case des nouvelles', () => {
+  test('case cochée : la fiche naît avec l’accord, porte « flyer »', async () => {
+    const appels: { url: string; methode: string; corps: unknown }[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
+      appels.push({ url, methode: init?.method ?? 'GET', corps: init?.body ? JSON.parse(String(init.body)) : null })
+      if (url.includes('/rest/v1/flyer_signup_log?')) return Promise.resolve(Response.json([]))
+      if (url.includes('/rest/v1/users?email_address')) return Promise.resolve(Response.json([]))
+      if (url.includes('/customers/search.json')) return Promise.resolve(Response.json({ customers: [] }))
+      if (url.includes('/customers.json')) return Promise.resolve(Response.json({ customer: { id: 42 } }))
+      return Promise.resolve(new Response(null, { status: 201 }))
+    }))
+    const handler = await charger('flyer-create-account')
+    await handler(post('{"email":"claire@exemple.fr","newsletter":true}', { 'x-nf-client-connection-ip': '1.2.3.4' }))
+    const fiche = appels.find((a) => a.methode === 'POST' && a.url.includes('/rest/v1/users'))
+    expect(fiche?.url).toContain('on_conflict=id')
+    expect(fiche?.corps).toMatchObject({ id: 'shopify-42', accord_nouvelles: true, accord_nouvelles_porte: 'flyer' })
   })
 })

@@ -9,6 +9,8 @@
 // réponse est la même pour un compte connu ou créé (rien ne dit qui est inscrit), et aucun en-tête
 // CORS : le seul appelant est la page /flyer, sur le même domaine.
 
+import { colonnesAccord } from './lib/accord'
+
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const PROMO_CODE = process.env.FLYER_PROMO_CODE || 'CONFRERIE'
@@ -97,6 +99,14 @@ export default async function handler(request: Request) {
     )
     const existingRows = await existingResp.json() as Array<{ id: string }>
     if (existingRows.length > 0) {
+      // La case cochée aujourd'hui est le choix le plus récent : il s'écrit sur la fiche existante.
+      if (newsletter) {
+        await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${encodeURIComponent(existingRows[0].id)}`, {
+          method: 'PATCH',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(colonnesAccord({ accord: true, le: new Date().toISOString(), porte: 'flyer' })),
+        })
+      }
       return json({ success: true, promoCode: PROMO_CODE })
     }
 
@@ -174,14 +184,16 @@ export default async function handler(request: Request) {
       rank: '',
       biography: '',
       created_at: new Date().toISOString(),
+      ...(newsletter ? colonnesAccord({ accord: true, le: new Date().toISOString(), porte: 'flyer' }) : {}),
     }
-    const insertResp = await fetch(`${SUPABASE_URL}/rest/v1/users`, {
+    // Le webhook client de Shopify peut avoir créé la même fiche à l'instant : le flyer la complète.
+    const insertResp = await fetch(`${SUPABASE_URL}/rest/v1/users?on_conflict=id`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
         'Content-Type': 'application/json',
-        'Prefer': 'return=minimal',
+        'Prefer': 'resolution=merge-duplicates,return=minimal',
       },
       body: JSON.stringify(newUser),
     })
