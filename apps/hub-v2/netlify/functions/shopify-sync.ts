@@ -113,6 +113,9 @@ export default async function handler(request: Request) {
   }
 
   try {
+    // La durée de chaque étape va au compte rendu : c'est la sonde quand la liaison traîne.
+    const debut = Date.now()
+    const secondes = (depuis: number) => `${((Date.now() - depuis) / 1000).toFixed(1)} s`
     // 1. Fetch tous les clients Shopify (paginé)
     const allCustomers: ShopifyCustomer[] = []
     let nextUrl: string | null = `https://${shop}/admin/api/2026-01/customers.json?limit=250&fields=id,email,first_name,last_name,orders_count,tags,created_at,email_marketing_consent`
@@ -139,6 +142,8 @@ export default async function handler(request: Request) {
       }
     }
 
+    const dureeShopify = secondes(debut)
+    const debutBase = Date.now()
     // 2. Fetch tous les users Supabase (paginé par 1000)
     const existingUsers: Array<{
       id: string
@@ -173,6 +178,7 @@ export default async function handler(request: Request) {
       if (u.email_address) emailToUser.set(u.email_address.toLowerCase(), u)
     }
 
+    const dureeBase = secondes(debutBase)
     // 3. Croiser
     const toUpdate: Array<{ id: string; patch: Record<string, unknown> }> = []
     const toCreate: Array<Record<string, unknown>> = []
@@ -215,6 +221,7 @@ export default async function handler(request: Request) {
       }
     }
 
+    const debutEcriture = Date.now()
     // Étape 4 : relier les existants et poser l'accord aux nouvelles, une requête par lot de 1 000 (mig 553).
     //    Une requête par fiche dépassait les 60 s de la fonction dès quelques milliers de fiches.
     let updated = 0
@@ -260,6 +267,7 @@ export default async function handler(request: Request) {
       }
     }
 
+    const dureeEcriture = secondes(debutEcriture)
     return json({
       success: true,
       shopifyTotal: allCustomers.length,
@@ -271,6 +279,7 @@ export default async function handler(request: Request) {
       toCreateCount: toCreate.length,
       toUpdateCount: toUpdate.length,
       logs: [
+        `Durées : Shopify ${dureeShopify}, lecture de la base ${dureeBase}, écriture ${dureeEcriture}, total ${secondes(debut)}`,
         `Shopify: ${allCustomers.length} clients récupérés`,
         `Supabase: ${existingUsers.length} users récupérés (${Math.ceil(existingUsers.length / PAGE_SIZE)} pages)`,
         `Croisement: ${toUpdate.length} à lier ou dont l'accord aux nouvelles change, ${toCreate.length} à créer, ${skipped} déjà à jour`,
