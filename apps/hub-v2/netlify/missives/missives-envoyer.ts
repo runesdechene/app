@@ -1,11 +1,12 @@
+// Source : `pnpm build` l'empaquette en un seul fichier dans netlify/functions (build:fonctions, voir le README).
 // Réveillée par pg_cron toutes les 5 minutes (_reveiller_missives, mig 541) quand une Missive est à envoyer.
 // Un réveil prépare les Missives arrivées à échéance, prend un lot de destinataires, rend chaque e-mail et
 // l'envoie par Resend, puis note chaque résultat. La base garantit qu'un destinataire n'est pris qu'une fois,
 // même si deux réveils se croisent ; ce qui reste part au réveil suivant.
 // Garde : l'en-tête X-Missives-Secret, partagé avec app_settings.missives_secret.
 
-import { message, type Missive } from './lib/missive'
-import { envoyerLot, TAILLE_DU_LOT_RESEND } from './lib/resend'
+import { message, type Missive } from '../functions/lib/missive'
+import { envoyerLot, TAILLE_DU_LOT_RESEND } from '../functions/lib/resend'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!

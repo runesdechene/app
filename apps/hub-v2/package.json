@@ -8,12 +8,13 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && pnpm build:fonctions",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "lint": "eslint . --max-warnings 0 && stylelint \"src/**/*.css\"",
     "test": "vitest run",
-    "gen:types": "pnpm dlx supabase gen types typescript --linked --schema public > src/shared/supabase/database.types.ts"
+    "gen:types": "pnpm dlx supabase gen types typescript --linked --schema public > src/shared/supabase/database.types.ts",
+    "build:fonctions": "esbuild netlify/missives/missives-envoyer.ts netlify/missives/missives-essai.ts --bundle --platform=node --format=esm --outdir=netlify/functions --out-extension:.js=.mjs --log-level=warning \"--banner:js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);\""
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "1.1.0",
@@ -38,6 +39,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.1",
+    "esbuild": "0.28.2",
     "eslint": "10.11.0",
     "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-react-refresh": "0.5.7",

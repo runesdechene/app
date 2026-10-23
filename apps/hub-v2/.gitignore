@@ -1,2 +1,5 @@
 # QUOI — fichiers générés propres au Hub V2, jamais versionnés.
 *.tsbuildinfo
+# Les fonctions qui rendent des e-mails, empaquetées par `pnpm build` (build:fonctions) depuis netlify/missives.
+netlify/functions/missives-envoyer.mjs
+netlify/functions/missives-essai.mjs

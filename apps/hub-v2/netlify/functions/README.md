@@ -27,6 +27,8 @@ Variables d'environnement lues (sans aucune valeur ici) : `VITE_SUPABASE_URL`,
 `SHOPIFY_CLIENT_SECRET`, `SHOPIFY_SHOP`, `FLYER_PROMO_CODE`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `MISSIVES_SECRET` (le même que le secret `missives_secret` de Supabase Vault, jamais dans `app_settings`, lisible sans compte), `MISSIVES_JETON_SECRET` (la clé des liens de désabonnement, dans Netlify seulement) (`flyer-create-account`, qui lit aussi
 `VITE_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` et `SHOPIFY_ACCESS_TOKEN`).
 
+`missives-envoyer` et `missives-essai` rendent des e-mails avec `@runes/missives` (React Email). Leurs sources vivent dans `../missives/` : l'empaqueteur de Netlify, devant les liens de pnpm, mettait dans le zip des raccourcis vers React au lieu du code, et la fonction ne démarrait pas (« Failed to wait for function to become active », 23/10). `pnpm build` les empaquette donc en un seul fichier complet ici (`build:fonctions`, esbuild) ; ces `.mjs` sont générés, jamais versionnés.
+
 `lib/` n'est pas une fonction : les aides partagées (`accord.ts`, `admin.ts`, `jeton.ts`, `missive.ts`, `resend.ts`, signature Shopify dans `shopify.ts`).
 
 Le webhook `orders/paid` de Shopify pointe vers `hub.runesdechene.com` : il suit le domaine, passé au Hub V2 le 16/10.

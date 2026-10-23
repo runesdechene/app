@@ -91,8 +91,6 @@ describe('shopify-order-webhook', () => {
 const APRES_LA_GARDE: [string, string, number][] = [
   ['shopify-batch-tags', '{"items":[]}', 200],
   ['shopify-sync-tags', '{}', 400],
-  // Sans Missive désignée, l'essai refuse : 400.
-  ['missives-essai', '{}', 400],
 ]
 
 describe.each(APRES_LA_GARDE)('%s : réservé aux admins', (nom, corps, statutAdmin) => {
@@ -539,7 +537,23 @@ describe('flyer-create-account : la case des nouvelles', () => {
   })
 })
 
+// L'essai vit dans netlify/missives (empaqueté au build, voir le README des fonctions).
+async function chargerEssai(): Promise<Fonction> {
+  vi.resetModules()
+  return ((await import('./missives/missives-essai.ts')) as { default: Fonction }).default
+}
+
 describe('missives-essai : la Missive part tout de suite, à l’admin seulement', () => {
+  test('sans jeton : 401 ; un joueur : 403 ; un admin sans Missive désignée : 400', async () => {
+    const appels = simulerReseau('admin')
+    expect((await (await chargerEssai())(post('{}'))).status).toBe(401)
+    expect(appels).toEqual([])
+    simulerReseau('player')
+    expect((await (await chargerEssai())(post('{}', { Authorization: 'Bearer jwt' }))).status).toBe(403)
+    simulerReseau('admin')
+    expect((await (await chargerEssai())(post('{}', { Authorization: 'Bearer jwt' }))).status).toBe(400)
+  })
+
   test('l’admin la reçoit à son adresse, objet préfixé « [Essai] »', async () => {
     vi.stubEnv('RESEND_API_KEY', 're_cle')
     vi.stubEnv('MISSIVES_JETON_SECRET', 'cle-des-jetons')
@@ -563,7 +577,7 @@ describe('missives-essai : la Missive part tout de suite, à l’admin seulement
       }
       return Promise.resolve(new Response('{}', { status: 500 }))
     }))
-    const handler = await charger('missives-essai')
+    const handler = await chargerEssai()
     const r = await handler(post('{"id":7}', { Authorization: 'Bearer jwt' }))
     expect(r.status).toBe(200)
     expect(envois).toEqual([expect.objectContaining({ to: ['uriel@exemple.fr'], subject: '[Essai] Sur la route' })])

@@ -24,7 +24,7 @@ async function charger(): Promise<Fonction> {
   vi.resetModules()
   const { EXEMPLES } = await import('@runes/missives')
   MISSIVE.contenu = EXEMPLES.missive
-  return ((await import('./functions/missives-envoyer.ts')) as { default: Fonction }).default
+  return ((await import('./missives/missives-envoyer.ts')) as { default: Fonction }).default
 }
 
 function reveil(secret: string | null = SECRET) {

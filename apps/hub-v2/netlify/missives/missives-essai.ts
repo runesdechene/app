@@ -1,9 +1,10 @@
+// Source : `pnpm build` l'empaquette en un seul fichier dans netlify/functions (build:fonctions, voir le README).
 // « M'envoyer un essai » dans l'écran Écrire du Hub : la Missive enregistrée part tout de suite, à l'adresse
 // de l'admin connecté seulement, objet préfixé « [Essai] ». Rien n'est noté dans missive_envois.
 
-import { exigerAdmin } from './lib/admin'
-import { message, type Missive } from './lib/missive'
-import { envoyerLot } from './lib/resend'
+import { exigerAdmin } from '../functions/lib/admin'
+import { message, type Missive } from '../functions/lib/missive'
+import { envoyerLot } from '../functions/lib/resend'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!

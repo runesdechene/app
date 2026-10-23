@@ -213,3 +213,14 @@ et le lint passent.
 **How to apply :** toujours lancer `pnpm install` depuis `C:\Users\uriel\Desktop\DEVs\app (Runes de Chêne)`.
 Pour vérifier : `(Get-Item apps\hub-v2\node_modules\react).Target` doit montrer cette casse. Sinon,
 relancer `pnpm install --frozen-lockfile --force` depuis ce chemin.
+
+## Une fonction Netlify du Hub qui importe un paquet du dépôt ne démarre pas
+
+**Le piège** (23/10/2026, Missives) : `missives-envoyer` importait `@runes/missives` (React Email). Le déploiement
+échouait sur « Failed to wait for function to become active 500 ». Dans le zip : `node_modules/@runes/missives`,
+puis `node_modules/react`, de simples liens pnpm de quelques octets — le code n'était pas dedans.
+
+**How to apply :** une fonction qui a besoin d'un paquet du dépôt (ou de ses dépendances) se met dans
+`apps/hub-v2/netlify/missives/` et `pnpm build` l'empaquette en un `.mjs` complet dans `netlify/functions`
+(script `build:fonctions`). Vérifier avant de déployer : `netlify functions:build --src netlify/functions
+--functions <dossier>` puis lister le zip : aucun `node_modules/` dedans.
