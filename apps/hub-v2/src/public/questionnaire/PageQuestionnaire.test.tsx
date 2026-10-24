@@ -50,7 +50,7 @@ test('« Une autre » ouvre un champ pour dire laquelle', async () => {
 
 test('une troisième époque ne se coche pas', async () => {
   monter('/qui-es-tu?j=u1.sig&q=1')
-  await userEvent.click(await screen.findByRole('checkbox', { name: 'L’Empire romain' }))
+  await userEvent.click(await screen.findByRole('checkbox', { name: 'L’Empire romain d’Orient et d’Occident' }))
   await userEvent.click(screen.getByRole('checkbox', { name: 'Le Moyen Âge' }))
   expect(screen.getByRole('checkbox', { name: 'La Grèce antique' })).toBeDisabled()
 })
@@ -59,9 +59,9 @@ test('une question par écran ; « Précédent » revient en arrière', async ()
   monter('/qui-es-tu?j=u1.sig&q=1')
   await userEvent.click(await screen.findByRole('button', { name: 'Suivant →' }))
   expect(screen.getByRole('heading', { name: 'Comment as-tu découvert Runes de Chêne ?' })).toBeInTheDocument()
-  expect(screen.queryByRole('checkbox', { name: 'L’Empire romain' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('checkbox', { name: 'L’Empire romain d’Orient et d’Occident' })).not.toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: '← Précédent' }))
-  expect(screen.getByRole('checkbox', { name: 'L’Empire romain' })).toBeInTheDocument()
+  expect(screen.getByRole('checkbox', { name: 'L’Empire romain d’Orient et d’Occident' })).toBeInTheDocument()
 })
 
 test('« Envoyer mes réponses » poste les réponses des sept écrans, puis « C’est noté » salue le prénom', async () => {
@@ -103,7 +103,7 @@ test('ses réponses d’avant sont déjà cochées', async () => {
     prenom: 'Kelpie',
     portrait: { epoques: ['rome'], decouverte: [], amene: ['cadeau'], plait: [], attente: null, departement: null, anniv_jour: null, anniv_mois: null },
   })
-  expect(await screen.findByRole('checkbox', { name: 'L’Empire romain' })).toBeChecked()
+  expect(await screen.findByRole('checkbox', { name: 'L’Empire romain d’Orient et d’Occident' })).toBeChecked()
   await userEvent.click(screen.getByRole('button', { name: 'Suivant →' }))
   await userEvent.click(screen.getByRole('button', { name: 'Suivant →' }))
   expect(screen.getByRole('checkbox', { name: 'Offrir un cadeau' })).toBeChecked()
