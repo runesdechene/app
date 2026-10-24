@@ -12,7 +12,6 @@ export type CouleursCarte = {
   foret: string
   ombre: string
   cire: string
-  or: string
 }
 
 export function lireCouleurs(racine: HTMLElement): CouleursCarte {
@@ -27,6 +26,5 @@ export function lireCouleurs(racine: HTMLElement): CouleursCarte {
     foret: jeton('foret'),
     ombre: jeton('ombre'),
     cire: jeton('cire'),
-    or: jeton('or'),
   }
 }

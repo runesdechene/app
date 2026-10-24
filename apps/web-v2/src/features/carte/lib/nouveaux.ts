@@ -1,16 +1,18 @@
 /**
- * QUOI     — les nouveaux lieux sur la carte (Figma 793:1996, piste 6 « l'aube dorée », Uriel 24/10) :
- *            autour de la marque d'un lieu ajouté depuis moins de 14 jours et pas encore ouvert, une
- *            lumière dorée, un fin anneau d'or qui s'élargit et s'efface en boucle lente, et deux
- *            étincelles qui scintillent tour à tour en haut à droite ; une gélule d'encre « NOUVEAU »
- *            écrite en or sous la marque, à tous les zooms. Le lieu reste à sa place et à sa taille.
- * POURQUOI — l'anneau d'encre seul (08/10) ne se voyait pas assez (Uriel, 24/10). Une seule couleur pour
- *            tous les lieux neufs : les couleurs par nature faisaient « pêle-mêle » (08/10). L'anneau
- *            est plus lent que l'onde des énigmes, pour ne pas les confondre. Calques MapLibre sur la
- *            source des lieux : la propriété `nouveau` (migration 469) suffit.
- * ATTENTION — les tailles suivent la courbe des marques (PALIERS, calques.ts), au premier niveau de
- *            l'expression de zoom ; l'anneau et les étincelles s'animent image par image (comme
- *            `fairePulser` des énigmes). Animations réduites : tout reste fixe.
+ * QUOI     — les nouveaux lieux sur la carte (Figma 793:2095, piste 5 « le sceau de cire », Uriel 24/10) :
+ *            un lieu ajouté depuis moins de 14 jours et pas encore ouvert porte un sceau de cire rouge
+ *            (sceaux.ts), entouré d'une lueur rouge et d'un fin anneau rouge qui s'élargit et s'efface
+ *            en boucle lente ; de près seulement, une gélule rouge « NOUVEAU » sous la marque. Le lieu
+ *            reste à sa place et à sa taille.
+ * POURQUOI — l'anneau d'encre seul (08/10), puis l'aube dorée, ne se voyaient pas assez parmi les
+ *            lieux (Uriel, 24/10). Une seule couleur pour tous les lieux neufs : les couleurs par nature
+ *            faisaient « pêle-mêle » (08/10). Le mot de loin chargeait la carte : la cire suffit à
+ *            signaler. Calques MapLibre sur la source des lieux : la propriété `nouveau` (migration 469).
+ * ATTENTION — les énigmes portent aussi un sceau de cire « ? » ; elles seront revues avec leurs propres
+ *            icônes (Uriel, 24/10). L'anneau est plus lent que leur onde, pour ne pas les confondre.
+ *            Les tailles suivent la courbe des marques (PALIERS, calques.ts), au premier niveau de
+ *            l'expression de zoom ; l'anneau s'anime image par image (comme `fairePulser` des
+ *            énigmes). Animations réduites : un anneau fixe.
  */
 import type {
   AddLayerObject,
@@ -19,25 +21,18 @@ import type {
   Map as Carte,
 } from 'maplibre-gl'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
-import { PALIERS, SOURCE, taille } from './calques'
+import { PALIERS, SOURCE } from './calques'
 
 export const CALQUE_ANNEAU_NOUVEAUX = 'nouveaux-anneau'
 export const CALQUE_GELULE_NOUVEAUX = 'nouveaux-gelule'
-export const CALQUE_AURA_NOUVEAUX = 'nouveaux-aura'
+export const CALQUE_LUEUR_NOUVEAUX = 'nouveaux-lueur'
 
 const PERIODE = 3000 // ms : plus lent que les énigmes (2 200), pour qu'on ne les confonde pas
 const RAYON = 13 // le rayon d'une marque à la taille 1 (sceau de 26 px)
 const ELAN = 4 // de combien l'anneau s'élargit au-delà de la marque (réduit de moitié, Uriel 08/10)
 const TRAIT = 1.2 // l'épaisseur de l'anneau
-const DE_PLUS_PRES = 7 // la gélule a sa pleine taille dès l'échelle d'une région
-const AURA = 32 // le rayon de la lumière dorée, à la taille 1 (2,5 fois la marque)
-
-// Les deux étincelles ✦ (l'image `etincelle`, sceaux.ts) : leur taille, et leur place depuis le centre de
-// la marque (en pixels de l'image ; MapLibre les multiplie par la taille).
-const ETINCELLES = [
-  { id: 'nouveaux-etincelle-1', taille: 1.1, decalage: [11, -14] },
-  { id: 'nouveaux-etincelle-2', taille: 0.7, decalage: [27, -8] },
-] as const
+const LUEUR = 22 // le rayon de la lueur rouge, à la taille 1
+const DE_PRES = 9 // « NOUVEAU » dès l'échelle d'un département, comme les noms des revendications
 
 const estNouveau: FilterSpecification = ['==', ['get', 'nouveau'], true]
 
@@ -78,7 +73,7 @@ export function calqueAnneau(c: CouleursCarte, ecran: number): AddLayerObject {
     paint: {
       'circle-opacity': 0, // un contour seul
       'circle-radius': rayonAuZoom(rayon * ecran),
-      'circle-stroke-color': c.or,
+      'circle-stroke-color': c.cire,
       'circle-stroke-width': TRAIT * ecran,
       'circle-stroke-opacity': opacite,
       // Pas de fondu : on change ces valeurs à chaque image (sinon les fondus se chevauchent).
@@ -88,59 +83,35 @@ export function calqueAnneau(c: CouleursCarte, ecran: number): AddLayerObject {
   }
 }
 
-// La lumière dorée : un disque d'or flou, sous toutes les marques.
-export function calqueAura(c: CouleursCarte, ecran: number): AddLayerObject {
+// La lueur rouge : un disque de cire flou, sous toutes les marques.
+export function calqueLueur(c: CouleursCarte, ecran: number): AddLayerObject {
   return {
-    id: CALQUE_AURA_NOUVEAUX,
+    id: CALQUE_LUEUR_NOUVEAUX,
     type: 'circle',
     source: SOURCE,
     filter: estNouveau,
     paint: {
-      'circle-color': c.or,
+      'circle-color': c.cire,
       'circle-blur': 1, // flou du centre jusqu'au bord : une lueur, pas un disque
-      'circle-opacity': 0.85,
-      'circle-radius': rayonAuZoom(AURA * ecran),
+      'circle-opacity': 0.6,
+      'circle-radius': rayonAuZoom(LUEUR * ecran),
     },
   }
 }
 
-// L'éclat d'une étincelle à la phase `t` (0 → 1) : elle ne s'éteint jamais tout à fait. La seconde a
-// une demi-période de retard, pour scintiller quand la première pâlit.
-export function eclatEtincelle(t: number): number {
-  return 0.3 + 0.7 * Math.abs(Math.sin(Math.PI * t))
-}
-
-export function calquesEtincelles(ecran: number): AddLayerObject[] {
-  return ETINCELLES.map((e) => ({
-    id: e.id,
-    type: 'symbol',
-    source: SOURCE,
-    filter: estNouveau,
-    layout: {
-      'icon-image': 'etincelle',
-      'icon-size': taille(e.taille * ecran),
-      'icon-offset': [...e.decalage],
-      'icon-allow-overlap': true,
-      'icon-ignore-placement': true,
-    },
-    paint: { 'icon-opacity-transition': { duration: 0, delay: 0 } },
-  }))
-}
-
-// La gélule « NOUVEAU », dessinée d'un bloc avec son mot (sceaux.ts). À tous les zooms, même de très
-// loin (Uriel, 22/10) : un lieu neuf doit se voir sur la France entière. Pleine taille dès l'échelle
-// d'une région, plus petite seulement de très loin.
+// La gélule « NOUVEAU », dessinée d'un bloc avec son mot (sceaux.ts), de près seulement (Uriel, 24/10) :
+// de loin, la cire suffit.
 export function calqueGelule(): AddLayerObject {
   return {
     id: CALQUE_GELULE_NOUVEAUX,
     type: 'symbol',
     source: SOURCE,
+    minzoom: DE_PRES,
     filter: estNouveau,
     layout: {
       'icon-image': 'gelule-nouveau',
-      'icon-size': ['interpolate', ['linear'], ['zoom'], 4, 0.55, DE_PLUS_PRES, 1],
       // Sous la marque, à la place du nom de qui l'a revendiqué (calques.ts ne le montre pas sur un
-      // lieu neuf) : jamais les deux empilés. Le décalage grandit avec la gélule (× icon-size).
+      // lieu neuf) : jamais les deux empilés.
       'icon-anchor': 'top',
       'icon-offset': [0, 16],
       // Deux lieux neufs voisins : une seule gélule, pour ne pas les empiler (l'anneau reste aux deux).
@@ -149,13 +120,11 @@ export function calqueGelule(): AddLayerObject {
   }
 }
 
-// La lumière sous toutes les marques ; l'anneau et les étincelles au-dessus (sous le lieu survolé),
-// pour qu'aucun voisin ne les cache ; la gélule par-dessus tout ; puis l'anneau et les étincelles
-// s'animent.
+// La lueur sous toutes les marques ; l'anneau au-dessus (sous le lieu survolé), pour qu'aucun voisin
+// ne le cache ; la gélule par-dessus tout ; puis l'anneau s'anime.
 export function poserNouveaux(map: Carte, c: CouleursCarte, ecran: number): () => void {
-  map.addLayer(calqueAura(c, ecran), 'billes')
+  map.addLayer(calqueLueur(c, ecran), 'billes')
   map.addLayer(calqueAnneau(c, ecran), 'survol')
-  for (const calque of calquesEtincelles(ecran)) map.addLayer(calque, 'survol')
   map.addLayer(calqueGelule())
   return faireRayonner(map, ecran)
 }
@@ -165,13 +134,9 @@ function faireRayonner(map: Carte, ecran: number): () => void {
   let image = 0
   const pas = (maintenant: number) => {
     if (!map.getLayer(CALQUE_ANNEAU_NOUVEAUX)) return
-    const t = (maintenant % PERIODE) / PERIODE
-    const { rayon, opacite } = anneauNouveau(t)
+    const { rayon, opacite } = anneauNouveau((maintenant % PERIODE) / PERIODE)
     map.setPaintProperty(CALQUE_ANNEAU_NOUVEAUX, 'circle-radius', rayonAuZoom(rayon * ecran))
     map.setPaintProperty(CALQUE_ANNEAU_NOUVEAUX, 'circle-stroke-opacity', opacite)
-    ETINCELLES.forEach((e, i) => {
-      map.setPaintProperty(e.id, 'icon-opacity', eclatEtincelle(t + i / 2))
-    })
     image = requestAnimationFrame(pas)
   }
   image = requestAnimationFrame(pas)

@@ -19,7 +19,7 @@ import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 import { nomImage } from './sceaux'
 
 export const SOURCE = 'lieux'
-export const CALQUES_LIEUX = ['billes', 'sceaux', 'curiosites']
+export const CALQUES_LIEUX = ['billes', 'sceaux', 'curiosites', 'neufs']
 export const CALQUE_SURVOL = 'survol'
 
 // De près seulement : les points d'intérêt ne chargent pas la vue d'ensemble.
@@ -59,6 +59,7 @@ export function enGeoJSON(
 }
 
 const estLieu: ExpressionSpecification = ['==', ['get', 'nature'], 'lieu']
+const pasNeuf: ExpressionSpecification = ['!=', ['get', 'nouveau'], true]
 
 // La marque grandit avec le zoom : un point de loin, le sceau entier de près. L'anneau des lieux
 // neufs suit la même courbe (nouveaux.ts).
@@ -117,14 +118,14 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
     id: 'billes',
     type: 'symbol',
     source: SOURCE,
-    filter: ['all', estLieu, ['==', ['get', 'etat'], 'inconnu']],
+    filter: ['all', estLieu, pasNeuf, ['==', ['get', 'etat'], 'inconnu']],
     layout: marque(ecran),
   })
   map.addLayer({
     id: 'sceaux',
     type: 'symbol',
     source: SOURCE,
-    filter: ['all', estLieu, ['!=', ['get', 'etat'], 'inconnu']],
+    filter: ['all', estLieu, pasNeuf, ['!=', ['get', 'etat'], 'inconnu']],
     // Un lieu visité passe au-dessus d'un lieu seulement connu.
     layout: {
       ...marque(ecran),
@@ -137,6 +138,14 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
     source: SOURCE,
     minzoom: DE_PRES,
     filter: ['==', ['get', 'nature'], 'curiosite'],
+    layout: marque(ecran),
+  })
+  // Les lieux neufs, au premier plan : aucun voisin ne passe dessus (Uriel, 24/10).
+  map.addLayer({
+    id: 'neufs',
+    type: 'symbol',
+    source: SOURCE,
+    filter: ['all', estLieu, ['!', pasNeuf]],
     layout: marque(ecran),
   })
   // Le lieu survolé, redessiné par-dessus : c'est lui qui grossit et « pulse » au clic (survol.ts).
