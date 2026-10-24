@@ -3,8 +3,9 @@
  *            l'endroit exact du sceau (pour y poser celui qui se retourne), et l'énigme `cachee` quitte
  *            la carte pendant ce temps.
  * POURQUOI — CarteScreen pose la couche dans son `style.load` (`poserEnigmes`) ; ce hook la nourrit.
- * ATTENTION — un style rechargé repart d'une source vide : les énigmes y reviennent (même motif que
- *            `useMesPinsSurLaCarte`). `carte` à null (visiteur) : rien n'est demandé.
+ * ATTENTION — un style rechargé repart d'une source vide et sans images : les énigmes y reviennent
+ *            avec leurs sceaux (même motif que `useMesPinsSurLaCarte`). Les sceaux de leurs couleurs se
+ *            dessinent avant qu'elles soient versées. `carte` à null (visiteur) : rien n'est demandé.
  */
 import { useQuery } from '@tanstack/react-query'
 import type { GeoJSONSource, Map as Carte, MapLayerMouseEvent } from 'maplibre-gl'
@@ -12,6 +13,7 @@ import { useEffect, useRef } from 'react'
 import { fetchEnigmesEnAttente } from '../api/enigmes'
 import type { EnigmeEnAttente } from '../api/lireEnigmes'
 import {
+  ajouterSceaux,
   CALQUE_SCEAUX_ENIGMES,
   CALQUES_ENIGMES,
   enGeoJSONEnigmes,
@@ -22,6 +24,15 @@ import {
 export type EnigmeTouchee = { id: number; x: number; y: number }
 
 const AUCUNE: EnigmeEnAttente[] = []
+
+// Les sceaux de leurs couleurs d'abord, puis les énigmes : jamais un point sans image.
+async function verser(carte: Carte, enigmes: EnigmeEnAttente[]) {
+  await ajouterSceaux(
+    carte,
+    enigmes.map((e) => e.couleur),
+  )
+  void carte.getSource<GeoJSONSource>(SOURCE_ENIGMES)?.setData(enGeoJSONEnigmes(enigmes))
+}
 
 export function useEnigmesSurLaCarte(
   carte: Carte | null,
@@ -42,7 +53,8 @@ export function useEnigmesSurLaCarte(
 
   useEffect(() => {
     dernieres.current = enigmes
-    void carte?.getSource<GeoJSONSource>(SOURCE_ENIGMES)?.setData(enGeoJSONEnigmes(enigmes))
+    // Des images qui ne se chargent pas : pas d'énigmes sur la carte, mais la carte reste debout.
+    if (carte) void verser(carte, enigmes).catch(() => undefined)
   }, [carte, enigmes])
 
   useEffect(() => {
@@ -53,9 +65,7 @@ export function useEnigmesSurLaCarte(
   useEffect(() => {
     if (!carte) return
     const reposer = () => {
-      void carte
-        .getSource<GeoJSONSource>(SOURCE_ENIGMES)
-        ?.setData(enGeoJSONEnigmes(dernieres.current))
+      void verser(carte, dernieres.current).catch(() => undefined)
     }
     // Le sceau qui se retourne se pose sur le sceau de la carte, pas sous le doigt (un peu à côté).
     const surToucher = (e: MapLayerMouseEvent) => {

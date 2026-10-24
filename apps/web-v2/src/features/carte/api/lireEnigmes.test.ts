@@ -5,7 +5,9 @@ import { expect, test } from 'vitest'
 import { lireEnAttente, lireOuverture, lireVerdict } from './lireEnigmes'
 
 test('en attente : seulement la place', () => {
-  expect(lireEnAttente([{ id: 3, lat: 41, lng: 28.9 }])).toEqual([{ id: 3, lat: 41, lng: 28.9 }])
+  expect(lireEnAttente([{ id: 3, lat: 41, lng: 28.9, couleur: '#5ca382' }])).toEqual([
+    { id: 3, lat: 41, lng: 28.9, couleur: '#5ca382' },
+  ])
 })
 
 test('ouverture : une culture sans icône ni couleur reste lisible', () => {

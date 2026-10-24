@@ -11,13 +11,18 @@ import {
   CALQUE_ONDES_ENIGMES,
   CALQUE_SCEAUX_ENIGMES,
   enGeoJSONEnigmes,
+  nomDuSceau,
   SOURCE_ENIGMES,
 } from './enigmes'
 
-test('une énigme devient un point qui ne porte que son id', () => {
-  const g = enGeoJSONEnigmes([{ id: 7, lat: 41, lng: 28.9 }])
+test('une énigme devient un point qui porte son id et le sceau de la couleur de sa culture', () => {
+  const g = enGeoJSONEnigmes([{ id: 7, lat: 41, lng: 28.9, couleur: '#5ca382' }])
   expect(g.features[0]?.geometry.coordinates).toEqual([28.9, 41])
-  expect(g.features[0]?.properties).toEqual({ id: 7 })
+  expect(g.features[0]?.properties).toEqual({ id: 7, image: 'enigme-#5ca382', couleur: '#5ca382' })
+})
+
+test('une culture sans couleur garde la cire d’origine', () => {
+  expect(nomDuSceau(null)).toBe('enigme')
 })
 
 test('le sceau « ? » à tous les zooms, sans regroupement : on le touche même dézoomé (Uriel, 07/10)', () => {

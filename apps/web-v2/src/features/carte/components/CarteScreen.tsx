@@ -209,7 +209,7 @@ function CarteVivante({
       ajouterCalques(map, couleurs, ecran)
       if (!visiteur) ajouterZones(map, couleurs.route, 'billes')
       if (!visiteur) void poserMesPins(map, couleurs).catch(() => undefined)
-      if (!visiteur) void poserEnigmes(map, couleurs, ecran).catch(() => undefined)
+      if (!visiteur) poserEnigmes(map, couleurs, ecran)
       // Les lieux neufs rayonnent, pour les visiteurs aussi (nouveaux.ts).
       poserNouveaux(map, couleurs, ecran)
       suivreSurvol(map, CALQUES_LIEUX, ecran)

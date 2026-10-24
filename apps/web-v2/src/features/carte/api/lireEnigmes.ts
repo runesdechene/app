@@ -1,12 +1,12 @@
 /**
  * QUOI     — les énigmes de la carte lues depuis `enigmes_en_attente`, `ouvrir_enigme` et
  *            `percer_enigme` (spec 2026-10-07-v2-enigmes-design.md).
- * POURQUOI — la liste ne dit que la place (la culture se découvre au toucher) ; la bonne réponse
- *            n'arrive qu'avec le verdict.
+ * POURQUOI — la liste dit la place et la couleur de la culture (Uriel, 24/10 : la place la trahit déjà) ;
+ *            la bonne réponse n'arrive qu'avec le verdict.
  */
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
 
-export type EnigmeEnAttente = { id: number; lat: number; lng: number }
+export type EnigmeEnAttente = { id: number; lat: number; lng: number; couleur: string | null }
 export type Culture = { id: string; nom: string; icone: string | null; couleur: string | null }
 export type EnigmeOuverte = {
   numero: number // son numéro fixe, le même pour tous (migration 448)
@@ -33,7 +33,12 @@ export type Verdict = {
 
 function enAttente(v: unknown): EnigmeEnAttente {
   const o = objet(v)
-  return { id: nombre(o.id), lat: nombre(o.lat), lng: nombre(o.lng) }
+  return {
+    id: nombre(o.id),
+    lat: nombre(o.lat),
+    lng: nombre(o.lng),
+    couleur: ouNull(chaine)(o.couleur),
+  }
 }
 
 export const lireEnAttente = liste(enAttente)
