@@ -12,7 +12,7 @@ export const QUESTIONS = {
       ['celtes', 'Les Celtes et les Gaulois'],
       ['scandinavie', 'La culture scandinave, viking'], ['slave', 'La culture slave'],
       ['napoleon', 'L’époque napoléonienne'], ['jules_verne', 'L’époque de Jules Verne'],
-      ['totems', 'Les totems animaliers'], ['amazigh', 'La culture amazighe'], ['egypte', 'L’Antiquité égyptienne'], ['autre', 'Une autre'],
+      ['totems', 'La symbolique des animaux à travers les âges'], ['amazigh', 'La culture amazighe'], ['egypte', 'L’Antiquité égyptienne'], ['autre', 'Une autre'],
     ],
   },
   decouverte: {
