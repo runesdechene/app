@@ -52,7 +52,12 @@ test('« + Ajouter aux Ambassadeurs et égéries » le nomme ambassadeur', async
   expect(mockRpc).toHaveBeenCalledWith('hub_ambassadeur', { p_user: 'u1', p_role: 'ambassadeur' })
 })
 
-test('déjà ambassadeur : sa balise, pas de bouton', async () => {
+test('déjà ambassadeur : sa balise une seule fois', async () => {
+  monter({ ...ABONNE, ambassadeur: 'ambassadeur', listes: ['porteurs', 'ambassadeurs'] })
+  expect(await screen.findAllByText('Ambassadeur')).toHaveLength(1)
+})
+
+test('égérie : sa balise, pas de bouton', async () => {
   monter({ ...ABONNE, ambassadeur: 'egerie' })
   expect(await screen.findByText('Égérie')).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: /Ajouter aux Ambassadeurs/ })).not.toBeInTheDocument()

@@ -14,13 +14,14 @@ async function charger(): Promise<Fonction> {
 }
 
 // La base connaît u1 (Kelpie, kelpie@exemple.fr). `dejaDemande` : une demande de lien récente pour cette adresse.
-function simuler({ dejaDemande = false } = {}) {
+function simuler({ dejaDemande = false, demandesDeLHeure = 0 } = {}) {
   const appels: Appel[] = []
   vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
     const brut = init?.body ? String(init.body) : null
     appels.push({ url, methode: init?.method ?? 'GET', corps: brut ? JSON.parse(brut) : null })
     if (url.includes('/rest/v1/users?id=eq.u1')) return Promise.resolve(Response.json([{ first_name: 'Kelpie' }]))
-    if (url.includes('/rest/v1/users?email_address=ilike.kelpie')) return Promise.resolve(Response.json([{ id: 'u1', first_name: 'Kelpie' }]))
+    if (url.includes('/rest/v1/users?email_address=ilike.kelpie')) return Promise.resolve(Response.json([{ id: 'u1', first_name: 'Kelpie', email_address: 'Kelpie@exemple.fr' }]))
+    if (url.includes('/rest/v1/questionnaire_demandes?le=gte')) return Promise.resolve(Response.json(Array.from({ length: demandesDeLHeure }, () => ({ le: '' }))))
     if (url.includes('/rest/v1/users?email_address')) return Promise.resolve(Response.json([]))
     if (url.includes('/rest/v1/portraits')) return Promise.resolve(Response.json([]))
     if (url.includes('/rest/v1/questionnaire_demandes') && (init?.method ?? 'GET') === 'GET') {
@@ -102,5 +103,34 @@ describe('questionnaire', () => {
     const handler = await charger()
     expect(await (await handler(poster({ email: 'kelpie@exemple.fr' }))).json()).toEqual({ ok: true })
     expect(appels.some((a) => a.url.startsWith('https://api.resend.com'))).toBe(false)
+  })
+})
+
+describe('questionnaire : les abus de la demande de lien', () => {
+  test('un « * » dans l’adresse n’est pas un joker, et le lien part à l’adresse de la fiche, jamais à celle tapée', async () => {
+    const appels = simuler()
+    const handler = await charger()
+    await handler(poster({ email: '*@exemple.fr' }))
+    const recherche = appels.find((a) => a.url.includes('/rest/v1/users?email_address'))
+    expect(recherche?.url).toContain(encodeURIComponent('\*@exemple.fr'))
+    await handler(poster({ email: 'kelpie@exemple.fr' }))
+    const envoi = appels.find((a) => a.url.startsWith('https://api.resend.com'))
+    expect(JSON.stringify(envoi?.corps)).toContain('"to":["Kelpie@exemple.fr"]')
+  })
+
+  test('au-delà de 200 demandes dans l’heure, plus aucun lien ne part', async () => {
+    const appels = simuler({ demandesDeLHeure: 200 })
+    const handler = await charger()
+    expect(await (await handler(poster({ email: 'kelpie@exemple.fr' }))).json()).toEqual({ ok: true })
+    expect(appels.some((a) => a.url.startsWith('https://api.resend.com'))).toBe(false)
+  })
+
+  test('la réponse n’attend pas l’envoi : l’envoi part dans waitUntil', async () => {
+    simuler()
+    const handler = (await charger()) as (r: Request, c: { waitUntil: (p: Promise<unknown>) => void }) => Promise<Response>
+    const attentes: Promise<unknown>[] = []
+    const r = await handler(poster({ email: 'kelpie@exemple.fr' }), { waitUntil: (p) => { attentes.push(p) } })
+    expect(await r.json()).toEqual({ ok: true })
+    expect(attentes).toHaveLength(1)
   })
 })

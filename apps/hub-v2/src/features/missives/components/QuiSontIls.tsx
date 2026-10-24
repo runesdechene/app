@@ -101,20 +101,23 @@ export function QuiSontIls() {
               ))}
             </section>
           </Bloc>
-
-          <Bloc>
-            <section aria-label={`Anniversaires ${moisEnCours()}`} className={styles.question}>
-              <TitreDeSection titre={`Anniversaires ${moisEnCours()}`} />
-              {data.anniversaires_du_mois.length === 0 && <p className={commun.calme}>Aucun ce mois-ci.</p>}
-              {data.anniversaires_du_mois.map((a) => (
-                <p key={a.id} className={styles.anniversaire}>
-                  <span className={styles.jour}>{a.jour}</span>
-                  <span>{a.nom ?? 'Sans nom'}</span>
-                </p>
-              ))}
-            </section>
-          </Bloc>
         </>
+      )}
+
+      {/* Les anniversaires viennent aussi du stand et de l'appli : ils se montrent même sans répondant. */}
+      {data && (
+        <Bloc>
+          <section aria-label={`Anniversaires ${moisEnCours()}`} className={styles.question}>
+            <TitreDeSection titre={`Anniversaires ${moisEnCours()}`} />
+            {data.anniversaires_du_mois.length === 0 && <p className={commun.calme}>Aucun ce mois-ci.</p>}
+            {data.anniversaires_du_mois.map((a) => (
+              <p key={a.id} className={styles.anniversaire}>
+                <span className={styles.jour}>{a.jour}</span>
+                <span>{a.nom ?? 'Sans nom'}</span>
+              </p>
+            ))}
+          </section>
+        </Bloc>
       )}
     </div>
   )

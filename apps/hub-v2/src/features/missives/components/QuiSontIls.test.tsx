@@ -52,3 +52,8 @@ test('personne n’a répondu : l’écran dit comment mettre le lien dans une M
   expect(await screen.findByText(/Personne n’a encore répondu/)).toBeInTheDocument()
   expect(screen.getByText('{questionnaire}')).toBeInTheDocument()
 })
+
+test('sans répondant, les anniversaires donnés au stand se voient quand même', async () => {
+  monter({ repondants: 0, reponses: {}, attentes: [], anniversaires_du_mois: [{ id: 'u2', nom: 'Brann', jour: 17 }] })
+  expect(await screen.findByText('Brann')).toBeInTheDocument()
+})

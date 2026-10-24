@@ -58,6 +58,7 @@ export default async function handler(request: Request) {
       missive,
       { user_id: auth.userId, email: moi.email_address, prenom: moi.first_name },
       `[Essai] ${missive.objet}`,
+      true,
     )
     const [resultat] = await envoyerLot([{ message: essai, cle: `essai-${String(missive.id)}-${String(Date.now())}` }], cle)
     // Le texte de Resend peut citer l'adresse : il ne quitte pas la fonction.

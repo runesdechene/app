@@ -15,6 +15,8 @@ const SUPABASE_URL = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const EMAIL_VALIDE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const DIX_MINUTES = 10 * 60 * 1000
+// Au-delà, plus aucun lien ne part dans l'heure : une liste d'adresses ne fait pas du domaine d'envoi un spammeur.
+const DEMANDES_PAR_HEURE = 200
 const NOMS_PAR_DEFAUT = ['', 'Un Voyageur', 'Client Shopify', 'Pionnier']
 
 function json(data: unknown, status = 200) {
@@ -45,16 +47,22 @@ async function prenomDe(userId: string): Promise<string | null> {
   return prenom(fiche?.first_name)
 }
 
-/** Une adresse à l'identique, majuscules à part (les « % » et « _ » de l'adresse ne servent pas de jokers). */
-const filtreAdresse = (email: string) => `email_address=ilike.${encodeURIComponent(email.replace(/[\\%_]/g, '\\$&'))}`
+/** Une adresse à l'identique, majuscules à part : ni « % », ni « _ », ni « * » (le joker de PostgREST) ne valent joker. */
+const filtreAdresse = (email: string) => `email_address=ilike.${encodeURIComponent(email.replace(/[\\%_*]/g, '\\$&'))}`
 
 async function envoyerLeLien(email: string): Promise<void> {
   const depuis = new Date(Date.now() - DIX_MINUTES).toISOString()
   const recentes = await lire<{ le: string }>(`questionnaire_demandes?email=eq.${encodeURIComponent(email)}&le=gte.${encodeURIComponent(depuis)}&select=le`)
   if (recentes.length > 0) return
+  const heure = new Date(Date.now() - 6 * DIX_MINUTES).toISOString()
+  const deLHeure = await lire<{ le: string }>(`questionnaire_demandes?le=gte.${encodeURIComponent(heure)}&select=le&limit=${String(DEMANDES_PAR_HEURE)}`)
+  if (deLHeure.length >= DEMANDES_PAR_HEURE) return
   await base('questionnaire_demandes', { method: 'POST', body: JSON.stringify({ email }) })
 
-  const [fiche] = await lire<{ id: string; first_name: string | null }>(`users?${filtreAdresse(email)}&supprime_le=is.null&select=id,first_name&limit=1`)
+  // Deux fiches pour une adresse (casse à part) : toujours la même, la première par identifiant.
+  const [fiche] = await lire<{ id: string; first_name: string | null; email_address: string }>(
+    `users?${filtreAdresse(email)}&supprime_le=is.null&select=id,first_name,email_address&order=id.asc&limit=1`,
+  )
   if (!fiche) return
   const cle = process.env.RESEND_API_KEY
   if (!cle) throw new Error('RESEND_API_KEY manquant')
@@ -65,7 +73,8 @@ async function envoyerLeLien(email: string): Promise<void> {
     cle: `questionnaire-${fiche.id}-${String(Math.floor(Date.now() / DIX_MINUTES))}`,
     message: {
       from: EXPEDITEUR,
-      to: [email],
+      // L'adresse de la fiche, jamais celle tapée : le lien ne va qu'à son propriétaire.
+      to: [fiche.email_address],
       reply_to: REPONSES,
       subject: 'Ton lien pour te présenter',
       text: `Salut ${salut},\n\nVoici ton lien pour répondre aux sept questions : ${lien}\n\nSi tu n'as rien demandé, ignore ce message.\n\nUriel`,
@@ -75,7 +84,7 @@ async function envoyerLeLien(email: string): Promise<void> {
   }], cle)
 }
 
-export default async function handler(request: Request) {
+export default async function handler(request: Request, context?: { waitUntil?: (p: Promise<unknown>) => void }) {
   try {
     if (request.method === 'GET') {
       const userId = verifier(new URL(request.url).searchParams.get('j') ?? '', 'questionnaire')
@@ -90,7 +99,10 @@ export default async function handler(request: Request) {
     if (typeof corps.email === 'string') {
       const email = corps.email.trim().toLowerCase()
       if (!EMAIL_VALIDE.test(email)) return json({ error: 'Adresse invalide' }, 400)
-      await envoyerLeLien(email)
+      // La réponse n'attend pas l'envoi : sa durée ne dit pas si l'adresse a un compte.
+      const envoi = envoyerLeLien(email).catch((e: unknown) => { console.error('questionnaire : lien non envoyé,', e instanceof Error ? e.message : 'erreur inconnue') })
+      if (context?.waitUntil) context.waitUntil(envoi)
+      else await envoi
       return json({ ok: true })
     }
 

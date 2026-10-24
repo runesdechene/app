@@ -17,7 +17,7 @@ const PORTES: Record<string, string> = {
   site: 'le site', stand: 'le stand', flyer: 'le flyer', appli: 'l’appli', shopify: 'la boutique', hub: 'le Hub',
   desabonnement: 'le lien de désabonnement', rebond: 'une adresse qui rebondit',
 }
-const LISTES: Record<string, string> = { prospects: 'Prospect', porteurs: 'Porteur', meilleurs: 'Meilleur client', ambassadeurs: 'Ambassadeur' }
+const LISTES: Record<string, string> = { prospects: 'Prospect', porteurs: 'Porteur', meilleurs: 'Meilleur client' }
 const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
 const EPOQUES = new Map<string, string>(QUESTIONS.epoques.reponses)
 
@@ -70,7 +70,9 @@ export function SesMissives({ compte }: { compte: string }) {
 
         <span>Ses listes</span>
         <span>
-          {data.listes.length === 0 ? '—' : data.listes.map((l) => <Balise key={l} texte={LISTES[l] ?? l} teinte="porteur" />)}
+          {/* « ambassadeurs » est déjà dit par la balise de son rôle, juste après. */}
+          {data.listes.filter((l) => l !== 'ambassadeurs').map((l) => <Balise key={l} texte={LISTES[l] ?? l} teinte="porteur" />)}
+          {data.listes.length === 0 && !data.ambassadeur && '—'}
           {data.ambassadeur && <Balise texte={data.ambassadeur === 'egerie' ? 'Égérie' : 'Ambassadeur'} teinte="porteur" />}
         </span>
 

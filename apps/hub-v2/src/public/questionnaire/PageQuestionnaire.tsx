@@ -125,13 +125,13 @@ function DemanderLeLien() {
 function Questionnaire({ jeton, epoque }: { jeton: string; epoque: string | null }) {
   const [reponses, setReponses] = useState<Reponses | null>(null)
   const [prenom, setPrenom] = useState<string | null>(null)
-  const [etat, setEtat] = useState<'lecture' | 'pret' | 'envoi' | 'fait' | 'lien' | 'erreur'>('lecture')
+  const [etat, setEtat] = useState<'lecture' | 'pret' | 'envoi' | 'fait' | 'lien' | 'panne' | 'erreur'>('lecture')
 
   useEffect(() => {
     void (async () => {
       const r = await fetch(`${FONCTION}?j=${encodeURIComponent(jeton)}`).catch(() => null)
       if (!r?.ok) {
-        setEtat('lien')
+        setEtat(r?.status === 403 ? 'lien' : 'panne')
         return
       }
       const lu = (await r.json()) as Lecture
@@ -154,6 +154,7 @@ function Questionnaire({ jeton, epoque }: { jeton: string; epoque: string | null
       </>
     )
   }
+  if (etat === 'panne') return <MessageDErreur>La page n’a pas pu se charger, réessaie dans un instant.</MessageDErreur>
   if (etat === 'fait') return <Merci prenom={prenom} />
   if (!reponses) return <p className={fin.texte}>Un instant…</p>
 

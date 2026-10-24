@@ -15,6 +15,8 @@ import { GrilleDeFragments } from './GrilleDeFragments'
 import styles from './AssocierUnFragment.module.css'
 
 const MOTS = { oui: 'Choisi', non: 'Choisir' }
+/** Les jours d'un mois d'une année bissextile (le 29 février existe) ; 31 tant que le mois n'est pas choisi. */
+const joursDuMois = (mois: string) => (mois ? new Date(2024, Number(mois), 0).getDate() : 31)
 const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
 
 export function NouveauCompte({ email, onCree }: { email: string; onCree: (id: string) => void }) {
@@ -43,9 +45,9 @@ export function NouveauCompte({ email, onCree }: { email: string; onCree: (id: s
       // Un Fragment refusé : on reste ici, le message le dit ; renvoyer est sans risque (la
       // fonction rend le compte déjà créé).
       try {
-        // L'anniversaire ne se pose que complet : le jour sans le mois ne dit rien.
-        if (jour && mois) await poserAnniversaire(id, Number(jour), Number(mois))
         for (const fragment of choisis) await associerFragment(id, fragment)
+        // Après les Fragments : un anniversaire refusé ne les empêche pas. Le jour sans le mois ne dit rien.
+        if (jour && mois) await poserAnniversaire(id, Number(jour), Number(mois))
         onCree(id)
       } catch (e) {
         setRefus(`Compte créé, mais la suite n’a pas pu s’enregistrer : ${messageDErreur(e)}`)
@@ -81,9 +83,16 @@ export function NouveauCompte({ email, onCree }: { email: string; onCree: (id: s
         <span className={styles.libelle}>Son anniversaire (facultatif)</span>
         <select aria-label="Jour" value={jour} onChange={(e) => { setJour(e.target.value) }}>
           <option value="">Jour</option>
-          {Array.from({ length: 31 }, (_, i) => <option key={i} value={i + 1}>{i + 1}</option>)}
+          {Array.from({ length: joursDuMois(mois) }, (_, i) => <option key={i} value={i + 1}>{i + 1}</option>)}
         </select>
-        <select aria-label="Mois" value={mois} onChange={(e) => { setMois(e.target.value) }}>
+        <select
+          aria-label="Mois"
+          value={mois}
+          onChange={(e) => {
+            setMois(e.target.value)
+            if (Number(jour) > joursDuMois(e.target.value)) setJour('')
+          }}
+        >
           <option value="">Mois</option>
           {MOIS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
         </select>

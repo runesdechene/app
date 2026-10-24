@@ -84,3 +84,13 @@ test('un lien invalide le dit', async () => {
   )
   expect(await screen.findByRole('alert')).toHaveTextContent(/ne fonctionne plus/)
 })
+
+test('une panne du serveur ne se fait pas passer pour un lien mort', async () => {
+  vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(new Response('{}', { status: 500 }))))
+  render(
+    <MemoryRouter initialEntries={['/qui-es-tu?j=u1.sig']}>
+      <PageQuestionnaire />
+    </MemoryRouter>,
+  )
+  expect(await screen.findByRole('alert')).toHaveTextContent(/réessaie dans un instant/)
+})
