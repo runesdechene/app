@@ -4367,6 +4367,7 @@ export type Database = {
           departement: string | null
           epoque_autre: string | null
           epoques: string[]
+          mot: string | null
           plait: string[]
           repondu_le: string | null
           user_id: string
@@ -4381,6 +4382,7 @@ export type Database = {
           departement?: string | null
           epoque_autre?: string | null
           epoques?: string[]
+          mot?: string | null
           plait?: string[]
           repondu_le?: string | null
           user_id: string
@@ -4395,6 +4397,7 @@ export type Database = {
           departement?: string | null
           epoque_autre?: string | null
           epoques?: string[]
+          mot?: string | null
           plait?: string[]
           repondu_le?: string | null
           user_id?: string
