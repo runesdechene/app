@@ -7,13 +7,12 @@ export const QUESTIONS = {
     aide: 'Deux au plus.',
     max: 2,
     libre: { reponse: 'autre', champ: 'epoque_autre', invite: 'Laquelle ?' },
-    // Le Moyen Âge en tête, puis l'ordre du temps, l'Égypte à la fin (Uriel, 24/10) ; « rome » garde sa clé sous son nouveau nom (mig 557 à 559).
+    // Des noms de collections, l'ordre d'Uriel (24/10) ; les clés ne changent pas avec les libellés (mig 557 à 562).
     reponses: [
-      ['moyen_age', 'Le Moyen Âge'], ['grece', 'La Grèce antique'], ['rome', 'L’Empire romain d’Orient et d’Occident'],
-      ['celtes', 'Les Celtes et les Gaulois'],
-      ['scandinavie', 'La culture scandinave, viking'], ['slave', 'La culture slave'],
-      ['napoleon', 'L’époque napoléonienne'], ['jules_verne', 'L’époque de Jules Verne'],
-      ['totems', 'La symbolique des animaux à travers les âges'], ['amazigh', 'La culture amazighe'], ['egypte', 'L’Antiquité égyptienne'], ['autre', 'Une autre'],
+      ['moyen_age', 'Le Moyen Âge'], ['grece', 'La Grèce antique'], ['rome', 'Rome, d’Orient et d’Occident'],
+      ['celtes', 'Les Celtes et les Gaulois'], ['scandinavie', 'Les Vikings et le Grand Nord'], ['slave', 'Les légendes slaves'],
+      ['napoleon', 'L’épopée napoléonienne'], ['totems', 'Les totems animaliers'], ['amazigh', 'La culture amazighe'],
+      ['egypte', 'L’Égypte antique'], ['autre', 'Une autre idée'],
     ],
   },
   decouverte: {

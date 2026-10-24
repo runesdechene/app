@@ -34,7 +34,7 @@ test('un abonné : depuis quand et par où, ses listes, sa suite, ses époques, 
   expect(screen.getByText('Meilleur client')).toBeInTheDocument()
   expect(screen.getByText('Bienvenue')).toBeInTheDocument()
   expect(screen.getByText(/jour 7 parti · le prochain le 03\/11/)).toBeInTheDocument()
-  expect(screen.getByText('Les Celtes et les Gaulois, L’Empire romain d’Orient et d’Occident')).toBeInTheDocument()
+  expect(screen.getByText('Les Celtes et les Gaulois, Rome, d’Orient et d’Occident')).toBeInTheDocument()
   expect(screen.getByText('12 mars')).toBeInTheDocument()
   expect(screen.getByText('« Ce que cache notre logo »')).toBeInTheDocument()
 })
