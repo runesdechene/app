@@ -15,15 +15,14 @@ export async function message(
   missive: Missive,
   d: { user_id: string; email: string; prenom: string | null },
   objet = missive.objet,
-  essai = false,
 ): Promise<MessageResend> {
   const jeton = signer(d.user_id)
   const { html, texte } = await rendre(missive, {
     prenom: d.prenom,
     lienDesabonnement: `${HUB}/desabonnement?j=${jeton}`,
     // Le questionnaire a son propre jeton : un lien de la lettre ne désabonne jamais, et l'inverse (lib/jeton.ts).
-    // Un essai mène à la page sans jeton : l'admin qui clique ne se crée pas de portrait.
-    ...(essai ? {} : { lienQuestionnaire: `${HUB}/qui-es-tu?j=${encodeURIComponent(signer(d.user_id, 'questionnaire'))}` }),
+    // Un essai porte aussi le lien personnel : il montre exactement ce que reçoivent les gens (Uriel, 24/10).
+    lienQuestionnaire: `${HUB}/qui-es-tu?j=${encodeURIComponent(signer(d.user_id, 'questionnaire'))}`,
   })
   return {
     from: EXPEDITEUR,

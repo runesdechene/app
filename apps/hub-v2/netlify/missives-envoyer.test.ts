@@ -162,15 +162,6 @@ describe('missives-envoyer', () => {
     expect(pour('u1')).toContain(encodeURIComponent(signer('u1', 'questionnaire')))
   })
 
-  test('un essai mène au questionnaire sans jeton', async () => {
-    const { EXEMPLES } = await import('@runes/missives')
-    const { message } = await import('./functions/lib/missive')
-    const lettre = { ...MISSIVE, contenu: { ...EXEMPLES.missive, rupture: { ...EXEMPLES.missive.rupture, appel: { texte: 'Réponds', lien: '{questionnaire}' } } } }
-    const essai = await message(lettre as Parameters<typeof message>[0], { user_id: 'u0', email: 'a@b.fr', prenom: null }, 'Essai', true)
-    expect(essai.html).toContain('https://hub.runesdechene.com/qui-es-tu')
-    expect(essai.html).not.toContain('qui-es-tu?j=')
-  })
-
   test('deux réveils qui se croisent : chacun reçoit la Missive une seule fois', async () => {
     const { envoyes } = simuler(personnes(3))
     const handler = await charger()
