@@ -162,8 +162,8 @@ function bille(c: CouleursCarte) {
 }
 
 // Une étoile à quatre branches ✦, plus petite que les sceaux : à l'encre pour un point d'intérêt,
-// en or cerclé de parchemin pour les étincelles des lieux neufs (nouveaux.ts) : sans le cerne, l'or
-// se perd dans leur lumière dorée.
+// en blanc cerclé d'or pour les étincelles des lieux neufs (nouveaux.ts) : le blanc ressort sur leur
+// lumière dorée (Uriel, 24/10 : l'or seul s'y perdait).
 function etoile(couleur: string, cerne?: string) {
   const ctx = toile(PETIT)
   const m = PETIT / 2
@@ -263,7 +263,7 @@ export async function ajouterMarques(
   await document.fonts.load('700 17px Cabin')
   ajouter(map, 'bille', bille(c))
   ajouter(map, 'curiosite', etoile(c.encre))
-  ajouter(map, 'etincelle', etoile(c.or, c.halo))
+  ajouter(map, 'etincelle', etoile('#fff', c.or))
   pilule(map, 'pilule', c.halo, melanger(c.encre, c.halo, 0.45))
   pilule(map, 'pilule-moi', c.encre, c.encre)
   ajouter(map, 'gelule-nouveau', geluleNouveau(c))
