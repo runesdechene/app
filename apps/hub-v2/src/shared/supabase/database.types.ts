@@ -4356,6 +4356,60 @@ export type Database = {
           },
         ]
       }
+      portraits: {
+        Row: {
+          amene: string[]
+          anniv_jour: number | null
+          anniv_mois: number | null
+          attente: string | null
+          decouverte: string[]
+          departement: string | null
+          epoques: string[]
+          plait: string[]
+          repondu_le: string
+          user_id: string
+        }
+        Insert: {
+          amene?: string[]
+          anniv_jour?: number | null
+          anniv_mois?: number | null
+          attente?: string | null
+          decouverte?: string[]
+          departement?: string | null
+          epoques?: string[]
+          plait?: string[]
+          repondu_le?: string
+          user_id: string
+        }
+        Update: {
+          amene?: string[]
+          anniv_jour?: number | null
+          anniv_mois?: number | null
+          attente?: string | null
+          decouverte?: string[]
+          departement?: string | null
+          epoques?: string[]
+          plait?: string[]
+          repondu_le?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portraits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portraits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       presences: {
         Row: {
           latitude: number
@@ -4394,6 +4448,7 @@ export type Database = {
       }
       purchase_log: {
         Row: {
+          client_depuis: string | null
           created_at: string | null
           email: string | null
           id: number
@@ -4405,6 +4460,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          client_depuis?: string | null
           created_at?: string | null
           email?: string | null
           id?: number
@@ -4416,6 +4472,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          client_depuis?: string | null
           created_at?: string | null
           email?: string | null
           id?: number
@@ -4530,6 +4587,21 @@ export type Database = {
           tracker_kind?: string
           type?: string
           wording?: string
+        }
+        Relationships: []
+      }
+      questionnaire_demandes: {
+        Row: {
+          email: string
+          le: string
+        }
+        Insert: {
+          email: string
+          le?: string
+        }
+        Update: {
+          email?: string
+          le?: string
         }
         Relationships: []
       }
@@ -5153,18 +5225,21 @@ export type Database = {
       suites: {
         Row: {
           active: boolean
+          active_depuis: string | null
           cle: string
           exige_accord: boolean
           nom: string
         }
         Insert: {
           active?: boolean
+          active_depuis?: string | null
           cle: string
           exige_accord: boolean
           nom: string
         }
         Update: {
           active?: boolean
+          active_depuis?: string | null
           cle?: string
           exige_accord?: boolean
           nom?: string
@@ -8313,6 +8388,7 @@ export type Database = {
         Args: { p_id: number; p_quand: string }
         Returns: undefined
       }
+      hub_qui_sont_ils: { Args: { p_segment?: string }; Returns: Json }
       hub_regler_etape: {
         Args: { p_id: number; p_jour: number }
         Returns: undefined
@@ -8323,6 +8399,7 @@ export type Database = {
         Args: { p_fragment: number; p_user: string }
         Returns: undefined
       }
+      hub_ses_missives: { Args: { p_user: string }; Returns: Json }
       hub_suites: { Args: never; Returns: Json }
       increment_community_quest: {
         Args: {
@@ -8713,6 +8790,10 @@ export type Database = {
         }
         Returns: Json
       }
+      questionnaire_repondre: {
+        Args: { p: Json; p_user: string }
+        Returns: undefined
+      }
       quitter_compagnie: { Args: { p_id: string }; Returns: undefined }
       randomize_position_on_land: {
         Args: { p_lat: number; p_lng: number }
@@ -8992,6 +9073,7 @@ export type Database = {
       supprimer_mise_a_jour: { Args: { p_id: number }; Returns: Json }
       supprimer_mon_compte: { Args: never; Returns: undefined }
       sur_les_chemins: { Args: { p_limite?: number }; Returns: Json }
+      synchro_lier_clients: { Args: { p: Json }; Returns: number }
       synchroniser_fragments: {
         Args: { p_illustrations: Json }
         Returns: number
