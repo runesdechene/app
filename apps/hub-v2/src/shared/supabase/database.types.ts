@@ -4366,7 +4366,7 @@ export type Database = {
           departement: string | null
           epoques: string[]
           plait: string[]
-          repondu_le: string
+          repondu_le: string | null
           user_id: string
         }
         Insert: {
@@ -4378,7 +4378,7 @@ export type Database = {
           departement?: string | null
           epoques?: string[]
           plait?: string[]
-          repondu_le?: string
+          repondu_le?: string | null
           user_id: string
         }
         Update: {
@@ -4390,7 +4390,7 @@ export type Database = {
           departement?: string | null
           epoques?: string[]
           plait?: string[]
-          repondu_le?: string
+          repondu_le?: string | null
           user_id?: string
         }
         Relationships: [
@@ -7234,6 +7234,10 @@ export type Database = {
         Args: { p_theme: string; p_user: string }
         Returns: number
       }
+      _poser_anniversaire: {
+        Args: { p_jour: number; p_mois: number; p_user: string }
+        Returns: undefined
+      }
       _presents_autour: {
         Args: { p_id: string }
         Returns: {
@@ -7761,6 +7765,10 @@ export type Database = {
       dmetaphone_alt: { Args: { "": string }; Returns: string }
       donner_accord_nouvelles: {
         Args: { p_accord: boolean }
+        Returns: undefined
+      }
+      donner_anniversaire: {
+        Args: { p_jour: number; p_mois: number }
         Returns: undefined
       }
       ecrire_au_carnet: {
@@ -8384,6 +8392,10 @@ export type Database = {
         Returns: undefined
       }
       hub_ouverture: { Args: { p_periode: string }; Returns: Json }
+      hub_poser_anniversaire: {
+        Args: { p_jour: number; p_mois: number; p_user: string }
+        Returns: undefined
+      }
       hub_programmer_missive: {
         Args: { p_id: number; p_quand: string }
         Returns: undefined
