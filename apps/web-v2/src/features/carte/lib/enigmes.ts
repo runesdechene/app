@@ -1,11 +1,11 @@
 /**
- * QUOI     — les énigmes sur la carte : une source, le calque des sceaux « ? » et son image, dessinée
- *            au canevas ; dessous, une onde qui rayonne.
+ * QUOI     — les énigmes sur la carte : une source, le calque des sceaux et leur image (le sceau de
+ *            cire à la clé d'or dessiné par Uriel, 24/10) ; dessous, une onde qui rayonne.
  * POURQUOI — le même sceau à tous les zooms, qu'on touche même dézoomé : les éclats de loin ne
  *            donnaient pas envie d'aller voir (Uriel, 07/10). Sans regroupement ni chiffre. Tous les
  *            sceaux sont pareils : la culture se découvre au toucher.
  * ATTENTION — la source et les calques se posent tout de suite (le hook peut y verser les données) ;
- *            seule l'image attend la police du « ? ».
+ *            seule l'image attend son chargement.
  */
 import type { FeatureCollection, Point } from 'geojson'
 import type {
@@ -18,7 +18,7 @@ import type {
 } from 'maplibre-gl'
 import type { EnigmeEnAttente } from '../api/lireEnigmes'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
-import { BORD_DE_CIRE } from './cachet'
+import imageEnigme from '@/assets/ui/enigme.png'
 
 export const SOURCE_ENIGMES = 'enigmes'
 export const CALQUE_ONDES_ENIGMES = 'enigmes-ondes'
@@ -106,32 +106,21 @@ export function toileDesEnigmes(taille: number) {
   return ctx
 }
 
-// Le sceau de cire et son « ? » en IM Fell English : le même bord irrégulier que le cachet qui se
-// retourne au toucher (Uriel, 07/10), dessiné dans le repère 96 × 96 de `BORD_DE_CIRE`.
-function sceau(c: CouleursCarte) {
+// Le sceau de cire à la clé d'or (assets/ui/enigme.png, dessiné par Uriel le 24/10) : la clé dit
+// « énigme » et le distingue du sceau des lieux neufs, rond et marqué de leur icône.
+async function sceau() {
+  const image = new Image()
+  image.src = imageEnigme
+  await image.decode()
   const ctx = toileDesEnigmes(SCEAU)
-  const m = SCEAU / 2
-  ctx.save()
-  ctx.scale(SCEAU / 96, SCEAU / 96)
-  const bord = new Path2D(BORD_DE_CIRE)
-  ctx.fillStyle = c.cire
-  ctx.fill(bord)
-  ctx.lineWidth = 5
-  ctx.strokeStyle = c.halo
-  ctx.stroke(bord)
-  ctx.restore()
-  ctx.fillStyle = c.halo
-  ctx.font = 'italic 24px "IM Fell English"'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText('?', m, m + 1)
+  ctx.drawImage(image, 0, 0, SCEAU, SCEAU)
   return ctx.getImageData(0, 0, SCEAU * RATIO, SCEAU * RATIO)
 }
 
 export async function poserEnigmes(map: Carte, c: CouleursCarte, ecran: number): Promise<void> {
   ajouterCalquesEnigmes(map, ecran)
-  await document.fonts.load('italic 24px "IM Fell English"')
-  if (!map.hasImage('enigme-sceau')) map.addImage('enigme-sceau', sceau(c), { pixelRatio: RATIO })
+  const image = await sceau()
+  if (!map.hasImage('enigme-sceau')) map.addImage('enigme-sceau', image, { pixelRatio: RATIO })
   fairePulser(map, c.cire, ecran)
 }
 
