@@ -4363,6 +4363,7 @@ export type Database = {
           anniv_mois: number | null
           attente: string | null
           decouverte: string[]
+          decouverte_autre: string | null
           departement: string | null
           epoque_autre: string | null
           epoques: string[]
@@ -4376,6 +4377,7 @@ export type Database = {
           anniv_mois?: number | null
           attente?: string | null
           decouverte?: string[]
+          decouverte_autre?: string | null
           departement?: string | null
           epoque_autre?: string | null
           epoques?: string[]
@@ -4389,6 +4391,7 @@ export type Database = {
           anniv_mois?: number | null
           attente?: string | null
           decouverte?: string[]
+          decouverte_autre?: string | null
           departement?: string | null
           epoque_autre?: string | null
           epoques?: string[]
