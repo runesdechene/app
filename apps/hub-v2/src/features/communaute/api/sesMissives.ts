@@ -11,7 +11,8 @@ export type SesMissives = {
   porte: string | null
   listes: string[]
   ambassadeur: 'ambassadeur' | 'egerie' | null
-  portrait: (Reponses & { repondu_le: string }) | null
+  // repondu_le à null : seul l'anniversaire a été donné (au stand ou dans l'appli), pas le questionnaire.
+  portrait: (Reponses & { repondu_le: string | null }) | null
   suite: { cle: string; nom: string; jour_fait: number | null; prochaine_le: string | null; arretee_le: string | null } | null
   derniers_envois: { objet: string; statut: string; le: string }[]
 }
@@ -24,5 +25,11 @@ export async function lireSesMissives(compte: string): Promise<SesMissives> {
 
 export async function nommerAmbassadeur(compte: string): Promise<void> {
   const { error } = await supabase.rpc('hub_ambassadeur', { p_user: compte, p_role: 'ambassadeur' })
+  if (error) throw error
+}
+
+/** L'anniversaire donné au stand, jour et mois (mig 556) : il ne touche pas aux réponses du questionnaire. */
+export async function poserAnniversaire(compte: string, jour: number, mois: number): Promise<void> {
+  const { error } = await supabase.rpc('hub_poser_anniversaire', { p_user: compte, p_jour: jour, p_mois: mois })
   if (error) throw error
 }

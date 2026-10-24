@@ -6,11 +6,12 @@ import { vi } from 'vitest'
 import { AssocierUnFragment } from './AssocierUnFragment'
 
 const m = vi.hoisted(() => ({
-  comptes: vi.fn(), compte: vi.fn(), shopify: vi.fn(), creer: vi.fn(), associer: vi.fn(), retirer: vi.fn(),
+  comptes: vi.fn(), compte: vi.fn(), shopify: vi.fn(), creer: vi.fn(), associer: vi.fn(), retirer: vi.fn(), anniversaire: vi.fn(),
 }))
 vi.mock('../api/comptes', () => ({ lireComptes: m.comptes, lireCompte: m.compte }))
 vi.mock('../api/clientShopify', () => ({ lireClientShopify: m.shopify }))
 vi.mock('../api/compteDuStand', () => ({ creerCompteDuStand: m.creer }))
+vi.mock('../api/sesMissives', () => ({ poserAnniversaire: m.anniversaire }))
 vi.mock('../api/fragmentsDuCompte', () => ({
   lireFragmentsAssociables: () => Promise.resolve([{ id: 7, nom: 'Hoplite', image: null }, { id: 9, nom: 'Kelpie', image: null }]),
   associerFragment: m.associer, retirerFragment: m.retirer,
@@ -88,4 +89,18 @@ test('créer ce compte : le prénom, les Fragments choisis d’avance, un seul b
   await userEvent.click(screen.getByRole('button', { name: 'Créer le compte de Léa · 1 Fragment' }))
   expect(m.creer).toHaveBeenCalledWith({ email: 'lea@gmail.com', prenom: 'Léa', newsletter: false })
   expect(m.associer).toHaveBeenCalledWith('u9', 9)
+  expect(m.anniversaire).not.toHaveBeenCalled()
+})
+
+test('son anniversaire, s’il le donne, se pose après la création', async () => {
+  m.creer.mockResolvedValue('u9')
+  m.anniversaire.mockResolvedValue(undefined)
+  monter()
+  await userEvent.type(champ(), 'lea@gmail.com')
+  await userEvent.click(await screen.findByRole('button', { name: 'Créer ce compte' }))
+  await userEvent.type(screen.getByRole('textbox', { name: 'Son prénom' }), 'Léa')
+  await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Jour' }), '12')
+  await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Mois' }), '3')
+  await userEvent.click(screen.getByRole('button', { name: 'Créer le compte de Léa' }))
+  expect(m.anniversaire).toHaveBeenCalledWith('u9', 12, 3)
 })

@@ -1,6 +1,6 @@
 /**
  * QUOI     — « Nouveau compte » au stand (maquette 634:1568) : l'adresse tapée, le prénom, l'accord pour
- *            la newsletter, les Fragments choisis d'avance, et un seul bouton qui crée tout.
+ *            la newsletter, son anniversaire (facultatif), les Fragments choisis d'avance, et un seul bouton qui crée tout.
  * POURQUOI — le compte se crée par stand-create-account (client Shopify, puis compte de l'appli), puis
  *            chaque Fragment choisi s'associe. La newsletter part décochée : elle se demande à voix
  *            haute (L34-5 CPCE). La fonction Netlify ne tourne pas en local : son erreur s'affiche.
@@ -8,18 +8,22 @@
 import { useState, type SyntheticEvent } from 'react'
 import { messageDErreur } from '@/shared/lib/erreur'
 import { associerFragment } from '../api/fragmentsDuCompte'
+import { poserAnniversaire } from '../api/sesMissives'
 import { useCreerCompteDuStand } from '../hooks/useCompteDuStand'
 import { useFragmentsAssociables } from '../hooks/useFragmentsDuCompte'
 import { GrilleDeFragments } from './GrilleDeFragments'
 import styles from './AssocierUnFragment.module.css'
 
 const MOTS = { oui: 'Choisi', non: 'Choisir' }
+const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
 
 export function NouveauCompte({ email, onCree }: { email: string; onCree: (id: string) => void }) {
   const { data: tous = [] } = useFragmentsAssociables()
   const creer = useCreerCompteDuStand()
   const [prenom, setPrenom] = useState('')
   const [newsletter, setNewsletter] = useState(false)
+  const [jour, setJour] = useState('')
+  const [mois, setMois] = useState('')
   const [choisis, setChoisis] = useState<Set<number>>(new Set())
   const [refus, setRefus] = useState<string | null>(null)
   const [enCours, setEnCours] = useState(false)
@@ -39,10 +43,12 @@ export function NouveauCompte({ email, onCree }: { email: string; onCree: (id: s
       // Un Fragment refusé : on reste ici, le message le dit ; renvoyer est sans risque (la
       // fonction rend le compte déjà créé).
       try {
+        // L'anniversaire ne se pose que complet : le jour sans le mois ne dit rien.
+        if (jour && mois) await poserAnniversaire(id, Number(jour), Number(mois))
         for (const fragment of choisis) await associerFragment(id, fragment)
         onCree(id)
       } catch (e) {
-        setRefus(`Compte créé, mais un Fragment n’a pas pu s’associer : ${messageDErreur(e)}`)
+        setRefus(`Compte créé, mais la suite n’a pas pu s’enregistrer : ${messageDErreur(e)}`)
       }
     } catch (e) {
       setRefus(messageDErreur(e))
@@ -71,6 +77,17 @@ export function NouveauCompte({ email, onCree }: { email: string; onCree: (id: s
         <span className={styles.libelle}>Son prénom</span>
         <input value={prenom} required autoComplete="off" autoCapitalize="words" onChange={(e) => { setPrenom(e.target.value) }} />
       </label>
+      <div className={styles.anniversaire}>
+        <span className={styles.libelle}>Son anniversaire (facultatif)</span>
+        <select aria-label="Jour" value={jour} onChange={(e) => { setJour(e.target.value) }}>
+          <option value="">Jour</option>
+          {Array.from({ length: 31 }, (_, i) => <option key={i} value={i + 1}>{i + 1}</option>)}
+        </select>
+        <select aria-label="Mois" value={mois} onChange={(e) => { setMois(e.target.value) }}>
+          <option value="">Mois</option>
+          {MOIS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
+        </select>
+      </div>
       <label className={styles.accord}>
         <input type="checkbox" checked={newsletter} onChange={(e) => { setNewsletter(e.target.checked) }} />
         Accepte les nouvelles de Runes de Chêne (à lui demander)

@@ -77,12 +77,13 @@ export function SesMissives({ compte }: { compte: string }) {
         <span>Sa suite</span>
         {data.suite ? <Suite suite={data.suite} /> : <span>—</span>}
 
-        {p ? (
+        <span>Anniversaire</span>
+        <span>{p?.anniv_jour && p.anniv_mois ? `${String(p.anniv_jour)} ${MOIS[p.anniv_mois - 1] ?? ''}` : '—'}</span>
+
+        {p?.repondu_le ? (
           <>
             <span>Ses époques</span>
             <span>{p.epoques.length > 0 ? p.epoques.map((e) => EPOQUES.get(e) ?? e).join(', ') : '—'}</span>
-            <span>Anniversaire</span>
-            <span>{p.anniv_jour && p.anniv_mois ? `${String(p.anniv_jour)} ${MOIS[p.anniv_mois - 1] ?? ''}` : '—'}</span>
             <span>Ce qu’il attend</span>
             <span className={styles.qui}>
               <strong>{p.attente ? `« ${p.attente} »` : '—'}</strong>
