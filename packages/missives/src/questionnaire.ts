@@ -10,9 +10,9 @@ export const QUESTIONS = {
     reponses: [
       ['moyen_age', 'Le Moyen Âge'], ['grece', 'La Grèce antique'], ['rome', 'L’Empire romain d’Orient et d’Occident'],
       ['celtes', 'Les Celtes et les Gaulois'],
-      ['scandinavie', 'La culture scandinave, viking'], ['amazigh', 'La culture amazighe'], ['slave', 'La culture slave'],
+      ['scandinavie', 'La culture scandinave, viking'], ['slave', 'La culture slave'],
       ['napoleon', 'L’époque napoléonienne'], ['jules_verne', 'L’époque de Jules Verne'],
-      ['totems', 'Les totems animaliers'], ['egypte', 'L’Antiquité égyptienne'], ['autre', 'Une autre'],
+      ['totems', 'Les totems animaliers'], ['amazigh', 'La culture amazighe'], ['egypte', 'L’Antiquité égyptienne'], ['autre', 'Une autre'],
     ],
   },
   decouverte: {
