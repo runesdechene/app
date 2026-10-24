@@ -7,7 +7,7 @@
  *            l'adresse (?q=3), comme l'étape de /soumettre-contenu : le retour du navigateur revient d'une
  *            question. Sans lien, la page demande l'e-mail et envoie le lien, rien d'autre.
  */
-import { LIBRE_MAX, QUESTIONS, type Question, type Reponses } from '@runes/missives'
+import { ATTENTE_MAX, LIBRE_MAX, QUESTIONS, type Question, type Reponses } from '@runes/missives'
 import { useEffect, useState, type ReactNode, type SubmitEvent } from 'react'
 import { useSearchParams } from 'react-router'
 import cadeau from '@/assets/flyer/cadeau.webp'
@@ -29,7 +29,7 @@ const BOUTIQUE = 'https://runesdechene.com'
 const EXPLORE = 'https://app.runesdechene.com'
 const DONNEES_PERSONNELLES = 'https://app.runesdechene.com/legal/confidentialite'
 const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
-const VIDE: Reponses = { epoques: [], epoque_autre: null, decouverte: [], decouverte_autre: null, amene: [], plait: [], attente: null, departement: null, anniv_jour: null, anniv_mois: null }
+const VIDE: Reponses = { epoques: [], epoque_autre: null, decouverte: [], decouverte_autre: null, amene: [], plait: [], attente: null, mot: null, departement: null, anniv_jour: null, anniv_mois: null }
 const A_CASES = Object.keys(QUESTIONS) as Question[]
 const DERNIERE = ETAPES.length
 
@@ -187,19 +187,30 @@ function Ecran({ n, reponses, changer, compte, setCompte }: {
   }
   if (n === 5) {
     const attente = reponses.attente ?? ''
+    const mot = reponses.mot ?? ''
     return (
       <>
         <Intitule n={n} titre="Qu’attends-tu de nous ?" aide="Écris ce qui te vient." />
         <textarea
           className={`${etape.champ ?? ''} ${styles.zone ?? ''}`}
           aria-label="Ta réponse"
-          maxLength={1000}
-          rows={7}
+          maxLength={ATTENTE_MAX}
+          rows={5}
           placeholder="Plus d’histoires sur les Celtes, une collection d’hiver…"
           value={attente}
           onChange={(e) => { changer({ attente: e.target.value || null }) }}
         />
-        <p className={styles.compteur}>{attente.length} / 1000</p>
+        <p className={styles.compteur}>{attente.length} / {ATTENTE_MAX}</p>
+        <label className={styles.mot}>
+          <span className={styles.aide}>Un petit mot pour l’équipe ou sur notre mission ?</span>
+          <textarea
+            className={`${etape.champ ?? ''} ${styles.zone ?? ''}`}
+            maxLength={ATTENTE_MAX}
+            rows={4}
+            value={mot}
+            onChange={(e) => { changer({ mot: e.target.value || null }) }}
+          />
+        </label>
       </>
     )
   }

@@ -1,6 +1,6 @@
 /**
  * QUOI     — « Qui sont-ils ? » (maquette 771:2639) : ce que les réponses à « Dis-nous qui tu es » disent, pour tous,
- *            les prospects ou les porteurs — une barre par réponse, les dernières attentes, les anniversaires du mois.
+ *            les prospects ou les porteurs — une barre par réponse, les dernières attentes et les petits mots, les anniversaires du mois.
  * POURQUOI — écrire des lettres qui leur ressemblent. Les chiffres sont comptés par la base (hub_qui_sont_ils).
  */
 import { QUESTIONS, type Question } from '@runes/missives'
@@ -11,7 +11,7 @@ import { Bloc } from '@/shared/ui/Bloc'
 import { ChoixSegmente } from '@/shared/ui/ChoixSegmente'
 import { EnTeteDePage } from '@/shared/ui/EnTeteDePage'
 import { TitreDeSection } from '@/shared/ui/TitreDeSection'
-import { lireQuiSontIls, type Segment } from '../api/portraits'
+import { lireQuiSontIls, type Parole, type Segment } from '../api/portraits'
 import commun from './Missives.module.css'
 import styles from './QuiSontIls.module.css'
 
@@ -65,6 +65,24 @@ function Barres({ q, compte, libres }: { q: Question; compte: { cle: string; nom
   )
 }
 
+/** Les derniers textes libres d'une question : ce qu'ils attendent, leurs petits mots. */
+function Paroles({ titre, vide, liste }: { titre: string; vide: string; liste: Parole[] }) {
+  return (
+    <Bloc>
+      <section aria-label={titre} className={styles.question}>
+        <TitreDeSection titre={titre} />
+        {liste.length === 0 && <p className={commun.calme}>{vide}</p>}
+        {liste.map((a) => (
+          <p key={a.id} className={commun.qui}>
+            <strong>« {a.texte} »</strong>
+            <span className={commun.detail}>{a.nom ?? 'Sans nom'} · {dateCourte(a.le)}</span>
+          </p>
+        ))}
+      </section>
+    </Bloc>
+  )
+}
+
 export function QuiSontIls() {
   const [segment, setSegment] = useState<Segment>('tous')
   const { data, error } = useQuery({ queryKey: ['missives-qui-sont-ils', segment], queryFn: () => lireQuiSontIls(segment) })
@@ -94,18 +112,8 @@ export function QuiSontIls() {
             {(Object.keys(QUESTIONS) as Question[]).map((q) => <Barres key={q} q={q} compte={data.reponses[q] ?? []} libres={data.libres[q] ?? []} />)}
           </div>
 
-          <Bloc>
-            <section aria-label="Ce qu’ils attendent" className={styles.question}>
-              <TitreDeSection titre="Ce qu’ils attendent" />
-              {data.attentes.length === 0 && <p className={commun.calme}>Personne n’a encore écrit ce qu’il attend.</p>}
-              {data.attentes.map((a) => (
-                <p key={a.id} className={commun.qui}>
-                  <strong>« {a.texte} »</strong>
-                  <span className={commun.detail}>{a.nom ?? 'Sans nom'} · {dateCourte(a.le)}</span>
-                </p>
-              ))}
-            </section>
-          </Bloc>
+          <Paroles titre="Ce qu’ils attendent" vide="Personne n’a encore écrit ce qu’il attend." liste={data.attentes} />
+          <Paroles titre="Leurs petits mots" vide="Personne n’a encore laissé de petit mot." liste={data.mots} />
         </>
       )}
 

@@ -61,6 +61,8 @@ export type Reponses = {
   amene: string[]
   plait: string[]
   attente: string | null
+  /** « Un petit mot pour l'équipe ou sur notre mission ? » */
+  mot: string | null
   departement: string | null
   anniv_jour: number | null
   anniv_mois: number | null
@@ -96,12 +98,14 @@ export function validerReponses(recu: unknown): Reponses | null {
     if (date.getUTCMonth() !== mois - 1 || date.getUTCDate() !== jour) return null
   }
   if (typeof r.attente === 'string' && r.attente.trim().length > ATTENTE_MAX) return null
+  if (typeof r.mot === 'string' && r.mot.trim().length > ATTENTE_MAX) return null
   return {
     ...listes,
     // Le texte d'une réponse « autre » ne vaut qu'avec sa case.
     epoque_autre: listes.epoques.includes('autre') ? texte(r.epoque_autre, LIBRE_MAX) : null,
     decouverte_autre: listes.decouverte.includes('autrement') ? texte(r.decouverte_autre, LIBRE_MAX) : null,
     attente: texte(r.attente, ATTENTE_MAX),
+    mot: texte(r.mot, ATTENTE_MAX),
     departement: texte(r.departement, 60),
     anniv_jour: jour as number | null,
     anniv_mois: mois as number | null,

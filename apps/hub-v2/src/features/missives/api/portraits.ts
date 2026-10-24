@@ -6,12 +6,16 @@ import { supabase } from '@/shared/supabase/client'
 
 export type Segment = 'tous' | 'prospects' | 'porteurs'
 
+/** Un texte libre d'un répondant : ce qu'il attend, son petit mot. */
+export type Parole = { id: string; nom: string | null; texte: string; le: string }
+
 export type QuiSontIls = {
   repondants: number
   reponses: Partial<Record<Question, { cle: string; nombre: number }[]>>
   /** Ce que précisent les réponses « autre », par question : le plus cité d'abord (mig 560). */
   libres: Partial<Record<Question, { texte: string; nombre: number }[]>>
-  attentes: { id: string; nom: string | null; texte: string; le: string }[]
+  attentes: Parole[]
+  mots: Parole[]
   anniversaires_du_mois: { id: string; nom: string | null; jour: number }[]
 }
 

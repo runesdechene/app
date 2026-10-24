@@ -91,6 +91,12 @@ export function SesMissives({ compte }: { compte: string }) {
               <strong>{p.attente ? `« ${p.attente} »` : '—'}</strong>
               <span className={styles.detail}>répondu le {dateCourte(p.repondu_le)}</span>
             </span>
+            {p.mot && (
+              <>
+                <span>Son petit mot</span>
+                <strong>« {p.mot} »</strong>
+              </>
+            )}
           </>
         ) : (
           <>

@@ -78,6 +78,7 @@ test('« Envoyer mes réponses » poste les réponses des sept écrans, puis « 
   await userEvent.click(screen.getByRole('button', { name: 'Suivant →' }))
   await userEvent.click(screen.getByRole('button', { name: 'Suivant →' }))
   await userEvent.type(screen.getByLabelText('Ta réponse'), 'Plus de Celtes')
+  await userEvent.type(screen.getByLabelText('Un petit mot pour l’équipe ou sur notre mission ?'), 'Merci')
   await userEvent.click(screen.getByRole('button', { name: 'Suivant →' }))
   await userEvent.click(screen.getByRole('button', { name: 'Suivant →' }))
   await userEvent.selectOptions(screen.getByLabelText('Jour'), '12')
@@ -88,7 +89,7 @@ test('« Envoyer mes réponses » poste les réponses des sept écrans, puis « 
     jeton: 'u1.sig',
     reponses: {
       epoques: ['celtes'], epoque_autre: null, decouverte: ['flyer'], decouverte_autre: null, amene: [], plait: [],
-      attente: 'Plus de Celtes', departement: null, anniv_jour: 12, anniv_mois: 3,
+      attente: 'Plus de Celtes', mot: 'Merci', departement: null, anniv_jour: 12, anniv_mois: 3,
     },
     compte: false,
   })

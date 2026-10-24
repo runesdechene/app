@@ -142,7 +142,13 @@
 }
 
 .zone {
-  min-height: 180px;
+  min-height: 110px;
+}
+
+.mot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .date {
