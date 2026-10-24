@@ -2,8 +2,7 @@
  * QUOI     — les marques des lieux, dessinées une fois dans un canevas puis confiées à MapLibre :
  *            le « ? » (lieu inconnu) et l'icône du type à l'encre (connu), chacun sur une lueur
  *            parchemin légère ; le sceau du type (visité, en couleur par défaut depuis le 24/10) ; le
- *            sceau d'encre (lieu neuf) ; l'étoile (point d'intérêt), le fond des pilules et la gélule
- *            « NOUVEAU ».
+ *            sceau d'encre (lieu neuf) ; l'étoile (point d'intérêt) et la gélule « NOUVEAU ».
  * POURQUOI — des images de carte, et non des éléments HTML : des milliers de lieux restent
  *            fluides sur un téléphone (spec Carte §3). Ce qui reste à faire est un signe d'encre nu,
  *            comme sur une carte de jeu ; ce qu'on a visité prend son sceau : de loin, on voit qu'il
@@ -198,28 +197,6 @@ function etoile(c: CouleursCarte) {
   return ctx.getImageData(0, 0, PETIT, PETIT)
 }
 
-// Le fond d'une pilule : une gélule étirable autour du nom (`icon-text-fit`). La mienne en
-// encre pleine, les autres en parchemin cerclé d'encre pâle.
-function pilule(map: Carte, nom: string, fond: string, bord: string) {
-  const [largeur, hauteur, rayon] = [40, 24, 12]
-  const ctx = new OffscreenCanvas(largeur, hauteur).getContext('2d')
-  if (!ctx) throw new Error('canevas indisponible')
-  ctx.beginPath()
-  ctx.roundRect(1, 1, largeur - 2, hauteur - 2, rayon - 1)
-  ctx.fillStyle = fond
-  ctx.fill()
-  ctx.lineWidth = 2
-  ctx.strokeStyle = bord
-  ctx.stroke()
-  if (map.hasImage(nom)) return
-  map.addImage(nom, ctx.getImageData(0, 0, largeur, hauteur), {
-    pixelRatio: RATIO,
-    stretchX: [[rayon, largeur - rayon]],
-    stretchY: [[rayon - 1, rayon + 1]],
-    content: [rayon, 4, largeur - rayon, hauteur - 4],
-  })
-}
-
 // La gélule « NOUVEAU » (nouveaux.ts), mot compris, en une seule image : la carte l'agrandit d'un
 // bloc avec le zoom. Une gélule étirée autour d'un texte de carte ne suit pas quand ce texte change
 // de taille avec le zoom : le mot glissait dedans (22/10). Mot en Cabin 9 px, marges de 3 et 6 px,
@@ -278,8 +255,6 @@ export async function ajouterMarques(
   const inconnu = await chargerImage(imageInconnu)
   ajouter(map, 'bille', bille(inconnu, c))
   ajouter(map, 'curiosite', etoile(c))
-  pilule(map, 'pilule', c.halo, melanger(c.encre, c.halo, 0.45))
-  pilule(map, 'pilule-moi', c.encre, c.encre)
   ajouter(map, 'gelule-nouveau', geluleNouveau(c))
 
   // Chaque image une seule fois (02/10 : dessinée pour chaque lieu, elle coûtait une seconde de

@@ -33,7 +33,6 @@ type Proprietes = {
   nature: LieuCarte['nature']
   image: string
   pilule?: string
-  moi?: boolean
   nouveau: boolean // l'anneau et la gélule « NOUVEAU » (nouveaux.ts)
 }
 
@@ -52,7 +51,7 @@ export function enGeoJSON(
         nature: l.nature,
         image: nomImage(l, couleurTypes),
         nouveau: l.nouveau,
-        ...(l.revendication && { pilule: l.revendication.nom, moi: l.revendication.moi }),
+        ...(l.revendication && { pilule: l.revendication.nom }),
       },
     })),
   }
@@ -162,7 +161,8 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
     source: SOURCE,
     minzoom: DE_PRES_PILULES,
     // Un lieu neuf montre « NOUVEAU » à la place du nom (nouveaux.ts) : jamais les deux empilés. Et
-    // aucun nom sous un lieu encore inconnu (Uriel, 08/10).
+    // aucun nom sous un lieu encore inconnu (Uriel, 08/10). Le nom seul, à l'encre, sur un halo
+    // parchemin comme les noms de la carte : ni fond ni bordure (Uriel, 24/10).
     filter: [
       'all',
       ['has', 'pilule'],
@@ -176,10 +176,12 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
       'text-letter-spacing': 0.08,
       'text-anchor': 'top',
       'text-offset': [0, 2.1], // sous le sceau (26 px × 1,15 de près)
-      'icon-image': ['case', ['get', 'moi'], 'pilule-moi', 'pilule'],
-      'icon-text-fit': 'both',
-      'icon-text-fit-padding': [2, 5, 2, 5],
     },
-    paint: { 'text-color': ['case', ['get', 'moi'], c.halo, c.encre] },
+    paint: {
+      'text-color': c.encre,
+      'text-halo-color': c.fond,
+      'text-halo-width': 1.5,
+      'text-halo-blur': 1,
+    },
   })
 }

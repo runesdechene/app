@@ -41,7 +41,6 @@ test('un lieu devient un point avec sa marque et sa pilule', () => {
     nouveau: false,
     image: 'visite-x.svg',
     pilule: 'Rémy',
-    moi: true,
   })
 })
 
