@@ -2,7 +2,8 @@
  * QUOI     — les marques des lieux, dessinées une fois dans un canevas puis confiées à MapLibre :
  *            le « ? » (lieu inconnu) et l'icône du type à l'encre (connu), chacun sur une lueur
  *            parchemin légère ; le sceau du type (visité, en couleur par défaut depuis le 24/10) ; le
- *            sceau d'encre (lieu neuf) ; l'étoile (point d'intérêt) et la gélule « NOUVEAU ».
+ *            sceau d'encre (lieu neuf) ; l'étoile (point d'intérêt), la gélule « NOUVEAU » et l'étendard
+ *            posé devant le nom de qui a revendiqué un lieu.
  * POURQUOI — des images de carte, et non des éléments HTML : des milliers de lieux restent
  *            fluides sur un téléphone (spec Carte §3). Ce qui reste à faire est un signe d'encre nu,
  *            comme sur une carte de jeu ; ce qu'on a visité prend son sceau : de loin, on voit qu'il
@@ -15,6 +16,7 @@
 import type { Map as Carte } from 'maplibre-gl'
 import iconeDefaut from '@/assets/ui/sceau-defaut.svg'
 import imageInconnu from '@/assets/ui/inconnu.webp'
+import imageEtendard from '@/assets/ui/etendard.png'
 import type { LieuCarte } from '../api/lireCarte'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 
@@ -255,6 +257,9 @@ export async function ajouterMarques(
   const inconnu = await chargerImage(imageInconnu)
   ajouter(map, 'bille', bille(inconnu, c))
   ajouter(map, 'curiosite', etoile(c))
+  // L'étendard de la marque (VISUELS/1. IMAGES EN VRAC/etendard vert.png), tel quel.
+  if (!map.hasImage('etendard'))
+    map.addImage('etendard', await chargerImage(imageEtendard), { pixelRatio: 6 }) // 72 px → 12 px, la hauteur du nom
   ajouter(map, 'gelule-nouveau', geluleNouveau(c))
 
   // Chaque image une seule fois (02/10 : dessinée pour chaque lieu, elle coûtait une seconde de

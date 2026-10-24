@@ -162,7 +162,8 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
     minzoom: DE_PRES_PILULES,
     // Un lieu neuf montre « NOUVEAU » à la place du nom (nouveaux.ts) : jamais les deux empilés. Et
     // aucun nom sous un lieu encore inconnu (Uriel, 08/10). Le nom seul, à l'encre, sur un halo
-    // parchemin comme les noms de la carte : ni fond ni bordure (Uriel, 24/10).
+    // parchemin comme les noms de la carte : ni fond ni bordure ; devant lui, l'étendard de la marque
+    // dit « revendiqué » (Uriel, 24/10).
     filter: [
       'all',
       ['has', 'pilule'],
@@ -170,7 +171,15 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
       ['!=', ['get', 'etat'], 'inconnu'],
     ],
     layout: {
-      'text-field': ['upcase', ['get', 'pilule']],
+      'text-field': [
+        'format',
+        ['image', 'etendard'],
+        {},
+        ' ',
+        {},
+        ['upcase', ['get', 'pilule']],
+        {},
+      ],
       'text-font': ['Noto Sans Bold'],
       'text-size': 8,
       'text-letter-spacing': 0.08,
