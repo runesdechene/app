@@ -6,15 +6,13 @@ export const QUESTIONS = {
     titre: 'Quelle époque t’appelle ?',
     aide: 'Deux au plus.',
     max: 2,
-    // Dans l'ordre du temps (Uriel, 24/10) ; « rome » garde sa clé sous son nouveau nom (mig 557).
+    // Dans l'ordre du temps (Uriel, 24/10) ; « rome » garde sa clé sous son nouveau nom (mig 557, 558).
     reponses: [
       ['egypte', 'L’Antiquité égyptienne'], ['grece', 'La Grèce antique'], ['rome', 'L’Empire romain'],
       ['celtes', 'Les Celtes et les Gaulois'], ['byzance', 'L’Empire byzantin'],
       ['scandinavie', 'La culture scandinave, viking'], ['amazigh', 'La culture amazighe'], ['slave', 'La culture slave'],
-      ['moyen_age', 'Le Moyen Âge'], ['ecosse', 'L’Écosse médiévale'], ['renaissance', 'La Renaissance'],
-      ['explorateurs', 'L’époque des grands explorateurs'], ['napoleon', 'L’époque napoléonienne'],
-      ['belle_epoque', 'La Belle Époque'], ['jules_verne', 'L’époque de Jules Verne'],
-      ['grande_guerre', 'La Première Guerre mondiale'], ['nature', 'Les esprits de la nature'], ['autre', 'Une autre'],
+      ['moyen_age', 'Le Moyen Âge'], ['napoleon', 'L’époque napoléonienne'], ['jules_verne', 'L’époque de Jules Verne'],
+      ['totems', 'Les totems animaliers'], ['autre', 'Une autre'],
     ],
   },
   decouverte: {

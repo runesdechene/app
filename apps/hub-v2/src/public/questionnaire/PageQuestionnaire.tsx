@@ -174,7 +174,7 @@ function Ecran({ n, reponses, changer, compte, setCompte }: {
           <input
             className={etape.champ}
             aria-label="Laquelle ?"
-            placeholder="Laquelle ? Les Mayas, le Japon des samouraïs…"
+            placeholder="Laquelle ?"
             maxLength={EPOQUE_AUTRE_MAX}
             value={reponses.epoque_autre ?? ''}
             onChange={(e) => { changer({ epoque_autre: e.target.value || null }) }}
