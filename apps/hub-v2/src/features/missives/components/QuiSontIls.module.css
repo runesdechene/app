@@ -1,0 +1,73 @@
+/*
+ * QUOI     — « Qui sont-ils ? » (maquette 771:2639) : quatre questions en deux colonnes (une au téléphone),
+ *            une barre rouge par réponse sur une piste de sable.
+ */
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: var(--space-6);
+}
+
+.question {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.question p {
+  margin: 0;
+}
+
+.barres {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ligne {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(80px, 1fr) 3ch;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-encre);
+  font-size: var(--legende-size);
+}
+
+.libelle {
+  color: var(--color-texte-doux);
+}
+
+.piste {
+  height: 8px;
+  border-radius: var(--radius-rond);
+  background: var(--color-sable);
+}
+
+.barre {
+  display: block;
+  width: var(--part);
+  height: 100%;
+  min-width: 4px;
+  border-radius: var(--radius-rond);
+  background: var(--color-accent);
+}
+
+.nombre {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.anniversaire {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  color: var(--color-encre);
+}
+
+.jour {
+  min-width: 3ch;
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+}

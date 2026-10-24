@@ -34,6 +34,7 @@ import { EcrireMissive } from '@/features/missives/components/Ecrire'
 import { Automatisations } from '@/features/missives/components/Automatisations'
 import { Envois } from '@/features/missives/components/Envois'
 import { Listes } from '@/features/missives/components/Listes'
+import { QuiSontIls } from '@/features/missives/components/QuiSontIls'
 import { TiroirArticle } from '@/features/joueurs/components/TiroirArticle'
 import { Notifications } from '@/features/joueurs/components/Notifications'
 import { MisesAJour } from '@/features/joueurs/components/MisesAJour'
@@ -93,6 +94,7 @@ export const routes: RouteObject[] = [
       { path: 'missives/envois', Component: Envois },
       { path: 'missives/listes', Component: Listes },
       { path: 'missives/automatisations', Component: Automatisations },
+      { path: 'missives/qui-sont-ils', Component: QuiSontIls },
       { path: 'joueurs/mises-a-jour', Component: MisesAJour, children: [{ path: 'nouvelle', Component: TiroirMiseAJour }, { path: ':id', Component: TiroirMiseAJour }] },
       { path: 'joueurs/notifications', Component: Notifications },
       { path: 'joueurs/blog', Component: Blog, children: [{ path: 'nouveau', Component: TiroirArticle }, { path: ':id', Component: TiroirArticle }] },
