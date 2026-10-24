@@ -3,7 +3,7 @@
 
 export const QUESTIONS = {
   epoques: {
-    titre: 'Quelle époque t’appelle ?',
+    titre: 'Quelle époque tu aimerais porter ?',
     aide: 'Deux au plus.',
     max: 2,
     // Le Moyen Âge en tête, puis l'ordre du temps, l'Égypte à la fin (Uriel, 24/10) ; « rome » garde sa clé sous son nouveau nom (mig 557 à 559).

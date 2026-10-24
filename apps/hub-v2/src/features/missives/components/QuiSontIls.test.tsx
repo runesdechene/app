@@ -35,7 +35,7 @@ function monter(reponse: unknown = REPONSE) {
 test('chaque réponse a son libellé et son nombre, les attentes et les anniversaires suivent', async () => {
 
   monter()
-  const epoques = await screen.findByRole('region', { name: 'Quelle époque les appelle ?' })
+  const epoques = await screen.findByRole('region', { name: 'Quelle époque aimeraient-ils porter ?' })
   expect(within(epoques).getByRole('listitem', { name: /Les Celtes et les Gaulois/ })).toHaveTextContent('58')
   expect(screen.getByText(/128 personnes ont répondu/)).toBeInTheDocument()
   expect(screen.getByText('« Plus de Celtes »')).toBeInTheDocument()

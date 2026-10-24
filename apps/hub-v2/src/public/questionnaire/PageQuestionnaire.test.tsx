@@ -30,7 +30,7 @@ test('le lien ouvre l’accueil à son prénom, sans rien demander', async () =>
   expect(await screen.findByText('Bonjour Kelpie')).toBeInTheDocument()
   expect(screen.queryByLabelText('Ton e-mail')).not.toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Commencer →' }))
-  expect(screen.getByRole('heading', { name: 'Quelle époque t’appelle ?' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'Quelle époque tu aimerais porter ?' })).toBeInTheDocument()
 })
 
 test('le lien d’une époque la coche, et rien n’est envoyé avant le bouton', async () => {
