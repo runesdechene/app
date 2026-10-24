@@ -27,9 +27,9 @@ test('chaque lieu reçoit la marque de son état', () => {
   expect(nomImage({ ...lieu, nature: 'curiosite' }, false)).toBe('curiosite')
 })
 
-test('un lieu neuf porte le sceau de cire, son icône ou son « ? »', () => {
-  expect(nomImage({ ...lieu, etat: 'connu', nouveau: true }, true)).toBe('cire-x.svg')
-  expect(nomImage({ ...lieu, etat: 'inconnu', nouveau: true }, true)).toBe('cire-inconnu')
+test('un lieu neuf porte le sceau d’encre, son icône ou son « ? »', () => {
+  expect(nomImage({ ...lieu, etat: 'connu', nouveau: true }, true)).toBe('neuf-x.svg')
+  expect(nomImage({ ...lieu, etat: 'inconnu', nouveau: true }, true)).toBe('neuf-inconnu')
 })
 
 test('un inconnu neuf a son image à dessiner ; un inconnu ordinaire partage la bille', () => {
@@ -37,7 +37,7 @@ test('un inconnu neuf a son image à dessiner ; un inconnu ordinaire partage la 
     { ...lieu, id: 'b', etat: 'inconnu' as const },
     { ...lieu, id: 'c', etat: 'inconnu' as const, nouveau: true },
   ]
-  expect([...marquesADessiner(lieux, false, () => false).keys()]).toEqual(['cire-inconnu'])
+  expect([...marquesADessiner(lieux, false, () => false).keys()]).toEqual(['neuf-inconnu'])
 })
 
 test('le mélange de deux couleurs suit la part demandée', () => {

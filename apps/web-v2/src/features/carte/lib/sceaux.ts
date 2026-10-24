@@ -2,7 +2,7 @@
  * QUOI     — les marques des lieux, dessinées une fois dans un canevas puis confiées à MapLibre :
  *            le « ? » (lieu inconnu) et l'icône du type à l'encre (connu), chacun sur une lueur
  *            parchemin légère ; le sceau du type (visité, en couleur par défaut depuis le 24/10) ; le
- *            sceau de cire (lieu neuf) ; l'étoile (point d'intérêt), le fond des pilules et la gélule
+ *            sceau d'encre (lieu neuf) ; l'étoile (point d'intérêt), le fond des pilules et la gélule
  *            « NOUVEAU ».
  * POURQUOI — des images de carte, et non des éléments HTML : des milliers de lieux restent
  *            fluides sur un téléphone (spec Carte §3). Ce qui reste à faire est un signe d'encre nu,
@@ -27,7 +27,7 @@ const RATIO = 2
 export function nomImage(l: LieuCarte, couleurTypes: boolean): string {
   if (l.nature === 'curiosite') return 'curiosite'
   const icone = l.icone ?? 'defaut'
-  if (l.nouveau) return l.etat === 'inconnu' ? 'cire-inconnu' : `cire-${icone}`
+  if (l.nouveau) return l.etat === 'inconnu' ? 'neuf-inconnu' : `neuf-${icone}`
   if (l.etat === 'inconnu') return 'bille'
   if (l.etat === 'connu') return `connu-${icone}`
   return couleurTypes && l.couleur ? `visite-${icone}-${l.couleur}` : `visite-${icone}`
@@ -136,12 +136,12 @@ function bille(image: HTMLImageElement, c: CouleursCarte) {
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
 }
 
-// Un lieu neuf : un sceau de cire, l'icône (ou le « ? ») en clair (nouveaux.ts pose sa lueur et son
-// anneau).
-function sceauDeCire(icone: HTMLImageElement, c: CouleursCarte) {
+// Un lieu neuf : un sceau d'encre plein, l'icône (ou le « ? ») en clair (nouveaux.ts pose sa lueur et
+// son anneau). Noir et non rouge : le rouge est aux énigmes (Uriel, 24/10).
+function sceauNeuf(icone: HTMLImageElement, c: CouleursCarte) {
   const ctx = toile(SCEAU)
   disque(ctx, SCEAU / 2 - 2)
-  ctx.fillStyle = c.cire
+  ctx.fillStyle = c.encre
   ctx.fill()
   poserIcone(ctx, icone, c.halo)
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
@@ -223,7 +223,7 @@ function pilule(map: Carte, nom: string, fond: string, bord: string) {
 // La gélule « NOUVEAU » (nouveaux.ts), mot compris, en une seule image : la carte l'agrandit d'un
 // bloc avec le zoom. Une gélule étirée autour d'un texte de carte ne suit pas quand ce texte change
 // de taille avec le zoom : le mot glissait dedans (22/10). Mot en Cabin 9 px, marges de 3 et 6 px,
-// en clair sur la cire (Uriel, 24/10).
+// en clair sur l'encre (Uriel, 24/10).
 function geluleNouveau(c: CouleursCarte): ImageData {
   const [mot, haut, cote] = [9 * RATIO, 3 * RATIO, 6 * RATIO]
   const police = `700 ${String(mot)}px Cabin`
@@ -236,7 +236,7 @@ function geluleNouveau(c: CouleursCarte): ImageData {
   if (!ctx) throw new Error('canevas indisponible')
   ctx.beginPath()
   ctx.roundRect(0, 0, largeur, hauteur, hauteur / 2)
-  ctx.fillStyle = c.cire
+  ctx.fillStyle = c.encre
   ctx.fill()
   ctx.font = police
   ctx.letterSpacing = mesure.letterSpacing
@@ -288,7 +288,7 @@ export async function ajouterMarques(
   await Promise.all(
     [...aDessiner].map(async ([nom, l]) => {
       const dessiner = (icone: HTMLImageElement) => {
-        if (l.nouveau) return sceauDeCire(l.etat === 'inconnu' ? inconnu : icone, c)
+        if (l.nouveau) return sceauNeuf(l.etat === 'inconnu' ? inconnu : icone, c)
         if (l.etat === 'connu') return sceauConnu(icone, c)
         if (couleurTypes && l.couleur) return sceauCouleur(icone, l.couleur)
         return sceauVisite(icone, c)

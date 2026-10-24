@@ -1,15 +1,15 @@
 /**
- * QUOI     — les nouveaux lieux sur la carte (Figma 793:2095, piste 5 « le sceau de cire », Uriel 24/10) :
- *            un lieu ajouté depuis moins de 14 jours et pas encore ouvert porte un sceau de cire rouge
- *            (sceaux.ts), entouré d'une lueur rouge et d'un fin anneau rouge qui s'élargit et s'efface
- *            en boucle lente ; de près seulement, une gélule rouge « NOUVEAU » sous la marque. Le lieu
+ * QUOI     — les nouveaux lieux sur la carte (Uriel, 24/10) : un lieu ajouté depuis moins de 14 jours
+ *            et pas encore ouvert porte un sceau d'encre plein (sceaux.ts), au premier plan, entouré
+ *            d'une lueur et d'un fin anneau d'encre qui s'élargit et s'efface en boucle lente ; de près
+ *            seulement, une gélule d'encre « NOUVEAU » sous la marque. Le lieu
  *            reste à sa place et à sa taille.
  * POURQUOI — l'anneau d'encre seul (08/10), puis l'aube dorée, ne se voyaient pas assez parmi les
  *            lieux (Uriel, 24/10). Une seule couleur pour tous les lieux neufs : les couleurs par nature
- *            faisaient « pêle-mêle » (08/10). Le mot de loin chargeait la carte : la cire suffit à
+ *            faisaient « pêle-mêle » (08/10). Le mot de loin chargeait la carte : le sceau suffit à
  *            signaler. Calques MapLibre sur la source des lieux : la propriété `nouveau` (migration 469).
- * ATTENTION — les énigmes portent aussi un sceau de cire « ? » ; elles seront revues avec leurs propres
- *            icônes (Uriel, 24/10). L'anneau est plus lent que leur onde, pour ne pas les confondre.
+ * ATTENTION — noir et non rouge : le rouge est aux énigmes (Uriel, 24/10). L'anneau est plus lent que
+ *            leur onde, pour ne pas les confondre.
  *            Les tailles suivent la courbe des marques (PALIERS, calques.ts), au premier niveau de
  *            l'expression de zoom ; l'anneau s'anime image par image (comme `fairePulser` des
  *            énigmes). Animations réduites : un anneau fixe.
@@ -31,7 +31,7 @@ const PERIODE = 3000 // ms : plus lent que les énigmes (2 200), pour qu'on ne l
 const RAYON = 13 // le rayon d'une marque à la taille 1 (sceau de 26 px)
 const ELAN = 4 // de combien l'anneau s'élargit au-delà de la marque (réduit de moitié, Uriel 08/10)
 const TRAIT = 1.2 // l'épaisseur de l'anneau
-const LUEUR = 22 // le rayon de la lueur rouge, à la taille 1
+const LUEUR = 22 // le rayon de la lueur, à la taille 1
 const DE_PRES = 9 // « NOUVEAU » dès l'échelle d'un département, comme les noms des revendications
 
 const estNouveau: FilterSpecification = ['==', ['get', 'nouveau'], true]
@@ -73,7 +73,7 @@ export function calqueAnneau(c: CouleursCarte, ecran: number): AddLayerObject {
     paint: {
       'circle-opacity': 0, // un contour seul
       'circle-radius': rayonAuZoom(rayon * ecran),
-      'circle-stroke-color': c.cire,
+      'circle-stroke-color': c.encre,
       'circle-stroke-width': TRAIT * ecran,
       'circle-stroke-opacity': opacite,
       // Pas de fondu : on change ces valeurs à chaque image (sinon les fondus se chevauchent).
@@ -83,7 +83,7 @@ export function calqueAnneau(c: CouleursCarte, ecran: number): AddLayerObject {
   }
 }
 
-// La lueur rouge : un disque de cire flou, sous toutes les marques.
+// La lueur : un disque d'encre flou, sous toutes les marques.
 export function calqueLueur(c: CouleursCarte, ecran: number): AddLayerObject {
   return {
     id: CALQUE_LUEUR_NOUVEAUX,
@@ -91,7 +91,7 @@ export function calqueLueur(c: CouleursCarte, ecran: number): AddLayerObject {
     source: SOURCE,
     filter: estNouveau,
     paint: {
-      'circle-color': c.cire,
+      'circle-color': c.encre,
       'circle-blur': 1, // flou du centre jusqu'au bord : une lueur, pas un disque
       'circle-opacity': 0.6,
       'circle-radius': rayonAuZoom(LUEUR * ecran),
@@ -100,7 +100,7 @@ export function calqueLueur(c: CouleursCarte, ecran: number): AddLayerObject {
 }
 
 // La gélule « NOUVEAU », dessinée d'un bloc avec son mot (sceaux.ts), de près seulement (Uriel, 24/10) :
-// de loin, la cire suffit.
+// de loin, le sceau suffit.
 export function calqueGelule(): AddLayerObject {
   return {
     id: CALQUE_GELULE_NOUVEAUX,

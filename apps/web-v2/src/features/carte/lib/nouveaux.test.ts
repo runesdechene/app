@@ -1,5 +1,5 @@
 /**
- * QUOI     — les nouveaux lieux : une lueur rouge, un fin anneau de cire qui part de la marque et
+ * QUOI     — les nouveaux lieux : une lueur d'encre, un fin anneau d'encre qui part de la marque et
  *            s'efface, une taille qui suit le zoom, une gélule « NOUVEAU » de près seulement.
  */
 import { expect, test } from 'vitest'
@@ -13,7 +13,7 @@ import {
   rayonAuZoom,
 } from './nouveaux'
 
-const c = { encre: '#494841', halo: '#fffaf2', cire: '#a94842' } as CouleursCarte
+const c = { encre: '#494841', halo: '#fffaf2' } as CouleursCarte
 
 test('l’anneau naît transparent, se dessine en s’élargissant, puis s’efface : jamais d’un coup', () => {
   expect(anneauNouveau(0)).toEqual({ rayon: 14, opacite: 0 })
@@ -28,19 +28,19 @@ test('la taille suit le zoom, avec la courbe au premier niveau (exigence de MapL
   expect(rayonAuZoom(10)).toEqual(['interpolate', ['linear'], ['zoom'], 4, 5, 8, 8, 12, 11.5])
 })
 
-test('un contour de cire seul, seulement pour les lieux nouveaux', () => {
+test('un contour d’encre seul, seulement pour les lieux nouveaux', () => {
   expect(calqueAnneau(c, 1)).toMatchObject({
     type: 'circle',
     filter: ['==', ['get', 'nouveau'], true],
-    paint: { 'circle-opacity': 0, 'circle-stroke-color': '#a94842' },
+    paint: { 'circle-opacity': 0, 'circle-stroke-color': '#494841' },
   })
 })
 
-test('une lueur de cire floue sous la marque', () => {
+test('une lueur d’encre floue sous la marque', () => {
   expect(calqueLueur(c, 1)).toMatchObject({
     type: 'circle',
     filter: ['==', ['get', 'nouveau'], true],
-    paint: { 'circle-color': '#a94842', 'circle-blur': 1, 'circle-radius': rayonAuZoom(22) },
+    paint: { 'circle-color': '#494841', 'circle-blur': 1, 'circle-radius': rayonAuZoom(22) },
   })
 })
 
