@@ -1,0 +1,159 @@
+/*
+ * QUOI     — la fenêtre du questionnaire (maquette 776:2696), reprise de la carte de /soumettre-contenu :
+ *            le bandeau --color-ombre, le parchemin du flyer dessous, le bouton sombre.
+ * POURQUOI — au téléphone (moins de 900 px), la fenêtre tient l'écran et le pied reste sous le pouce :
+ *            seul le corps défile. Sur PC, une fenêtre de 420 px, coins de 24 px, posée au centre.
+ */
+.fenetre {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: var(--hauteur-ecran);
+  background: var(--color-gravure) url('../../assets/flyer/fond-parchemin-entrelacs.webp') center top / cover;
+  color: var(--color-boutique-brun);
+}
+
+.entete {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 22px 24px 18px;
+  background: var(--color-ombre);
+}
+
+.marque {
+  margin: 0;
+  color: var(--color-ocre);
+  font-size: var(--pilule-size);
+  letter-spacing: var(--explore-tracking);
+  text-transform: uppercase;
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-sur-accent);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  line-height: 1;
+}
+
+/* Les sept pastilles, reliées par un trait qui se dore derrière les questions faites. */
+.frise {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 6px 3px 2px;
+  list-style: none;
+}
+
+.frise li {
+  display: flex;
+  align-items: center;
+}
+
+.frise li:not(:last-child) {
+  flex: 1;
+}
+
+.frise li:not(:last-child)::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: color-mix(in srgb, var(--color-sur-accent) 22%, transparent);
+}
+
+.frise li[data-etat='faite']::after {
+  background: var(--color-boutique-or);
+}
+
+.pastille {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid color-mix(in srgb, var(--color-sur-accent) 35%, transparent);
+  border-radius: 50%;
+  color: color-mix(in srgb, var(--color-sur-accent) 60%, transparent);
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    box-shadow var(--duree-douce) var(--courbe-douce);
+}
+
+[data-etat='faite'] .pastille {
+  border-color: var(--color-boutique-or);
+  background: var(--color-boutique-or);
+  color: var(--color-ombre);
+}
+
+[data-etat='en-cours'] .pastille {
+  border-color: var(--color-sur-accent);
+  background: var(--color-sur-accent);
+  box-shadow: 0 0 0 3px var(--color-boutique-or);
+  color: var(--color-ombre);
+}
+
+.sous {
+  margin: 0;
+  color: var(--color-pilule);
+  font-family: var(--font-condensee);
+  font-size: var(--flux-size);
+}
+
+/* Le corps défile seul ; chaque question y entre en glissant depuis la droite. */
+.corps {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 24px 16px;
+  overflow-y: auto;
+  animation: glisse var(--duree-douce) var(--courbe-douce) both;
+}
+
+.pied {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px 20px;
+  border-top: 1px solid color-mix(in srgb, var(--color-boutique-or) 35%, transparent);
+}
+
+@keyframes glisse {
+  from {
+    opacity: 0;
+    translate: 24px 0;
+  }
+}
+
+@keyframes leve {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+
+@container app (width >= 900px) {
+  .fenetre {
+    width: 420px;
+    height: min(820px, var(--hauteur-ecran) - 2 * var(--space-6));
+    overflow: hidden;
+    border-radius: 24px;
+    box-shadow: 0 30px 70px color-mix(in srgb, var(--color-ombre) 60%, transparent);
+    animation: leve var(--duree-douce) var(--courbe-douce) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fenetre,
+  .corps {
+    animation: none;
+  }
+}

@@ -1,7 +1,8 @@
 // Source : `pnpm build` l'empaquette en un seul fichier dans netlify/functions (build:fonctions, voir le README).
 // Le questionnaire « Dis-nous qui tu es », page publique /qui-es-tu, sans compte :
 //   GET  ?j=…               → le prénom de la personne du lien, et ses réponses s'il en a déjà donné.
-//   POST { jeton, reponses } → les réponses s'écrivent (mig 555), pour la personne du lien seulement.
+//   POST { jeton, reponses, compte } → les réponses s'écrivent (mig 555), pour la personne du lien seulement ;
+//                            `compte` coché, son compte Explore s'ouvre à l'adresse de sa fiche.
 //   POST { email }           → sans lien : si une fiche porte l'adresse, elle reçoit son lien par e-mail.
 // Rien ne s'écrit sans lien signé (usage « questionnaire », lib/jeton.ts) : personne ne remplit la fiche d'un
 // autre. Une adresse inconnue reçoit la même réponse qu'une connue : la page ne dit pas qui a un compte.
@@ -84,6 +85,30 @@ async function envoyerLeLien(email: string): Promise<void> {
   }], cle)
 }
 
+/**
+ * La case « Créer aussi mon compte Explore » : un compte confirmé à l'adresse de la fiche. Le lien signé,
+ * envoyé à cette adresse, vaut la preuve que le code de connexion demande d'habitude ; à sa création,
+ * handle_new_user (mig 455) reprend la fiche, comme à une première connexion. Un compte qui existe déjà
+ * (422) est un compte prêt. Un échec ne retire rien aux réponses, déjà enregistrées.
+ */
+async function creerCompte(userId: string): Promise<boolean> {
+  try {
+    const [fiche] = await lire<{ email_address: string }>(`users?id=eq.${encodeURIComponent(userId)}&select=email_address`)
+    if (!fiche?.email_address) return false
+    const r = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: fiche.email_address, email_confirm: true }),
+    })
+    if (r.ok || r.status === 422) return true
+    console.error('questionnaire : compte non créé, HTTP', r.status)
+    return false
+  } catch (e) {
+    console.error('questionnaire : compte non créé,', e instanceof Error ? e.message : 'erreur inconnue')
+    return false
+  }
+}
+
 export default async function handler(request: Request, context?: { waitUntil?: (p: Promise<unknown>) => void }) {
   try {
     if (request.method === 'GET') {
@@ -94,7 +119,7 @@ export default async function handler(request: Request, context?: { waitUntil?: 
     }
     if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
 
-    const corps = (await request.json().catch(() => ({}))) as { jeton?: unknown; reponses?: unknown; email?: unknown }
+    const corps = (await request.json().catch(() => ({}))) as { jeton?: unknown; reponses?: unknown; email?: unknown; compte?: unknown }
 
     if (typeof corps.email === 'string') {
       const email = corps.email.trim().toLowerCase()
@@ -115,7 +140,9 @@ export default async function handler(request: Request, context?: { waitUntil?: 
       console.error('questionnaire : la base a refusé, HTTP', r.status)
       return json({ error: 'Tes réponses n’ont pas pu s’enregistrer, réessaie dans un instant.' }, 500)
     }
-    return json({ ok: true, prenom: await prenomDe(userId) })
+    // Le prénom avant le compte : le compte peut déplacer la fiche sous un nouvel identifiant.
+    const salut = await prenomDe(userId)
+    return json({ ok: true, prenom: salut, compte: corps.compte === true ? await creerCompte(userId) : false })
   } catch (erreur) {
     console.error('questionnaire :', erreur instanceof Error ? erreur.message : 'erreur inconnue')
     return json({ error: 'Unexpected error' }, 500)

@@ -19,7 +19,7 @@ function simuler({ dejaDemande = false, demandesDeLHeure = 0 } = {}) {
   vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) => {
     const brut = init?.body ? String(init.body) : null
     appels.push({ url, methode: init?.method ?? 'GET', corps: brut ? JSON.parse(brut) : null })
-    if (url.includes('/rest/v1/users?id=eq.u1')) return Promise.resolve(Response.json([{ first_name: 'Kelpie' }]))
+    if (url.includes('/rest/v1/users?id=eq.u1')) return Promise.resolve(Response.json([{ first_name: 'Kelpie', email_address: 'Kelpie@exemple.fr' }]))
     if (url.includes('/rest/v1/users?email_address=ilike.kelpie')) return Promise.resolve(Response.json([{ id: 'u1', first_name: 'Kelpie', email_address: 'Kelpie@exemple.fr' }]))
     if (url.includes('/rest/v1/questionnaire_demandes?le=gte')) return Promise.resolve(Response.json(Array.from({ length: demandesDeLHeure }, () => ({ le: '' }))))
     if (url.includes('/rest/v1/users?email_address')) return Promise.resolve(Response.json([]))
@@ -68,9 +68,21 @@ describe('questionnaire', () => {
     const appels = simuler()
     const handler = await charger()
     const r = await handler(poster({ jeton: signer('u1', 'questionnaire'), reponses: { epoques: ['celtes'], anniv_jour: 12, anniv_mois: 3 } }))
-    expect(await r.json()).toEqual({ ok: true, prenom: 'Kelpie' })
+    expect(await r.json()).toEqual({ ok: true, prenom: 'Kelpie', compte: false })
+    expect(appels.some((a) => a.url.includes('/auth/v1/'))).toBe(false)
     const ecrit = appels.find((a) => a.url.endsWith('/rest/v1/rpc/questionnaire_repondre'))
     expect(ecrit?.corps).toMatchObject({ p_user: 'u1', p: { epoques: ['celtes'], anniv_jour: 12, anniv_mois: 3 } })
+  })
+
+  test('la case du compte coché : un compte confirmé à l’adresse de la fiche, après les réponses', async () => {
+    const appels = simuler()
+    const handler = await charger()
+    const r = await handler(poster({ jeton: signer('u1', 'questionnaire'), reponses: { epoques: ['celtes'] }, compte: true }))
+    expect(await r.json()).toEqual({ ok: true, prenom: 'Kelpie', compte: true })
+    const rangs = appels.map((a) => a.url)
+    const creation = appels.find((a) => a.url.endsWith('/auth/v1/admin/users'))
+    expect(creation?.corps).toEqual({ email: 'Kelpie@exemple.fr', email_confirm: true })
+    expect(rangs.findIndex((u) => u.endsWith('/auth/v1/admin/users'))).toBeGreaterThan(rangs.findIndex((u) => u.endsWith('questionnaire_repondre')))
   })
 
   test('lire : le prénom de la personne du lien', async () => {

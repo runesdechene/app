@@ -1,42 +1,296 @@
 /*
- * QUOI     — /qui-es-tu (maquette 750:2520) : la colonne de /flyercadeau, une question par bloc, ses cases
- *            dessous ; les champs reprennent la carte de Public/Champ.
+ * QUOI     — le contenu de /qui-es-tu (maquette 776:2696) : la photo floutée derrière, et dans la fenêtre
+ *            l'intitulé, les réponses en cartes, l'encart du cadeau, l'écran de fin.
+ * ÉCARTS   — les couleurs de /soumettre-contenu : #9b3f39 = --color-fiche-badge, #b4894f =
+ *            --color-boutique-or, #ead3ad = --color-vignette, #fbf1df = --color-pilule ; la case cochée
+ *            reprend --color-accent et la coche des pages publiques.
  */
-.formulaire {
-  display: grid;
-  gap: var(--space-6);
+.photo {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  /* Le flou mord les bords : l'image déborde un peu pour qu'ils ne se voient pas. */
+  filter: blur(16px) brightness(0.8);
+  scale: 1.08;
 }
 
-.question {
-  display: grid;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  border: 0;
+.formulaire {
+  display: contents;
 }
 
 .intitule {
-  margin: 0 0 var(--space-1);
-  padding: 0;
-  color: var(--color-encre);
-  font-size: var(--corps-size);
-  font-weight: var(--weight-semi);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.aide {
-  margin: calc(-1 * var(--space-2)) 0 0;
+.numero {
+  margin: 0;
+  color: var(--color-boutique-or);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.question,
+.grand {
+  margin: 0;
+  color: var(--color-fiche-badge);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  line-height: 1;
+}
+
+.grand {
+  font-size: var(--fete-size);
+}
+
+.aide,
+.signature,
+.compteur,
+.precision {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-size: var(--flux-size);
+}
+
+.signature {
+  font-style: italic;
+}
+
+.compteur {
+  margin-top: -8px;
+  text-align: end;
+}
+
+.texte {
+  margin: 0;
+  color: var(--color-boutique-brun);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+.legal {
+  margin: auto 0 0;
   color: var(--color-texte-doux);
   font-size: var(--legende-size);
 }
 
-.texte {
-  resize: vertical;
-  font: inherit;
+.reponses {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.anniversaire {
+/* Une réponse : toute la carte coche, le rond à droite se remplit. */
+.choix {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: 11px 14px 11px 16px;
+  border: 1px solid var(--color-vignette);
+  border-radius: 12px;
+  background: var(--color-sur-accent);
+  color: var(--color-boutique-brun);
+  font-size: var(--sous-titre-size);
+  cursor: pointer;
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.choix span {
+  flex: 1;
+}
+
+.choix:has(:checked) {
+  border-color: var(--color-boutique-or);
+  background: var(--color-pilule);
+  font-weight: var(--weight-semi);
+  box-shadow: inset 0 0 0 0.5px var(--color-boutique-or);
+}
+
+.choix:has(:disabled) {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.rond {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border: 1.5px solid var(--color-bord);
+  border-radius: 50%;
+  background: center / 13px no-repeat;
+  appearance: none;
+  cursor: inherit;
+}
+
+.rond:checked {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  background-image: url('../../assets/ui/coche.svg');
+}
+
+.rond:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.zone {
+  min-height: 180px;
+}
+
+.date {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
+}
+
+/* Le jour et le mois : une carte, son libellé en petites capitales, la liste dessous. */
+.carte {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px 12px;
+  border: 1px solid var(--color-vignette);
+  border-radius: 12px;
+  background: var(--color-sur-accent);
+}
+
+.carte span {
+  color: var(--color-texte-doux);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.carte select {
+  border: none;
+  background: none;
+  color: var(--color-boutique-brun);
+  font: inherit;
+  font-size: var(--corps-size);
+}
+
+/* L'encart : le cadeau de l'accueil, la case du compte. */
+.encart {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--color-vignette);
+  border-radius: 14px;
+  background: var(--color-sur-accent);
+}
+
+.mot,
+.encart label span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+}
+
+.petitCadeau {
+  width: 54px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.lien {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.lien > :not(button) {
+  align-self: stretch;
+}
+
+.duree {
+  color: var(--color-boutique-or);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.precedent {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-texte-doux);
+  font: inherit;
+  font-size: var(--flux-size);
+  font-weight: var(--weight-semi);
+  cursor: pointer;
+}
+
+/* La fin : tout au centre, le pin dans son cadre pointillé. */
+.merci {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  text-align: center;
+}
+
+.merci .intitule {
+  align-items: center;
+}
+
+.cadeau {
+  width: 92px;
+  height: 86px;
+  object-fit: contain;
+}
+
+.pin {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-self: stretch;
+  padding: 18px 16px 16px;
+  border: 1.5px dashed var(--color-boutique-or);
+  border-radius: 14px;
+  background: var(--color-pilule);
+  color: var(--color-texte-doux);
+  font-size: var(--flux-size);
+}
+
+.pin strong {
+  color: var(--color-fiche-badge);
+  font-family: var(--font-titre);
+  font-size: var(--code-promo-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.compte {
+  margin: 0;
+  color: var(--color-confetti-vert);
+  font-size: var(--flux-size);
+}
+
+.legal a,
+.compte a {
+  color: inherit;
+}
+
+.large {
+  flex: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choix {
+    transition: none;
+  }
 }
