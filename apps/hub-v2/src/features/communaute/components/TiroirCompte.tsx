@@ -1,6 +1,6 @@
 /**
  * QUOI     — la fiche d'un compte (maquette 595:1140) : identité, parcours, rôle, compteurs,
- *            Fragments, achats, dernières traces.
+ *            Fragments, ses missives (771:3259), achats, dernières traces.
  * POURQUOI — le rôle se change ici : c'est le seul geste d'écriture de la fiche. Le choix ne part qu'au
  *            bouton « Changer » (une flèche du clavier dans la liste n'écrit rien), et faire un admin se confirme.
  */
@@ -19,6 +19,7 @@ import { useChangerRole, useCompte } from '../hooks/useCompte'
 import { balisesDuCompte } from '../lib/balises'
 import { PROVENANCES } from '../lib/provenances'
 import { AssocierFragment } from './AssocierFragment'
+import { SesMissives } from './SesMissives'
 import styles from './Communaute.module.css'
 
 const LISTE = '/communaute/comptes'
@@ -139,6 +140,8 @@ export function TiroirCompte() {
       </div>
 
       <AssocierFragment compte={data.id} fragments={data.fragments} />
+
+      <SesMissives compte={data.id} />
 
       <TitreDeSection titre="Ses achats" />
       <Bloc>

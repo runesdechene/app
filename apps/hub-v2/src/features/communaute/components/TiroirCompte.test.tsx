@@ -10,6 +10,7 @@ const mockChanger = vi.hoisted(() => vi.fn())
 vi.mock('../hooks/useCompte', async (orig) => ({ ...(await orig<typeof import('../hooks/useCompte')>()), useCompte: mockUseCompte }))
 vi.mock('../api/comptes', async (orig) => ({ ...(await orig<typeof import('../api/comptes')>()), changerRole: mockChanger }))
 
+vi.mock('../api/sesMissives', () => ({ lireSesMissives: () => new Promise(() => undefined), nommerAmbassadeur: vi.fn() }))
 vi.mock('../api/fragmentsDuCompte', () => ({ lireFragmentsAssociables: () => Promise.resolve([]), associerFragment: vi.fn(), retirerFragment: vi.fn() }))
 
 const fiche = {
