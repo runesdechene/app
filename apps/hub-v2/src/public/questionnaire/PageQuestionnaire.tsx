@@ -58,7 +58,7 @@ function Cases({ q, choisies, onChange }: { q: Question; choisies: string[]; onC
             <span>{libelle}</span>
             <input
               type="checkbox"
-              className={styles.rond}
+              className={styles.case}
               checked={cochee}
               disabled={plein && !cochee}
               onChange={() => { onChange(cochee ? choisies.filter((c) => c !== cle) : [...choisies, cle]) }}
