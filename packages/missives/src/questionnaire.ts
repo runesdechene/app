@@ -6,12 +6,12 @@ export const QUESTIONS = {
     titre: 'Quelle époque t’appelle ?',
     aide: 'Deux au plus.',
     max: 2,
-    // Dans l'ordre du temps, l'Égypte à la fin (Uriel, 24/10) ; « rome » garde sa clé sous son nouveau nom (mig 557 à 559).
+    // Le Moyen Âge en tête, puis l'ordre du temps, l'Égypte à la fin (Uriel, 24/10) ; « rome » garde sa clé sous son nouveau nom (mig 557 à 559).
     reponses: [
-      ['grece', 'La Grèce antique'], ['rome', 'L’Empire romain d’Orient et d’Occident'],
+      ['moyen_age', 'Le Moyen Âge'], ['grece', 'La Grèce antique'], ['rome', 'L’Empire romain d’Orient et d’Occident'],
       ['celtes', 'Les Celtes et les Gaulois'],
       ['scandinavie', 'La culture scandinave, viking'], ['amazigh', 'La culture amazighe'], ['slave', 'La culture slave'],
-      ['moyen_age', 'Le Moyen Âge'], ['napoleon', 'L’époque napoléonienne'], ['jules_verne', 'L’époque de Jules Verne'],
+      ['napoleon', 'L’époque napoléonienne'], ['jules_verne', 'L’époque de Jules Verne'],
       ['totems', 'Les totems animaliers'], ['egypte', 'L’Antiquité égyptienne'], ['autre', 'Une autre'],
     ],
   },
