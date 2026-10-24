@@ -36,7 +36,7 @@ function moisEnCours(): string {
   return /^[aeiouéèêâô]/i.test(mois) ? `d’${mois}` : `de ${mois}`
 }
 
-function Barres({ q, compte }: { q: Question; compte: { cle: string; nombre: number }[] }) {
+function Barres({ q, compte, libres }: { q: Question; compte: { cle: string; nombre: number }[]; libres: { texte: string; nombre: number }[] }) {
   const parCle = new Map(compte.map((c) => [c.cle, c.nombre]))
   const lignes = QUESTIONS[q].reponses
     .map(([cle, libelle]) => ({ cle, libelle, n: parCle.get(cle) ?? 0 }))
@@ -55,6 +55,11 @@ function Barres({ q, compte }: { q: Question; compte: { cle: string; nombre: num
             </li>
           ))}
         </ul>
+        {libres.length > 0 && (
+          <p className={commun.calme}>
+            Ils ont précisé : {libres.map((l) => (l.nombre > 1 ? `${l.texte} (${nombre.format(l.nombre)})` : l.texte)).join(' · ')}
+          </p>
+        )}
       </section>
     </Bloc>
   )
@@ -86,19 +91,8 @@ export function QuiSontIls() {
       {data && data.repondants > 0 && (
         <>
           <div className={styles.grille}>
-            {(Object.keys(QUESTIONS) as Question[]).map((q) => <Barres key={q} q={q} compte={data.reponses[q] ?? []} />)}
+            {(Object.keys(QUESTIONS) as Question[]).map((q) => <Barres key={q} q={q} compte={data.reponses[q] ?? []} libres={data.libres[q] ?? []} />)}
           </div>
-
-          {data.epoques_autres.length > 0 && (
-            <Bloc>
-              <section aria-label="Les autres époques citées" className={styles.question}>
-                <TitreDeSection titre="Les autres époques citées" />
-                <p className={commun.calme}>
-                  {data.epoques_autres.map((e) => (e.nombre > 1 ? `${e.texte} (${nombre.format(e.nombre)})` : e.texte)).join(' · ')}
-                </p>
-              </section>
-            </Bloc>
-          )}
 
           <Bloc>
             <section aria-label="Ce qu’ils attendent" className={styles.question}>

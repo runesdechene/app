@@ -48,6 +48,13 @@ test('« Une autre » ouvre un champ pour dire laquelle', async () => {
   expect(screen.getByLabelText('Laquelle ?')).toHaveValue('Les Mayas')
 })
 
+test('« Autrement » ouvre un champ pour dire comment', async () => {
+  monter('/qui-es-tu?j=u1.sig&q=2')
+  await userEvent.click(await screen.findByRole('checkbox', { name: 'Autrement' }))
+  await userEvent.type(screen.getByLabelText('Comment ?'), 'Un podcast')
+  expect(screen.getByLabelText('Comment ?')).toHaveValue('Un podcast')
+})
+
 test('une troisième époque ne se coche pas', async () => {
   monter('/qui-es-tu?j=u1.sig&q=1')
   await userEvent.click(await screen.findByRole('checkbox', { name: 'L’Empire romain d’Orient et d’Occident' }))
@@ -80,7 +87,7 @@ test('« Envoyer mes réponses » poste les réponses des sept écrans, puis « 
   expect(envoi?.corps).toEqual({
     jeton: 'u1.sig',
     reponses: {
-      epoques: ['celtes'], epoque_autre: null, decouverte: ['flyer'], amene: [], plait: [],
+      epoques: ['celtes'], epoque_autre: null, decouverte: ['flyer'], decouverte_autre: null, amene: [], plait: [],
       attente: 'Plus de Celtes', departement: null, anniv_jour: 12, anniv_mois: 3,
     },
     compte: false,

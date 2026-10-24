@@ -94,6 +94,15 @@ describe('questionnaire', () => {
     expect(ecrits).toEqual(['Les Mayas', null])
   })
 
+  test('le texte de « Autrement » ne part qu’avec sa case', async () => {
+    const appels = simuler()
+    const handler = await charger()
+    await handler(poster({ jeton: signer('u1', 'questionnaire'), reponses: { decouverte: ['autrement'], decouverte_autre: 'Un podcast' } }))
+    await handler(poster({ jeton: signer('u1', 'questionnaire'), reponses: { decouverte: ['ami'], decouverte_autre: 'Un podcast' } }))
+    const ecrits = appels.filter((a) => a.url.endsWith('questionnaire_repondre')).map((a) => (a.corps as { p: { decouverte_autre: unknown } }).p.decouverte_autre)
+    expect(ecrits).toEqual(['Un podcast', null])
+  })
+
   test('lire : le prénom de la personne du lien', async () => {
     simuler()
     const handler = await charger()

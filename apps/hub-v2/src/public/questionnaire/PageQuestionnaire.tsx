@@ -7,7 +7,7 @@
  *            l'adresse (?q=3), comme l'étape de /soumettre-contenu : le retour du navigateur revient d'une
  *            question. Sans lien, la page demande l'e-mail et envoie le lien, rien d'autre.
  */
-import { EPOQUE_AUTRE_MAX, QUESTIONS, type Question, type Reponses } from '@runes/missives'
+import { LIBRE_MAX, QUESTIONS, type Question, type Reponses } from '@runes/missives'
 import { useEffect, useState, type ReactNode, type SubmitEvent } from 'react'
 import { useSearchParams } from 'react-router'
 import cadeau from '@/assets/flyer/cadeau.webp'
@@ -29,7 +29,7 @@ const BOUTIQUE = 'https://runesdechene.com'
 const EXPLORE = 'https://app.runesdechene.com'
 const DONNEES_PERSONNELLES = 'https://app.runesdechene.com/legal/confidentialite'
 const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
-const VIDE: Reponses = { epoques: [], epoque_autre: null, decouverte: [], amene: [], plait: [], attente: null, departement: null, anniv_jour: null, anniv_mois: null }
+const VIDE: Reponses = { epoques: [], epoque_autre: null, decouverte: [], decouverte_autre: null, amene: [], plait: [], attente: null, departement: null, anniv_jour: null, anniv_mois: null }
 const A_CASES = Object.keys(QUESTIONS) as Question[]
 const DERNIERE = ETAPES.length
 
@@ -166,18 +166,20 @@ function Ecran({ n, reponses, changer, compte, setCompte }: {
 }) {
   const q = A_CASES[n - 1]
   if (q) {
+    // Une réponse « autre » cochée ouvre son champ, pour dire laquelle.
+    const libre = QUESTIONS[q].libre
     return (
       <>
         <Intitule n={n} titre={QUESTIONS[q].titre} aide={QUESTIONS[q].aide} />
         <Cases q={q} choisies={reponses[q]} onChange={(choisies) => { changer({ [q]: choisies }) }} />
-        {q === 'epoques' && reponses.epoques.includes('autre') && (
+        {libre && reponses[q].includes(libre.reponse) && (
           <input
             className={etape.champ}
-            aria-label="Laquelle ?"
-            placeholder="Laquelle ?"
-            maxLength={EPOQUE_AUTRE_MAX}
-            value={reponses.epoque_autre ?? ''}
-            onChange={(e) => { changer({ epoque_autre: e.target.value || null }) }}
+            aria-label={libre.invite}
+            placeholder={libre.invite}
+            maxLength={LIBRE_MAX}
+            value={reponses[libre.champ] ?? ''}
+            onChange={(e) => { changer({ [libre.champ]: e.target.value || null }) }}
           />
         )}
       </>

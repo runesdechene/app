@@ -6,6 +6,7 @@ export const QUESTIONS = {
     titre: 'Quelle époque tu aimerais porter ?',
     aide: 'Deux au plus.',
     max: 2,
+    libre: { reponse: 'autre', champ: 'epoque_autre', invite: 'Laquelle ?' },
     // Le Moyen Âge en tête, puis l'ordre du temps, l'Égypte à la fin (Uriel, 24/10) ; « rome » garde sa clé sous son nouveau nom (mig 557 à 559).
     reponses: [
       ['moyen_age', 'Le Moyen Âge'], ['grece', 'La Grèce antique'], ['rome', 'L’Empire romain d’Orient et d’Occident'],
@@ -19,6 +20,7 @@ export const QUESTIONS = {
     titre: 'Comment as-tu découvert Runes de Chêne ?',
     aide: null,
     max: null,
+    libre: { reponse: 'autrement', champ: 'decouverte_autre', invite: 'Comment ?' },
     reponses: [
       ['stand', 'Sur un stand, en festival'], ['instagram', 'Instagram'], ['tiktok', 'TikTok'], ['ami', 'Un ami'],
       ['flyer', 'Un flyer'], ['recherche', 'Une recherche sur internet'], ['autrement', 'Autrement'],
@@ -28,6 +30,7 @@ export const QUESTIONS = {
     titre: 'Qu’est-ce qui t’amène ?',
     aide: null,
     max: null,
+    libre: null,
     reponses: [
       ['histoire', 'Porter l’Histoire'], ['lieux', 'Explorer des lieux'], ['cadeau', 'Offrir un cadeau'],
       ['communaute', 'La communauté'], ['curiosite', 'La curiosité'],
@@ -37,10 +40,12 @@ export const QUESTIONS = {
     titre: 'Qu’est-ce qui te plaît le plus chez nous ?',
     aide: 'Plusieurs réponses possibles.',
     max: null,
+    libre: null,
     reponses: [
       ['illustrations', 'Les illustrations'], ['histoires', 'Les histoires derrière les Fragments'],
       ['qualite', 'La qualité des vêtements'], ['ethique', 'L’éthique : coton bio, Bretagne, sans IA'],
-      ['carte', 'La carte des lieux'], ['communaute', 'La communauté'],
+      ['carte', 'La carte des lieux'], ['scan', 'Pouvoir scanner son t-shirt'], ['communaute', 'La communauté'],
+      ['equipe', 'L’équipe'],
     ],
   },
 } as const
@@ -49,8 +54,9 @@ export type Question = keyof typeof QUESTIONS
 
 export type Reponses = {
   epoques: string[]
-  /** « Une autre » : laquelle, en clair. */
+  /** Ce que précisent « Une autre » époque et « Autrement » (`libre` de leur question), en clair. */
   epoque_autre: string | null
+  decouverte_autre: string | null
   decouverte: string[]
   amene: string[]
   plait: string[]
@@ -61,7 +67,7 @@ export type Reponses = {
 }
 
 export const ATTENTE_MAX = 1000
-export const EPOQUE_AUTRE_MAX = 60
+export const LIBRE_MAX = 60
 
 const estUneListe = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string')
 
@@ -92,7 +98,9 @@ export function validerReponses(recu: unknown): Reponses | null {
   if (typeof r.attente === 'string' && r.attente.trim().length > ATTENTE_MAX) return null
   return {
     ...listes,
-    epoque_autre: listes.epoques.includes('autre') ? texte(r.epoque_autre, EPOQUE_AUTRE_MAX) : null,
+    // Le texte d'une réponse « autre » ne vaut qu'avec sa case.
+    epoque_autre: listes.epoques.includes('autre') ? texte(r.epoque_autre, LIBRE_MAX) : null,
+    decouverte_autre: listes.decouverte.includes('autrement') ? texte(r.decouverte_autre, LIBRE_MAX) : null,
     attente: texte(r.attente, ATTENTE_MAX),
     departement: texte(r.departement, 60),
     anniv_jour: jour as number | null,

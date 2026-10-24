@@ -16,7 +16,7 @@ const REPONSE = {
     amene: [],
     plait: [{ cle: 'illustrations', nombre: 88 }],
   },
-  epoques_autres: [{ texte: 'Les Mayas', nombre: 2 }],
+  libres: { epoques: [{ texte: 'Les Mayas', nombre: 2 }] },
   attentes: [{ id: 'u1', nom: 'Kelpie', texte: 'Plus de Celtes', le: '2026-10-22T10:00:00Z' }],
   anniversaires_du_mois: [{ id: 'u2', nom: 'Brann', jour: 17 }],
 }
@@ -39,7 +39,7 @@ test('chaque réponse a son libellé et son nombre, les attentes et les annivers
   expect(within(epoques).getByRole('listitem', { name: /Les Celtes et les Gaulois/ })).toHaveTextContent('58')
   expect(screen.getByText(/128 personnes ont répondu/)).toBeInTheDocument()
   expect(screen.getByText('« Plus de Celtes »')).toBeInTheDocument()
-  expect(screen.getByText('Les Mayas (2)')).toBeInTheDocument()
+  expect(within(epoques).getByText('Ils ont précisé : Les Mayas (2)')).toBeInTheDocument()
   expect(within(screen.getByRole('region', { name: /Anniversaires/ })).getByText('Brann')).toBeInTheDocument()
 })
 
@@ -51,12 +51,12 @@ test('« Porteurs » relit les réponses des seuls porteurs', async () => {
 })
 
 test('personne n’a répondu : l’écran dit comment mettre le lien dans une Missive', async () => {
-  monter({ repondants: 0, reponses: {}, epoques_autres: [], attentes: [], anniversaires_du_mois: [] })
+  monter({ repondants: 0, reponses: {}, libres: {}, attentes: [], anniversaires_du_mois: [] })
   expect(await screen.findByText(/Personne n’a encore répondu/)).toBeInTheDocument()
   expect(screen.getByText('{questionnaire}')).toBeInTheDocument()
 })
 
 test('sans répondant, les anniversaires donnés au stand se voient quand même', async () => {
-  monter({ repondants: 0, reponses: {}, epoques_autres: [], attentes: [], anniversaires_du_mois: [{ id: 'u2', nom: 'Brann', jour: 17 }] })
+  monter({ repondants: 0, reponses: {}, libres: {}, attentes: [], anniversaires_du_mois: [{ id: 'u2', nom: 'Brann', jour: 17 }] })
   expect(await screen.findByText('Brann')).toBeInTheDocument()
 })
