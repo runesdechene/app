@@ -257,7 +257,7 @@ export async function ajouterMarques(
   const inconnu = await chargerImage(imageInconnu)
   ajouter(map, 'bille', bille(inconnu, c))
   ajouter(map, 'curiosite', etoile(c))
-  // L'étendard de la marque (VISUELS/1. IMAGES EN VRAC/etendard vert.png), tel quel.
+  // L'étendard de la marque (VISUELS/1. IMAGES EN VRAC/etendard.webp), tel quel.
   if (!map.hasImage('etendard'))
     map.addImage('etendard', await chargerImage(imageEtendard), { pixelRatio: 6 }) // 72 px → 12 px, la hauteur du nom
   ajouter(map, 'gelule-nouveau', geluleNouveau(c))
