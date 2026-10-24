@@ -1,0 +1,128 @@
+/*
+ * QUOI     — la visionneuse en plein écran : le voile d'encre des ombres (`--color-ombre`), le
+ *            compteur en Bebas et la croix en clair, la photo au milieu, le nom et les vignettes en bas.
+ *            Elle apparaît et s'efface en fondu, la photo grandit un peu en arrivant.
+ * POURQUOI — le glissé vers le bas pose `--tire` (px) et `--recul` (0 à 1) : la photo suit le doigt
+ *            et rapetisse, le voile s'éclaircit et laisse revoir la fiche. Pendant le geste
+ *            (`data-tire`), rien ne transitionne : la photo colle au doigt.
+ * ATTENTION — `display` n'est posé qu'ouvert : la feuille du navigateur cache le dialog fermé, et
+ *            `allow-discrete` laisse le fondu de sortie se jouer avant.
+ */
+.visionneuse {
+  --tire: 0px;
+  --recul: 0;
+  --color-fiche-vignette: var(--color-sur-accent); /* la vignette choisie, cerclée de clair */
+
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0 0 env(safe-area-inset-bottom);
+  overflow: hidden;
+  border: none;
+  background: color-mix(in srgb, var(--color-ombre) calc(100% - var(--recul) * 70%), transparent);
+  color: var(--color-sur-accent);
+  touch-action: none; /* le glissé vertical est à nous, pas au défilement de la page */
+  opacity: 0;
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    background-color var(--duree-douce) var(--courbe-douce),
+    overlay var(--duree-douce) allow-discrete,
+    display var(--duree-douce) allow-discrete;
+}
+
+.visionneuse[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  opacity: 1;
+}
+
+@starting-style {
+  .visionneuse[open] {
+    opacity: 0;
+  }
+}
+
+.visionneuse::backdrop {
+  background: none; /* le voile, c'est le dialog lui-même : il s'éclaircit avec le glissé */
+}
+
+.haut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--space-4) + env(safe-area-inset-top)) var(--space-4) var(--space-4)
+    var(--space-6);
+  opacity: calc(1 - var(--recul));
+}
+
+.compteur {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--titre-detail-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+.fermer {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.fermer::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  background: var(--color-sur-accent);
+  mask: url('../../../assets/ui/croix.svg') center / contain no-repeat;
+}
+
+/* La photo : elle suit le doigt et rapetisse jusqu'aux trois quarts. */
+.scene {
+  position: relative;
+  translate: 0 var(--tire);
+  scale: calc(1 - var(--recul) * 0.25);
+  transition:
+    translate var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-douce) var(--courbe-douce);
+}
+
+@starting-style {
+  .visionneuse[open] .scene {
+    scale: 0.92;
+  }
+}
+
+.visionneuse[data-tire],
+.visionneuse[data-tire] .scene {
+  transition: none;
+}
+
+.bas {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-4) var(--space-6);
+  opacity: calc(1 - var(--recul));
+}
+
+.nom {
+  margin: 0;
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-semi);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visionneuse,
+  .scene {
+    transition: none;
+  }
+}

@@ -39,6 +39,8 @@ const PASSED_INLINE = new Set([
   '--de',
   '--a',
   '--taille', // la taille d'un tampon photo, posée par la rangée qui le contient
+  '--tire', // la visionneuse : la photo tirée vers le bas, et le recul qui en suit
+  '--recul',
 ])
 
 const cssFiles = readdirSync(SRC, { recursive: true, encoding: 'utf8' })

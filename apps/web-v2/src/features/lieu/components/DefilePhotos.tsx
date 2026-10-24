@@ -8,6 +8,8 @@
  *            elle n'y est pas déjà, et les photos qu'elle traverse alors ne comptent pas. Glissée au
  *            doigt, elle ne dit la photo montrée qu'une fois posée — sinon chaque photo traversée
  *            deviendrait l'active, et la bande se contredirait en plein élan.
+ *            Sur la fiche, toucher la bande ouvre la visionneuse (`onAgrandir`) : un glissé, lui,
+ *            ne déclenche pas de clic. Dans la visionneuse, les photos sont `entieres`, sans recadrage.
  */
 import { useEffect, useRef } from 'react'
 import { aLaTaille } from '@/shared/lib/image'
@@ -26,10 +28,14 @@ export function DefilePhotos({
   photos,
   active,
   onChoisir,
+  onAgrandir,
+  entieres = false,
 }: {
   photos: Photo[]
   active: number
   onChoisir: (i: number) => void
+  onAgrandir?: () => void
+  entieres?: boolean
 }) {
   const bande = useRef<HTMLDivElement>(null)
   const pose = useRef(0)
@@ -50,6 +56,14 @@ export function DefilePhotos({
       <div
         ref={bande}
         className={styles.bande}
+        data-agrandir={onAgrandir ? '' : undefined}
+        // Au clavier aussi : la bande se choisit et Entrée l'ouvre en grand.
+        tabIndex={onAgrandir ? 0 : undefined}
+        aria-label={onAgrandir ? 'Voir les photos en grand' : undefined}
+        onClick={onAgrandir}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') onAgrandir?.()
+        }}
         onPointerDown={() => {
           visee.current = null
         }}
@@ -70,7 +84,7 @@ export function DefilePhotos({
         {photos.map((p, i) => (
           <img
             key={p.url}
-            className={styles.photo}
+            className={entieres ? styles.entiere : styles.photo}
             src={aLaTaille(p.url, 430)}
             alt={`Photo ${String(i + 1)} sur ${String(photos.length)}`}
             loading={i === 0 ? undefined : 'lazy'}

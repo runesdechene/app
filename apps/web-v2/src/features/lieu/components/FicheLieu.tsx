@@ -5,14 +5,15 @@
  *            revendication, bouton de visite, le récit, les infos en plus (accès, quand y aller, bon à
  *            savoir, bivouac), « Enrichir la fiche », puis les crédits : « Lieu ajouté par… » et, si
  *            d'autres l'ont écrit, « Récit enrichi par… » (Uriel, 05/10). Les cœurs (30/09) : la pastille à droite de
- *            la galerie, « Féliciter » sous les crédits ; puis le Carnet de passage.
+ *            la galerie, « Féliciter » sous les crédits ; puis le Carnet de passage. Toucher la
+ *            photo l'ouvre en grand dans la visionneuse (24/10).
  * POURQUOI — spec fiche §2 : chaque ligne sans donnée disparaît, jamais une ligne vide ; la fiche
- *            ne connaît ni la coquille ni les feuilles — la route les lui passe.
+ *            ne connaît ni la coquille ni les feuilles — la route les lui passe. La visionneuse,
+ *            elle, est une adresse (`?photos`) : le retour du téléphone la referme.
  * ATTENTION — `boutonVisite` est une fonction : le bouton a besoin de la fiche chargée.
  */
-import { aLaTaille } from '@/shared/lib/image'
-import { Link } from 'react-router'
-import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router'
+import { Fragment, useState, type ReactNode } from 'react'
 import acces from '@/assets/ui/acces.svg'
 import bivouacIcone from '@/assets/ui/bivouac.svg'
 import bonASavoir from '@/assets/ui/bon-a-savoir.svg'
@@ -27,6 +28,8 @@ import signetPlein from '@/assets/ui/signet-plein.svg'
 import signet from '@/assets/ui/signet.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import { DefilePhotos } from './DefilePhotos'
+import { Vignettes } from './Vignettes'
+import { Visionneuse } from './Visionneuse'
 import { useCalendrier } from '@/shared/hooks/useCalendrier'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -74,11 +77,27 @@ export function FicheLieu({
   const moi = useMoi()
   const calendrier = useCalendrier()
   const [grande, setGrande] = useState(0)
-  // La photo change (au doigt, aux flèches) : sa vignette se range dans la partie visible.
-  const galerie = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    galerie.current?.children[grande]?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
-  }, [grande])
+  const [recherche, setRecherche] = useSearchParams()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const agrandir = () => {
+    setRecherche((p) => {
+      p.set('photos', '')
+      return p
+    })
+  }
+  // Refermer, c'est revenir en arrière ; arrivé tout droit sur `?photos` (un lien), on l'efface.
+  const reduire = () => {
+    if (location.key !== 'default') void navigate(-1)
+    else
+      setRecherche(
+        (p) => {
+          p.delete('photos')
+          return p
+        },
+        { replace: true },
+      )
+  }
 
   if (erreur) {
     return (
@@ -103,7 +122,12 @@ export function FicheLieu({
     <article className={styles.fiche}>
       <div className={styles.photo}>
         {fiche.photos.length > 0 ? (
-          <DefilePhotos photos={fiche.photos} active={grande} onChoisir={setGrande} />
+          <DefilePhotos
+            photos={fiche.photos}
+            active={grande}
+            onChoisir={setGrande}
+            onAgrandir={agrandir}
+          />
         ) : (
           fiche.type?.icone && (
             <span className={styles.sansPhoto} style={{ '--icone': `url(${fiche.type.icone})` }} />
@@ -122,22 +146,7 @@ export function FicheLieu({
       <div className={styles.corps}>
         <div className={styles.haut}>
           {fiche.photos.length > 1 && (
-            <div ref={galerie} className={styles.galerie}>
-              {fiche.photos.map((p, i) => (
-                <button
-                  key={p.url}
-                  type="button"
-                  className={styles.vignette}
-                  aria-label={`Photo ${String(i + 1)}`}
-                  aria-pressed={i === grande}
-                  onClick={() => {
-                    setGrande(i)
-                  }}
-                >
-                  <img src={aLaTaille(p.vignette, 33)} alt="" loading="lazy" decoding="async" />
-                </button>
-              ))}
-            </div>
+            <Vignettes photos={fiche.photos} active={grande} onChoisir={setGrande} />
           )}
           {coeurs && moi && (
             <PastilleCoeurs
@@ -312,6 +321,17 @@ export function FicheLieu({
 
         <CarnetDuLieu id={id} limite={3} />
       </div>
+
+      {fiche.photos.length > 0 && (
+        <Visionneuse
+          ouverte={recherche.has('photos')}
+          nom={fiche.nom}
+          photos={fiche.photos}
+          active={grande}
+          onChoisir={setGrande}
+          onFermer={reduire}
+        />
+      )}
     </article>
   )
 }

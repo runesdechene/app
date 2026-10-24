@@ -20,7 +20,12 @@
   display: none;
 }
 
-.photo {
+.bande[data-agrandir] {
+  cursor: zoom-in;
+}
+
+.photo,
+.entiere {
   flex: 0 0 100%;
   width: 100%;
   height: 100%;
@@ -28,6 +33,13 @@
   scroll-snap-align: start;
   scroll-snap-stop: always;
   animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+/* Dans la visionneuse : la photo entière ; le doigt ne fait défiler qu'en travers, un glissé
+   vertical revient à la visionneuse (qui ferme d'un glissé vers le bas). */
+.entiere {
+  object-fit: contain;
+  touch-action: pan-x;
 }
 
 .precedente,
@@ -82,7 +94,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .photo {
+  .photo,
+  .entiere {
     animation: none;
   }
 
