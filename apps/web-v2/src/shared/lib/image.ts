@@ -27,7 +27,9 @@ export function aLaTaille<T extends string | null>(url: T, largeurAffichee: numb
   if (url.startsWith(SHOPIFY)) return `${url}${separateur}width=${String(largeur)}` as T
   if (!url.includes(OBJET)) return url
   if (PHOTO_DE_LIEU.test(url)) {
-    return (largeurAffichee <= LARGEUR_VIGNETTE ? url.replace(/(_thumb)?\.webp$/, '_thumb.webp') : url) as T
+    return (
+      largeurAffichee <= LARGEUR_VIGNETTE ? url.replace(/(_thumb)?\.webp$/, '_thumb.webp') : url
+    ) as T
   }
   return `${url.replace(OBJET, RENDU)}${separateur}width=${String(largeur)}&quality=70&resize=contain` as T
 }

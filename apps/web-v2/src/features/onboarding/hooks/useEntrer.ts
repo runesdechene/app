@@ -10,7 +10,13 @@
 import { useMutation } from '@tanstack/react-query'
 import { VERSION_DES_CONDITIONS } from '@/shared/lib/conditions'
 import { accepterConditions } from '@/shared/supabase/conditions'
-import { donnerAccordNouvelles, fetchEntree, reclamerFragments, signerCharte, verifierCode } from '../api/entree'
+import {
+  donnerAccordNouvelles,
+  fetchEntree,
+  reclamerFragments,
+  signerCharte,
+  verifierCode,
+} from '../api/entree'
 import type { Entree } from '../api/lireEntree'
 import { useParcours } from './useParcours'
 

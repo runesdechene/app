@@ -36,7 +36,9 @@ test('une photo de lieu, déjà réduite à l’envoi, est servie telle quelle :
     `${BASE}/object/public/place-images/rapatrie/x_thumb.webp`,
   )
   // Pas encore rattrapée (JPEG) : redimensionnée comme avant.
-  expect(aLaTaille(`${BASE}/object/public/place-images/rapatrie/x.jpeg`, 300)).toContain('/render/image/')
+  expect(aLaTaille(`${BASE}/object/public/place-images/rapatrie/x.jpeg`, 300)).toContain(
+    '/render/image/',
+  )
 })
 
 test('une image de Shopify est redimensionnée par son CDN, au double de la taille affichée', () => {
