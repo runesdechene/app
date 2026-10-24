@@ -23,7 +23,7 @@ const SEGMENTS: { valeur: Segment; libelle: string }[] = [
 
 // Les questions telles que l'équipe les lit : à la troisième personne.
 const TITRES: Record<Question, string> = {
-  epoques: 'Quelle époque aimeraient-ils porter ?',
+  epoques: 'Quelles collections leur plaisent ?',
   decouverte: 'Comment ils t’ont découvert',
   amene: 'Ce qui les amène',
   plait: 'Ce qui leur plaît',

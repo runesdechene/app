@@ -3,7 +3,7 @@
 
 export const QUESTIONS = {
   epoques: {
-    titre: 'Quelle époque tu aimerais porter ?',
+    titre: 'Quelle collection te plaît ou te plairait ?',
     aide: 'Deux au plus.',
     max: 2,
     libre: { reponse: 'autre', champ: 'epoque_autre', invite: 'Laquelle ?' },
