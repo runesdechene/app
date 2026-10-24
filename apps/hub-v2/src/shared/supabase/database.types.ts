@@ -4364,6 +4364,7 @@ export type Database = {
           attente: string | null
           decouverte: string[]
           departement: string | null
+          epoque_autre: string | null
           epoques: string[]
           plait: string[]
           repondu_le: string | null
@@ -4376,6 +4377,7 @@ export type Database = {
           attente?: string | null
           decouverte?: string[]
           departement?: string | null
+          epoque_autre?: string | null
           epoques?: string[]
           plait?: string[]
           repondu_le?: string | null
@@ -4388,6 +4390,7 @@ export type Database = {
           attente?: string | null
           decouverte?: string[]
           departement?: string | null
+          epoque_autre?: string | null
           epoques?: string[]
           plait?: string[]
           repondu_le?: string | null
