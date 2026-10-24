@@ -9,6 +9,8 @@ export type Segment = 'tous' | 'prospects' | 'porteurs'
 export type QuiSontIls = {
   repondants: number
   reponses: Partial<Record<Question, { cle: string; nombre: number }[]>>
+  /** « Une autre » époque, en clair : la plus citée d'abord (mig 557). */
+  epoques_autres: { texte: string; nombre: number }[]
   attentes: { id: string; nom: string | null; texte: string; le: string }[]
   anniversaires_du_mois: { id: string; nom: string | null; jour: number }[]
 }

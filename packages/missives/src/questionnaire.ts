@@ -6,10 +6,15 @@ export const QUESTIONS = {
     titre: 'Quelle époque t’appelle ?',
     aide: 'Deux au plus.',
     max: 2,
+    // Dans l'ordre du temps (Uriel, 24/10) ; « rome » garde sa clé sous son nouveau nom (mig 557).
     reponses: [
-      ['grece', 'La Grèce antique'], ['rome', 'Rome'], ['celtes', 'Les Celtes et les Gaulois'],
-      ['scandinavie', 'La culture scandinave, viking'], ['moyen_age', 'Le Moyen Âge'],
-      ['nature', 'Les esprits de la nature'], ['autre', 'Une autre'],
+      ['egypte', 'L’Antiquité égyptienne'], ['grece', 'La Grèce antique'], ['rome', 'L’Empire romain'],
+      ['celtes', 'Les Celtes et les Gaulois'], ['byzance', 'L’Empire byzantin'],
+      ['scandinavie', 'La culture scandinave, viking'], ['amazigh', 'La culture amazighe'], ['slave', 'La culture slave'],
+      ['moyen_age', 'Le Moyen Âge'], ['ecosse', 'L’Écosse médiévale'], ['renaissance', 'La Renaissance'],
+      ['explorateurs', 'L’époque des grands explorateurs'], ['napoleon', 'L’époque napoléonienne'],
+      ['belle_epoque', 'La Belle Époque'], ['jules_verne', 'L’époque de Jules Verne'],
+      ['grande_guerre', 'La Première Guerre mondiale'], ['nature', 'Les esprits de la nature'], ['autre', 'Une autre'],
     ],
   },
   decouverte: {
@@ -46,6 +51,8 @@ export type Question = keyof typeof QUESTIONS
 
 export type Reponses = {
   epoques: string[]
+  /** « Une autre » : laquelle, en clair. */
+  epoque_autre: string | null
   decouverte: string[]
   amene: string[]
   plait: string[]
@@ -56,6 +63,7 @@ export type Reponses = {
 }
 
 export const ATTENTE_MAX = 1000
+export const EPOQUE_AUTRE_MAX = 60
 
 const estUneListe = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string')
 
@@ -86,6 +94,7 @@ export function validerReponses(recu: unknown): Reponses | null {
   if (typeof r.attente === 'string' && r.attente.trim().length > ATTENTE_MAX) return null
   return {
     ...listes,
+    epoque_autre: listes.epoques.includes('autre') ? texte(r.epoque_autre, EPOQUE_AUTRE_MAX) : null,
     attente: texte(r.attente, ATTENTE_MAX),
     departement: texte(r.departement, 60),
     anniv_jour: jour as number | null,

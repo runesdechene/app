@@ -85,6 +85,15 @@ describe('questionnaire', () => {
     expect(rangs.findIndex((u) => u.endsWith('/auth/v1/admin/users'))).toBeGreaterThan(rangs.findIndex((u) => u.endsWith('questionnaire_repondre')))
   })
 
+  test('le texte de « Une autre » ne part qu’avec sa case', async () => {
+    const appels = simuler()
+    const handler = await charger()
+    await handler(poster({ jeton: signer('u1', 'questionnaire'), reponses: { epoques: ['autre'], epoque_autre: ' Les Mayas ' } }))
+    await handler(poster({ jeton: signer('u1', 'questionnaire'), reponses: { epoques: ['egypte'], epoque_autre: 'Les Mayas' } }))
+    const ecrits = appels.filter((a) => a.url.endsWith('questionnaire_repondre')).map((a) => (a.corps as { p: { epoque_autre: unknown } }).p.epoque_autre)
+    expect(ecrits).toEqual(['Les Mayas', null])
+  })
+
   test('lire : le prénom de la personne du lien', async () => {
     simuler()
     const handler = await charger()

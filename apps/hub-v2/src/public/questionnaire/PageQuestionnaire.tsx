@@ -7,7 +7,7 @@
  *            l'adresse (?q=3), comme l'étape de /soumettre-contenu : le retour du navigateur revient d'une
  *            question. Sans lien, la page demande l'e-mail et envoie le lien, rien d'autre.
  */
-import { QUESTIONS, type Question, type Reponses } from '@runes/missives'
+import { EPOQUE_AUTRE_MAX, QUESTIONS, type Question, type Reponses } from '@runes/missives'
 import { useEffect, useState, type ReactNode, type SubmitEvent } from 'react'
 import { useSearchParams } from 'react-router'
 import cadeau from '@/assets/flyer/cadeau.webp'
@@ -29,7 +29,7 @@ const BOUTIQUE = 'https://runesdechene.com'
 const EXPLORE = 'https://app.runesdechene.com'
 const DONNEES_PERSONNELLES = 'https://app.runesdechene.com/legal/confidentialite'
 const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
-const VIDE: Reponses = { epoques: [], decouverte: [], amene: [], plait: [], attente: null, departement: null, anniv_jour: null, anniv_mois: null }
+const VIDE: Reponses = { epoques: [], epoque_autre: null, decouverte: [], amene: [], plait: [], attente: null, departement: null, anniv_jour: null, anniv_mois: null }
 const A_CASES = Object.keys(QUESTIONS) as Question[]
 const DERNIERE = ETAPES.length
 
@@ -170,6 +170,16 @@ function Ecran({ n, reponses, changer, compte, setCompte }: {
       <>
         <Intitule n={n} titre={QUESTIONS[q].titre} aide={QUESTIONS[q].aide} />
         <Cases q={q} choisies={reponses[q]} onChange={(choisies) => { changer({ [q]: choisies }) }} />
+        {q === 'epoques' && reponses.epoques.includes('autre') && (
+          <input
+            className={etape.champ}
+            aria-label="Laquelle ?"
+            placeholder="Laquelle ? Les Mayas, le Japon des samouraïs…"
+            maxLength={EPOQUE_AUTRE_MAX}
+            value={reponses.epoque_autre ?? ''}
+            onChange={(e) => { changer({ epoque_autre: e.target.value || null }) }}
+          />
+        )}
       </>
     )
   }

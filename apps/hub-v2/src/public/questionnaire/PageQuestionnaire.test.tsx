@@ -39,9 +39,18 @@ test('le lien d’une époque la coche, et rien n’est envoyé avant le bouton'
   expect(appels.every((a) => a.methode === 'GET')).toBe(true)
 })
 
+test('« Une autre » ouvre un champ pour dire laquelle', async () => {
+  monter('/qui-es-tu?j=u1.sig&q=1')
+  expect(await screen.findByRole('checkbox', { name: 'L’Antiquité égyptienne' })).toBeInTheDocument()
+  expect(screen.queryByLabelText('Laquelle ?')).not.toBeInTheDocument()
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Une autre' }))
+  await userEvent.type(screen.getByLabelText('Laquelle ?'), 'Les Mayas')
+  expect(screen.getByLabelText('Laquelle ?')).toHaveValue('Les Mayas')
+})
+
 test('une troisième époque ne se coche pas', async () => {
   monter('/qui-es-tu?j=u1.sig&q=1')
-  await userEvent.click(await screen.findByRole('checkbox', { name: 'Rome' }))
+  await userEvent.click(await screen.findByRole('checkbox', { name: 'L’Empire romain' }))
   await userEvent.click(screen.getByRole('checkbox', { name: 'Le Moyen Âge' }))
   expect(screen.getByRole('checkbox', { name: 'La Grèce antique' })).toBeDisabled()
 })
@@ -50,9 +59,9 @@ test('une question par écran ; « Précédent » revient en arrière', async ()
   monter('/qui-es-tu?j=u1.sig&q=1')
   await userEvent.click(await screen.findByRole('button', { name: 'Suivant →' }))
   expect(screen.getByRole('heading', { name: 'Comment as-tu découvert Runes de Chêne ?' })).toBeInTheDocument()
-  expect(screen.queryByRole('checkbox', { name: 'Rome' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('checkbox', { name: 'L’Empire romain' })).not.toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: '← Précédent' }))
-  expect(screen.getByRole('checkbox', { name: 'Rome' })).toBeInTheDocument()
+  expect(screen.getByRole('checkbox', { name: 'L’Empire romain' })).toBeInTheDocument()
 })
 
 test('« Envoyer mes réponses » poste les réponses des sept écrans, puis « C’est noté » salue le prénom', async () => {
@@ -71,7 +80,7 @@ test('« Envoyer mes réponses » poste les réponses des sept écrans, puis « 
   expect(envoi?.corps).toEqual({
     jeton: 'u1.sig',
     reponses: {
-      epoques: ['celtes'], decouverte: ['flyer'], amene: [], plait: [],
+      epoques: ['celtes'], epoque_autre: null, decouverte: ['flyer'], amene: [], plait: [],
       attente: 'Plus de Celtes', departement: null, anniv_jour: 12, anniv_mois: 3,
     },
     compte: false,
@@ -94,7 +103,7 @@ test('ses réponses d’avant sont déjà cochées', async () => {
     prenom: 'Kelpie',
     portrait: { epoques: ['rome'], decouverte: [], amene: ['cadeau'], plait: [], attente: null, departement: null, anniv_jour: null, anniv_mois: null },
   })
-  expect(await screen.findByRole('checkbox', { name: 'Rome' })).toBeChecked()
+  expect(await screen.findByRole('checkbox', { name: 'L’Empire romain' })).toBeChecked()
   await userEvent.click(screen.getByRole('button', { name: 'Suivant →' }))
   await userEvent.click(screen.getByRole('button', { name: 'Suivant →' }))
   expect(screen.getByRole('checkbox', { name: 'Offrir un cadeau' })).toBeChecked()

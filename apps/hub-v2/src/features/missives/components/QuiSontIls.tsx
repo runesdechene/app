@@ -89,6 +89,17 @@ export function QuiSontIls() {
             {(Object.keys(QUESTIONS) as Question[]).map((q) => <Barres key={q} q={q} compte={data.reponses[q] ?? []} />)}
           </div>
 
+          {data.epoques_autres.length > 0 && (
+            <Bloc>
+              <section aria-label="Les autres époques citées" className={styles.question}>
+                <TitreDeSection titre="Les autres époques citées" />
+                <p className={commun.calme}>
+                  {data.epoques_autres.map((e) => (e.nombre > 1 ? `${e.texte} (${nombre.format(e.nombre)})` : e.texte)).join(' · ')}
+                </p>
+              </section>
+            </Bloc>
+          )}
+
           <Bloc>
             <section aria-label="Ce qu’ils attendent" className={styles.question}>
               <TitreDeSection titre="Ce qu’ils attendent" />

@@ -114,7 +114,7 @@ export default async function handler(request: Request, context?: { waitUntil?: 
     if (request.method === 'GET') {
       const userId = verifier(new URL(request.url).searchParams.get('j') ?? '', 'questionnaire')
       if (!userId) return json({ error: 'Lien invalide' }, 403)
-      const [portrait] = await lire<Record<string, unknown>>(`portraits?user_id=eq.${encodeURIComponent(userId)}&select=epoques,decouverte,amene,plait,attente,departement,anniv_jour,anniv_mois`)
+      const [portrait] = await lire<Record<string, unknown>>(`portraits?user_id=eq.${encodeURIComponent(userId)}&select=epoques,epoque_autre,decouverte,amene,plait,attente,departement,anniv_jour,anniv_mois`)
       return json({ prenom: await prenomDe(userId), portrait: portrait ?? null })
     }
     if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
