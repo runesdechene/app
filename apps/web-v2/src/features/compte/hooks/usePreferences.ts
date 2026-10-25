@@ -24,6 +24,7 @@ export type Reglage =
   | 'showDepartement'
   | 'showEnvies'
   | 'lieuxEnCouleur'
+  | 'carteSkyrim'
 
 const CLES: Record<Exclude<Reglage, 'brouillerPistes'>, ClePreference> = {
   pushImportant: 'push_important_enabled',
@@ -31,6 +32,7 @@ const CLES: Record<Exclude<Reglage, 'brouillerPistes'>, ClePreference> = {
   showDepartement: 'show_departement',
   showEnvies: 'show_envies',
   lieuxEnCouleur: 'lieux_en_couleur',
+  carteSkyrim: 'carte_skyrim',
 }
 
 function ecrire(reglage: Reglage, valeur: boolean): Promise<void> {

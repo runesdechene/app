@@ -20,6 +20,7 @@ export type Preferences = {
   showDepartement: boolean
   showEnvies: boolean
   lieuxEnCouleur: boolean
+  carteSkyrim: boolean
   titleGender: 'm' | 'f'
 }
 
@@ -29,6 +30,7 @@ export type ClePreference =
   | 'push_important_enabled'
   | 'push_recap_enabled'
   | 'lieux_en_couleur'
+  | 'carte_skyrim'
 
 export async function mesPreferences(): Promise<Preferences> {
   const { data, error } = await supabase.rpc('get_my_preferences')
@@ -42,6 +44,7 @@ export async function mesPreferences(): Promise<Preferences> {
     showDepartement: booleen(p.showDepartement),
     showEnvies: booleen(p.showEnvies),
     lieuxEnCouleur: booleen(p.lieuxEnCouleur),
+    carteSkyrim: booleen(p.carteSkyrim),
     titleGender: p.titleGender === 'f' ? 'f' : 'm',
   }
 }

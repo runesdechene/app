@@ -7,7 +7,7 @@ Conception de l'écran : `docs/superpowers/specs/2026-09-28-v2-carte-design.md`.
 - `components/` — `CarteScreen` (la carte vivante). La feuille « Ajouter » vit dans `ajout/`.
 - `lib/` — le fond de carte, le relief, les marques et les calques des lieux.
 - `hooks/` — `useCarteLieux` (les lieux en cache), `usePreparerLaCarte` (code, lieux et icônes demandés en avance, depuis la coquille), `useTerritoire` (le nom à inscrire),
-  `useLieuxEnCouleur` (l'option des Préférences, clé `['preferences', 'lieuxEnCouleur']`).
+  `useReglageCarte` (« Mes lieux en couleur », « Carte Skyrim » : clé `['preferences', <réglage>]`).
 - `api/` — `carte.ts` parle à Supabase (`carte_lieux`, `territoire_en`) ; `lireCarte.ts` lit
   leur JSON.
 - Énigmes (spec `2026-10-07-v2-enigmes-design.md`) : `api/enigmes.ts` + `lireEnigmes.ts`, `lib/enigmes.ts`

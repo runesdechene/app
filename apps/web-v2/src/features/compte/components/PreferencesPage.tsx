@@ -17,6 +17,7 @@ import calendrier from '@/assets/ui/calendrier.svg'
 import chevron from '@/assets/ui/chevron.svg'
 import cloche from '@/assets/ui/cloche.svg'
 import coeur from '@/assets/ui/coeur.svg'
+import cartePliee from '@/assets/ui/carte-pliee.svg'
 import courriel from '@/assets/ui/courriel.svg'
 import palette from '@/assets/ui/palette.svg'
 import pas from '@/assets/ui/pas.svg'
@@ -170,6 +171,12 @@ export function PreferencesPage() {
           palette,
           'Mes lieux en couleur',
           'Les lieux que tu as visités prennent la couleur de leur type.',
+        )}
+        {ligne(
+          'carteSkyrim',
+          cartePliee,
+          'Carte Skyrim',
+          'Les lieux à visiter, à l’encre, posés à même le parchemin.',
         )}
       </Carte>
 

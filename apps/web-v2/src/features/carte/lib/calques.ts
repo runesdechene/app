@@ -16,7 +16,7 @@ import type {
 } from 'maplibre-gl'
 import type { LieuCarte } from '../api/lireCarte'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
-import { nomImage } from './sceaux'
+import { nomImage, type StyleDesMarques } from './sceaux'
 
 export const SOURCE = 'lieux'
 export const CALQUES_LIEUX = ['billes', 'sceaux', 'curiosites', 'neufs']
@@ -38,7 +38,7 @@ type Proprietes = {
 
 export function enGeoJSON(
   lieux: LieuCarte[],
-  couleurTypes: boolean,
+  style: StyleDesMarques,
 ): FeatureCollection<Point, Proprietes> {
   return {
     type: 'FeatureCollection',
@@ -49,7 +49,7 @@ export function enGeoJSON(
         id: l.id,
         etat: l.etat,
         nature: l.nature,
-        image: nomImage(l, couleurTypes),
+        image: nomImage(l, style),
         nouveau: l.nouveau,
         ...(l.revendication && { pilule: l.revendication.nom }),
       },

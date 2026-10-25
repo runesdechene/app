@@ -3,8 +3,8 @@
  *            visiteur sans compte (positions floutées, migration 392), et le territoire sous un
  *            point ; et les Explorateurs dont le nom commence par ce qu'on tape.
  * POURQUOI — les deux fonctions lisent `auth.uid()` (migration 363) : l'état de chaque lieu
- *            (inconnu, connu, visité) est celui de la personne qui regarde. S'y ajoute l'option
- *            « Mes lieux en couleur », réglée dans les Préférences.
+ *            (inconnu, connu, visité) est celui de la personne qui regarde. S'y ajoutent les options
+ *            « Mes lieux en couleur » et « Carte Skyrim », réglées dans les Préférences.
  */
 import { supabase } from '@/shared/supabase/client'
 import { booleen, objet } from '@/shared/lib/lire'
@@ -37,10 +37,12 @@ export async function fetchCartePublique(): Promise<LieuCarte[]> {
   return lireLieux(data)
 }
 
-export async function fetchLieuxEnCouleur(): Promise<boolean> {
+export type ReglageCarte = 'lieuxEnCouleur' | 'carteSkyrim'
+
+export async function fetchReglageCarte(reglage: ReglageCarte): Promise<boolean> {
   const { data, error } = await supabase.rpc('get_my_preferences')
   if (error) throw error
-  return booleen(objet(data).lieuxEnCouleur)
+  return booleen(objet(data)[reglage])
 }
 
 export async function fetchTerritoire(lat: number, lng: number): Promise<Territoire> {

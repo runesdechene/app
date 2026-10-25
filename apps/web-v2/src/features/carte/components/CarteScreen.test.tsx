@@ -18,7 +18,7 @@ import { CarteScreen, CarteVisiteur } from './CarteScreen'
 const api = vi.hoisted(() => ({
   fetchCarteLieux: vi.fn<() => Promise<LieuCarte[]>>(),
   fetchCartePublique: vi.fn<() => Promise<LieuCarte[]>>(),
-  fetchLieuxEnCouleur: vi.fn(() => Promise.resolve(false)),
+  fetchReglageCarte: vi.fn(() => Promise.resolve(false)),
   fetchTerritoire: vi.fn(() => Promise.resolve({ territoire: null, pays: null })),
   fetchFiltres: vi.fn(() =>
     Promise.resolve({
@@ -408,7 +408,7 @@ test('au survol d’un lieu, la main apparaît et le lieu se détache ; elle s�
 test('le visiteur voit la carte publique, sans filtre ni préférences, jusqu’au lieu ouvert', async () => {
   tiroirDe(0)
   api.fetchCartePublique.mockResolvedValue(LIEUX)
-  api.fetchLieuxEnCouleur.mockClear()
+  api.fetchReglageCarte.mockClear()
   api.fetchFiltres.mockClear()
   render(
     <QueryClientProvider client={new QueryClient()}>
@@ -426,7 +426,7 @@ test('le visiteur voit la carte publique, sans filtre ni préférences, jusqu’
     expect(carte().flyTo).toHaveBeenCalledWith({ center: [7, 44], zoom: 11 })
   })
   expect(api.fetchCarteLieux).not.toHaveBeenCalled()
-  expect(api.fetchLieuxEnCouleur).not.toHaveBeenCalled()
+  expect(api.fetchReglageCarte).not.toHaveBeenCalled()
   expect(api.fetchFiltres).not.toHaveBeenCalled()
   expect(screen.queryByRole('button', { name: 'Filtre' })).not.toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Frise des époques' })).not.toBeInTheDocument()

@@ -21,6 +21,7 @@ const api = vi.hoisted(() => ({
       showDepartement: true,
       showEnvies: true,
       lieuxEnCouleur: false,
+      carteSkyrim: false,
       titleGender: 'm' as const,
     }),
   ),

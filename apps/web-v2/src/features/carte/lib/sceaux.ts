@@ -1,13 +1,13 @@
 /**
  * QUOI     — les marques des lieux, dessinées une fois dans un canevas puis confiées à MapLibre :
- *            le « ? » (lieu inconnu) et l'icône du type à l'encre (connu), chacun sur une lueur
- *            parchemin légère ; le sceau du type (visité, en couleur par défaut depuis le 24/10) ; le
+ *            le « ? » (lieu inconnu) sur une lueur parchemin légère ; le lieu connu dans sa bulle
+ *            crème, ou, en « Carte Skyrim », son icône nue à l'encre sur la même lueur ; le sceau
+ *            du type (visité, en couleur par défaut depuis le 24/10) ; le
  *            sceau d'encre (lieu neuf) ; l'étoile (point d'intérêt), la gélule « NOUVEAU » et l'étendard
  *            posé devant le nom de qui a revendiqué un lieu.
  * POURQUOI — des images de carte, et non des éléments HTML : des milliers de lieux restent
- *            fluides sur un téléphone (spec Carte §3). Ce qui reste à faire est un signe d'encre nu,
- *            comme sur une carte de jeu ; ce qu'on a visité prend son sceau : de loin, on voit qu'il
- *            y a plein de lieux, et la carte s'allume à mesure qu'on visite (Uriel, 24/10).
+ *            fluides sur un téléphone (spec Carte §3). Les signes d'encre nus (24/10) n'ont pas plu :
+ *            les bulles reviennent par défaut, l'encre devient une option (Uriel, 25/10).
  * ATTENTION — une icône de type qui ne se charge ou ne se dessine pas retombe sur le losange par
  *            défaut : jamais une marque vide. Dessin en pixelRatio 2 (52 px = 26 px à l'écran).
  *            Chaque icône ne se télécharge qu'une fois : `prechargerIcones` la demande dès que les
@@ -24,13 +24,16 @@ const SCEAU = 52
 const PETIT = 26
 const RATIO = 2
 
+// Les deux options des Préférences qui changent les marques.
+export type StyleDesMarques = { couleurTypes: boolean; skyrim: boolean }
+
 // Le nom de l'image d'un lieu : l'écran le range dans les propriétés de chaque point.
-export function nomImage(l: LieuCarte, couleurTypes: boolean): string {
+export function nomImage(l: LieuCarte, { couleurTypes, skyrim }: StyleDesMarques): string {
   if (l.nature === 'curiosite') return 'curiosite'
   const icone = l.icone ?? 'defaut'
   if (l.nouveau) return l.etat === 'inconnu' ? 'neuf-inconnu' : `neuf-${icone}`
   if (l.etat === 'inconnu') return 'bille'
-  if (l.etat === 'connu') return `connu-${icone}`
+  if (l.etat === 'connu') return skyrim ? `encre-${icone}` : `connu-${icone}`
   return couleurTypes && l.couleur ? `visite-${icone}-${l.couleur}` : `visite-${icone}`
 }
 
@@ -118,7 +121,7 @@ function lueur(ctx: OffscreenCanvasRenderingContext2D, c: CouleursCarte) {
   ctx.fill()
 }
 
-function sceauConnu(icone: HTMLImageElement, c: CouleursCarte) {
+function signeDEncre(icone: HTMLImageElement, c: CouleursCarte) {
   const ctx = toile(SCEAU)
   lueur(ctx, c)
   ctx.shadowColor = `${c.encre}4d` // une ombre à peine, sous l'icône
@@ -148,7 +151,8 @@ function sceauNeuf(icone: HTMLImageElement, c: CouleursCarte) {
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
 }
 
-function sceauVisite(icone: HTMLImageElement, c: CouleursCarte) {
+// Le sceau crème cerclé d'encre : un lieu connu, ou visité quand les couleurs sont éteintes.
+function sceauClair(icone: HTMLImageElement, c: CouleursCarte) {
   const ctx = toile(SCEAU)
   disque(ctx, SCEAU / 2 - 3)
   ctx.fillStyle = c.halo
@@ -230,13 +234,13 @@ function geluleNouveau(c: CouleursCarte): ImageData {
 // partagent quelques dizaines d'images) ; pas celles déjà sur la carte.
 export function marquesADessiner(
   lieux: LieuCarte[],
-  couleurTypes: boolean,
+  style: StyleDesMarques,
   dejaLa: (nom: string) => boolean,
 ): Map<string, LieuCarte> {
   const aDessiner = new Map<string, LieuCarte>()
   for (const l of lieux) {
     if (l.nature !== 'lieu' || (l.etat === 'inconnu' && !l.nouveau)) continue
-    const nom = nomImage(l, couleurTypes)
+    const nom = nomImage(l, style)
     if (!aDessiner.has(nom) && !dejaLa(nom)) aDessiner.set(nom, l)
   }
   return aDessiner
@@ -250,7 +254,7 @@ export async function ajouterMarques(
   map: Carte,
   lieux: LieuCarte[],
   c: CouleursCarte,
-  couleurTypes: boolean,
+  style: StyleDesMarques,
 ): Promise<void> {
   // La gélule « NOUVEAU » s'écrit en Cabin : la police doit être là avant de dessiner.
   await document.fonts.load('700 17px Cabin')
@@ -264,14 +268,14 @@ export async function ajouterMarques(
 
   // Chaque image une seule fois (02/10 : dessinée pour chaque lieu, elle coûtait une seconde de
   // calcul sur un PC, bien plus sur un téléphone).
-  const aDessiner = marquesADessiner(lieux, couleurTypes, (nom) => map.hasImage(nom))
+  const aDessiner = marquesADessiner(lieux, style, (nom) => map.hasImage(nom))
   await Promise.all(
     [...aDessiner].map(async ([nom, l]) => {
       const dessiner = (icone: HTMLImageElement) => {
         if (l.nouveau) return sceauNeuf(l.etat === 'inconnu' ? inconnu : icone, c)
-        if (l.etat === 'connu') return sceauConnu(icone, c)
-        if (couleurTypes && l.couleur) return sceauCouleur(icone, l.couleur)
-        return sceauVisite(icone, c)
+        if (l.etat === 'connu') return style.skyrim ? signeDEncre(icone, c) : sceauClair(icone, c)
+        if (style.couleurTypes && l.couleur) return sceauCouleur(icone, l.couleur)
+        return sceauClair(icone, c)
       }
       const icone = await chargerIcone(l.icone)
       // Une icône qui se charge mais ne se dessine pas (SVG sans taille, par exemple) prend

@@ -38,7 +38,7 @@ import { useMesPinsSurLaCarte } from '../hooks/useMesPinsSurLaCarte'
 import { useEnigmesSurLaCarte, type EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
 import { FeuilleEnigme } from './FeuilleEnigme'
 import { useAPortee, type SurPlace } from '../hooks/useAPortee'
-import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
+import { useStyleDesMarques } from '../hooks/useReglageCarte'
 import { useTerritoire } from '../hooks/useTerritoire'
 import { ajouterCalques, CALQUES_LIEUX, echelleEcran, enGeoJSON, SOURCE } from '../lib/calques'
 import { ajouterZones } from '../lib/actifs'
@@ -130,7 +130,7 @@ function CarteVivante({
   const [premiereFois, setPremiereFois] = useState<boolean | null>(null)
   if (premiereFois === null && !relecture) setPremiereFois(lieux === undefined)
   const [lieuxPoses, setLieuxPoses] = useState(false)
-  const couleurTypes = useLieuxEnCouleur(!visiteur)
+  const style = useStyleDesMarques(!visiteur)
   const navigate = useNavigate()
   // « Trouver sur la carte » (fiche d'un lieu) et « Les chercher sur la carte » (énigmes) arrivent par
   // l'adresse : /carte?centre=lat,lng[,zoom].
@@ -272,11 +272,11 @@ function CarteVivante({
     if (!carte || !lieux) return
     let actif = true
     const montres = filtrer(lieux, filtres)
-    ajouterMarques(carte, montres, couleurs, couleurTypes).then(
+    ajouterMarques(carte, montres, couleurs, style).then(
       () => {
         performance.mark('carte:marques-dessinees')
         if (!actif) return
-        void carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, couleurTypes))
+        void carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, style))
         ajouterOmbrage(carte, couleurs)
         setLieuxPoses(true)
         performance.mark('carte:lieux-poses')
@@ -288,7 +288,7 @@ function CarteVivante({
     return () => {
       actif = false
     }
-  }, [carte, lieux, couleurs, couleurTypes, filtres, essai])
+  }, [carte, lieux, couleurs, style, filtres, essai])
 
   useEffect(() => {
     if (!sansPosition) return

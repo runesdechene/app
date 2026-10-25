@@ -1,7 +1,7 @@
 /**
  * QUOI     — le calendrier où s'affichent les dates, et le moyen d'en changer.
  * POURQUOI — la clé `['preferences', 'calendrier']` suit le contrat des Préférences (voir
- *            useLieuxEnCouleur) : changer de calendrier réécrit aussitôt toutes les dates à
+ *            useReglageCarte) : changer de calendrier réécrit aussitôt toutes les dates à
  *            l'écran. Tant qu'il n'est pas lu, ou sans compte : chrétien, le défaut de la base.
  * ATTENTION — le choix s'affiche avant la réponse de la base ; refusé, la relecture remet le
  *            vrai, et `echec` permet de le dire.

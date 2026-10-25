@@ -2868,6 +2868,7 @@ export type Database = {
         Row: {
           apercu: string | null
           contenu: Json
+          contenu_envoi: Json | null
           couleurs: Json
           cree_le: string
           envoyee_le: string | null
@@ -2881,6 +2882,7 @@ export type Database = {
         Insert: {
           apercu?: string | null
           contenu: Json
+          contenu_envoi?: Json | null
           couleurs: Json
           cree_le?: string
           envoyee_le?: string | null
@@ -2894,6 +2896,7 @@ export type Database = {
         Update: {
           apercu?: string | null
           contenu?: Json
+          contenu_envoi?: Json | null
           couleurs?: Json
           cree_le?: string
           envoyee_le?: string | null
@@ -4353,6 +4356,69 @@ export type Database = {
           },
         ]
       }
+      portraits: {
+        Row: {
+          amene: string[]
+          anniv_jour: number | null
+          anniv_mois: number | null
+          attente: string | null
+          decouverte: string[]
+          decouverte_autre: string | null
+          departement: string | null
+          epoque_autre: string | null
+          epoques: string[]
+          mot: string | null
+          plait: string[]
+          repondu_le: string | null
+          user_id: string
+        }
+        Insert: {
+          amene?: string[]
+          anniv_jour?: number | null
+          anniv_mois?: number | null
+          attente?: string | null
+          decouverte?: string[]
+          decouverte_autre?: string | null
+          departement?: string | null
+          epoque_autre?: string | null
+          epoques?: string[]
+          mot?: string | null
+          plait?: string[]
+          repondu_le?: string | null
+          user_id: string
+        }
+        Update: {
+          amene?: string[]
+          anniv_jour?: number | null
+          anniv_mois?: number | null
+          attente?: string | null
+          decouverte?: string[]
+          decouverte_autre?: string | null
+          departement?: string | null
+          epoque_autre?: string | null
+          epoques?: string[]
+          mot?: string | null
+          plait?: string[]
+          repondu_le?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portraits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portraits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       presences: {
         Row: {
           latitude: number
@@ -4391,6 +4457,7 @@ export type Database = {
       }
       purchase_log: {
         Row: {
+          client_depuis: string | null
           created_at: string | null
           email: string | null
           id: number
@@ -4402,6 +4469,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          client_depuis?: string | null
           created_at?: string | null
           email?: string | null
           id?: number
@@ -4413,6 +4481,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          client_depuis?: string | null
           created_at?: string | null
           email?: string | null
           id?: number
@@ -4527,6 +4596,21 @@ export type Database = {
           tracker_kind?: string
           type?: string
           wording?: string
+        }
+        Relationships: []
+      }
+      questionnaire_demandes: {
+        Row: {
+          email: string
+          le: string
+        }
+        Insert: {
+          email: string
+          le?: string
+        }
+        Update: {
+          email?: string
+          le?: string
         }
         Relationships: []
       }
@@ -5061,6 +5145,115 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      suite_etapes: {
+        Row: {
+          id: number
+          jour: number
+          missive_id: number
+          suite: string
+        }
+        Insert: {
+          id?: never
+          jour: number
+          missive_id: number
+          suite: string
+        }
+        Update: {
+          id?: never
+          jour?: number
+          missive_id?: number
+          suite?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suite_etapes_missive_id_fkey"
+            columns: ["missive_id"]
+            isOneToOne: true
+            referencedRelation: "missives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suite_etapes_suite_fkey"
+            columns: ["suite"]
+            isOneToOne: false
+            referencedRelation: "suites"
+            referencedColumns: ["cle"]
+          },
+        ]
+      }
+      suite_inscriptions: {
+        Row: {
+          arretee_le: string | null
+          inscrit_le: string
+          jour_fait: number | null
+          prochaine_le: string | null
+          suite: string
+          user_id: string
+        }
+        Insert: {
+          arretee_le?: string | null
+          inscrit_le?: string
+          jour_fait?: number | null
+          prochaine_le?: string | null
+          suite: string
+          user_id: string
+        }
+        Update: {
+          arretee_le?: string | null
+          inscrit_le?: string
+          jour_fait?: number | null
+          prochaine_le?: string | null
+          suite?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suite_inscriptions_suite_fkey"
+            columns: ["suite"]
+            isOneToOne: false
+            referencedRelation: "suites"
+            referencedColumns: ["cle"]
+          },
+          {
+            foreignKeyName: "suite_inscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suite_inscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suites: {
+        Row: {
+          active: boolean
+          active_depuis: string | null
+          cle: string
+          exige_accord: boolean
+          nom: string
+        }
+        Insert: {
+          active?: boolean
+          active_depuis?: string | null
+          cle: string
+          exige_accord: boolean
+          nom: string
+        }
+        Update: {
+          active?: boolean
+          active_depuis?: string | null
+          cle?: string
+          exige_accord?: boolean
+          nom?: string
+        }
+        Relationships: []
       }
       tag_gauge_mapping: {
         Row: {
@@ -5628,6 +5821,7 @@ export type Database = {
           biography: string
           brouiller_pistes: boolean
           calendrier: string
+          carte_skyrim: boolean
           charte_signee_le: string | null
           conditions_acceptees_le: string | null
           conditions_version: string | null
@@ -5703,6 +5897,7 @@ export type Database = {
           biography?: string
           brouiller_pistes?: boolean
           calendrier?: string
+          carte_skyrim?: boolean
           charte_signee_le?: string | null
           conditions_acceptees_le?: string | null
           conditions_version?: string | null
@@ -5778,6 +5973,7 @@ export type Database = {
           biography?: string
           brouiller_pistes?: boolean
           calendrier?: string
+          carte_skyrim?: boolean
           charte_signee_le?: string | null
           conditions_acceptees_le?: string | null
           conditions_version?: string | null
@@ -6952,6 +7148,10 @@ export type Database = {
       }
       _hub_pouls: { Args: { p_debut: string; p_fin: string }; Returns: Json }
       _hub_pouls_periode: { Args: { p_periode: string }; Returns: Json }
+      _inscrire: {
+        Args: { p_suite: string; p_user: string }
+        Returns: undefined
+      }
       _is_admin: { Args: never; Returns: boolean }
       _is_staff:
         | { Args: never; Returns: boolean }
@@ -7046,6 +7246,10 @@ export type Database = {
         Args: { p_theme: string; p_user: string }
         Returns: number
       }
+      _poser_anniversaire: {
+        Args: { p_jour: number; p_mois: number; p_user: string }
+        Returns: undefined
+      }
       _presents_autour: {
         Args: { p_id: string }
         Returns: {
@@ -7110,6 +7314,10 @@ export type Database = {
       }
       _silhouette: { Args: { p_geom: unknown }; Returns: Json }
       _succession: { Args: { p_id: string }; Returns: undefined }
+      _suite_permet: {
+        Args: { p_missive: number; p_user: string }
+        Returns: boolean
+      }
       _top_user_for_place: { Args: { p_place_id: string }; Returns: string }
       _total_connaissance: { Args: { p_theme: string }; Returns: number }
       _unlike_contribution_internal: {
@@ -7569,6 +7777,10 @@ export type Database = {
       dmetaphone_alt: { Args: { "": string }; Returns: string }
       donner_accord_nouvelles: {
         Args: { p_accord: boolean }
+        Returns: undefined
+      }
+      donner_anniversaire: {
+        Args: { p_jour: number; p_mois: number }
         Returns: undefined
       }
       ecrire_au_carnet: {
@@ -8081,6 +8293,19 @@ export type Database = {
         Args: { p_active: boolean; p_id: number }
         Returns: undefined
       }
+      hub_activer_suite: {
+        Args: { p_active: boolean; p_cle: string }
+        Returns: undefined
+      }
+      hub_ajouter_etape: {
+        Args: { p: Json; p_cle: string; p_jour: number }
+        Returns: number
+      }
+      hub_ambassadeur: {
+        Args: { p_role: string; p_user: string }
+        Returns: undefined
+      }
+      hub_ambassadeurs: { Args: never; Returns: Json }
       hub_associer_achat: {
         Args: { p_achat: number; p_fragment: number }
         Returns: undefined
@@ -8154,6 +8379,8 @@ export type Database = {
         }
         Returns: undefined
       }
+      hub_enregistrer_missive: { Args: { p: Json }; Returns: number }
+      hub_envois: { Args: never; Returns: Json }
       hub_est_admin: { Args: never; Returns: boolean }
       hub_lieux: {
         Args: {
@@ -8177,10 +8404,27 @@ export type Database = {
         Returns: undefined
       }
       hub_ouverture: { Args: { p_periode: string }; Returns: Json }
+      hub_poser_anniversaire: {
+        Args: { p_jour: number; p_mois: number; p_user: string }
+        Returns: undefined
+      }
+      hub_programmer_missive: {
+        Args: { p_id: number; p_quand: string }
+        Returns: undefined
+      }
+      hub_qui_sont_ils: { Args: { p_segment?: string }; Returns: Json }
+      hub_regler_etape: {
+        Args: { p_id: number; p_jour: number }
+        Returns: undefined
+      }
+      hub_retirer_ambassadeur: { Args: { p_user: string }; Returns: undefined }
+      hub_retirer_etape: { Args: { p_id: number }; Returns: undefined }
       hub_retirer_fragment: {
         Args: { p_fragment: number; p_user: string }
         Returns: undefined
       }
+      hub_ses_missives: { Args: { p_user: string }; Returns: Json }
+      hub_suites: { Args: never; Returns: Json }
       increment_community_quest: {
         Args: {
           p_amount?: number
@@ -8570,6 +8814,10 @@ export type Database = {
         }
         Returns: Json
       }
+      questionnaire_repondre: {
+        Args: { p: Json; p_user: string }
+        Returns: undefined
+      }
       quitter_compagnie: { Args: { p_id: string }; Returns: undefined }
       randomize_position_on_land: {
         Args: { p_lat: number; p_lng: number }
@@ -8845,9 +9093,11 @@ export type Database = {
       }
       signer_charte: { Args: never; Returns: undefined }
       soundex: { Args: { "": string }; Returns: string }
+      suites_preparer: { Args: never; Returns: undefined }
       supprimer_mise_a_jour: { Args: { p_id: number }; Returns: Json }
       supprimer_mon_compte: { Args: never; Returns: undefined }
       sur_les_chemins: { Args: { p_limite?: number }; Returns: Json }
+      synchro_lier_clients: { Args: { p: Json }; Returns: number }
       synchroniser_fragments: {
         Args: { p_illustrations: Json }
         Returns: number

@@ -4,6 +4,8 @@ import type { LieuCarte } from '../api/lireCarte'
 import { ajouterCalques, echelleEcran, enGeoJSON, taille } from './calques'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 
+const CLASSIQUE = { couleurTypes: false, skyrim: false }
+
 const couleurs: CouleursCarte = {
   fond: '#ecdcbb',
   eau: '#bfc3ad',
@@ -32,7 +34,7 @@ const lieu: LieuCarte = {
 }
 
 test('un lieu devient un point avec sa marque et sa pilule', () => {
-  const [point] = enGeoJSON([lieu], false).features
+  const [point] = enGeoJSON([lieu], CLASSIQUE).features
   expect(point?.geometry).toEqual({ type: 'Point', coordinates: [7.4, 43.7] })
   expect(point?.properties).toEqual({
     id: 'a',
@@ -45,7 +47,7 @@ test('un lieu devient un point avec sa marque et sa pilule', () => {
 })
 
 test('sans revendication, pas de pilule', () => {
-  const [point] = enGeoJSON([{ ...lieu, revendication: null }], false).features
+  const [point] = enGeoJSON([{ ...lieu, revendication: null }], CLASSIQUE).features
   expect(point?.properties).not.toHaveProperty('pilule')
 })
 

@@ -15,7 +15,7 @@ import { CarteScreen, CarteVisiteur } from './CarteScreen'
 vi.mock('../api/carte', () => ({
   fetchCarteLieux: vi.fn(() => Promise.resolve([])),
   fetchCartePublique: vi.fn(() => Promise.resolve([])),
-  fetchLieuxEnCouleur: vi.fn(() => Promise.resolve(false)),
+  fetchReglageCarte: vi.fn(() => Promise.resolve(false)),
   fetchTerritoire: vi.fn(() => Promise.resolve({ territoire: null, pays: null })),
   fetchFiltres: vi.fn(() => Promise.resolve({ natures: [], epoques: [] })),
 }))
