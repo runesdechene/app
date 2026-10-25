@@ -15,7 +15,7 @@
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-bord);
   border-radius: var(--radius-carte);
-  background: color-mix(in srgb, var(--color-sur-accent) 90%, transparent);
+  background: var(--color-sur-accent); /* opaque : la carte ne transparaît plus (Uriel, 25/10) */
 }
 
 .loupe {

@@ -18,6 +18,22 @@
   inset: 0;
 }
 
+/* Sur téléphone, la carte naît du parchemin de l'en-tête : un fondu par-dessus ses marques, sous
+   les boutons (Uriel, 25/10 : la carte coupait net sous la bande d'entrelacs). */
+@container app (width < 1024px) {
+  .carte::after {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 48px;
+    background: linear-gradient(
+      color-mix(in srgb, var(--color-fond) 50%, var(--color-sable)),
+      transparent
+    );
+    pointer-events: none;
+  }
+}
+
 /* Invisible : sa largeur est la place du tiroir, que la carte observe pour se recentrer. */
 .placeDuTiroir {
   position: absolute;
@@ -183,7 +199,7 @@
   height: 48px;
   border: 1px solid var(--color-bord);
   border-radius: var(--radius-carte);
-  background: color-mix(in srgb, var(--color-sur-accent) 90%, transparent);
+  background: var(--color-sur-accent); /* opaque, comme la recherche (Uriel, 25/10) */
 }
 
 .sablier {

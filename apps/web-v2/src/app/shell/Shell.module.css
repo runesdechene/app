@@ -59,6 +59,13 @@
   height: 24px;
 }
 
+/* Sur la bande d'entrelacs, le logo et les icônes se détachent d'un halo de parchemin diffus
+   (Uriel, 25/10 : illisibles sur téléphone). */
+.logo,
+.action img {
+  filter: drop-shadow(0 0 3px var(--color-fond)) drop-shadow(0 0 6px var(--color-fond));
+}
+
 /* La pastille des notifications non lues, à cheval sur le coin haut droit de la cloche. */
 .nonLues {
   position: absolute;

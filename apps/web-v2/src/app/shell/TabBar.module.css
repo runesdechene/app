@@ -18,11 +18,12 @@
   background: var(--color-barre);
 }
 
-/* La lisière de forêt, posée juste au-dessus de la barre, dans ses proportions d'origine. */
+/* La lisière de forêt, posée juste au-dessus de la barre, dans ses proportions d'origine. Elle
+   mord d'un pixel sur la barre : bord à bord, l'arrondi des sous-pixels laissait une ligne (25/10). */
 .bar::before {
   content: '';
   position: absolute;
-  inset: auto 0 100%;
+  inset: auto 0 calc(100% - 1px);
   aspect-ratio: 1920 / 74;
   background: url('../../assets/ui/barre-lisiere.png') bottom center / 100% 100% no-repeat;
   pointer-events: none;
