@@ -94,6 +94,10 @@ export class FausseCarte {
   getPitch() {
     return this.inclinaison
   }
+  getBearing() {
+    return 0
+  }
+  resetNorth = vi.fn()
   getTerrain() {
     return this.terrain
   }

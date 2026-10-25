@@ -26,7 +26,6 @@ import { useNavigate, useParams, useSearchParams } from 'react-router'
 import filtre from '@/assets/ui/filtre.svg'
 import plus from '@/assets/ui/plus.svg'
 import position from '@/assets/ui/position.svg'
-import roseDesVents from '@/assets/ui/rose-des-vents.svg'
 import { useMaPosition } from '@/shared/hooks/useMaPosition'
 import { Button } from '@/shared/ui/Button'
 import { useActifs } from '../hooks/useActifs'
@@ -64,6 +63,7 @@ import { FriseDesEpoques } from './FriseDesEpoques'
 import { DateDuJour } from './DateDuJour'
 import { Inscription } from './Inscription'
 import { Recherche } from './Recherche'
+import { RoseDesVents } from './RoseDesVents'
 import { Sablier } from './Sablier'
 
 const DUREE_MESSAGE = 3000
@@ -383,7 +383,7 @@ function CarteVivante({
         <Inscription nom={territoire} />
         {!visiteur && <DateDuJour />}
       </div>
-      <img className={styles.rose} src={roseDesVents} alt="" />
+      <RoseDesVents carte={carte} />
       {sansPosition && (
         <p role="status" className={styles.message}>
           Position indisponible
