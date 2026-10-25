@@ -35,9 +35,7 @@ export function useActifsSurLaCarte(
   useEffect(() => {
     if (!carte) return
     const s = suivreActifs(
-      // Ancrée à gauche : le portrait sur la position, la légende à sa droite (marquesActifs.module.css).
-      (element, ou) =>
-        new maplibregl.Marker({ element, anchor: 'left' }).setLngLat(ou).addTo(carte),
+      (element, ou) => new maplibregl.Marker({ element }).setLngLat(ou).addTo(carte),
       onToucher,
       onToucherSoi,
     )

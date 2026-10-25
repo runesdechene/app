@@ -19,11 +19,12 @@ export type Poser = (element: HTMLElement, ou: [number, number]) => Marque
 // Soi sur la carte, lu dans son profil : `titres` = ses titres portés, déjà réunis (« A · B »).
 export type Soi = { id: string; nom: string; avatar: string | null; titres: string | null }
 
-// La légende d'une marque : le nom, puis une seconde ligne (le titre, ou depuis quand il est parti).
+// Sous le portrait : le nom, puis un second encadré (le titre, ou depuis quand il est parti).
 function legende(nom: string, dessous: string | null): HTMLElement {
   const texte = document.createElement('span')
   texte.className = styles.etiquette ?? ''
   const ligneNom = document.createElement('span')
+  ligneNom.className = styles.nom ?? ''
   ligneNom.textContent = nom
   texte.append(ligneNom)
   if (dessous) {

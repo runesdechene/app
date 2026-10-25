@@ -1,18 +1,15 @@
 /*
- * QUOI     — les marques des Actifs et de soi, « la légende » (Figma « Explorateurs sur la carte — piste C »,
- *            Uriel 25/10) : le portrait sans contour, et à sa droite le nom puis le titre, à l'encre sur
- *            un halo parchemin, comme une légende de carte. Parti depuis peu : désaturé et transparent.
- *            Soi : un halo bleu qui respire, le nom en bleu. De très loin (`data-loin` sur la carte), les
- *            portraits restent et les noms se taisent (Uriel, 01/10).
- * ATTENTION — la marque est ancrée par son bord gauche (useActifsSurLaCarte) : la marge négative de la
- *            moitié du portrait pose son centre pile sur la position.
+ * QUOI     — les marques des Actifs et de soi : le portrait sans contour, et dessous deux petits
+ *            encadrés parchemin à filet léger, le nom puis le titre (Uriel, 25/10 : la légende à côté
+ *            du portrait était illisible). Parti depuis peu : désaturé et transparent. Soi : un halo
+ *            bleu qui respire, le nom en bleu. De très loin (`data-loin` sur la carte), les portraits
+ *            restent et les noms se taisent (Uriel, 01/10).
  */
 .actif,
 .moi {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: -16px; /* la moitié du portrait */
+  display: grid;
+  justify-items: center;
+  gap: 3px;
   transition: opacity var(--duree-douce) var(--courbe-douce);
 
   @starting-style {
@@ -43,19 +40,28 @@
   object-fit: cover;
 }
 
-/* Le nom, puis le titre dessous : à nu sur la carte, détachés par un halo de parchemin. */
+/* Le nom, puis le titre : deux encadrés séparés, empilés et centrés sous le portrait. */
 .etiquette {
   display: grid;
-  color: var(--color-carte-encre);
+  justify-items: center;
+  gap: 2px;
   font-family: var(--font-corps);
-  font-size: var(--legende-size);
-  font-weight: var(--weight-gras);
   line-height: var(--titre-leading);
   white-space: nowrap;
-  text-shadow:
-    0 0 2px var(--color-carte-fond),
-    0 0 2px var(--color-carte-fond),
-    0 0 4px var(--color-carte-fond);
+}
+
+.nom,
+.titre {
+  padding: 2px 6px;
+  border: 1px solid color-mix(in srgb, var(--color-ocre) 35%, transparent);
+  border-radius: var(--radius-vignette);
+  background: var(--color-carte-halo);
+}
+
+.nom {
+  color: var(--color-carte-encre);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
 }
 
 .titre {
@@ -70,7 +76,6 @@
    le rouge est à la cire des énigmes et des lieux neufs (Uriel, 25/10). */
 .moi {
   position: relative;
-  margin-left: -18px;
 }
 
 .moi .portrait,
@@ -83,14 +88,14 @@
   height: 36px;
 }
 
-.moi .etiquette {
+.moi .nom {
   color: var(--color-carte-moi);
 }
 
 .halo {
   position: absolute;
-  top: 50%;
-  left: 18px; /* le centre du portrait */
+  top: 18px; /* le centre du portrait (36 px) */
+  left: 50%;
   width: 64px;
   height: 64px;
   border-radius: var(--radius-rond);
@@ -126,8 +131,11 @@
 }
 
 .actif[data-recent='true'] .etiquette {
-  color: var(--color-texte-doux);
   opacity: 0.7;
+}
+
+.actif[data-recent='true'] .nom {
+  color: var(--color-texte-doux);
 }
 
 @media (prefers-reduced-motion: reduce) {
