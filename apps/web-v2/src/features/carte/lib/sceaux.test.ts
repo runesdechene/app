@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import type { LieuCarte } from '../api/lireCarte'
-import { marquesADessiner, melanger, nomImage } from './sceaux'
+import { marquesADessiner, nomImage } from './sceaux'
 
 const lieu: LieuCarte = {
   id: 'a',
@@ -49,11 +49,6 @@ test('un inconnu neuf a son image à dessiner ; un inconnu ordinaire partage la 
     { ...lieu, id: 'c', etat: 'inconnu' as const, nouveau: true },
   ]
   expect([...marquesADessiner(lieux, CLASSIQUE, () => false).keys()]).toEqual(['neuf-inconnu'])
-})
-
-test('le mélange de deux couleurs suit la part demandée', () => {
-  expect(melanger('#ffffff', '#000000', 1)).toBe('#ffffff')
-  expect(melanger('#ffffff', '#000000', 0.5)).toBe('#808080')
 })
 
 test('chaque marque ne se dessine qu’une fois, quel que soit le nombre de lieux qui la portent', () => {

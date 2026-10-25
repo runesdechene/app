@@ -187,24 +187,12 @@ function sceauClair(icone: HTMLImageElement, c: CouleursCarte) {
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
 }
 
-// Mélange deux couleurs #rrggbb : `part` (0 à 1) de la première. Le canevas ne connaît pas
-// `color-mix` partout, on fait le calcul ici.
-export function melanger(a: string, b: string, part: number): string {
-  const canal = (hex: string, i: number) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16)
-  const canaux = [0, 1, 2].map((i) => Math.round(canal(a, i) * part + canal(b, i) * (1 - part)))
-  return `#${canaux.map((v) => v.toString(16).padStart(2, '0')).join('')}`
-}
-
 // « Mes lieux en couleur » : la pastille de la V1, très appréciée (Uriel, 30/09) — un disque plein
-// dans la couleur franche du type, éclairé en haut et plus profond en bas, l'icône en blanc.
+// dans la couleur franche du type, en aplat (Uriel, 25/10 : plus de dégradé), l'icône en blanc.
 function sceauCouleur(icone: HTMLImageElement, couleur: string) {
   const ctx = toile(SCEAU)
-  const degrade = ctx.createLinearGradient(0, 0, 0, SCEAU)
-  degrade.addColorStop(0, melanger(couleur, '#ffffff', 0.65))
-  degrade.addColorStop(0.5, couleur)
-  degrade.addColorStop(1, melanger(couleur, '#000000', 0.75))
   disque(ctx, SCEAU / 2 - 1)
-  ctx.fillStyle = degrade
+  ctx.fillStyle = couleur
   ctx.fill()
   poserIcone(ctx, icone, '#fff')
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
