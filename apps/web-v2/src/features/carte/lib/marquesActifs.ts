@@ -23,9 +23,9 @@ function nomEtTitre(nom: string, titre: string | null): string {
   return titre ? `${nom} · ${titre}` : nom
 }
 
+// Un brouillé montre aussi son titre : la zone floue dit déjà « quelque part par ici » (Uriel, 25/10).
 function etiquette(a: Actif): string {
   if (!a.enLigne) return `${a.nom} · ${ilYA(a.vuA)}`
-  if (a.brouille) return `${a.nom} · quelque part par ici`
   return nomEtTitre(a.nom, a.titre)
 }
 

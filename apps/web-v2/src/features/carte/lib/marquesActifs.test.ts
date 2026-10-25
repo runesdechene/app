@@ -41,7 +41,7 @@ test('une marque par Actif ; celle d’un parti est retirée, les autres restent
   expect(posees[1]?.marque.remove).toHaveBeenCalled()
 })
 
-test('l’étiquette dit le titre, « quelque part par ici », ou depuis quand', () => {
+test('l’étiquette dit le titre, même brouillé, ou depuis quand', () => {
   const { suivi, posees } = monter()
   suivi.actifs([
     actif('Kelpie'),
@@ -51,7 +51,7 @@ test('l’étiquette dit le titre, « quelque part par ici », ou depuis quand',
   ])
   const textes = posees.map((p) => p.element.lastElementChild?.textContent)
   expect(textes[0]).toBe('Kelpie · Arpenteur')
-  expect(textes[1]).toBe('Mathéo · quelque part par ici')
+  expect(textes[1]).toBe('Mathéo · Arpenteur')
   expect(textes[2]).toMatch(/^Luna · il y a 23\smin$/)
   expect(textes[3]).toBe('Aelis')
   expect(posees[1]?.element.dataset.brouille).toBe('true')
