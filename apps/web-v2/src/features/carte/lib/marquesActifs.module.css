@@ -1,7 +1,7 @@
 /*
  * QUOI     — les marques des Actifs (maquette 362:182) : un portrait cerclé d'ocre et une gélule
  *            « Nom · titre » ; parti depuis peu, désaturé et transparent ; soi, posé sans contour,
- *            son nom à l'encre sur un halo parchemin (Uriel, 25/10), avec un halo rouge qui respire. De très loin (`data-loin` sur la carte), les portraits
+ *            avec un halo bleu qui respire (Uriel, 25/10). De très loin (`data-loin` sur la carte), les portraits
  *            restent et les noms se taisent (Uriel, 01/10).
  */
 .actif,
@@ -52,8 +52,8 @@
   white-space: nowrap;
 }
 
-/* Soi : posé à même la carte, sans contour ; le nom à l'encre sur un halo parchemin, comme les noms
-   sous les lieux revendiqués (Uriel, 25/10). Un halo rouge respire autour. */
+/* Soi : le portrait posé sans contour, un halo bleu qui respire autour — le bleu du « tu es ici » ;
+   le rouge est à la cire des énigmes et des lieux neufs (Uriel, 25/10). */
 .moi {
   position: relative;
 }
@@ -66,15 +66,8 @@
 }
 
 .moi .etiquette {
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--color-carte-encre);
+  color: var(--color-carte-moi);
   font-weight: var(--weight-gras);
-  text-shadow:
-    0 0 2px var(--color-carte-fond),
-    0 0 2px var(--color-carte-fond),
-    0 0 4px var(--color-carte-fond);
 }
 
 .halo {
@@ -84,7 +77,7 @@
   width: 84px;
   height: 84px;
   border-radius: var(--radius-rond);
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  background: color-mix(in srgb, var(--color-carte-moi) 32%, transparent);
   translate: -50% 0;
   animation: respirer 2.4s ease-in-out infinite;
   pointer-events: none;
