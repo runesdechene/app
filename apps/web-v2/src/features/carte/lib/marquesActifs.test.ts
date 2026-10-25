@@ -56,11 +56,13 @@ test('l’étiquette dit le titre, même brouillé, ou depuis quand', () => {
     actif('Luna', { enLigne: false, vuA: new Date(Date.now() - 23 * 60_000).toISOString() }),
     actif('Aelis', { titre: null }),
   ])
-  const textes = posees.map((p) => p.element.lastElementChild?.textContent)
-  expect(textes[0]).toBe('Kelpie · Arpenteur')
-  expect(textes[1]).toBe('Mathéo · Arpenteur')
-  expect(textes[2]).toMatch(/^Luna · il y a 23\smin$/)
-  expect(textes[3]).toBe('Aelis')
+  const lignes = posees.map((p) =>
+    [...(p.element.lastElementChild?.children ?? [])].map((l) => l.textContent),
+  )
+  expect(lignes[0]).toEqual(['Kelpie', 'Arpenteur'])
+  expect(lignes[1]).toEqual(['Mathéo', 'Arpenteur'])
+  expect(lignes[2]?.[1]).toMatch(/^il y a 23\smin$/)
+  expect(lignes[3]).toEqual(['Aelis'])
   expect(posees[1]?.element.dataset.brouille).toBe('true')
   expect(posees[2]?.element.dataset.recent).toBe('true')
 })

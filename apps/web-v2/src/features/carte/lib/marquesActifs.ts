@@ -19,14 +19,25 @@ export type Poser = (element: HTMLElement, ou: [number, number]) => Marque
 // Soi sur la carte, lu dans son profil : `titres` = ses titres portés, déjà réunis (« A · B »).
 export type Soi = { id: string; nom: string; avatar: string | null; titres: string | null }
 
-function nomEtTitre(nom: string, titre: string | null): string {
-  return titre ? `${nom} · ${titre}` : nom
+// La légende d'une marque : le nom, puis une seconde ligne (le titre, ou depuis quand il est parti).
+function legende(nom: string, dessous: string | null): HTMLElement {
+  const texte = document.createElement('span')
+  texte.className = styles.etiquette ?? ''
+  const ligneNom = document.createElement('span')
+  ligneNom.textContent = nom
+  texte.append(ligneNom)
+  if (dessous) {
+    const ligne = document.createElement('span')
+    ligne.className = styles.titre ?? ''
+    ligne.textContent = dessous
+    texte.append(ligne)
+  }
+  return texte
 }
 
 // Un brouillé montre aussi son titre : la zone floue dit déjà « quelque part par ici » (Uriel, 25/10).
-function etiquette(a: Actif): string {
-  if (!a.enLigne) return `${a.nom} · ${ilYA(a.vuA)}`
-  return nomEtTitre(a.nom, a.titre)
+function dessous(a: Actif): string | null {
+  return a.enLigne ? a.titre : ilYA(a.vuA)
 }
 
 function portrait(avatar: string | null, nom: string): HTMLElement {
@@ -52,10 +63,7 @@ function remplir(element: HTMLElement, a: Actif, onToucher: (id: string) => void
   bouton.addEventListener('click', () => {
     onToucher(a.id)
   })
-  const texte = document.createElement('span')
-  texte.className = styles.etiquette ?? ''
-  texte.textContent = etiquette(a)
-  element.replaceChildren(bouton, texte)
+  element.replaceChildren(bouton, legende(a.nom, dessous(a)))
   element.dataset.brouille = String(a.brouille)
   element.dataset.recent = String(!a.enLigne)
 }
@@ -128,19 +136,7 @@ export function suivreActifs(
       bouton.setAttribute('aria-label', 'Mon profil')
       bouton.append(portrait(soi.avatar, soi.nom))
       bouton.addEventListener('click', onToucherSoi)
-      // Le nom, puis les titres sur la ligne du dessous.
-      const texte = document.createElement('span')
-      texte.className = styles.etiquette ?? ''
-      const nom = document.createElement('span')
-      nom.textContent = soi.nom
-      texte.append(nom)
-      if (soi.titres) {
-        const titres = document.createElement('span')
-        titres.className = styles.titres ?? ''
-        titres.textContent = soi.titres
-        texte.append(titres)
-      }
-      moi.element.replaceChildren(halo, bouton, texte)
+      moi.element.replaceChildren(halo, bouton, legende(soi.nom, soi.titres))
     },
 
     vider() {
