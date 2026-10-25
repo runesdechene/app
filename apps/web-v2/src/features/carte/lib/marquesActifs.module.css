@@ -1,5 +1,5 @@
 /*
- * QUOI     — les marques des Actifs (maquette 362:182) : un portrait cerclé d'ocre et une gélule
+ * QUOI     — les marques des Actifs (maquette 362:182) : un portrait sans contour (25/10) et une gélule
  *            « Nom · titre » ; parti depuis peu, désaturé et transparent ; soi, posé sans contour,
  *            avec un halo bleu qui respire (Uriel, 25/10). De très loin (`data-loin` sur la carte), les portraits
  *            restent et les noms se taisent (Uriel, 01/10).
@@ -23,7 +23,7 @@
   height: 32px;
   overflow: hidden;
   padding: 0;
-  border: 2.5px solid var(--color-ocre);
+  border: none;
   border-radius: var(--radius-rond);
   background: var(--color-sable);
   color: var(--color-encre);
@@ -58,10 +58,14 @@
   position: relative;
 }
 
+.moi .portrait,
+.moi .etiquette {
+  position: relative; /* devant le halo : positionnés après lui, ils se peignent par-dessus */
+}
+
 .moi .portrait {
   width: 36px;
   height: 36px;
-  border: none;
   cursor: default;
 }
 
@@ -72,10 +76,10 @@
 
 .halo {
   position: absolute;
-  top: -24px;
+  top: -14px; /* centré sur le portrait (36 px) */
   left: 50%;
-  width: 84px;
-  height: 84px;
+  width: 64px;
+  height: 64px;
   border-radius: var(--radius-rond);
   background: color-mix(in srgb, var(--color-carte-moi) 32%, transparent);
   translate: -50% 0;
@@ -104,7 +108,6 @@
 /* Parti il y a moins d'une heure : il s'efface, il ne disparaît pas. L'opacité se pose sur les
    enfants : MapLibre réécrit celle de la marque elle-même à chaque déplacement. */
 .actif[data-recent='true'] .portrait {
-  border-color: var(--color-texte-pale);
   opacity: 0.55;
   filter: grayscale(1);
 }
