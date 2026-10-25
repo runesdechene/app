@@ -25,9 +25,10 @@
     content: '';
     position: absolute;
     inset: 0 0 auto;
-    height: 48px;
+    height: 96px; /* sous la recherche et les pastilles : la carte paraît en clair en dessous */
     background: linear-gradient(
-      color-mix(in srgb, var(--color-fond) 50%, var(--color-sable)),
+      var(--color-carte-entete),
+      color-mix(in srgb, var(--color-carte-entete) 60%, transparent) 45%,
       transparent
     );
     pointer-events: none;
