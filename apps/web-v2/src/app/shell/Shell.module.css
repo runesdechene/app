@@ -27,7 +27,8 @@
   height: auto;
 
   /* +6 px dessous : la bande d'entrelacs du parchemin entière avant la carte (Uriel, 25/10) */
-  margin: calc(env(safe-area-inset-top) + var(--space-4)) var(--space-4) calc(var(--space-2) + 6px);
+  margin: calc(env(safe-area-inset-top) + var(--space-4) + 4px) var(--space-4)
+    calc(var(--space-2) + 6px);
 }
 
 .embleme {
@@ -67,7 +68,9 @@
    (Uriel, 25/10 : illisibles sur téléphone). */
 .logo,
 .action img {
-  filter: drop-shadow(0 0 3px var(--color-fond)) drop-shadow(0 0 8px var(--color-fond))
+  /* Des couches empilées : chacune épaissit le halo, assez pour couvrir les entrelacs. */
+  filter: drop-shadow(0 0 1px var(--color-fond)) drop-shadow(0 0 2px var(--color-fond))
+    drop-shadow(0 0 4px var(--color-fond)) drop-shadow(0 0 8px var(--color-fond))
     drop-shadow(0 0 14px var(--color-fond));
 }
 
