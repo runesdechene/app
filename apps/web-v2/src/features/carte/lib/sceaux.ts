@@ -1,7 +1,7 @@
 /**
  * QUOI     — les marques des lieux, dessinées une fois dans un canevas puis confiées à MapLibre :
- *            le « ? » (lieu inconnu) sur une lueur parchemin légère ; le lieu connu dans sa bulle
- *            crème, ou, en « Carte Skyrim », son icône nue à l'encre sur la même lueur ; le sceau
+ *            le « ? » (lieu inconnu) et le lieu connu dans leur bulle crème, ou, en « Carte Skyrim »,
+ *            le « ? » au pinceau et l'icône nue à l'encre, sur une lueur parchemin légère ; le sceau
  *            du type (visité, en couleur par défaut depuis le 24/10) ; le
  *            sceau d'encre (lieu neuf) ; l'étoile (point d'intérêt), la gélule « NOUVEAU » et l'étendard
  *            posé devant le nom de qui a revendiqué un lieu.
@@ -32,7 +32,7 @@ export function nomImage(l: LieuCarte, { couleurTypes, skyrim }: StyleDesMarques
   if (l.nature === 'curiosite') return 'curiosite'
   const icone = l.icone ?? 'defaut'
   if (l.nouveau) return l.etat === 'inconnu' ? 'neuf-inconnu' : `neuf-${icone}`
-  if (l.etat === 'inconnu') return 'bille'
+  if (l.etat === 'inconnu') return skyrim ? 'inconnu-encre' : 'bille'
   if (l.etat === 'connu') return skyrim ? `encre-${icone}` : `connu-${icone}`
   return couleurTypes && l.couleur ? `visite-${icone}-${l.couleur}` : `visite-${icone}`
 }
@@ -131,9 +131,9 @@ function signeDEncre(icone: HTMLImageElement, c: CouleursCarte) {
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
 }
 
-// Un lieu pas encore découvert : le « ? » au pinceau de la marque (VISUELS/LA CARTE/inconnu_2.webp,
-// Uriel 24/10), tel quel, à la taille des icônes.
-function bille(image: HTMLImageElement, c: CouleursCarte) {
+// Un lieu pas encore découvert, en « Carte Skyrim » : le « ? » au pinceau de la marque
+// (VISUELS/LA CARTE/inconnu_2.webp, Uriel 24/10), tel quel, à la taille des icônes.
+function inconnuALEncre(image: HTMLImageElement, c: CouleursCarte) {
   const ctx = toile(SCEAU)
   lueur(ctx, c)
   ctx.drawImage(image, BORD, BORD - 1, ICONE, ICONE)
@@ -149,6 +149,29 @@ function sceauNeuf(icone: HTMLImageElement, c: CouleursCarte) {
   ctx.fill()
   poserIcone(ctx, icone, c.halo)
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
+}
+
+// Un lieu pas encore découvert : plus petit que les sceaux, mais qu'on voit (Uriel, 28/09) —
+// 17 px à l'écran, fond presque plein, cercle et « ? » d'encre francs.
+const BILLE = 34
+
+function bille(c: CouleursCarte) {
+  const ctx = toile(BILLE)
+  disque(ctx, BILLE / 2 - 2)
+  ctx.globalAlpha = 0.95
+  ctx.fillStyle = c.halo
+  ctx.fill()
+  ctx.globalAlpha = 0.85
+  ctx.lineWidth = 3
+  ctx.strokeStyle = c.encre
+  ctx.stroke()
+  ctx.globalAlpha = 0.9
+  ctx.fillStyle = c.encre
+  ctx.font = '700 22px Cabin, sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('?', BILLE / 2, BILLE / 2 + 1)
+  return ctx.getImageData(0, 0, BILLE, BILLE)
 }
 
 // Le sceau crème cerclé d'encre : un lieu connu, ou visité quand les couleurs sont éteintes.
@@ -256,10 +279,11 @@ export async function ajouterMarques(
   c: CouleursCarte,
   style: StyleDesMarques,
 ): Promise<void> {
-  // La gélule « NOUVEAU » s'écrit en Cabin : la police doit être là avant de dessiner.
+  // La gélule « NOUVEAU » et le « ? » de la bille s'écrivent en Cabin : la police d'abord.
   await document.fonts.load('700 17px Cabin')
   const inconnu = await chargerImage(imageInconnu)
-  ajouter(map, 'bille', bille(inconnu, c))
+  ajouter(map, 'bille', bille(c))
+  ajouter(map, 'inconnu-encre', inconnuALEncre(inconnu, c))
   ajouter(map, 'curiosite', etoile(c))
   // L'étendard de la marque (VISUELS/1. IMAGES EN VRAC/etendard.webp), tel quel.
   if (!map.hasImage('etendard'))

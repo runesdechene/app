@@ -30,11 +30,11 @@ test('chaque lieu reçoit la marque de son état', () => {
   expect(nomImage({ ...lieu, nature: 'curiosite' }, CLASSIQUE)).toBe('curiosite')
 })
 
-test('en « Carte Skyrim », seul le lieu connu change de marque', () => {
+test('en « Carte Skyrim », les lieux inconnus et connus changent de marque', () => {
   const skyrim = { couleurTypes: true, skyrim: true }
   expect(nomImage({ ...lieu, etat: 'connu' }, skyrim)).toBe('encre-x.svg')
   expect(nomImage(lieu, skyrim)).toBe('visite-x.svg-#708d44')
-  expect(nomImage({ ...lieu, etat: 'inconnu' }, skyrim)).toBe('bille')
+  expect(nomImage({ ...lieu, etat: 'inconnu' }, skyrim)).toBe('inconnu-encre')
   expect(nomImage({ ...lieu, etat: 'connu', nouveau: true }, skyrim)).toBe('neuf-x.svg')
 })
 
