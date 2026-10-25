@@ -1,15 +1,15 @@
 /**
  * QUOI     — les nouveaux lieux sur la carte (Uriel, 24/10) : un lieu ajouté depuis moins de 14 jours
- *            et pas encore ouvert porte un sceau d'encre plein (sceaux.ts), au premier plan, entouré
- *            d'une lueur et d'un fin anneau d'encre qui s'élargit et s'efface en boucle lente ; de près
- *            seulement, une gélule d'encre « NOUVEAU » sous la marque. Le lieu
+ *            et pas encore ouvert porte un sceau de cire rouge (sceaux.ts), au premier plan, entouré
+ *            d'une lueur et d'un fin anneau de cire qui s'élargit et s'efface en boucle lente ; de près
+ *            seulement, une gélule de cire « NOUVEAU » sous la marque. Le lieu
  *            reste à sa place et à sa taille.
  * POURQUOI — l'anneau d'encre seul (08/10), puis l'aube dorée, ne se voyaient pas assez parmi les
  *            lieux (Uriel, 24/10). Une seule couleur pour tous les lieux neufs : les couleurs par nature
- *            faisaient « pêle-mêle » (08/10). Le mot de loin chargeait la carte : le sceau suffit à
+ *            faisaient « pêle-mêle » (08/10). Le mot de loin chargeait la carte : la cire suffit à
  *            signaler. Calques MapLibre sur la source des lieux : la propriété `nouveau` (migration 469).
- * ATTENTION — noir et non rouge : le rouge est aux énigmes (Uriel, 24/10). L'anneau est plus lent que
- *            leur onde, pour ne pas les confondre.
+ * ATTENTION — rouge comme les énigmes : passé à l'encre le 24/10, la cire revient le 25/10 (Uriel).
+ *            L'anneau est plus lent que leur onde, pour ne pas les confondre.
  *            Les tailles suivent la courbe des marques (PALIERS, calques.ts), au premier niveau de
  *            l'expression de zoom ; l'anneau s'anime image par image (comme `fairePulser` des
  *            énigmes). Animations réduites : un anneau fixe.
@@ -73,7 +73,7 @@ export function calqueAnneau(c: CouleursCarte, ecran: number): AddLayerObject {
     paint: {
       'circle-opacity': 0, // un contour seul
       'circle-radius': rayonAuZoom(rayon * ecran),
-      'circle-stroke-color': c.encre,
+      'circle-stroke-color': c.cire,
       'circle-stroke-width': TRAIT * ecran,
       'circle-stroke-opacity': opacite,
       // Pas de fondu : on change ces valeurs à chaque image (sinon les fondus se chevauchent).
@@ -83,7 +83,7 @@ export function calqueAnneau(c: CouleursCarte, ecran: number): AddLayerObject {
   }
 }
 
-// La lueur : un disque d'encre flou, sous toutes les marques.
+// La lueur : un disque de cire flou, sous toutes les marques.
 export function calqueLueur(c: CouleursCarte, ecran: number): AddLayerObject {
   return {
     id: CALQUE_LUEUR_NOUVEAUX,
@@ -91,7 +91,7 @@ export function calqueLueur(c: CouleursCarte, ecran: number): AddLayerObject {
     source: SOURCE,
     filter: estNouveau,
     paint: {
-      'circle-color': c.encre,
+      'circle-color': c.cire,
       'circle-blur': 1, // flou du centre jusqu'au bord : une lueur, pas un disque
       'circle-opacity': 0.6,
       'circle-radius': rayonAuZoom(LUEUR * ecran),
@@ -100,7 +100,7 @@ export function calqueLueur(c: CouleursCarte, ecran: number): AddLayerObject {
 }
 
 // La gélule « NOUVEAU », dessinée d'un bloc avec son mot (sceaux.ts), de près seulement (Uriel, 24/10) :
-// de loin, le sceau suffit.
+// de loin, la cire suffit.
 export function calqueGelule(): AddLayerObject {
   return {
     id: CALQUE_GELULE_NOUVEAUX,

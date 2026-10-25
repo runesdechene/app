@@ -3,7 +3,7 @@
  *            le « ? » (lieu inconnu) et le lieu connu dans leur bulle crème, ou, en « Carte Skyrim »,
  *            le « ? » au pinceau et l'icône nue à l'encre, sur une lueur parchemin légère ; le sceau
  *            du type (visité, en couleur par défaut depuis le 24/10) ; le
- *            sceau d'encre (lieu neuf) ; l'étoile (point d'intérêt), la gélule « NOUVEAU » et l'étendard
+ *            sceau de cire (lieu neuf) ; l'étoile (point d'intérêt), la gélule « NOUVEAU » et l'étendard
  *            posé devant le nom de qui a revendiqué un lieu.
  * POURQUOI — des images de carte, et non des éléments HTML : des milliers de lieux restent
  *            fluides sur un téléphone (spec Carte §3). Les signes d'encre nus (24/10) n'ont pas plu :
@@ -140,12 +140,12 @@ function inconnuALEncre(image: HTMLImageElement, c: CouleursCarte) {
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
 }
 
-// Un lieu neuf : un sceau d'encre plein, l'icône (ou le « ? ») en clair (nouveaux.ts pose sa lueur et
-// son anneau). Noir et non rouge : le rouge est aux énigmes (Uriel, 24/10).
+// Un lieu neuf : un sceau de cire rouge, l'icône (ou le « ? ») en clair (nouveaux.ts pose sa lueur et
+// son anneau). Passé à l'encre le 24/10, la cire revient le 25/10 (Uriel).
 function sceauNeuf(icone: HTMLImageElement, c: CouleursCarte) {
   const ctx = toile(SCEAU)
   disque(ctx, SCEAU / 2 - 2)
-  ctx.fillStyle = c.encre
+  ctx.fillStyle = c.cire
   ctx.fill()
   poserIcone(ctx, icone, c.halo)
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
@@ -198,7 +198,7 @@ function sceauCouleur(icone: HTMLImageElement, couleur: string) {
   ctx.lineWidth = 3
   ctx.strokeStyle = couleur
   ctx.stroke()
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)'
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)'
   ctx.stroke()
   poserIcone(ctx, icone, '#fff')
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
@@ -223,7 +223,7 @@ function etoile(c: CouleursCarte) {
 // La gélule « NOUVEAU » (nouveaux.ts), mot compris, en une seule image : la carte l'agrandit d'un
 // bloc avec le zoom. Une gélule étirée autour d'un texte de carte ne suit pas quand ce texte change
 // de taille avec le zoom : le mot glissait dedans (22/10). Mot en Cabin 9 px, marges de 3 et 6 px,
-// en clair sur l'encre (Uriel, 24/10).
+// en clair sur la cire (Uriel, 25/10).
 function geluleNouveau(c: CouleursCarte): ImageData {
   const [mot, haut, cote] = [9 * RATIO, 3 * RATIO, 6 * RATIO]
   const police = `700 ${String(mot)}px Cabin`
@@ -236,7 +236,7 @@ function geluleNouveau(c: CouleursCarte): ImageData {
   if (!ctx) throw new Error('canevas indisponible')
   ctx.beginPath()
   ctx.roundRect(0, 0, largeur, hauteur, hauteur / 2)
-  ctx.fillStyle = c.encre
+  ctx.fillStyle = c.cire
   ctx.fill()
   ctx.font = police
   ctx.letterSpacing = mesure.letterSpacing
