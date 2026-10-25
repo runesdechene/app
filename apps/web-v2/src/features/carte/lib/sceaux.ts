@@ -188,12 +188,18 @@ function sceauClair(icone: HTMLImageElement, c: CouleursCarte) {
 }
 
 // « Mes lieux en couleur » : la pastille de la V1, très appréciée (Uriel, 30/09) — un disque plein
-// dans la couleur franche du type, en aplat (Uriel, 25/10 : plus de dégradé), l'icône en blanc.
+// dans la couleur franche du type, en aplat cerclé de la même couleur plus foncée (Uriel, 25/10), l'icône en blanc.
 function sceauCouleur(icone: HTMLImageElement, couleur: string) {
   const ctx = toile(SCEAU)
-  disque(ctx, SCEAU / 2 - 1)
+  disque(ctx, SCEAU / 2 - 3)
   ctx.fillStyle = couleur
   ctx.fill()
+  // La bordure : la même couleur, assombrie d'un voile noir (Uriel, 25/10).
+  ctx.lineWidth = 3
+  ctx.strokeStyle = couleur
+  ctx.stroke()
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)'
+  ctx.stroke()
   poserIcone(ctx, icone, '#fff')
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
 }
