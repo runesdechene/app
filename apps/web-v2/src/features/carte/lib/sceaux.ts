@@ -274,8 +274,10 @@ export async function ajouterMarques(
   ajouter(map, 'inconnu-encre', inconnuALEncre(inconnu, c))
   ajouter(map, 'curiosite', etoile(c))
   // L'étendard de la marque (VISUELS/1. IMAGES EN VRAC/etendard.webp), tel quel.
-  if (!map.hasImage('etendard'))
-    map.addImage('etendard', await chargerImage(imageEtendard), { pixelRatio: 6 }) // 72 px → 12 px, la hauteur du nom
+  // Chargée avant de regarder si elle est déjà là : deux dessins qui se chevauchent l'ajouteraient
+  // chacun (« already exists », 25/10).
+  const etendard = await chargerImage(imageEtendard)
+  if (!map.hasImage('etendard')) map.addImage('etendard', etendard, { pixelRatio: 6 }) // 72 px → 12 px, la hauteur du nom
   ajouter(map, 'gelule-nouveau', geluleNouveau(c))
 
   // Chaque image une seule fois (02/10 : dessinée pour chaque lieu, elle coûtait une seconde de
