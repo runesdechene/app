@@ -47,7 +47,8 @@
 
 .bandeau {
   position: absolute;
-  top: var(--space-3);
+  top: 112px; /* sous la recherche et ses pastilles : à leur hauteur, il passait derrière (25/10) */
+  z-index: 3;
   left: calc(50% + var(--decalage-carte) / 2);
   transition: left var(--duree-douce) var(--courbe-douce);
   display: flex;
