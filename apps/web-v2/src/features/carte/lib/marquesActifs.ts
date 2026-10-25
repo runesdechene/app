@@ -1,8 +1,8 @@
 /**
  * QUOI     — les marques des Actifs et de soi sur la carte (maquette « Carte — les Explorateurs
  *            actifs », 01/10) : un portrait et une étiquette par Explorateur, posés, déplacés,
- *            retirés à chaque relecture ; soi, cerclé de rouge, à sa vraie position, avec son nom
- *            et son titre comme les autres (Uriel, 06/10 : plus « Toi »).
+ *            retirés à chaque relecture ; soi, à sa vraie position, son nom puis ses titres en dessous,
+ *            et le toucher ouvre son profil (Uriel, 25/10).
  * POURQUOI — des portraits, pas des icônes : ce sont des personnes. Quelques dizaines tout au plus,
  *            des éléments HTML suffisent (MapLibre les déplace avec la carte). Qui pose une marque
  *            vient d'ailleurs (`poser`) : la carte réelle en vrai, une fausse en test.
@@ -16,8 +16,8 @@ import styles from './marquesActifs.module.css'
 
 export type Marque = { setLngLat: (ou: [number, number]) => unknown; remove: () => unknown }
 export type Poser = (element: HTMLElement, ou: [number, number]) => Marque
-// Soi sur la carte : ce que sa marque affiche, lu dans son profil.
-export type Soi = { nom: string; avatar: string | null; titre: string | null }
+// Soi sur la carte, lu dans son profil : `titres` = ses titres portés, déjà réunis (« A · B »).
+export type Soi = { id: string; nom: string; avatar: string | null; titres: string | null }
 
 function nomEtTitre(nom: string, titre: string | null): string {
   return titre ? `${nom} · ${titre}` : nom
@@ -70,7 +70,11 @@ function garderPourSoi(element: HTMLElement) {
   }
 }
 
-export function suivreActifs(poser: Poser, onToucher: (id: string) => void) {
+export function suivreActifs(
+  poser: Poser,
+  onToucher: (id: string) => void,
+  onToucherSoi: () => void,
+) {
   const marques = new Map<string, { marque: Marque; element: HTMLElement }>()
   let moi: { marque: Marque; element: HTMLElement } | null = null
 
@@ -101,7 +105,7 @@ export function suivreActifs(poser: Poser, onToucher: (id: string) => void) {
 
     // Sans position ou sans profil (pas encore lu), pas de marque. Le contenu est refait à chaque
     // appel : le profil peut arriver après la position, ou changer (nouveau portrait).
-    moi(point: Point | null, soi: Soi | null) {
+    moi(point: Point | null, soi: Omit<Soi, 'id'> | null) {
       if (!point || !soi) {
         moi?.marque.remove()
         moi = null
@@ -111,19 +115,32 @@ export function suivreActifs(poser: Poser, onToucher: (id: string) => void) {
       if (!moi) {
         const element = document.createElement('div')
         element.className = styles.moi ?? ''
+        garderPourSoi(element)
         moi = { marque: poser(element, ou), element }
       } else {
         moi.marque.setLngLat(ou)
       }
       const halo = document.createElement('span')
       halo.className = styles.halo ?? ''
-      const cadre = document.createElement('span')
-      cadre.className = styles.portrait ?? ''
-      cadre.append(portrait(soi.avatar, soi.nom))
+      const bouton = document.createElement('button')
+      bouton.type = 'button'
+      bouton.className = styles.portrait ?? ''
+      bouton.setAttribute('aria-label', 'Mon profil')
+      bouton.append(portrait(soi.avatar, soi.nom))
+      bouton.addEventListener('click', onToucherSoi)
+      // Le nom, puis les titres sur la ligne du dessous.
       const texte = document.createElement('span')
       texte.className = styles.etiquette ?? ''
-      texte.textContent = nomEtTitre(soi.nom, soi.titre)
-      moi.element.replaceChildren(halo, cadre, texte)
+      const nom = document.createElement('span')
+      nom.textContent = soi.nom
+      texte.append(nom)
+      if (soi.titres) {
+        const titres = document.createElement('span')
+        titres.className = styles.titres ?? ''
+        titres.textContent = soi.titres
+        texte.append(titres)
+      }
+      moi.element.replaceChildren(halo, bouton, texte)
     },
 
     vider() {

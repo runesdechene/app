@@ -78,11 +78,12 @@ const BoutonAPortee = lazy(() =>
   import('@/features/lieu/components/BoutonAPortee').then((m) => ({ default: m.BoutonAPortee })),
 )
 
-// La carte de la coquille : la jauge d'énergie sous la recherche, soi (portrait, nom, premier
-// titre porté, comme les autres Explorateurs), et le « + »
+// La carte de la coquille : la jauge d'énergie sous la recherche, soi (portrait, nom, titres
+// portés ; le toucher ouvre son profil), et le « + »
 // qui ouvre l'ajout (Uriel, 05/10 : le seul « + », sur la carte, téléphone comme PC).
 function CarteDeLaCoquille() {
-  const { profil } = useExplorateur(useMonIdentifiant())
+  const monId = useMonIdentifiant()
+  const { profil } = useExplorateur(monId)
   const ouvrir = useOuvrir()
   const navigate = useNavigate()
   // Mes pins sur la carte (seulement ceux que le serveur connaît) ; « Voir sur la carte » arrive
@@ -124,8 +125,13 @@ function CarteDeLaCoquille() {
           </Suspense>
         )}
         soi={
-          profil
-            ? { nom: profil.nom, avatar: profil.avatarUrl, titre: profil.titres[0]?.nom ?? null }
+          profil && monId
+            ? {
+                id: monId,
+                nom: profil.nom,
+                avatar: profil.avatarUrl,
+                titres: profil.titres.map((t) => t.nom).join(' · ') || null,
+              }
             : null
         }
         onAjouter={() => {

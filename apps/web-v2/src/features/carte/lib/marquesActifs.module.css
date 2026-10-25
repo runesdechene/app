@@ -66,12 +66,18 @@
 .moi .portrait {
   width: 36px;
   height: 36px;
-  cursor: default;
 }
 
 .moi .etiquette {
+  display: grid;
+  justify-items: center;
   color: var(--color-carte-moi);
   font-weight: var(--weight-gras);
+}
+
+.titres {
+  color: var(--color-texte-doux);
+  font-weight: var(--weight-normal);
 }
 
 .halo {

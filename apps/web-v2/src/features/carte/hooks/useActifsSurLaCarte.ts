@@ -8,7 +8,8 @@
  */
 import { maplibregl } from '@/shared/lib/maplibre'
 import type { GeoJSONSource, Map as Carte } from 'maplibre-gl'
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router'
 import type { Point } from '@/shared/lib/distance'
 import type { Actif } from '../api/lireActifs'
 import { ZONES, zonesEnGeoJSON } from '../lib/actifs'
@@ -23,6 +24,12 @@ export function useActifsSurLaCarte(
   soi: Soi | null,
   onToucher: (id: string) => void,
 ) {
+  // Toucher son propre portrait ouvre son profil.
+  const navigate = useNavigate()
+  const monId = soi?.id
+  const onToucherSoi = useCallback(() => {
+    if (monId) void navigate(`/carte/explorateur/${monId}`)
+  }, [navigate, monId])
   const suivi = useRef<ReturnType<typeof suivreActifs> | null>(null)
 
   useEffect(() => {
@@ -30,6 +37,7 @@ export function useActifsSurLaCarte(
     const s = suivreActifs(
       (element, ou) => new maplibregl.Marker({ element }).setLngLat(ou).addTo(carte),
       onToucher,
+      onToucherSoi,
     )
     suivi.current = s
     const loin = () => {
@@ -42,7 +50,7 @@ export function useActifsSurLaCarte(
       carte.off('zoom', loin)
       suivi.current = null
     }
-  }, [carte, onToucher])
+  }, [carte, onToucher, onToucherSoi])
 
   useEffect(() => {
     suivi.current?.actifs(actifs)
@@ -52,8 +60,8 @@ export function useActifsSurLaCarte(
   // `soi` est refait à chaque rendu : on suit ses champs, pas l'objet.
   const nom = soi?.nom
   const avatar = soi?.avatar ?? null
-  const titre = soi?.titre ?? null
+  const titres = soi?.titres ?? null
   useEffect(() => {
-    suivi.current?.moi(maPosition, nom === undefined ? null : { nom, avatar, titre })
-  }, [carte, maPosition, nom, avatar, titre])
+    suivi.current?.moi(maPosition, nom === undefined ? null : { nom, avatar, titres })
+  }, [carte, maPosition, nom, avatar, titres, onToucherSoi])
 }

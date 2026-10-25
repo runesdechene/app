@@ -28,7 +28,14 @@ function monter() {
     return marque
   })
   const onToucher = vi.fn()
-  return { suivi: suivreActifs(poser, onToucher), posees, poser, onToucher }
+  const onToucherSoi = vi.fn()
+  return {
+    suivi: suivreActifs(poser, onToucher, onToucherSoi),
+    posees,
+    poser,
+    onToucher,
+    onToucherSoi,
+  }
 }
 
 test('une marque par Actif ; celle d’un parti est retirée, les autres restent', () => {
@@ -85,17 +92,21 @@ test('toucher un portrait ne touche pas la carte dessous (le lieu sous ses pieds
   expect(carte).not.toHaveBeenCalled()
 })
 
-const uriel = { nom: 'Uriel', avatar: 'moi.jpg', titre: 'Cartographe' }
+const uriel = { nom: 'Uriel', avatar: 'moi.jpg', titres: 'Cartographe · Chevalier errant' }
 
-test('soi : rien sans position ni profil, son nom et son titre à sa position, puis suivi', () => {
-  const { suivi, posees, poser } = monter()
+test('soi : rien sans position ni profil, son nom puis ses titres à sa position, puis suivi', () => {
+  const { suivi, posees, poser, onToucherSoi } = monter()
   suivi.moi(null, uriel)
   suivi.moi({ latitude: 45, longitude: 1 }, null)
   expect(poser).not.toHaveBeenCalled()
   suivi.moi({ latitude: 45, longitude: 1 }, uriel)
-  expect(posees[0]?.element.textContent).toContain('Uriel · Cartographe')
+  const etiquette = posees[0]?.element.lastElementChild
+  expect(etiquette?.children[0]?.textContent).toBe('Uriel')
+  expect(etiquette?.children[1]?.textContent).toBe('Cartographe · Chevalier errant')
   expect(posees[0]?.ou).toEqual([1, 45])
-  suivi.moi({ latitude: 46, longitude: 2 }, { ...uriel, titre: null })
+  posees[0]?.element.querySelector('button')?.click()
+  expect(onToucherSoi).toHaveBeenCalledTimes(1)
+  suivi.moi({ latitude: 46, longitude: 2 }, { ...uriel, titres: null })
   expect(poser).toHaveBeenCalledTimes(1)
   expect(posees[0]?.marque.setLngLat).toHaveBeenCalledWith([2, 46])
   expect(posees[0]?.element.textContent).toBe('Uriel')
