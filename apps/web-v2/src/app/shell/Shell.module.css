@@ -25,7 +25,9 @@
   width: 216px;
   max-width: calc(100% - 2 * var(--space-4)); /* il rapetisse avec sa colonne, sans déborder */
   height: auto;
-  margin: calc(env(safe-area-inset-top) + var(--space-4)) var(--space-4) var(--space-2);
+
+  /* +6 px dessous : la bande d'entrelacs du parchemin entière avant la carte (Uriel, 25/10) */
+  margin: calc(env(safe-area-inset-top) + var(--space-4)) var(--space-4) calc(var(--space-2) + 6px);
 }
 
 .embleme {
@@ -39,7 +41,9 @@
 .actions {
   grid-area: actions;
   display: flex;
-  margin: calc(env(safe-area-inset-top) + var(--space-3)) var(--space-3) var(--space-2) 0;
+
+  /* +6 px dessus : centrées sur la hauteur du logo (Uriel, 25/10) */
+  margin: calc(env(safe-area-inset-top) + var(--space-3) + 6px) var(--space-3) var(--space-2) 0;
 }
 
 /* « Ajouter » et la cloche : des pochoirs de 24 px dans une cible tactile (maquette 162:107). */
@@ -63,7 +67,8 @@
    (Uriel, 25/10 : illisibles sur téléphone). */
 .logo,
 .action img {
-  filter: drop-shadow(0 0 3px var(--color-fond)) drop-shadow(0 0 6px var(--color-fond));
+  filter: drop-shadow(0 0 3px var(--color-fond)) drop-shadow(0 0 8px var(--color-fond))
+    drop-shadow(0 0 14px var(--color-fond));
 }
 
 /* La pastille des notifications non lues, à cheval sur le coin haut droit de la cloche. */
