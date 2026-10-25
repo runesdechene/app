@@ -29,19 +29,21 @@ function monter() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
     <QueryClientProvider client={client}>
-      <FeuilleEnigme touchee={{ id: 4, x: 100, y: 200 }} onFermer={onFermer} />
+      <FeuilleEnigme touchee={{ id: 4, x: 100, y: 200, couleur: null }} onFermer={onFermer} />
     </QueryClientProvider>,
   )
 }
 
-// jsdom n'anime rien : une fois l'énigme chargée (le sceau porte `data-retourne`), la fin du
-// retournement se déclenche à la main.
+// jsdom n'anime rien : une fois l'énigme chargée (le sceau porte `data-prete`), la fin du tour et
+// l'effacement se déclenchent à la main.
 async function retourner() {
   await waitFor(() => {
-    expect(document.querySelector('[data-retourne]')).not.toBeNull()
+    expect(document.querySelector('[data-prete]')).not.toBeNull()
   })
-  const sceau = document.querySelector('[data-retourne]')
-  if (sceau) fireEvent.animationEnd(sceau)
+  const sceau = document.querySelector('[data-prete]')
+  if (!sceau) return
+  fireEvent.animationIteration(sceau)
+  fireEvent.animationEnd(sceau)
 }
 
 const enigme = {

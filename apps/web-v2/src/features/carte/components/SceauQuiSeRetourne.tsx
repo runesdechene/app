@@ -1,14 +1,15 @@
 /**
- * QUOI     — le sceau « ? » touché, posé à l'endroit du doigt : tant que l'énigme se charge il attend,
- *            puis il se retourne sur un cachet de cire à la couleur et au logo de la culture (ou à son
- *            initiale, sans logo).
- * POURQUOI — Uriel, 07/10 : le sceau de la carte, puis le cachet de la culture. Sans pluie d'éclats
- *            (UI sobre, `.claude/rules/interface.md`).
- * ATTENTION — mouvement réduit : pas de rotation, `onFini` dès que la culture est connue.
+ * QUOI     — le sceau touché, posé sur celui de la carte (la cire à la couleur de la culture, la clé
+ *            d'or) : il pivote sur lui-même tant que l'énigme se charge, puis s'efface en grandissant
+ *            pendant que la feuille s'ouvre.
+ * POURQUOI — Uriel, 25/10 : le même sceau que sur la carte, qui pivote puis disparaît en s'ouvrant.
+ *            Sans pluie d'éclats (UI sobre, `.claude/rules/interface.md`).
+ * ATTENTION — il finit toujours son tour avant de partir : `onOuvrir` tombe à la fin d'un tour.
+ *            Mouvement réduit : ni tour ni effacement, la feuille s'ouvre dès l'énigme chargée.
  */
-import { useEffect } from 'react'
-import type { Culture } from '../api/lireEnigmes'
-import { BORD_DE_CIRE } from '../lib/cachet'
+import { useEffect, useState } from 'react'
+import imageCire from '@/assets/ui/enigme-cire.png'
+import imageCle from '@/assets/ui/enigme-cle.png'
 import styles from './SceauQuiSeRetourne.module.css'
 
 const mouvementReduit = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -16,53 +17,49 @@ const mouvementReduit = () => window.matchMedia('(prefers-reduced-motion: reduce
 export function SceauQuiSeRetourne({
   x,
   y,
-  culture,
+  couleur,
+  prete,
+  onOuvrir,
   onFini,
 }: {
   x: number
   y: number
-  culture: Culture | null
+  couleur: string | null
+  prete: boolean
+  onOuvrir: () => void
   onFini: () => void
 }) {
+  const [part, setPart] = useState(false)
+
   useEffect(() => {
-    if (culture && mouvementReduit()) onFini()
-  }, [culture, onFini])
+    if (prete && mouvementReduit()) {
+      onOuvrir()
+      onFini()
+    }
+  }, [prete, onOuvrir, onFini])
 
   return (
     <div
       className={styles.sceau}
-      data-retourne={culture ? true : undefined}
-      style={{ '--x': `${String(x)}px`, '--y': `${String(y)}px` }}
+      data-prete={prete ? true : undefined}
+      data-part={part ? true : undefined}
+      style={{
+        '--x': `${String(x)}px`,
+        '--y': `${String(y)}px`,
+        '--icone': `url("${imageCire}")`,
+        ...(couleur && { '--couleur-culture': couleur }),
+      }}
       aria-hidden="true"
+      onAnimationIteration={() => {
+        if (!prete) return
+        setPart(true)
+        onOuvrir()
+      }}
       onAnimationEnd={onFini}
     >
-      <span className={styles.face}>
-        <Cire />
-        <span className={styles.point}>?</span>
-      </span>
-      <span
-        className={styles.dos}
-        style={culture?.couleur ? { '--couleur-culture': culture.couleur } : undefined}
-      >
-        <Cire />
-        <span className={styles.coeur}>
-          {culture?.icone ? (
-            <span className={styles.logo} style={{ '--icone': `url("${culture.icone}")` }} />
-          ) : (
-            culture?.nom.charAt(0)
-          )}
-        </span>
-      </span>
+      <img className={styles.calque} src={imageCire} alt="" />
+      {couleur && <span className={styles.teinte} />}
+      <img className={styles.calque} src={imageCle} alt="" />
     </div>
-  )
-}
-
-// La cire des deux faces : le bord irrégulier et l'anneau où la matrice a pressé.
-function Cire() {
-  return (
-    <svg className={styles.cire} viewBox="0 0 96 96">
-      <path d={BORD_DE_CIRE} />
-      <circle cx="48" cy="48" r="31" />
-    </svg>
   )
 }

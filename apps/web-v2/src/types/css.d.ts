@@ -26,7 +26,7 @@ declare module 'react' {
     '--teinte-sous-titre'?: string
     '--ombre-texte'?: string
     '--ombre-force'?: string
-    // Une énigme touchée : l'endroit du doigt (le sceau s'y retourne) et la couleur de sa culture.
+    // Une énigme touchée : l'endroit du doigt (le sceau y pivote) et la couleur de sa culture.
     '--x'?: string
     '--y'?: string
     '--couleur-culture'?: string

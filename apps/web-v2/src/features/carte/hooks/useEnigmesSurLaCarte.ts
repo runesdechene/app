@@ -21,7 +21,7 @@ import {
   SOURCE_ENIGMES,
 } from '../lib/enigmes'
 
-export type EnigmeTouchee = { id: number; x: number; y: number }
+export type EnigmeTouchee = { id: number; x: number; y: number; couleur: string | null }
 
 const AUCUNE: EnigmeEnAttente[] = []
 
@@ -76,7 +76,13 @@ export function useEnigmesSurLaCarte(
         marque?.geometry.type === 'Point'
           ? carte.project(marque.geometry.coordinates as [number, number])
           : e.point
-      toucher.current({ id, x: ou.x, y: ou.y })
+      const couleur: unknown = marque?.properties.couleur
+      toucher.current({
+        id,
+        x: ou.x,
+        y: ou.y,
+        couleur: typeof couleur === 'string' ? couleur : null,
+      })
     }
     carte.on('style.load', reposer)
     carte.on('click', CALQUE_SCEAUX_ENIGMES, surToucher)

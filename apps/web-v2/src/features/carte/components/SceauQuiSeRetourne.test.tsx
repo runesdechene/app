@@ -1,41 +1,46 @@
 /**
- * QUOI     — le sceau touché : le « ? » de cire devant, le cachet de la culture derrière — à sa
- *            couleur, avec son logo (ou son initiale).
+ * QUOI     — le sceau touché : le sceau de la carte (cire teinte, clé d'or), qui pivote jusqu'à ce que
+ *            l'énigme soit là, puis part.
  */
-import { render, screen } from '@testing-library/react'
-import { expect, test } from 'vitest'
-import { BORD_DE_CIRE } from '../lib/cachet'
+import { fireEvent, render } from '@testing-library/react'
+import { expect, test, vi } from 'vitest'
 import { SceauQuiSeRetourne } from './SceauQuiSeRetourne'
 
-const byzance = { id: 'byzantine', nom: 'Byzance', icone: null, couleur: '#a93d76' }
-
-test('devant, le sceau « ? » qu’on a touché, au même bord de cire que le cachet', () => {
-  const { container } = render(
-    <SceauQuiSeRetourne x={10} y={20} culture={null} onFini={() => undefined} />,
-  )
-  expect(screen.getByText('?')).toBeInTheDocument()
-  expect(container.querySelectorAll(`path[d="${BORD_DE_CIRE}"]`)).toHaveLength(2)
-})
-
-test('derrière, le cachet prend la couleur de la culture et porte son initiale', () => {
-  const { container } = render(
-    <SceauQuiSeRetourne x={10} y={20} culture={byzance} onFini={() => undefined} />,
-  )
-  expect(screen.getByText('B')).toBeInTheDocument()
-  expect(container.querySelector('[style*="--couleur-culture: #a93d76"]')).not.toBeNull()
-})
-
-test('avec un logo, le cachet porte le logo de la culture, peint à sa couleur', () => {
+function monter(prete: boolean) {
+  const onOuvrir = vi.fn()
+  const onFini = vi.fn()
   const { container } = render(
     <SceauQuiSeRetourne
       x={10}
       y={20}
-      culture={{ ...byzance, icone: 'https://x/chrisme.png' }}
-      onFini={() => undefined}
+      couleur="#7a3359"
+      prete={prete}
+      onOuvrir={onOuvrir}
+      onFini={onFini}
     />,
   )
-  expect(container.querySelector('img')).toBeNull()
-  expect(container.querySelector('[style*="--icone"]')?.getAttribute('style')).toContain(
-    'https://x/chrisme.png',
-  )
+  const sceau = container.firstElementChild ?? container
+  return { container, sceau, onOuvrir, onFini }
+}
+
+test('la cire et la clé de la carte, la cire teinte à la couleur de la culture', () => {
+  const { container } = monter(false)
+  expect(container.querySelectorAll('img')).toHaveLength(2)
+  expect(container.querySelector('[style*="--couleur-culture: #7a3359"]')).not.toBeNull()
+})
+
+test('tant que l’énigme se charge, il continue de pivoter', () => {
+  const { sceau, onOuvrir } = monter(false)
+  fireEvent.animationIteration(sceau)
+  expect(onOuvrir).not.toHaveBeenCalled()
+  expect(sceau).not.toHaveAttribute('data-part')
+})
+
+test('l’énigme là, il finit son tour, la feuille s’ouvre et il s’efface', () => {
+  const { sceau, onOuvrir, onFini } = monter(true)
+  fireEvent.animationIteration(sceau)
+  expect(onOuvrir).toHaveBeenCalledOnce()
+  expect(sceau).toHaveAttribute('data-part')
+  fireEvent.animationEnd(sceau)
+  expect(onFini).toHaveBeenCalledOnce()
 })

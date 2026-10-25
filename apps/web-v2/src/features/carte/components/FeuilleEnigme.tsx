@@ -1,5 +1,5 @@
 /**
- * QUOI     — une énigme touchée sur la carte : le sceau se retourne, puis la feuille monte — « Énigme »
+ * QUOI     — une énigme touchée sur la carte : le sceau pivote, puis s.efface pendant que la feuille monte — « Énigme »
  *            et sa culture, le récit, la question, les réponses lettrées ; après la réponse, le verdict,
  *            et tout en bas un lien discret pour signaler une erreur (mig 470). Avant de répondre, ce lien
  *            est sous la question (mig 472) : un énoncé faux se signale, puis on répond quand même.
@@ -33,7 +33,8 @@ export function FeuilleEnigme({
 }) {
   const { enigme, erreurOuverture, repondre, verdict, envoi, erreurReponse } = useEnigme(touchee.id)
   const calendrier = useCalendrier()
-  const [retourne, setRetourne] = useState(false)
+  const [ouverte, setOuverte] = useState(false)
+  const [sceauParti, setSceauParti] = useState(false)
   const [choisie, setChoisie] = useState<string | null>(null)
   // La réponse tapée vit ici : la feuille de signalement remplace un moment les réponses.
   const [libre, setLibre] = useState('')
@@ -49,18 +50,23 @@ export function FeuilleEnigme({
     )
   }
 
-  if (!retourne || !enigme) {
-    return (
-      <SceauQuiSeRetourne
-        x={touchee.x}
-        y={touchee.y}
-        culture={enigme?.culture ?? null}
-        onFini={() => {
-          if (enigme) setRetourne(true)
-        }}
-      />
-    )
-  }
+  // Le sceau s'efface pendant que la feuille monte : les deux sont là un instant.
+  const sceau = !sceauParti && (
+    <SceauQuiSeRetourne
+      x={touchee.x}
+      y={touchee.y}
+      couleur={touchee.couleur}
+      prete={Boolean(enigme)}
+      onOuvrir={() => {
+        setOuverte(true)
+      }}
+      onFini={() => {
+        setSceauParti(true)
+      }}
+    />
+  )
+
+  if (!ouverte || !enigme) return sceau
 
   // Le verdict reste dans la mutation de useEnigme : fermer le signalement le retrouve intact.
   if (signaler) {
@@ -85,84 +91,89 @@ export function FeuilleEnigme({
   const question = texteEnClair(enigme.question, calendrier)
 
   return (
-    <Feuille titre={`Énigme · ${enigme.culture.nom}`} onFermer={onFermer}>
-      <div
-        className={styles.contenu}
-        style={enigme.culture.couleur ? { '--couleur-culture': enigme.culture.couleur } : undefined}
-      >
-        <header className={styles.entete}>
-          {/* Le sceau de la culture : son icône du Hub peinte à sa couleur, ou son initiale. */}
-          <span className={styles.sceau} data-testid="sceau-culture">
-            {enigme.culture.icone ? (
-              <span
-                className={styles.logo}
-                style={{ '--icone': `url("${enigme.culture.icone}")` }}
-              />
-            ) : (
-              enigme.culture.nom.charAt(0)
-            )}
-          </span>
-          <span className={styles.titre}>
-            <span className={styles.surtitre}>{`Énigme n° ${String(enigme.numero)}`}</span>
-            <span className={styles.culture}>{enigme.culture.nom}</span>
-          </span>
-        </header>
-        {verdict ? (
-          <FeteDuVerdict verdict={verdict} />
-        ) : (
-          <p className={styles.recit}>{texteEnClair(enigme.recit, calendrier)}</p>
-        )}
-        {verdict ? (
-          <Text variant="legende">{question}</Text>
-        ) : (
-          <p className={styles.question}>{question}</p>
-        )}
-        {!verdict && (
-          <button
-            type="button"
-            className={[styles.signaler, styles.signalerQuestion].join(' ')}
-            onClick={() => {
-              setSignaler(true)
-            }}
-          >
-            Signaler une erreur
-          </button>
-        )}
-        {/* Un titre gagné prend la place : les réponses se replient (maquette 5d). */}
-        {!verdict?.nouveauxTitres.length && (
-          <Reponses
-            enigme={enigme}
-            verdict={verdict}
-            choisie={choisie}
-            calendrier={calendrier}
-            libre={libre}
-            onLibre={setLibre}
-            envoi={envoi}
-            onRepondre={envoyer}
-          />
-        )}
-        {erreurReponse && <Text variant="legende">{erreurReponse}</Text>}
-        {verdict && <BilanDuVerdict verdict={verdict} culture={enigme.culture.nom} />}
-        {verdict ? (
-          <Relance reste={verdict.resteEnAttente} onFermer={onFermer} />
-        ) : (
-          <Text variant="legende">
-            Une seule réponse. Juste : +1 XP et des points de connaissance.
-          </Text>
-        )}
-        {verdict && (
-          <button
-            type="button"
-            className={styles.signaler}
-            onClick={() => {
-              setSignaler(true)
-            }}
-          >
-            Signaler une erreur ou une injustice
-          </button>
-        )}
-      </div>
-    </Feuille>
+    <>
+      {sceau}
+      <Feuille titre={`Énigme · ${enigme.culture.nom}`} onFermer={onFermer}>
+        <div
+          className={styles.contenu}
+          style={
+            enigme.culture.couleur ? { '--couleur-culture': enigme.culture.couleur } : undefined
+          }
+        >
+          <header className={styles.entete}>
+            {/* Le sceau de la culture : son icône du Hub peinte à sa couleur, ou son initiale. */}
+            <span className={styles.sceau} data-testid="sceau-culture">
+              {enigme.culture.icone ? (
+                <span
+                  className={styles.logo}
+                  style={{ '--icone': `url("${enigme.culture.icone}")` }}
+                />
+              ) : (
+                enigme.culture.nom.charAt(0)
+              )}
+            </span>
+            <span className={styles.titre}>
+              <span className={styles.surtitre}>{`Énigme n° ${String(enigme.numero)}`}</span>
+              <span className={styles.culture}>{enigme.culture.nom}</span>
+            </span>
+          </header>
+          {verdict ? (
+            <FeteDuVerdict verdict={verdict} />
+          ) : (
+            <p className={styles.recit}>{texteEnClair(enigme.recit, calendrier)}</p>
+          )}
+          {verdict ? (
+            <Text variant="legende">{question}</Text>
+          ) : (
+            <p className={styles.question}>{question}</p>
+          )}
+          {!verdict && (
+            <button
+              type="button"
+              className={[styles.signaler, styles.signalerQuestion].join(' ')}
+              onClick={() => {
+                setSignaler(true)
+              }}
+            >
+              Signaler une erreur
+            </button>
+          )}
+          {/* Un titre gagné prend la place : les réponses se replient (maquette 5d). */}
+          {!verdict?.nouveauxTitres.length && (
+            <Reponses
+              enigme={enigme}
+              verdict={verdict}
+              choisie={choisie}
+              calendrier={calendrier}
+              libre={libre}
+              onLibre={setLibre}
+              envoi={envoi}
+              onRepondre={envoyer}
+            />
+          )}
+          {erreurReponse && <Text variant="legende">{erreurReponse}</Text>}
+          {verdict && <BilanDuVerdict verdict={verdict} culture={enigme.culture.nom} />}
+          {verdict ? (
+            <Relance reste={verdict.resteEnAttente} onFermer={onFermer} />
+          ) : (
+            <Text variant="legende">
+              Une seule réponse. Juste : +1 XP et des points de connaissance.
+            </Text>
+          )}
+          {verdict && (
+            <button
+              type="button"
+              className={styles.signaler}
+              onClick={() => {
+                setSignaler(true)
+              }}
+            >
+              Signaler une erreur ou une injustice
+            </button>
+          )}
+        </div>
+      </Feuille>
+    </>
   )
 }
 
