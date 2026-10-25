@@ -1,8 +1,8 @@
 /*
  * QUOI     — les marques des Actifs et de soi : le portrait sans contour, et dessous deux petits
  *            encadrés parchemin à filet léger, le nom puis le titre (Uriel, 25/10 : la légende à côté
- *            du portrait était illisible). Parti depuis peu : désaturé et transparent. Soi : un halo
- *            bleu qui respire, le nom en bleu. De très loin (`data-loin` sur la carte), les portraits
+ *            du portrait était illisible). Parti depuis peu : désaturé et transparent. Soi : une onde
+ *            rouge Runes de Chêne qui respire, le nom à l'encre comme les autres. De très loin (`data-loin` sur la carte), les portraits
  *            restent et les noms se taisent (Uriel, 01/10).
  */
 .actif,
@@ -72,8 +72,7 @@
   text-transform: uppercase;
 }
 
-/* Soi : un portrait un peu plus grand, un halo bleu qui respire — le bleu du « tu es ici » ;
-   le rouge est à la cire des énigmes et des lieux neufs (Uriel, 25/10). */
+/* Soi : un portrait un peu plus grand, une onde rouge Runes de Chêne qui respire autour (Uriel, 25/10). */
 .moi {
   position: relative;
 }
@@ -88,10 +87,6 @@
   height: 36px;
 }
 
-.moi .nom {
-  color: var(--color-carte-moi);
-}
-
 .halo {
   position: absolute;
   top: 18px; /* le centre du portrait (36 px) */
@@ -99,7 +94,7 @@
   width: 64px;
   height: 64px;
   border-radius: var(--radius-rond);
-  background: color-mix(in srgb, var(--color-carte-moi) 32%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 32%, transparent);
   translate: -50% -50%;
   animation: respirer 2.4s ease-in-out infinite;
   pointer-events: none;

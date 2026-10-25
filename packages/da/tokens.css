@@ -59,7 +59,6 @@
   --color-carte-ombre: #5a442c8c; /* 55 % : MapLibre lit le hex, pas color-mix */
   --color-carte-cire: #a94842; /* le sceau des énigmes : l'accent, en hex pour MapLibre */
   --color-carte-entete: #eadfca; /* le bas de la bande d'entrelacs (fond-parchemin) : le fondu de la carte en part */
-  --color-carte-moi: #3f6fae; /* le halo de soi : le bleu du « tu es ici », sourd pour le parchemin */
 
   /* La fiche d'un lieu (Figma 229:128, palette de la maquette du 19/08) */
   --color-fiche-titre: #5c5151; /* le nom du lieu, « Le récit » */

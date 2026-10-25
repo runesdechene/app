@@ -45,7 +45,6 @@ export const COLOR_TOKENS = [
   '--color-carte-ombre',
   '--color-carte-cire',
   '--color-carte-entete',
-  '--color-carte-moi',
   '--color-fiche-titre',
   '--color-fiche-ligne',
   '--color-fiche-aide',
