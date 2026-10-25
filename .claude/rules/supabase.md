@@ -388,3 +388,14 @@ visitent toutes les fiches SEO. Ces photos sont pourtant déjà réduites à l'e
 se réduit **à l'envoi**, et `aLaTaille` sert la grande ou sa vignette telle quelle. Le
 redimensionnement à la volée reste pour les images rares (bannières, emblèmes, avatars). Quota :
 Dashboard → Organization → Usage → *Storage Image Transformations*.
+
+## Un envoi Storage en `upsert` demande aussi les droits de lecture et de mise à jour
+
+**Le piège** (payé du 16 au 25/10/2026) : le Hub V2 envoie ses images avec `upsert: true`
+(`shared/lib/envoi.ts`). Storage fait alors un INSERT … ON CONFLICT DO UPDATE : sans politique UPDATE
+(et SELECT) sur le seau, l'envoi est refusé, « new row violates row-level security policy ». Le seau
+`announcement-covers` n'avait que déposer et effacer (mig 222, ancien Hub) : aucune mise à jour n'a pu
+porter d'image depuis la bascule, sans que personne ne le voie (mig 567).
+
+**How to apply :** un seau où le Hub dépose a ses quatre politiques réservées à `_is_admin()` —
+déposer, remplacer (UPDATE), lire (SELECT, ou lecture publique), effacer — comme `missives` (mig 543).
