@@ -61,11 +61,13 @@ const estLieu: ExpressionSpecification = ['==', ['get', 'nature'], 'lieu']
 const pasNeuf: ExpressionSpecification = ['!=', ['get', 'nouveau'], true]
 
 // La marque grandit avec le zoom : un point de loin, le sceau entier de près. L'anneau des lieux
-// neufs suit la même courbe (nouveaux.ts).
+// neufs suit la même courbe (nouveaux.ts). Dès que les noms apparaissent (zoom 9), tout est 20 %
+// plus grand (Uriel, 25/10) : la marque prend ces 20 % entre le zoom 8 et le zoom 9.
 export const PALIERS: [zoom: number, taille: number][] = [
   [4, 0.5],
   [8, 0.8],
-  [12, 1.15],
+  [9, 1.065],
+  [12, 1.38],
 ]
 
 // Sur un grand écran, les marques grandissent avec lui (Uriel, 30/09 : sur un écran 2K ou 4K,
@@ -181,10 +183,10 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
         {},
       ],
       'text-font': ['Noto Sans Bold'],
-      'text-size': 8,
+      'text-size': 9.6, // 8 px + 20 % (Uriel, 25/10)
       'text-letter-spacing': 0.08,
       'text-anchor': 'top',
-      'text-offset': [0, 2.1], // sous le sceau (26 px × 1,15 de près)
+      'text-offset': [0, 2.1], // sous le sceau (en em : suit la taille du nom, comme le sceau grandit)
     },
     paint: {
       'text-color': c.encre,

@@ -73,7 +73,7 @@ test('aucun lieu n’est regroupé, même dézoomé ; les marques grandissent av
 })
 
 test('une taille agrandie reste une courbe de zoom au premier niveau (MapLibre l’exige)', () => {
-  expect(taille(2)).toEqual(['interpolate', ['linear'], ['zoom'], 4, 1, 8, 1.6, 12, 2.3])
+  expect(taille(2)).toEqual(['interpolate', ['linear'], ['zoom'], 4, 1, 8, 1.6, 9, 2.13, 12, 2.76])
 })
 
 test('les marques grandissent avec l’écran : 1 jusqu’au 1080p, 1,4 en 2K, 1,8 en 4K', () => {

@@ -107,14 +107,14 @@ function poserIcone(
 // centre pour laisser place à son ombre.
 const [ICONE, BORD] = [34, 9]
 
-// Une lueur légère, juste sous la marque, couleur parchemin des terres : elle soutient le signe sans se
-// voir (Uriel, 24/10 : « très léger, juste en dessous »).
+// Une lueur juste sous la marque, couleur parchemin des terres : elle détache le signe du relief
+// (Uriel : « très léger » le 24/10, renforcée le 25/10).
 function lueur(ctx: OffscreenCanvasRenderingContext2D, c: CouleursCarte) {
   const m = ctx.canvas.width / 2
-  const rayon = m * 0.65
+  const rayon = m * 0.8
   const degrade = ctx.createRadialGradient(m, m, 0, m, m, rayon)
   degrade.addColorStop(0, c.fond)
-  degrade.addColorStop(0.5, `${c.fond}cc`)
+  degrade.addColorStop(0.6, `${c.fond}ee`)
   degrade.addColorStop(1, `${c.fond}00`) // le même parchemin, transparent : la lueur se fond
   disque(ctx, rayon)
   ctx.fillStyle = degrade

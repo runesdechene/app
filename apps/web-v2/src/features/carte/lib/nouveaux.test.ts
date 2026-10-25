@@ -24,8 +24,13 @@ test('l’anneau naît transparent, se dessine en s’élargissant, puis s’eff
 })
 
 test('la taille suit le zoom, avec la courbe au premier niveau (exigence de MapLibre)', () => {
-  // La courbe des marques : la moitié de loin, 1,15 de près.
-  expect(rayonAuZoom(10)).toEqual(['interpolate', ['linear'], ['zoom'], 4, 5, 8, 8, 12, 11.5])
+  // La courbe des marques : la moitié de loin, 1,38 de près.
+  expect(rayonAuZoom(10)).toEqual([
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    ...[4, 5, 8, 8, 9, 10.65, 12, 13.8],
+  ])
 })
 
 test('un contour de cire seul, seulement pour les lieux nouveaux', () => {
