@@ -54,13 +54,15 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+
+  /* La matière de la recherche, juste au-dessus : les contrôles posés sur la carte se ressemblent. */
   padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
   border: 1px solid var(--color-bord);
-  border-radius: var(--radius-rond);
-  background: var(--color-surface);
-  color: var(--color-texte);
+  border-radius: var(--radius-carte);
+  background: var(--color-sur-accent);
+  color: var(--color-encre);
   font-family: var(--font-corps);
-  font-size: var(--legende-size);
+  font-size: var(--flux-size);
   white-space: nowrap;
   translate: -50% 0;
 }
