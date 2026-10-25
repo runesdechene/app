@@ -25,21 +25,9 @@ function monter() {
   return router
 }
 
-test('tant que les motifs ne sont pas filmés, /scan renvoie à l’accueil qui n’est pas admin', async () => {
-  moi.fetchMoi.mockResolvedValue({ id: 'u1', admin: false })
-  const router = monter()
-  expect(await screen.findByText('Accueil')).toBeInTheDocument()
-  expect(router.state.location.pathname).toBe('/')
-})
-
-test('sans session non plus, pas de scanner', async () => {
+test('le scanner est ouvert à tous, même sans session', async () => {
   moi.fetchMoi.mockRejectedValue(new Error('sans session'))
-  monter()
-  expect(await screen.findByText('Accueil')).toBeInTheDocument()
-})
-
-test('un admin garde le scanner, pour filmer les motifs', async () => {
-  moi.fetchMoi.mockResolvedValue({ id: 'u1', admin: true })
-  monter()
+  const router = monter()
   expect(await screen.findByText('Le scanner')).toBeInTheDocument()
+  expect(router.state.location.pathname).toBe('/scan')
 })

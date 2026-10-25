@@ -67,13 +67,9 @@ const ecran = vi.hoisted(() => ({ pc: false }))
 vi.mock('@/shared/hooks/useSurOrdinateur', () => ({ useSurOrdinateur: () => ecran.pc }))
 const son = vi.hoisted(() => ({ debloquerSon: vi.fn(), sonDebloque: () => false, biper: vi.fn() }))
 vi.mock('@/features/scan/lib/son', () => son)
-// Le scanner, aux admins seulement tant que les motifs ne sont pas filmés : visible par défaut ici.
-const scanner = vi.hoisted((): { visible: boolean | null } => ({ visible: true }))
-vi.mock('../routes/scannerVisible', () => ({ useScannerVisible: () => scanner.visible }))
 
 beforeEach(() => {
   ecran.pc = false
-  scanner.visible = true
   murmures.fetchFils.mockResolvedValue([])
   registre.fetchRegistreNonLus.mockResolvedValue({ messages: 0, mentions: 0 })
 })
@@ -222,13 +218,6 @@ test('l’icône du scanner, devant la cloche, ouvre /scan et débloque le son d
   await userEvent.click(scanner)
   expect(son.debloquerSon).toHaveBeenCalled()
   expect(router.state.location.pathname).toBe('/scan')
-})
-
-test('pour qui n’est pas admin, pas d’icône du scanner', async () => {
-  scanner.visible = false
-  renderAt('/accueil')
-  await screen.findByRole('button', { name: 'Notifications' })
-  expect(screen.queryByRole('button', { name: 'Scanner un Fragment' })).not.toBeInTheDocument()
 })
 
 test('le « + » de la carte ouvre la feuille « Ajouter »', async () => {

@@ -55,7 +55,6 @@ import { useSurOrdinateur } from '@/shared/hooks/useSurOrdinateur'
 import { disposition } from '../navigation/disposition'
 import { useOuvrir } from '../navigation/useOuvrir'
 import { TABS, type TabId } from '../navigation/tabs'
-import { useScannerVisible } from '../routes/scannerVisible'
 import { TabBar } from './TabBar'
 import styles from './Shell.module.css'
 
@@ -151,7 +150,6 @@ export function Shell() {
   // Au téléphone, l'app s'ouvre sur l'Accueil : la carte se prépare derrière.
   usePreparerLaCarte()
   const nonLues = useNonLues()
-  const scannerVisible = useScannerVisible()
   const { actif: active, detail, feuille, tiroir } = disposition(pathname)
   const overlayOpen = detail || feuille
   // L'adresse sur laquelle on a replié le tiroir : ailleurs, il est déplié.
@@ -251,21 +249,18 @@ export function Shell() {
               </button>
             </>
           )}
-          {/* Le scanner (spec 2026-10-09-v2-scan), aux admins seulement tant que les motifs ne sont pas
-              filmés (scannerVisible) : ce toucher débloque aussi le son du bip (Safari). */}
-          {scannerVisible && (
-            <button
-              type="button"
-              className={styles.action}
-              aria-label="Scanner un Fragment"
-              onClick={() => {
-                debloquerSon()
-                void navigate('/scan')
-              }}
-            >
-              <img src={scanner} alt="" />
-            </button>
-          )}
+          {/* Le scanner (spec 2026-10-09-v2-scan) : ce toucher débloque aussi le son du bip (Safari). */}
+          <button
+            type="button"
+            className={styles.action}
+            aria-label="Scanner un Fragment"
+            onClick={() => {
+              debloquerSon()
+              void navigate('/scan')
+            }}
+          >
+            <img src={scanner} alt="" />
+          </button>
           <button
             ref={boutonNotifications}
             type="button"

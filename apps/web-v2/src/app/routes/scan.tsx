@@ -5,12 +5,12 @@
  *            2026-10-09-v2-scan). Le scanner se charge à part : il tire le modèle de vision.
  */
 import { lazy, Suspense } from 'react'
-import { Link, Navigate, useParams } from 'react-router'
+import { Link, useParams } from 'react-router'
 import { RecitFragment } from '@/features/fragments/components/RecitFragment'
 import { useConnecte } from '@/features/vitrine/hooks/useVitrine'
 import { ListeFragments } from '@/features/scan/components/ListeFragments'
 import fleche from '@/assets/ui/fleche-retour.svg'
-import { useScannerAdmin, useScannerVisible } from './scannerVisible'
+import { useScannerAdmin } from './scannerAdmin'
 import styles from './scan.module.css'
 
 const ScanScreenCharge = lazy(() =>
@@ -20,9 +20,6 @@ const ScanScreenCharge = lazy(() =>
 export function RouteScan() {
   const connecte = useConnecte()
   const admin = useScannerAdmin() ?? false
-  const visible = useScannerVisible()
-  if (visible === null) return null
-  if (!visible) return <Navigate to="/" replace />
   return (
     <Suspense fallback={null}>
       <ScanScreenCharge connecte={connecte} admin={admin} />
