@@ -17,8 +17,8 @@ const api = vi.hoisted(() => ({ fetchVoisins: vi.fn() }))
 vi.mock('../api/ajout', () => api)
 const geocodeur = vi.hoisted(() => ({ endroitDe: vi.fn(), chercherEndroits: vi.fn() }))
 vi.mock('@/shared/lib/adresse', () => geocodeur)
-const position = vi.hoisted(() => ({ positionSiAutorisee: vi.fn() }))
-vi.mock('@/shared/lib/position', () => position)
+const position = vi.hoisted(() => ({ useMaPosition: vi.fn() }))
+vi.mock('@/shared/hooks/useMaPosition', () => ({ ...position, MA_POSITION: ['ma-position'] }))
 
 const brouillon: Brouillon = {
   ...BROUILLON_VIDE,
@@ -33,7 +33,7 @@ beforeEach(() => {
   changer.mockReset()
   suivant.mockReset()
   api.fetchVoisins.mockResolvedValue([])
-  position.positionSiAutorisee.mockResolvedValue(null)
+  position.useMaPosition.mockReturnValue(null)
   geocodeur.endroitDe.mockResolvedValue({
     titre: 'Près de Colomars',
     detail: 'Alpes-Maritimes',
@@ -86,7 +86,7 @@ test('chercher un village y emmène la carte', async () => {
 })
 
 test('loin du point, le lieu s’ajoute à distance, et la feuille le dit', async () => {
-  position.positionSiAutorisee.mockResolvedValue({ latitude: 48.85, longitude: 2.35 })
+  position.useMaPosition.mockReturnValue({ latitude: 48.85, longitude: 2.35 })
   monter()
   await screen.findByText('Près de Colomars')
   expect(await screen.findByText(/marqué « ajouté à distance »/)).toBeInTheDocument()
@@ -95,7 +95,7 @@ test('loin du point, le lieu s’ajoute à distance, et la feuille le dit', asyn
 
 test('« C’est ici » garde le point où la carte s’est posée, et son adresse', async () => {
   // Je suis là où la carte se pose (la fausse carte rend toujours le centre de la France).
-  position.positionSiAutorisee.mockResolvedValue({ latitude: 46.6, longitude: 2.4 })
+  position.useMaPosition.mockReturnValue({ latitude: 46.6, longitude: 2.4 })
   monter()
   await screen.findByText('Près de Colomars')
   // La carte glisse puis se pose.

@@ -36,6 +36,7 @@ import { seDeconnecter } from '@/features/compte/api/session'
 import { InvitationPosition } from '@/features/carte/components/InvitationPosition'
 import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
+import { useSuivrePosition } from '@/shared/hooks/useSuivrePosition'
 import { useEnvoyerPins, useMesPinsCharges } from '@/features/pin/hooks/usePins'
 import { useNonLues } from '@/features/notifications/hooks/useNotifications'
 import { debloquerSon } from '@/features/scan/lib/son'
@@ -144,7 +145,8 @@ function CarteDeLaCoquille() {
 export function Shell() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  // Tant que l'app est ouverte (position autorisée) : sur la carte, et proposé comme compagnon.
+  // Tant que l'app est ouverte : la position suivie, et partagée (carte des autres, compagnons).
+  useSuivrePosition()
   useSignalerPresence()
   useEnvoyerPins() // les pins posés sans réseau partent dès qu'il revient
   // Au téléphone, l'app s'ouvre sur l'Accueil : la carte se prépare derrière.

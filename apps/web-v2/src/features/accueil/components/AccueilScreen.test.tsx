@@ -21,8 +21,8 @@ const api = vi.hoisted(() => ({
 vi.mock('../api/accueil', () => api)
 
 // La position du téléphone : accordée, sauf là où un test la refuse.
-const position = vi.hoisted(() => ({ positionSiAutorisee: vi.fn() }))
-vi.mock('@/shared/lib/position', () => position)
+const position = vi.hoisted(() => ({ useMaPosition: vi.fn() }))
+vi.mock('@/shared/hooks/useMaPosition', () => position)
 
 const LUNA = { id: 'u2', nom: 'Luna', avatar: null }
 const VISITE = {
@@ -91,7 +91,7 @@ beforeEach(() => {
     },
   ])
   api.saluer.mockResolvedValue({ saluts: 3, salue: true })
-  position.positionSiAutorisee.mockResolvedValue({ latitude: 48.1, longitude: -1.6 })
+  position.useMaPosition.mockReturnValue({ latitude: 48.1, longitude: -1.6 })
   api.fetchGrandsExplorateurs.mockResolvedValue({ tete: [], moi: null, dixieme: null })
   api.fetchPresDeMoi.mockResolvedValue([
     {
@@ -336,7 +336,7 @@ test('près de toi : les lieux proches, leur type et leur distance ; un lieu ouv
 })
 
 test('sans position partagée, pas de « Près de toi »', async () => {
-  position.positionSiAutorisee.mockResolvedValue(null)
+  position.useMaPosition.mockReturnValue(null)
   monter()
   await screen.findByRole('list', { name: 'Sur les chemins' })
   expect(screen.queryByRole('list', { name: 'À explorer près de toi' })).toBeNull()

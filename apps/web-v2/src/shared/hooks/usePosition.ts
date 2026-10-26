@@ -1,51 +1,26 @@
 /**
- * QUOI     — ma position, suivie tant que l'écran qui la lit est ouvert (fiche, carte) ; ou pourquoi
- *            on ne l'a pas.
- * POURQUOI — le bouton de visite change d'état quand on s'approche, sans recharger. On ne
- *            demande la position que sur un geste (« Me localiser pour visiter ») ; déjà
- *            autorisée, on la suit tout de suite.
+ * QUOI     — ma position, ou pourquoi on ne l'a pas, pour les boutons de visite.
+ * POURQUOI — le bouton de visite change d'état quand on s'approche, sans recharger : il lit le
+ *            suivi de l'app (`useSuivrePosition`). « Me localiser » redemande l'autorisation.
  */
-import { useCallback, useEffect, useState } from 'react'
+import { useAutorisationPosition } from './useAutorisationPosition'
+import { useMaPosition } from './useMaPosition'
 
 // Ma position, ou pourquoi on ne l'a pas.
 export type Position = 'inconnue' | 'refusee' | { lat: number; lng: number }
 
 export function usePosition(): { position: Position; demander: () => void } {
-  // Sans géolocalisation du tout, on le sait dès le départ.
-  const [position, setPosition] = useState<Position>(() =>
-    'geolocation' in navigator ? 'inconnue' : 'refusee',
-  )
-  const [suivre, setSuivre] = useState(false)
-
-  useEffect(() => {
-    if (!('geolocation' in navigator) || !('permissions' in navigator)) return
-    void navigator.permissions.query({ name: 'geolocation' }).then((statut) => {
-      if (statut.state === 'granted') setSuivre(true)
-      if (statut.state === 'denied') setPosition('refusee')
-    })
-  }, [])
-
-  useEffect(() => {
-    if (!suivre || !('geolocation' in navigator)) return
-    const geo = navigator.geolocation
-    const id = geo.watchPosition(
-      ({ coords }) => {
-        setPosition({ lat: coords.latitude, lng: coords.longitude })
-      },
-      (erreur) => {
-        // Seul un refus est un refus : une position lente ou introuvable reste « à localiser ».
-        if (erreur.code === 1) setPosition('refusee')
-      },
-      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 30_000 },
-    )
-    return () => {
-      geo.clearWatch(id)
-    }
-  }, [suivre])
-
-  const demander = useCallback(() => {
-    setSuivre(true)
-  }, [])
-
-  return { position, demander }
+  const point = useMaPosition()
+  const { autorisation, autoriser } = useAutorisationPosition()
+  const position: Position = point
+    ? { lat: point.latitude, lng: point.longitude }
+    : autorisation === 'refusee' || !('geolocation' in navigator)
+      ? 'refusee'
+      : 'inconnue'
+  return {
+    position,
+    demander: () => {
+      void autoriser()
+    },
+  }
 }

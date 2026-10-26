@@ -19,9 +19,9 @@ vi.mock('../api/monProfil', () => ({ choisirSigne }))
 const fetchPasseport = vi.hoisted(() => vi.fn(() => Promise.resolve(null)))
 vi.mock('../api/passeport', () => ({ fetchPasseport }))
 const position = vi.hoisted(() =>
-  vi.fn(() => Promise.resolve<{ latitude: number; longitude: number } | null>(null)),
+  vi.fn<() => { latitude: number; longitude: number } | null>(() => null),
 )
-vi.mock('@/shared/lib/position', () => ({ positionSiAutorisee: position }))
+vi.mock('@/shared/hooks/useMaPosition', () => ({ useMaPosition: position }))
 
 const carte = (id: string, nom: string, auteur: string | null = null) => ({
   id,
@@ -213,14 +213,14 @@ test('un lieu envié dit qui l’a ajouté', async () => {
 })
 
 test('sans position autorisée, aucune distance', async () => {
-  position.mockResolvedValue(null)
+  position.mockReturnValue(null)
   afficher(PROFIL)
   await screen.findByText('Mont Bégo')
   expect(screen.queryByText(/km/)).toBeNull()
 })
 
 test('avec la position de celui qui regarde, la distance de chaque lieu', async () => {
-  position.mockResolvedValue({ latitude: 43.7102, longitude: 7.262 })
+  position.mockReturnValue({ latitude: 43.7102, longitude: 7.262 })
   afficher(PROFIL)
   expect(await screen.findAllByText('159 km')).toHaveLength(2)
 })

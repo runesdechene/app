@@ -4,7 +4,7 @@
  *            l'endroit en mots (« Près de Colomars »), un lieu voisin s'il y en a un, « Je suis
  *            ici » et « C'est ici ».
  * POURQUOI — la carte part de la position de la photo (si l'appareil l'a notée), sinon de la
- *            mienne (si elle est déjà accordée), sinon de la France. Jamais de coordonnées à lire :
+ *            mienne (dès que le suivi la donne), sinon de la France. Jamais de coordonnées à lire :
  *            des mots. Un lieu à moins de 50 m se signale ici, pas à la fin (« c'est le même ? »).
  *            Sur place (200 m au plus de moi), la visite compte et le lieu est à mon nom ; sinon, il
  *            est « ajouté à distance » (Uriel, 30/09 ; la base en juge, mig 393).
@@ -15,16 +15,17 @@
  */
 import { maplibregl } from '@/shared/lib/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { distanceKm, type Point } from '@/shared/lib/distance'
-import { positionSiAutorisee } from '@/shared/lib/position'
 import { ajouterOmbrage, FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
 import { appliquerVue, attributionVisible, type VueCarte } from '@/shared/lib/styleSatellite'
 import { joursRestants } from '@/shared/lib/validitePin'
 import { PlanSatellite } from '@/shared/ui/PlanSatellite'
 import { useEndroit } from '@/shared/hooks/useEndroit'
+import { MA_POSITION, useMaPosition } from '@/shared/hooks/useMaPosition'
 import { useVoisins } from '../hooks/useAjout'
 import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import { chercherEndroits, type Resultat } from '@/shared/lib/adresse'
@@ -46,7 +47,8 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
   const [origine, setOrigine] = useState<Origine>(
     brouillon.point ? 'carte' : pin ? 'pin' : brouillon.positionPhoto ? 'photo' : null,
   )
-  const [moi, setMoi] = useState<Point | null>(null)
+  const moi = useMaPosition()
+  const queryClient = useQueryClient()
   const [enMouvement, setEnMouvement] = useState(false)
   const endroit = useEndroit(centre)
   const voisins = useVoisins(centre)
@@ -107,22 +109,18 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
       setCentre({ latitude: lat, longitude: lng })
     })
     carte.current = map
-    let fini = false
-    // Ma position, si je l'ai déjà permise ; sans photo située ni point choisi, la carte part d'elle.
-    void positionSiAutorisee().then((p) => {
-      if (!p || fini) return
-      setMoi(p)
-      if (!depart) {
-        posee.current = true
-        map.jumpTo({ center: [p.longitude, p.latitude], zoom: ZOOM_PROCHE })
-      }
-    })
     return () => {
-      fini = true
       map.remove()
       carte.current = null
     }
   }, [])
+
+  // Sans photo située ni point choisi, la carte part de ma position, dès qu'elle arrive.
+  useEffect(() => {
+    if (!moi || posee.current) return
+    posee.current = true
+    carte.current?.jumpTo({ center: [moi.longitude, moi.latitude], zoom: ZOOM_PROCHE })
+  }, [moi])
 
   // Plan ↔ satellite : seulement quand la vue choisie diffère de celle de la carte.
   useEffect(() => {
@@ -140,7 +138,7 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
     navigator.geolocation.getCurrentPosition(
       (p) => {
         const ici = { latitude: p.coords.latitude, longitude: p.coords.longitude }
-        setMoi(ici)
+        queryClient.setQueryData(MA_POSITION, ici) // un relevé frais, pour toute l'app
         setOrigine('moi')
         allerA(ici, 17)
       },

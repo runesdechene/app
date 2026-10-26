@@ -8,7 +8,7 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Point } from '@/shared/lib/distance'
-import { positionSiAutorisee } from '@/shared/lib/position'
+import { MA_POSITION } from '@/shared/hooks/useMaPosition'
 import { envoyerPhotos } from '@/shared/supabase/photos'
 import { ajouterLieu, fetchEpoques, fetchNatures, fetchVoisins } from '../api/ajout'
 import { jeterBrouillon, type Brouillon } from '../lib/brouillon'
@@ -49,7 +49,7 @@ export function usePoser() {
     mutationKey: POSE,
     mutationFn: async (b: Brouillon) => {
       const images = await envoyerPhotos(b.photos)
-      return ajouterLieu(b, images, await positionSiAutorisee())
+      return ajouterLieu(b, images, queryClient.getQueryData<Point>(MA_POSITION) ?? null)
     },
     // Ici et non dans l'écran : le brouillon est jeté même si l'écran a disparu entre-temps.
     onSuccess: () => {
