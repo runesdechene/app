@@ -8,8 +8,9 @@
  *            déploiements. Uriel, 07/10 : retrouver la fenêtre de la V1, et son forçage.
  * ATTENTION — deux degrés. « prete » : le service worker a déjà pris la nouvelle version, un
  *            rechargement suffit. « forcee » : la base annonce plus récent mais le service worker
- *            n'a rien vu (coincé, piège du 02/10) — on vide les caches et on le désinscrit, comme
- *            la V1. Si l'Explorateur quitte l'app sans répondre, elle se recharge en partant :
+ *            n'a rien vu (coincé, piège du 02/10) — on vide les caches et on lui fait reprendre
+ *            la dernière version. Jamais le désinscrire : ça efface l'abonnement aux
+ *            notifications du téléphone (piège du 26/10). Si l'Explorateur quitte l'app sans répondre, elle se recharge en partant :
  *            il n'était plus en train d'écrire.
  */
 import { registerSW } from 'virtual:pwa-register'
@@ -44,9 +45,7 @@ export function signalerNouvelleVersion(degre: 'prete' | 'forcee') {
 export async function recharger() {
   if (nouvelle === 'forcee') {
     for (const cle of await caches.keys()) await caches.delete(cle)
-    for (const inscription of await navigator.serviceWorker.getRegistrations()) {
-      await inscription.unregister()
-    }
+    await (await navigator.serviceWorker.getRegistration())?.update()
   }
   window.location.reload()
 }
