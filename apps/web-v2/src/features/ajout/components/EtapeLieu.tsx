@@ -60,6 +60,9 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
   const vueDeLaCarte = useRef<VueCarte>('plan')
   // Le pin, lu par l'effet de naissance de la carte sans le relancer (comme le point de départ).
   const pinDuBrouillon = useRef(pin)
+  // La carte a-t-elle été posée quelque part (départ, recherche, ma position, glissé) ? Sinon elle
+  // montre la France par défaut, qui n'est pas un point choisi (Fontaine de Neptune, 26/10).
+  const posee = useRef(depart !== null)
 
   useEffect(() => {
     if (!conteneur.current) return
@@ -93,10 +96,15 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
     })
     map.on('moveend', (e: { originalEvent?: unknown }) => {
       setEnMouvement(false)
+      // Glissée à la main : c'est désormais la carte qui dit où.
+      if (e.originalEvent) {
+        posee.current = true
+        setOrigine('carte')
+      }
+      // Un redimensionnement (le clavier qui s'ouvre) émet aussi « moveend », sans rien choisir.
+      if (!posee.current) return
       const { lat, lng } = map.getCenter()
       setCentre({ latitude: lat, longitude: lng })
-      // Glissée à la main : c'est désormais la carte qui dit où.
-      if (e.originalEvent) setOrigine('carte')
     })
     carte.current = map
     let fini = false
@@ -104,7 +112,10 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
     void positionSiAutorisee().then((p) => {
       if (!p || fini) return
       setMoi(p)
-      if (!depart) map.jumpTo({ center: [p.longitude, p.latitude], zoom: ZOOM_PROCHE })
+      if (!depart) {
+        posee.current = true
+        map.jumpTo({ center: [p.longitude, p.latitude], zoom: ZOOM_PROCHE })
+      }
     })
     return () => {
       fini = true
@@ -121,6 +132,7 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
   }, [vue])
 
   const allerA = (p: Point, zoom = ZOOM_PROCHE) => {
+    posee.current = true
     carte.current?.flyTo({ center: [p.longitude, p.latitude], zoom, essential: true })
   }
 

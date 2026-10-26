@@ -116,6 +116,22 @@ test('« C’est ici » garde le point où la carte s’est posée, et son adres
   expect(suivant).toHaveBeenCalled()
 })
 
+test('sans point de départ, un redimensionnement ne choisit pas la France à ma place', async () => {
+  monter({ ...brouillon, positionPhoto: null })
+  // Le clavier s'ouvre : la carte change de taille et émet « moveend », sans geste.
+  act(() => {
+    FausseCarte.derniere?.emettre('moveend', {})
+  })
+  expect(await screen.findByText('Déplace la carte')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'C’est ici' })).toBeDisabled()
+  expect(geocodeur.endroitDe).not.toHaveBeenCalled()
+  // Glissée à la main : là, c'est un choix.
+  act(() => {
+    FausseCarte.derniere?.emettre('moveend', { originalEvent: {} })
+  })
+  expect(screen.getByRole('button', { name: 'C’est ici' })).toBeEnabled()
+})
+
 test('le pin prime sur la photo : la carte part du pin, et le cercle juge', async () => {
   monter({
     ...brouillon,
