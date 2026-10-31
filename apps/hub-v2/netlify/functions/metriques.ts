@@ -1,7 +1,8 @@
 // Les chiffres de Runes de Chêne pour le tableau de bord d'Obsidian (plugin Accueil, connecteur « Requête JSON »),
 // sur une fenêtre de dates. Boutique : CA, commandes et pièces payées, par le jeton Shopify du Hub (pas de
 // deuxième app Shopify). Appli : comptes créés au stand, ceux déjà activés (première connexion faite :
-// la fiche « shopify-… » a pris l'identifiant de connexion), scans du QR Fragment. Lecture seule.
+// la fiche « shopify-… » a pris l'identifiant de connexion), nouvelles fiches par origine, scans du QR Fragment.
+// Lecture seule.
 
 import crypto from 'crypto'
 
@@ -64,15 +65,24 @@ export default async function handler(request: Request) {
 
   const de = `${debut}T00:00:00`
   const a = `${fin}T23:59:59`
-  const stand = `users?account_source=eq.stand&created_at=gte.${de}&created_at=lte.${a}`
-  const [inscriptions_stand, activations_stand, scans] = await Promise.all([
+  const nes = `users?created_at=gte.${de}&created_at=lte.${a}`
+  const stand = `${nes}&account_source=eq.stand`
+  // Les nouvelles fiches par origine : stand, flyer, appli, boutique (achat ou newsletter du site, aspirés par le Hub).
+  const [inscriptions_stand, activations_stand, scans, comptes_flyer, comptes_app, comptes_boutique] = await Promise.all([
     compter(stand),
     compter(`${stand}&id=not.like.shopify-*`),
     compter(`scans?quand=gte.${de}&quand=lte.${a}`),
+    compter(`${nes}&account_source=eq.flyer`),
+    compter(`${nes}&account_source=eq.app`),
+    compter(`${nes}&account_source=eq.shopify`),
   ])
-  if ([inscriptions_stand, activations_stand, scans].includes(null)) return repondre({ error: 'Lecture de la base impossible' }, 502)
+  const lus = [inscriptions_stand, activations_stand, scans, comptes_flyer, comptes_app, comptes_boutique]
+  if (lus.includes(null)) return repondre({ error: 'Lecture de la base impossible' }, 502)
 
-  return repondre({ debut, fin, ca: Math.round(ca * 100) / 100, commandes, pieces, inscriptions_stand, activations_stand, scans })
+  return repondre({
+    debut, fin, ca: Math.round(ca * 100) / 100, commandes, pieces, inscriptions_stand, activations_stand, scans,
+    comptes_stand: inscriptions_stand, comptes_flyer, comptes_app, comptes_boutique,
+  })
 }
 
 /** Le nombre de lignes d'une requête PostgREST (en-tête Content-Range), sans les lire. null : échec. */
