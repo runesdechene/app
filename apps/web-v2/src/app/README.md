@@ -7,5 +7,7 @@ Ce qui entoure les écrans, sans être un écran.
 - `shell/` — la mise en page : bandeau, barre d'onglets, écrans, panneau de détail.
 - `router.tsx` — la liste des adresses de l'app.
 - `queryClient.ts` — le cache des données serveur.
+- `miseAJour.ts` + `NouvelleVersion` — le service worker et la fenêtre « nouvelle version ».
+- `installation.ts` + `InvitationInstaller` — l'invitation à installer l'appli sur l'écran d'accueil.
 
 `app/` a le droit d'importer les écrans des zones (`features/*`) ; l'inverse est interdit.

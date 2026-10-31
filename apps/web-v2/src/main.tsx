@@ -14,8 +14,10 @@ import { persistance, queryClient } from './app/queryClient'
 import { router } from './app/router'
 import { tenirAJour } from './app/miseAJour'
 import { NouvelleVersion } from './app/NouvelleVersion'
+import { ecouterInstallation } from './app/installation'
 
 tenirAJour()
+ecouterInstallation() // avant le rendu : Chrome ne propose l'installation qu'une fois
 
 const root = document.getElementById('root')
 if (!root) throw new Error('#root absent de index.html')

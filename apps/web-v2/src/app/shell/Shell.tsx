@@ -56,6 +56,7 @@ import { useSurOrdinateur } from '@/shared/hooks/useSurOrdinateur'
 import { disposition } from '../navigation/disposition'
 import { useOuvrir } from '../navigation/useOuvrir'
 import { TABS, type TabId } from '../navigation/tabs'
+import { InvitationInstaller } from '../InvitationInstaller'
 import { TabBar } from './TabBar'
 import styles from './Shell.module.css'
 
@@ -329,6 +330,8 @@ export function Shell() {
         <Outlet />
         {/* Une seule fois, si la position n'a jamais été demandée : sans elle, invisible. */}
         <InvitationPosition />
+        {/* Tant que l'appli n'est pas installée, à chaque ouverture, après celle de la position. */}
+        <InvitationInstaller />
         <TabBar
           onScrollTop={scrollTop}
           onToucher={() => {
