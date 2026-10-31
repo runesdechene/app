@@ -208,6 +208,7 @@
   --duree-douce: 0.32s;
   --courbe-douce: cubic-bezier(0.2, 0.8, 0.2, 1);
   --duree-elan: 0.38s;
+  --duree-roue: 0.8s; /* un tour de la roue d'un bouton en cours */
   --duree-envol: 0.9s; /* un cœur qui s'envole (le salut de l'Accueil) */
   --duree-defile: 90s; /* un tour complet du défilé des natures, sur la vitrine */
   --duree-activite: 5s; /* une activité de la vitrine : elle apparaît, reste, s'efface */

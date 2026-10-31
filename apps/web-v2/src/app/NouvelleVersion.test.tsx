@@ -37,6 +37,11 @@ test('rien tant qu’aucune version n’est arrivée, puis la fenêtre et Rechar
   expect(screen.getByText('Une nouvelle version d’Explore est arrivée')).toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Recharger' }))
   expect(mise.recharger).toHaveBeenCalled()
+  // Pendant la mise à jour, le bouton le dit et ne relance rien.
+  const bouton = screen.getByRole('button', { name: 'Mise à jour…' })
+  expect(bouton).toHaveAttribute('aria-busy', 'true')
+  await userEvent.click(bouton)
+  expect(mise.recharger).toHaveBeenCalledTimes(1)
 })
 
 test('« Plus tard » ferme la fenêtre', async () => {

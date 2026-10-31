@@ -146,6 +146,12 @@ export function DaBriques() {
             Désactivé
           </Button>
         </div>
+        <div className={styles.rangee}>
+          <Button enCours>Mise à jour…</Button>
+          <Button kind="secondaire" enCours>
+            Envoi…
+          </Button>
+        </div>
       </DaSection>
 
       <DaSection name="IconButton">

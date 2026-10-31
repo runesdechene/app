@@ -13,6 +13,8 @@ import { nouvelleVersion, recharger } from './miseAJour'
 export function NouvelleVersion() {
   const degre = useSyncExternalStore(nouvelleVersion.suivre, nouvelleVersion.lire)
   const [plusTard, setPlusTard] = useState(false)
+  // Vider les caches et reprendre la dernière version prend quelques secondes (Uriel, 31/10).
+  const [enCours, setEnCours] = useState(false)
   if (!degre || plusTard) return null
 
   const fermer = () => {
@@ -25,11 +27,13 @@ export function NouvelleVersion() {
       onFermer={fermer}
     >
       <Button
+        enCours={enCours}
         onClick={() => {
+          setEnCours(true)
           void recharger()
         }}
       >
-        Recharger
+        {enCours ? 'Mise à jour…' : 'Recharger'}
       </Button>
       <Button kind="secondaire" onClick={fermer}>
         Plus tard

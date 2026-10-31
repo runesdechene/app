@@ -80,3 +80,35 @@
   justify-content: center;
   text-decoration: none;
 }
+
+/* En cours : la couleur reste, une roue tourne devant le libellé. */
+.enCours {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  cursor: progress;
+}
+
+.enCours::before {
+  content: '';
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentcolor;
+  border-right-color: transparent;
+  border-radius: var(--radius-rond);
+  animation: tourne var(--duree-roue) linear infinite;
+}
+
+@keyframes tourne {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* Sans mouvement, la roue reste là, immobile : le libellé dit déjà que ça avance. */
+@media (prefers-reduced-motion: reduce) {
+  .enCours::before {
+    animation: none;
+  }
+}
