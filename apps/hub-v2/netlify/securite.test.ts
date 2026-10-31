@@ -635,18 +635,24 @@ describe('metriques', () => {
   test('bon jeton : somme le CA sur toutes les pages, boutique fixe', async () => {
     vi.stubEnv('METRIQUES_JETON', 'le-bon')
     const pages = [
-      { nodes: [{ currentTotalPriceSet: { shopMoney: { amount: '40.50' } } }], pageInfo: { hasNextPage: true, endCursor: 'c1' } },
-      { nodes: [{ currentTotalPriceSet: { shopMoney: { amount: '9.50' } } }], pageInfo: { hasNextPage: false, endCursor: null } },
+      { nodes: [{ currentTotalPriceSet: { shopMoney: { amount: '40.50' } }, currentSubtotalLineItemsQuantity: 3 }], pageInfo: { hasNextPage: true, endCursor: 'c1' } },
+      { nodes: [{ currentTotalPriceSet: { shopMoney: { amount: '9.50' } }, currentSubtotalLineItemsQuantity: 1 }], pageInfo: { hasNextPage: false, endCursor: null } },
     ]
     const urls: string[] = []
     vi.stubGlobal('fetch', vi.fn((url: string) => {
       urls.push(url)
+      if (url.includes('/rest/v1/scans')) return Promise.resolve(new Response(null, { headers: { 'Content-Range': '0-0/12' } }))
+      if (url.includes('not.like')) return Promise.resolve(new Response(null, { headers: { 'Content-Range': '0-0/2' } }))
+      if (url.includes('/rest/v1/users')) return Promise.resolve(new Response(null, { headers: { 'Content-Range': '0-0/7' } }))
       return Promise.resolve(Response.json({ data: { orders: pages.shift() } }))
     }))
     const handler = await charger('metriques')
     const r = await handler(get('debut=2026-11-01&fin=2026-11-30', { Authorization: 'Bearer le-bon' }))
     expect(r.status).toBe(200)
-    expect(await r.json()).toEqual({ debut: '2026-11-01', fin: '2026-11-30', ca: 50, commandes: 2 })
-    expect(urls.every((u) => u.startsWith(`https://${BOUTIQUE}/`))).toBe(true)
+    expect(await r.json()).toEqual({
+      debut: '2026-11-01', fin: '2026-11-30', ca: 50, commandes: 2, pieces: 4,
+      inscriptions_stand: 7, activations_stand: 2, scans: 12,
+    })
+    expect(urls.filter((u) => !u.startsWith('http://supabase.test/')).every((u) => u.startsWith(`https://${BOUTIQUE}/`))).toBe(true)
   })
 })
