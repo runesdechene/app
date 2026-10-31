@@ -642,6 +642,7 @@ describe('metriques', () => {
     vi.stubGlobal('fetch', vi.fn((url: string) => {
       urls.push(url)
       if (url.includes('/rest/v1/scans')) return Promise.resolve(new Response(null, { headers: { 'Content-Range': '0-0/12' } }))
+      if (url.includes('not.like') && !url.includes('account_source')) return Promise.resolve(new Response(null, { headers: { 'Content-Range': '0-0/9' } }))
       if (url.includes('not.like')) return Promise.resolve(new Response(null, { headers: { 'Content-Range': '0-0/2' } }))
       if (url.includes('eq.flyer')) return Promise.resolve(new Response(null, { headers: { 'Content-Range': '0-0/3' } }))
       if (url.includes('eq.app')) return Promise.resolve(new Response(null, { headers: { 'Content-Range': '0-0/4' } }))
@@ -655,7 +656,7 @@ describe('metriques', () => {
     expect(await r.json()).toEqual({
       debut: '2026-11-01', fin: '2026-11-30', ca: 50, commandes: 2, pieces: 4,
       inscriptions_stand: 7, activations_stand: 2, scans: 12,
-      comptes_stand: 7, comptes_flyer: 3, comptes_app: 4, comptes_boutique: 5,
+      comptes_stand: 7, comptes_flyer: 3, comptes_app: 4, comptes_boutique: 5, membres: 9,
     })
     expect(urls.filter((u) => !u.startsWith('http://supabase.test/')).every((u) => u.startsWith(`https://${BOUTIQUE}/`))).toBe(true)
   })

@@ -68,20 +68,22 @@ export default async function handler(request: Request) {
   const nes = `users?created_at=gte.${de}&created_at=lte.${a}`
   const stand = `${nes}&account_source=eq.stand`
   // Les nouvelles fiches par origine : stand, flyer, appli, boutique (achat ou newsletter du site, aspirés par le Hub).
-  const [inscriptions_stand, activations_stand, scans, comptes_flyer, comptes_app, comptes_boutique] = await Promise.all([
+  // Les membres : les nouvelles fiches déjà reliées à un accès (plus de « shopify-… »), toutes origines.
+  const [inscriptions_stand, activations_stand, scans, comptes_flyer, comptes_app, comptes_boutique, membres] = await Promise.all([
     compter(stand),
     compter(`${stand}&id=not.like.shopify-*`),
     compter(`scans?quand=gte.${de}&quand=lte.${a}`),
     compter(`${nes}&account_source=eq.flyer`),
     compter(`${nes}&account_source=eq.app`),
     compter(`${nes}&account_source=eq.shopify`),
+    compter(`${nes}&id=not.like.shopify-*`),
   ])
-  const lus = [inscriptions_stand, activations_stand, scans, comptes_flyer, comptes_app, comptes_boutique]
+  const lus = [inscriptions_stand, activations_stand, scans, comptes_flyer, comptes_app, comptes_boutique, membres]
   if (lus.includes(null)) return repondre({ error: 'Lecture de la base impossible' }, 502)
 
   return repondre({
     debut, fin, ca: Math.round(ca * 100) / 100, commandes, pieces, inscriptions_stand, activations_stand, scans,
-    comptes_stand: inscriptions_stand, comptes_flyer, comptes_app, comptes_boutique,
+    comptes_stand: inscriptions_stand, comptes_flyer, comptes_app, comptes_boutique, membres,
   })
 }
 
