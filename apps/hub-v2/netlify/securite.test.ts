@@ -659,5 +659,16 @@ describe('metriques', () => {
       comptes_stand: 7, comptes_flyer: 3, comptes_app: 4, comptes_boutique: 5, membres: 9,
     })
     expect(urls.filter((u) => !u.startsWith('http://supabase.test/')).every((u) => u.startsWith(`https://${BOUTIQUE}/`))).toBe(true)
+    // Les jours de Paris : novembre en heure d'hiver, borne de fin exclue.
+    const users = urls.find((u) => u.includes('/rest/v1/users'))!
+    expect(users).toContain('created_at=gte.2026-10-31T23:00:00.000Z')
+    expect(users).toContain('created_at=lt.2026-11-30T23:00:00.000Z')
+  })
+
+  test('minuit à Paris, en hiver comme en été', async () => {
+    const { minuitParis } = await import('./functions/metriques')
+    expect(minuitParis('2026-11-01')).toBe('2026-10-31T23:00:00.000Z')
+    expect(minuitParis('2026-07-01')).toBe('2026-06-30T22:00:00.000Z')
+    expect(minuitParis('2027-03-28')).toBe('2027-03-27T23:00:00.000Z')
   })
 })

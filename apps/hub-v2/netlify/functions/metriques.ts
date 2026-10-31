@@ -40,6 +40,7 @@ export default async function handler(request: Request) {
   if (!DATE.test(debut) || !DATE.test(fin)) return repondre({ error: 'debut et fin attendus en AAAA-MM-JJ' }, 400)
 
   // Les commandes payées (remboursements déduits par currentTotalPriceSet), créées dans la fenêtre.
+  // Shopify lit ces dates sans heure dans le fuseau de la boutique.
   const q = `created_at:>=${debut} created_at:<=${fin}T23:59:59 (financial_status:paid OR financial_status:partially_refunded)`
   let ca = 0
   let commandes = 0
@@ -63,16 +64,18 @@ export default async function handler(request: Request) {
     apres = orders.pageInfo.hasNextPage ? orders.pageInfo.endCursor : null
   } while (apres)
 
-  const de = `${debut}T00:00:00`
-  const a = `${fin}T23:59:59`
-  const nes = `users?created_at=gte.${de}&created_at=lte.${a}`
+  // Les jours de Paris, comme l'exposeur de Fellowship (contrat de « Briques — la méthode ») : de minuit le
+  // premier jour à minuit le lendemain du dernier, exclu. Avant : des heures sans fuseau, lues en UTC par la base.
+  const de = minuitParis(debut)
+  const a = minuitParis(lendemain(fin))
+  const nes = `users?created_at=gte.${de}&created_at=lt.${a}`
   const stand = `${nes}&account_source=eq.stand`
   // Les nouvelles fiches par origine : stand, flyer, appli, boutique (achat ou newsletter du site, aspirés par le Hub).
   // Les membres : les nouvelles fiches déjà reliées à un accès (plus de « shopify-… »), toutes origines.
   const [inscriptions_stand, activations_stand, scans, comptes_flyer, comptes_app, comptes_boutique, membres] = await Promise.all([
     compter(stand),
     compter(`${stand}&id=not.like.shopify-*`),
-    compter(`scans?quand=gte.${de}&quand=lte.${a}`),
+    compter(`scans?quand=gte.${de}&quand=lt.${a}`),
     compter(`${nes}&account_source=eq.flyer`),
     compter(`${nes}&account_source=eq.app`),
     compter(`${nes}&account_source=eq.shopify`),
@@ -85,6 +88,20 @@ export default async function handler(request: Request) {
     debut, fin, ca: Math.round(ca * 100) / 100, commandes, pieces, inscriptions_stand, activations_stand, scans,
     comptes_stand: inscriptions_stand, comptes_flyer, comptes_app, comptes_boutique, membres,
   })
+}
+
+/** Minuit à Paris ce jour-là (AAAA-MM-JJ), en instant UTC ISO : 2026-11-01 → 2026-10-31T23:00:00.000Z. */
+export function minuitParis(jour: string): string {
+  const utc = new Date(`${jour}T00:00:00Z`)
+  const lu = (tz: string) => new Date(utc.toLocaleString('en-US', { timeZone: tz })).getTime()
+  return new Date(utc.getTime() - (lu('Europe/Paris') - lu('UTC'))).toISOString()
+}
+
+/** Le jour suivant (AAAA-MM-JJ). */
+function lendemain(jour: string): string {
+  const d = new Date(`${jour}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() + 1)
+  return d.toISOString().slice(0, 10)
 }
 
 /** Le nombre de lignes d'une requête PostgREST (en-tête Content-Range), sans les lire. null : échec. */
