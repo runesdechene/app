@@ -602,3 +602,51 @@ describe('missives-essai : la Missive part tout de suite, à l’admin seulement
     expect(envois).toEqual([expect.objectContaining({ to: ['uriel@exemple.fr'], subject: '[Essai] Sur la route' })])
   })
 })
+
+describe('metriques', () => {
+  const get = (q: string, entetes: Record<string, string> = {}) =>
+    new Request(`http://localhost/.netlify/functions/metriques?${q}`, { headers: entetes })
+
+  test('sans METRIQUES_JETON configuré : refus, même avec un en-tête', async () => {
+    const appels = simulerReseau('admin')
+    const handler = await charger('metriques')
+    const r = await handler(get('debut=2026-11-01&fin=2026-11-30', { Authorization: 'Bearer ' }))
+    expect(r.status).toBe(401)
+    expect(appels).toEqual([])
+  })
+
+  test('mauvais jeton : 401, Shopify jamais appelé', async () => {
+    vi.stubEnv('METRIQUES_JETON', 'le-bon')
+    const appels = simulerReseau('admin')
+    const handler = await charger('metriques')
+    const r = await handler(get('debut=2026-11-01&fin=2026-11-30', { Authorization: 'Bearer le-faux' }))
+    expect(r.status).toBe(401)
+    expect(appels).toEqual([])
+  })
+
+  test('dates mal formées : 400', async () => {
+    vi.stubEnv('METRIQUES_JETON', 'le-bon')
+    simulerReseau('admin')
+    const handler = await charger('metriques')
+    const r = await handler(get('debut=hier&fin=2026-11-30', { Authorization: 'Bearer le-bon' }))
+    expect(r.status).toBe(400)
+  })
+
+  test('bon jeton : somme le CA sur toutes les pages, boutique fixe', async () => {
+    vi.stubEnv('METRIQUES_JETON', 'le-bon')
+    const pages = [
+      { nodes: [{ currentTotalPriceSet: { shopMoney: { amount: '40.50' } } }], pageInfo: { hasNextPage: true, endCursor: 'c1' } },
+      { nodes: [{ currentTotalPriceSet: { shopMoney: { amount: '9.50' } } }], pageInfo: { hasNextPage: false, endCursor: null } },
+    ]
+    const urls: string[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string) => {
+      urls.push(url)
+      return Promise.resolve(Response.json({ data: { orders: pages.shift() } }))
+    }))
+    const handler = await charger('metriques')
+    const r = await handler(get('debut=2026-11-01&fin=2026-11-30', { Authorization: 'Bearer le-bon' }))
+    expect(r.status).toBe(200)
+    expect(await r.json()).toEqual({ debut: '2026-11-01', fin: '2026-11-30', ca: 50, commandes: 2 })
+    expect(urls.every((u) => u.startsWith(`https://${BOUTIQUE}/`))).toBe(true)
+  })
+})
