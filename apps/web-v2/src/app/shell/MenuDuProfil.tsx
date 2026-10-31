@@ -1,13 +1,13 @@
 /**
  * QUOI     — le menu du profil (maquette 476:434, Uriel 07/10) : qui je suis (portrait, nom, niveau,
- *            premier titre porté), puis Mon profil · Les énigmes · Tous les titres · Préférences, et
- *            « Se déconnecter » à part.
+ *            premier titre porté), puis Mon profil · Les énigmes · Tous les titres · Préférences
+ *            (· Installer l'appli, tant qu'elle ne l'est pas), et « Se déconnecter » à part.
  * POURQUOI — le portrait de la barre ouvre ce menu, téléphone comme PC : la coupe, l'engrenage et la
  *            sortie y sont entrés ; la cloche reste dans la barre.
  * ATTENTION — chaque ligne ferme d'abord la feuille. Se déconnecter ne navigue nulle part : la garde
  *            d'accès voit la session tomber et renvoie vers la V1.
  */
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { useNavigate } from 'react-router'
 import { seDeconnecter } from '@/features/compte/api/session'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
@@ -21,6 +21,13 @@ import iconeSortie from '@/assets/ui/menu-sortie.svg'
 import iconeTitres from '@/assets/ui/menu-titres.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Feuille } from '@/shared/ui/Feuille'
+import {
+  estInstallee,
+  installation,
+  installer,
+  repousserInvitation,
+  surIPhone,
+} from '../installation'
 import { useOuvrir } from '../navigation/useOuvrir'
 import styles from './MenuDuProfil.module.css'
 
@@ -31,6 +38,8 @@ export function MenuDuProfil({ onFermer }: { onFermer: () => void }) {
   const navigate = useNavigate()
   const ouvrir = useOuvrir()
   const [echec, setEchec] = useState(false)
+  const navigateurInstalle = useSyncExternalStore(installation.suivre, installation.possible)
+  const installable = !estInstallee() && (navigateurInstalle || surIPhone())
 
   const aller = (action: () => void) => () => {
     onFermer()
@@ -88,6 +97,18 @@ export function MenuDuProfil({ onFermer }: { onFermer: () => void }) {
               ouvrir('preferences')
             })}
           />
+          {/* Pour qui a fermé l'invitation : la fenêtre du navigateur, ou sur iPhone la carte
+              qui montre le geste. */}
+          {installable && (
+            <Ligne
+              icone="/icon-192.png"
+              libelle="Installer l’appli"
+              onToucher={aller(() => {
+                if (surIPhone()) repousserInvitation(false)
+                else void installer()
+              })}
+            />
+          )}
         </ul>
         <button
           type="button"

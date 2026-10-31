@@ -1,13 +1,13 @@
 /**
  * QUOI     — l'invitation à installer : le bouton du navigateur s'il sait installer, le geste à
  *            faire sur iPhone, jamais avant l'invitation de position, et « Plus tard » jusqu'à la
- *            prochaine ouverture.
+ *            prochaine ouverture — ou jusqu'à la ligne du menu du profil.
  */
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
 import type { Autorisation } from '@/shared/lib/position'
-import { ecouterInstallation } from './installation'
+import { ecouterInstallation, repousserInvitation } from './installation'
 import { InvitationInstaller } from './InvitationInstaller'
 
 const position = vi.hoisted((): { autorisation: Autorisation | null } => ({
@@ -37,7 +37,7 @@ function surLeTelephone(userAgent: string, installee = false) {
 }
 
 beforeEach(() => {
-  sessionStorage.clear()
+  repousserInvitation(false)
   localStorage.clear()
   position.autorisation = 'accordee'
   prompt.mockClear()
@@ -61,6 +61,17 @@ test('« Plus tard » la fait taire jusqu’à la prochaine ouverture', async ()
   unmount()
   render(<InvitationInstaller />)
   expect(screen.queryByText(TITRE)).toBeNull()
+})
+
+test('fermée par la croix, « Installer l’appli » du menu la fait revenir', async () => {
+  surLeTelephone(IPHONE)
+  render(<InvitationInstaller />)
+  await userEvent.click(screen.getByRole('button', { name: 'Plus tard' }))
+  expect(screen.queryByText(TITRE)).toBeNull()
+  act(() => {
+    repousserInvitation(false)
+  })
+  expect(screen.getByText(TITRE)).toBeInTheDocument()
 })
 
 test('sur iPhone, le geste à faire, sans bouton Installer', () => {
