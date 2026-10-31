@@ -1,18 +1,18 @@
 /**
- * QUOI     — l'invitation « Installer Runes de Chêne » : le bouton du navigateur (Android, PC), ou
- *            le geste à faire à la main sur iPhone.
+ * QUOI     — l'invitation « Installer Runes de Chêne » : une carte posée au bas de la carte, avec
+ *            l'icône de l'appli. Le bouton du navigateur (Android, PC), ou le geste à faire à la
+ *            main sur iPhone ; la croix la fait taire.
  * POURQUOI — la V1 la montrait, la V2 l'avait perdue (Uriel, 31/10). Sur iPhone, les
- *            notifications n'existent que dans l'appli installée.
+ *            notifications n'existent que dans l'appli installée. Maquette d'Uriel : Figma 865:2549.
  * ATTENTION — comme la V1, elle revient à chaque ouverture tant que l'appli n'est pas installée ;
- *            « Plus tard » la fait taire jusqu'à la prochaine. Elle attend que l'invitation de
- *            position soit passée : jamais deux fenêtres l'une sur l'autre.
+ *            la croix la fait taire jusqu'à la prochaine. Elle attend que l'invitation de position
+ *            soit passée : jamais deux invitations à la fois. L'icône est celle du manifeste.
  */
 import { useState, useSyncExternalStore } from 'react'
 import partager from '@/assets/ui/partager-encre.svg'
 import { invitationPositionVue } from '@/features/carte/lib/invitationPosition'
 import { useAutorisationPosition } from '@/shared/hooks/useAutorisationPosition'
 import { Button } from '@/shared/ui/Button'
-import { Question } from '@/shared/ui/Question'
 import { estInstallee, installation, installer } from './installation'
 import styles from './InvitationInstaller.module.css'
 
@@ -43,45 +43,43 @@ export function InvitationInstaller() {
   const positionEnAttente = autorisation === 'a-demander' && !invitationPositionVue()
   if (fermee || positionEnAttente || estInstallee() || !(possible || iPhone)) return null
 
-  const fermer = () => {
-    repousser()
-    setFermee(true)
-  }
-  // Safari ne sait pas installer de lui-même : on montre le geste.
-  if (iPhone) {
-    return (
-      <Question
-        titre={TITRE}
-        explication={
-          <>
-            Touche <img className={styles.icone} src={partager} alt="Partager" />, puis « Sur
-            l’écran d’accueil » : la carte s’ouvrira en plein écran, et tu recevras les
-            notifications.
-          </>
-        }
-        onFermer={fermer}
-      >
-        <Button onClick={fermer}>Compris</Button>
-      </Question>
-    )
-  }
   return (
-    <Question
-      titre={TITRE}
-      explication="Retrouve la carte sur ton écran d’accueil, en plein écran, comme une vraie appli."
-      onFermer={fermer}
-    >
-      <Button
+    // Pas un <aside> : la coquille réserve `> aside` à son panneau de détail.
+    <div className={styles.invitation} role="region" aria-label={TITRE}>
+      <img className={styles.icone} src="/icon-512.png" alt="" />
+      <div className={styles.texte}>
+        <p className={styles.titre}>{TITRE}</p>
+        {/* Safari ne sait pas installer de lui-même : on montre le geste. */}
+        {iPhone ? (
+          <p className={styles.explication}>
+            Touche <img className={styles.partager} src={partager} alt="Partager" />, puis « Sur
+            l’écran d’accueil » : la carte en plein écran, et les notifications.
+          </p>
+        ) : (
+          <>
+            <p className={styles.explication}>
+              Retrouve la carte sur ton écran d’accueil, en plein écran, comme une vraie appli.
+            </p>
+            <Button
+              onClick={() => {
+                setFermee(true)
+                void installer()
+              }}
+            >
+              Installer
+            </Button>
+          </>
+        )}
+      </div>
+      <button
+        type="button"
+        className={styles.croix}
+        aria-label="Plus tard"
         onClick={() => {
+          repousser()
           setFermee(true)
-          void installer()
         }}
-      >
-        Installer
-      </Button>
-      <Button kind="secondaire" onClick={fermer}>
-        Plus tard
-      </Button>
-    </Question>
+      />
+    </div>
   )
 }

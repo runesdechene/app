@@ -68,7 +68,7 @@ test('sur iPhone, le geste à faire, sans bouton Installer', () => {
   render(<InvitationInstaller />)
   expect(screen.getByRole('img', { name: 'Partager' })).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Installer' })).toBeNull()
-  expect(screen.getByRole('button', { name: 'Compris' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Plus tard' })).toBeInTheDocument() // la croix
 })
 
 test('rien dans l’appli déjà installée', () => {

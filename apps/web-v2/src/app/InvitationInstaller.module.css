@@ -1,8 +1,90 @@
 /*
- * QUOI     — l'icône Partager de Safari, dans le fil de la phrase de l'invitation (iPhone).
+ * QUOI     — l'invitation à installer (maquette d'Uriel, Figma 865:2549) : une carte crème posée au
+ *            bas de la carte, l'icône de l'appli à gauche, le titre, la phrase et le bouton à droite,
+ *            une petite croix dans le coin. Elle monte en apparaissant.
+ * ATTENTION — elle prend la case « main » de la coquille et se colle en bas : sur téléphone, juste
+ *            au-dessus des onglets ; sur PC, en bas à droite, hors du tiroir.
  */
+.invitation {
+  grid-area: main;
+  align-self: end;
+  position: relative;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: center;
+  width: min(100% - 2 * var(--space-4), 380px);
+  margin: 0 auto var(--space-2);
+  padding: var(--space-4) var(--space-6) var(--space-4) var(--space-6);
+  border-radius: var(--radius-feuille);
+  background: var(--color-feuille);
+  box-shadow: var(--ombre-flottante);
+  transition:
+    translate var(--duree-douce) var(--courbe-douce),
+    opacity var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    translate: 0 var(--space-6);
+    opacity: 0;
+  }
+}
+
 .icone {
-  width: 1.2em;
-  height: 1.2em;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-feuille);
+  box-shadow: var(--ombre-icone);
+}
+
+.texte {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.titre {
+  margin: 0;
+  padding-right: var(--space-4); /* la place de la croix */
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+}
+
+.explication {
+  margin: 0 0 var(--space-1);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+}
+
+/* L'icône Partager de Safari, dans le fil de la phrase. */
+.partager {
+  width: 1.4em;
+  height: 1.4em;
   vertical-align: text-bottom;
+}
+
+/* La croix : 16 px dessinés, la cible tactile entière autour. */
+.croix {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--cible-tactile);
+  height: var(--cible-tactile);
+  border: none;
+  background-color: var(--color-texte-doux);
+  mask: url('../assets/ui/croix.svg') center / 16px no-repeat;
+  cursor: pointer;
+}
+
+@container app (width >= 1024px) {
+  .invitation {
+    margin: 0 var(--space-6) var(--space-6) auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .invitation {
+    transition: none;
+  }
 }

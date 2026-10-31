@@ -40,7 +40,11 @@
   --color-choisie: #f1dcc0; /* fond d'une pastille choisie (Modifier mon profil) */
   --color-vignette: #ead3ad; /* bas du dégradé des cartes de Fragments : un parchemin doré (Figma 123:107) */
   --color-brun: #9c7963; /* texte du bouton doux (« Envoyer un murmure ») */
-  --color-doux-fond: color-mix(in srgb, #ffead5 72%, transparent); /* fond du bouton doux */
+  --color-doux-fond: color-mix(
+    in srgb,
+    #ffead5 72%,
+    transparent
+  ); /* fond du bouton doux */
   --color-feuille: #fff9f0; /* la feuille « Ses découvertes » */
   --color-ombre: #1f1a14; /* l'ombre des photos : un brun presque noir, jamais gris */
 
@@ -106,10 +110,11 @@
   --color-moderation: #f3c9c4; /* le type « Modération » du fil */
 
   /* Polices */
-  --font-titre: 'Bebas Neue', sans-serif;
-  --font-corps: 'Cabin', sans-serif;
-  --font-condensee: 'Cabin Condensed', sans-serif;
-  --font-inscription: 'IM Fell English', serif; /* le nom du territoire sur la carte */
+  --font-titre: "Bebas Neue", sans-serif;
+  --font-corps: "Cabin", sans-serif;
+  --font-condensee: "Cabin Condensed", sans-serif;
+  --font-inscription:
+    "IM Fell English", serif; /* le nom du territoire sur la carte */
   --weight-normal: 400;
   --weight-semi: 600;
   --weight-gras: 700;
@@ -192,7 +197,13 @@
   --radius-carte: 15px;
   --radius-feuille: 20px; /* la feuille « Ses découvertes » */
   --radius-rond: 999px;
-  --ombre-bouton: 0 0 8px 5px color-mix(in srgb, var(--color-sable) 40%, transparent);
+  --ombre-bouton: 0 0 8px 5px
+    color-mix(in srgb, var(--color-sable) 40%, transparent);
+  /* l'invitation à installer, posée sur la carte, et la tuile de l'icône (Figma 865:2549) */
+  --ombre-flottante: 0 4px 11px
+    color-mix(in srgb, var(--color-ombre) 32%, transparent);
+  --ombre-icone: 0 0 10px
+    color-mix(in srgb, var(--color-ombre) 41%, transparent);
 
   /* Coquille */
   --tabbar-height: 85px;
