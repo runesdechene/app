@@ -42,7 +42,8 @@ export function useAnalyse(
   }, [])
 
   useEffect(() => {
-    if (!actif || !empreinteur || !references) return
+    // Un modèle cassé ne repart pas au rendu suivant : il resterait cassé.
+    if (!actif || !empreinteur || !references || erreur) return
     const toile = document.createElement('canvas')
     let etat = DEPART
     let dernierPas = 0
@@ -74,7 +75,7 @@ export function useAnalyse(
     return () => {
       cancelAnimationFrame(image)
     }
-  }, [actif, empreinteur, references, video])
+  }, [actif, empreinteur, references, video, erreur])
 
   return { pret: empreinteur !== null, erreur, meilleur, empreinteActuelle: () => derniere.current }
 }
