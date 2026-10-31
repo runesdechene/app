@@ -11,6 +11,8 @@ Supabase ; aucune n'écrit une valeur visuelle en dur (Stylelint).
 - `Avatar` — photo ronde, ou l'initiale ; petit (menu) ou grand (profil).
 - `Interrupteur` — le switch des Préférences ; `role="switch"`.
 - `Feuille` — le panneau qui monte du bas (au centre sur PC) ; voile et Échap ferment.
+- `Question` — la feuille qui pose une question : un titre, une phrase, les choix (nouvelle
+  version, invitations, brouillons d'Ajouter). Les boutons arrivent en enfants.
 - `racineDesFeuilles.ts` — où les feuilles se posent (la coquille) : leur voile couvre toute l'app.
 - `Champ` — saisie avec libellé, aide et limite tenue à la frappe.
 - `PastilleChoix` — un titre porté : en lecture, ou à choisir.

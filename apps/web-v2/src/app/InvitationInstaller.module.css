@@ -1,29 +1,8 @@
 /*
- * QUOI     — l'invitation à installer : un titre, une phrase, un ou deux boutons (comme
- *            l'invitation de position et la fenêtre de nouvelle version).
+ * QUOI     — l'icône Partager de Safari, dans le fil de la phrase de l'invitation (iPhone).
  */
-.titre {
-  margin: 0 0 var(--space-1);
-  color: var(--color-encre);
-  font-family: var(--font-titre);
-  font-size: var(--titre-carte-size);
-}
-
-.explication {
-  margin: 0 0 var(--space-4);
-  color: var(--color-texte-doux);
-  font-family: var(--font-corps);
-  font-size: var(--sous-titre-size);
-}
-
-/* L'icône Partager de Safari, dans le fil de la phrase. */
 .icone {
   width: 1.2em;
   height: 1.2em;
   vertical-align: text-bottom;
-}
-
-.choix {
-  display: grid;
-  gap: var(--space-2);
 }

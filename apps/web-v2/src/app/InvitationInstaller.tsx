@@ -12,7 +12,7 @@ import partager from '@/assets/ui/partager-encre.svg'
 import { invitationPositionVue } from '@/features/carte/lib/invitationPosition'
 import { useAutorisationPosition } from '@/shared/hooks/useAutorisationPosition'
 import { Button } from '@/shared/ui/Button'
-import { Feuille } from '@/shared/ui/Feuille'
+import { Question } from '@/shared/ui/Question'
 import { estInstallee, installation, installer } from './installation'
 import styles from './InvitationInstaller.module.css'
 
@@ -47,38 +47,41 @@ export function InvitationInstaller() {
     repousser()
     setFermee(true)
   }
-  return (
-    <Feuille titre={TITRE} onFermer={fermer}>
-      <p className={styles.titre}>{TITRE}</p>
-      {iPhone ? (
-        <p className={styles.explication}>
-          Touche <img className={styles.icone} src={partager} alt="Partager" />, puis « Sur l’écran
-          d’accueil » : la carte s’ouvrira en plein écran, et tu recevras les notifications.
-        </p>
-      ) : (
-        <p className={styles.explication}>
-          Retrouve la carte sur ton écran d’accueil, en plein écran, comme une vraie appli.
-        </p>
-      )}
-      <div className={styles.choix}>
-        {iPhone ? (
-          <Button onClick={fermer}>Compris</Button>
-        ) : (
+  // Safari ne sait pas installer de lui-même : on montre le geste.
+  if (iPhone) {
+    return (
+      <Question
+        titre={TITRE}
+        explication={
           <>
-            <Button
-              onClick={() => {
-                setFermee(true)
-                void installer()
-              }}
-            >
-              Installer
-            </Button>
-            <Button kind="secondaire" onClick={fermer}>
-              Plus tard
-            </Button>
+            Touche <img className={styles.icone} src={partager} alt="Partager" />, puis « Sur
+            l’écran d’accueil » : la carte s’ouvrira en plein écran, et tu recevras les
+            notifications.
           </>
-        )}
-      </div>
-    </Feuille>
+        }
+        onFermer={fermer}
+      >
+        <Button onClick={fermer}>Compris</Button>
+      </Question>
+    )
+  }
+  return (
+    <Question
+      titre={TITRE}
+      explication="Retrouve la carte sur ton écran d’accueil, en plein écran, comme une vraie appli."
+      onFermer={fermer}
+    >
+      <Button
+        onClick={() => {
+          setFermee(true)
+          void installer()
+        }}
+      >
+        Installer
+      </Button>
+      <Button kind="secondaire" onClick={fermer}>
+        Plus tard
+      </Button>
+    </Question>
   )
 }

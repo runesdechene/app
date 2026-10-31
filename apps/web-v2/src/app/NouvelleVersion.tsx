@@ -7,9 +7,8 @@
  */
 import { useState, useSyncExternalStore } from 'react'
 import { Button } from '@/shared/ui/Button'
-import { Feuille } from '@/shared/ui/Feuille'
+import { Question } from '@/shared/ui/Question'
 import { nouvelleVersion, recharger } from './miseAJour'
-import styles from './NouvelleVersion.module.css'
 
 export function NouvelleVersion() {
   const degre = useSyncExternalStore(nouvelleVersion.suivre, nouvelleVersion.lire)
@@ -20,21 +19,21 @@ export function NouvelleVersion() {
     setPlusTard(true)
   }
   return (
-    <Feuille titre="Une nouvelle version d’Explore est arrivée" onFermer={fermer}>
-      <p className={styles.titre}>Une nouvelle version d’Explore est arrivée</p>
-      <p className={styles.explication}>Recharge pour en profiter : ça ne prend qu’un instant.</p>
-      <div className={styles.choix}>
-        <Button
-          onClick={() => {
-            void recharger()
-          }}
-        >
-          Recharger
-        </Button>
-        <Button kind="secondaire" onClick={fermer}>
-          Plus tard
-        </Button>
-      </div>
-    </Feuille>
+    <Question
+      titre="Une nouvelle version d’Explore est arrivée"
+      explication="Recharge pour en profiter : ça ne prend qu’un instant."
+      onFermer={fermer}
+    >
+      <Button
+        onClick={() => {
+          void recharger()
+        }}
+      >
+        Recharger
+      </Button>
+      <Button kind="secondaire" onClick={fermer}>
+        Plus tard
+      </Button>
+    </Question>
   )
 }

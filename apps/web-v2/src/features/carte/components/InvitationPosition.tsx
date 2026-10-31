@@ -8,9 +8,8 @@
 import { useState } from 'react'
 import { useAutorisationPosition } from '@/shared/hooks/useAutorisationPosition'
 import { Button } from '@/shared/ui/Button'
-import { Feuille } from '@/shared/ui/Feuille'
+import { Question } from '@/shared/ui/Question'
 import { invitationPositionVue, marquerInvitationPositionVue } from '../lib/invitationPosition'
-import styles from './InvitationPosition.module.css'
 
 export function InvitationPosition() {
   const { autorisation, autoriser } = useAutorisationPosition()
@@ -22,25 +21,22 @@ export function InvitationPosition() {
     setFermee(true)
   }
   return (
-    <Feuille titre="Apparaître sur la carte" onFermer={fermer}>
-      <p className={styles.titre}>Apparaître sur la carte</p>
-      <p className={styles.explication}>
-        Les autres Explorateurs te verront passer. Tu peux brouiller tes pistes dans les
-        Préférences.
-      </p>
-      <div className={styles.choix}>
-        <Button
-          onClick={() => {
-            fermer()
-            void autoriser()
-          }}
-        >
-          Autoriser ma position
-        </Button>
-        <Button kind="secondaire" onClick={fermer}>
-          Plus tard
-        </Button>
-      </div>
-    </Feuille>
+    <Question
+      titre="Apparaître sur la carte"
+      explication="Les autres Explorateurs te verront passer. Tu peux brouiller tes pistes dans les Préférences."
+      onFermer={fermer}
+    >
+      <Button
+        onClick={() => {
+          fermer()
+          void autoriser()
+        }}
+      >
+        Autoriser ma position
+      </Button>
+      <Button kind="secondaire" onClick={fermer}>
+        Plus tard
+      </Button>
+    </Question>
   )
 }

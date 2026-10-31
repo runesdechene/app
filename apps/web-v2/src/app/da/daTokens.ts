@@ -102,6 +102,7 @@ export const DA_SHOWCASED = [
   'PastilleChoix',
   'PastilleCoeurs',
   'PlanSatellite',
+  'Question',
   'Recompense',
   'Segments',
   'Text',

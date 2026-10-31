@@ -30,6 +30,7 @@ import { LieuCarte } from '@/shared/ui/LieuCarte'
 import { Pastille } from '@/shared/ui/Pastille'
 import { PastilleChoix } from '@/shared/ui/PastilleChoix'
 import { PlanSatellite } from '@/shared/ui/PlanSatellite'
+import { Question } from '@/shared/ui/Question'
 import { Recompense } from '@/shared/ui/Recompense'
 import { Segments } from '@/shared/ui/Segments'
 import { Text } from '@/shared/ui/Text'
@@ -263,6 +264,21 @@ export function DaBriques() {
             <Text variant="corps">Mon profil</Text>
             <Text variant="corps">Préférences</Text>
           </Feuille>
+        </div>
+      </DaSection>
+
+      <DaSection name="Question">
+        <div className={styles.cadreFeuille}>
+          <Question
+            titre="Apparaître sur la carte"
+            explication="Les autres Explorateurs te verront passer."
+            onFermer={rien}
+          >
+            <Button onClick={rien}>Autoriser ma position</Button>
+            <Button kind="secondaire" onClick={rien}>
+              Plus tard
+            </Button>
+          </Question>
         </div>
       </DaSection>
 

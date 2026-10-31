@@ -15,7 +15,7 @@ import { useContext, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useIsMutating } from '@tanstack/react-query'
 import { Navigate, useNavigate } from 'react-router'
-import { Feuille } from '@/shared/ui/Feuille'
+import { Question } from '@/shared/ui/Question'
 import { Recompense } from '@/shared/ui/Recompense'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import type { Ajout } from '../api/lireAjout'
@@ -145,31 +145,26 @@ export function ParcoursAjout({
           de l'app est sous le parcours. */}
       {question && (
         <RacineDesFeuilles.Provider value={null}>
-          <Feuille
-            titre="Quitter l’ajout"
+          <Question
+            titre="Tu reviens plus tard ?"
+            explication="Ton brouillon t’attend dans « Ajouter », à l’étape où tu l’as laissé."
             onFermer={() => {
               setQuestion(false)
             }}
           >
-            <p className={styles.question}>Tu reviens plus tard ?</p>
-            <p className={styles.explication}>
-              Ton brouillon t’attend dans « Ajouter », à l’étape où tu l’as laissé.
-            </p>
-            <div className={styles.choix}>
-              <button type="button" className={styles.garder} onClick={onQuitter}>
-                Garder le brouillon
-              </button>
-              <button
-                type="button"
-                className={styles.jeter}
-                onClick={() => {
-                  void jeter().then(onQuitter)
-                }}
-              >
-                Le jeter
-              </button>
-            </div>
-          </Feuille>
+            <button type="button" className={styles.garder} onClick={onQuitter}>
+              Garder le brouillon
+            </button>
+            <button
+              type="button"
+              className={styles.jeter}
+              onClick={() => {
+                void jeter().then(onQuitter)
+              }}
+            >
+              Le jeter
+            </button>
+          </Question>
         </RacineDesFeuilles.Provider>
       )}
     </div>

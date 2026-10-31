@@ -11,7 +11,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import type { Point } from '@/shared/lib/distance'
-import { Feuille } from '@/shared/ui/Feuille'
+import { Question } from '@/shared/ui/Question'
 import {
   brouillonDuPin,
   chargerBrouillon,
@@ -62,26 +62,23 @@ export function DepuisUnPin({ pin, onOuvrir }: { pin: Pin; onOuvrir: Ouvrir }) {
     onOuvrir(etapeDeReprise(enCours))
   }
   return (
-    <Feuille titre="Remplacer ton brouillon en cours ?" onFermer={garder}>
-      <p className={styles.question}>Remplacer ton brouillon en cours ?</p>
-      <p className={styles.explication}>
-        Un lieu attend déjà d’être fini. Le remplacer l’efface ; le garder te ramène à lui, et ton
-        pin t’attendra.
-      </p>
-      <div className={styles.choix}>
-        <button type="button" className={styles.garder} onClick={garder}>
-          Garder mon brouillon
-        </button>
-        <button
-          type="button"
-          className={styles.jeter}
-          onClick={() => {
-            void remplacer(pin, onOuvrir)
-          }}
-        >
-          Remplacer
-        </button>
-      </div>
-    </Feuille>
+    <Question
+      titre="Remplacer ton brouillon en cours ?"
+      explication="Un lieu attend déjà d’être fini. Le remplacer l’efface ; le garder te ramène à lui, et ton pin t’attendra."
+      onFermer={garder}
+    >
+      <button type="button" className={styles.garder} onClick={garder}>
+        Garder mon brouillon
+      </button>
+      <button
+        type="button"
+        className={styles.jeter}
+        onClick={() => {
+          void remplacer(pin, onOuvrir)
+        }}
+      >
+        Remplacer
+      </button>
+    </Question>
   )
 }
