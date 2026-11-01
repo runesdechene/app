@@ -2,6 +2,7 @@
  * QUOI     — le scanner (maquettes 530:915, 530:946, 530:982) : la caméra derrière un viseur, l'analyse
  *            en continu, le bip qui montre le Fragment puis ouvre son Récit ; au bout de 8 s, un conseil
  *            et « Voir tous les Fragments » ; pour les admins, la feuille « Apprendre cette vue » (530:1013).
+ *            En bas, toujours, « Découvrir l'appli » : le QR du dépliant mène ici, souvent sans vêtement.
  * POURQUOI — comme un QR code, sans QR code (spec 2026-10-09-v2-scan). Arrivé sans avoir touché
  *            l'écran (un QR du stand), le son n'est pas débloqué : un grand bouton « Scanner » d'abord.
  * ATTENTION — la caméra ne s'allume qu'une fois le son débloqué ; elle s'éteint en quittant l'écran.
@@ -73,16 +74,13 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
 
   const fragment = fragments?.find((f) => f.id === reconnu)
   const echec = analyse.erreur || erreurEmpreintes
+  const accueil = connecte ? '/accueil' : '/bienvenue'
 
   return (
     <main className={styles.ecran}>
       <video ref={video} className={styles.video} playsInline muted />
       <header className={styles.entete}>
-        <Link
-          className={styles.retour}
-          to={connecte ? '/accueil' : '/bienvenue'}
-          aria-label="Retour"
-        >
+        <Link className={styles.retour} to={accueil} aria-label="Retour">
           <img src={fleche} alt="" />
         </Link>
         <h1 className={styles.titre}>Scanner un Fragment</h1>
@@ -147,7 +145,17 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
           )}
         </div>
       )}
-      {!connecte && <p className={styles.pied}>Aucun compte nécessaire</p>}
+      <footer className={styles.pied}>
+        {reconnu === null && (
+          <p className={styles.sortie}>
+            Pas de vêtement sous la main ?
+            <Link className={styles.lien} to={accueil}>
+              Découvrir l’appli →
+            </Link>
+          </p>
+        )}
+        {!connecte && <p className={styles.mention}>Aucun compte nécessaire</p>}
+      </footer>
       {admin && camera === 'en-marche' && reconnu === null && (
         <FeuilleApprendre
           suggestion={

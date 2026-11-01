@@ -130,6 +130,23 @@ test('un visiteur arrive sur le Récit du scan', () => {
   expect(screen.getByText('Récit visiteur')).toBeInTheDocument()
 })
 
+test('sans vêtement sous la main : « Découvrir l’appli » dès l’arrivée, vers la vitrine ou l’accueil', () => {
+  etat.son = false
+  etat.connecte = false
+  const { unmount } = ouvrir()
+  expect(screen.getByRole('link', { name: 'Découvrir l’appli →' })).toHaveAttribute(
+    'href',
+    '/bienvenue',
+  )
+  unmount()
+  etat.connecte = true
+  ouvrir()
+  expect(screen.getByRole('link', { name: 'Découvrir l’appli →' })).toHaveAttribute(
+    'href',
+    '/accueil',
+  )
+})
+
 test('un visiteur lit « Aucun compte nécessaire » ; un membre, non', () => {
   etat.connecte = false
   const { unmount } = ouvrir()

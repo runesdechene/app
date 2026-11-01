@@ -137,8 +137,24 @@
 .pied {
   position: relative;
   grid-row: 5;
-  justify-self: center;
-  margin: 0 0 calc(env(safe-area-inset-bottom) + 24px);
+  display: grid;
+  gap: 20px;
+  justify-items: center;
+  margin: 0 16px calc(env(safe-area-inset-bottom) + 24px);
+  text-align: center;
+}
+
+.pied p {
+  margin: 0;
+}
+
+.sortie {
+  display: grid;
+  gap: 4px;
+  font-size: var(--corps-size);
+}
+
+.mention {
   color: color-mix(in srgb, var(--color-sur-accent) 75%, transparent);
   font-size: var(--legende-size);
 }
