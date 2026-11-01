@@ -71,7 +71,7 @@ function remplir(element: HTMLElement, a: Actif, onToucher: (id: string) => void
 
 // Un toucher sur un portrait ne descend pas jusqu'à la carte : sinon le lieu sous les pieds de
 // l'Explorateur s'ouvrirait en même temps que sa carte (MapLibre écoute ces gestes sur la carte).
-export function garderPourSoi(element: HTMLElement) {
+function garderPourSoi(element: HTMLElement) {
   for (const type of ['mousedown', 'pointerdown', 'touchstart', 'click']) {
     element.addEventListener(type, (e) => {
       e.stopPropagation()

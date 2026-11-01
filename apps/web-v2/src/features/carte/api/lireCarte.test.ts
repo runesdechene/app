@@ -141,8 +141,6 @@ test('un territoire revendiqué se lit, en un morceau ou en plusieurs', () => {
     lieux: 2,
     ids: ['lieu-1', 'lieu-2'],
     ancre: [1.5, 44],
-    compagnons: 0,
-    joueur: { id: 'u1', nom: 'Tugdual', avatar: null, niveau: 4, titre: null, signe: null },
   }
   const [un, deux] = lireTerritoiresRevendiques([
     { ...territoire, forme: { type: 'Polygon', coordinates: [anneau] } },

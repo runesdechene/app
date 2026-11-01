@@ -12,5 +12,5 @@
 Le style parchemin et ses couleurs sont montés dans `shared/lib/` (styleCarte, couleursCarte) :
 l'étape « Où » de l'ajout d'un lieu dessine la même carte.
 
-- `territoires.ts` — la forme des territoires (migrations 569-570) : tirets et dégradé vers l'intérieur, enclaves autour des lieux des autres ; `enGeoJSONTerritoires` (pur).
+- `territoires.ts` — les territoires (migrations 569-575) : tirets, dégradé vers l'intérieur, un nom sur la bordure ; `enGeoJSONTerritoires` (pur).
 - `allerAMaPosition.ts` — le bouton « Ma position » : une lecture, un vol.

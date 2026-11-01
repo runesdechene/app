@@ -1,25 +1,21 @@
 /**
- * QUOI     — les territoires sur la carte (Figma 878:2627 → 877:2679) : leur forme, un blason par
- *            territoire, toujours là, et ce qu'ouvre un toucher — la carte de l'Explorateur qui le
- *            tient, puis « Renommer » sur le mien.
- * POURQUOI — chaque blason est un composant React rendu dans une marque MapLibre (`createPortal`) :
- *            MapLibre le déplace avec la carte, React le dessine comme le reste de l'appli.
- * ATTENTION — `carte` à null (visiteur) : ni forme, ni blason.
+ * QUOI     — les territoires sur la carte (`poserTerritoires`) et « Renommer » (Figma 877:2679) :
+ *            un clic sur le nom d'un territoire que je tiens ouvre la feuille.
+ * POURQUOI — seuls ceux qui le tiennent le renomment (la base le refuse aux autres, migration 575) :
+ *            sur le nom d'un autre, le clic ne fait rien, et la main n'apparaît que sur les miens.
+ * ATTENTION — `carte` à null (visiteur) : rien n'est demandé ni posé.
  */
-import { maplibregl } from '@/shared/lib/maplibre'
-import type { Map as Carte } from 'maplibre-gl'
-import { useEffect, useMemo, useState } from 'react'
-import { createPortal } from 'react-dom'
+import type { Map as Carte, MapLayerMouseEvent } from 'maplibre-gl'
+import { useEffect, useState } from 'react'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
-import type { TerritoireRevendique } from '../api/lireCarte'
 import { useTerritoiresSurLaCarte } from '../hooks/useTerritoiresSurLaCarte'
-import { garderPourSoi } from '../lib/marquesActifs'
-import { Blason } from './Blason'
-import { CarteDExplorateur, type Etat } from './CarteExplorateur'
+import { CALQUE_NOMS_TERRITOIRES } from '../lib/territoires'
 import { FeuilleRenommer } from './FeuilleRenommer'
 
-function tient(t: TerritoireRevendique): Etat {
-  return { texte: `Tient ${t.nom} · ${String(t.lieux)} lieux`, ton: t.moi ? 'mien' : 'autre' }
+// Le territoire sous le pointeur, s'il est à moi.
+function mienSous(e: MapLayerMouseEvent): string | null {
+  const proprietes = e.features?.[0]?.properties
+  return proprietes?.moi === true && typeof proprietes.id === 'string' ? proprietes.id : null
 }
 
 export function TerritoiresSurLaCarte({
@@ -30,61 +26,38 @@ export function TerritoiresSurLaCarte({
   couleurs: CouleursCarte
 }) {
   const territoires = useTerritoiresSurLaCarte(carte, couleurs)
-  const [ouvert, setOuvert] = useState<{ id: string; renommer: boolean } | null>(null)
-  const touche = territoires.find((t) => t.id === ouvert?.id)
+  const [ouvert, setOuvert] = useState<string | null>(null)
+  const territoire = territoires.find((t) => t.id === ouvert)
 
-  // Un élément par blason, refait quand les territoires changent ; la marque l'accroche à la carte.
-  const places = useMemo(
-    () =>
-      territoires.map((t) => {
-        const element = document.createElement('div')
-        garderPourSoi(element)
-        return { t, element }
-      }),
-    [territoires],
-  )
   useEffect(() => {
     if (!carte) return
-    const marques = places.map(({ t, element }) =>
-      new maplibregl.Marker({ element, anchor: 'bottom' }).setLngLat(t.ancre).addTo(carte),
-    )
-    return () => {
-      for (const m of marques) m.remove()
+    const toucher = (e: MapLayerMouseEvent) => {
+      const id = mienSous(e)
+      if (id) setOuvert(id)
     }
-  }, [carte, places])
+    // La main sur mes noms seulement ; ailleurs, on laisse le curseur à qui l'a posé (un lieu).
+    const survoler = (e: MapLayerMouseEvent) => {
+      if (mienSous(e)) carte.getCanvas().style.cursor = 'pointer'
+    }
+    const quitter = () => {
+      carte.getCanvas().style.cursor = ''
+    }
+    carte.on('click', CALQUE_NOMS_TERRITOIRES, toucher)
+    carte.on('mousemove', CALQUE_NOMS_TERRITOIRES, survoler)
+    carte.on('mouseleave', CALQUE_NOMS_TERRITOIRES, quitter)
+    return () => {
+      carte.off('click', CALQUE_NOMS_TERRITOIRES, toucher)
+      carte.off('mousemove', CALQUE_NOMS_TERRITOIRES, survoler)
+      carte.off('mouseleave', CALQUE_NOMS_TERRITOIRES, quitter)
+    }
+  }, [carte])
 
-  const fermer = () => {
-    setOuvert(null)
-  }
-  const renommer = touche?.moi
-    ? () => {
-        setOuvert({ id: touche.id, renommer: true })
-      }
-    : undefined
-
-  return (
-    <>
-      {places.map(({ t, element }) =>
-        createPortal(
-          <Blason
-            territoire={t}
-            onToucher={() => {
-              setOuvert({ id: t.id, renommer: false })
-            }}
-          />,
-          element,
-          t.id,
-        ),
-      )}
-      {touche && ouvert?.renommer && <FeuilleRenommer territoire={touche} onFermer={fermer} />}
-      {touche && !ouvert?.renommer && (
-        <CarteDExplorateur
-          explorateur={touche.joueur}
-          etat={tient(touche)}
-          onFermer={fermer}
-          onRenommer={renommer}
-        />
-      )}
-    </>
-  )
+  return territoire ? (
+    <FeuilleRenommer
+      territoire={territoire}
+      onFermer={() => {
+        setOuvert(null)
+      }}
+    />
+  ) : null
 }

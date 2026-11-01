@@ -13,7 +13,7 @@ const contour: Coordonnees[] = [
   [0, 0],
 ]
 
-test('un territoire donne ses morceaux, et s’il est à moi', () => {
+test('un territoire donne ses morceaux, et son nom posé sur sa bordure', () => {
   const t: TerritoireRevendique = {
     id: 'lieu-1',
     nom: 'La Garde du Comté',
@@ -22,10 +22,9 @@ test('un territoire donne ses morceaux, et s’il est à moi', () => {
     morceaux: [[contour]],
     ancre: [0.5, 1],
     ids: ['lieu-1'],
-    compagnons: 0,
-    joueur: { id: 'u1', nom: 'Uriel', avatar: null, niveau: 23, titre: null, signe: null },
   }
-  const [forme] = enGeoJSONTerritoires([t]).features
+  const [forme, nom] = enGeoJSONTerritoires([t]).features
   expect(forme?.geometry).toEqual({ type: 'MultiPolygon', coordinates: [[contour]] })
-  expect(forme?.properties).toEqual({ moi: true })
+  expect(nom?.geometry).toEqual({ type: 'Point', coordinates: [0.5, 1] })
+  expect(nom?.properties).toEqual({ id: 'lieu-1', nom: 'La Garde du Comté', moi: true })
 })
