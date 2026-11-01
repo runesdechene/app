@@ -16,7 +16,8 @@ import { fileURLToPath } from 'node:url'
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const APP = resolve(ROOT, 'apps/web-v2')
 const PAQUET = resolve(APP, 'package.json')
-const SITE = '1b29da09-c7af-44bf-9c31-465bfaae9d74'
+// Le site par son nom : son identifiant répond « Project not found » (01/11/2026).
+const SITE = 'runesdechene'
 
 function lancer(commande, cwd = ROOT) {
   execSync(commande, { cwd, stdio: 'inherit' })
@@ -32,5 +33,6 @@ console.log(`Version ${avant} → ${version}`)
 // Seul package.json part dans ce commit, même si d'autres fichiers sont en cours.
 lancer(`git commit -m "chore(web-v2): ${version}" -- apps/web-v2/package.json`)
 lancer('pnpm build', APP)
-lancer(`netlify deploy --prod --no-build --dir dist --site=${SITE}`, APP)
+// Le dossier en chemin absolu : la CLI résout un chemin relatif depuis la racine du dépôt.
+lancer(`netlify deploy --prod --no-build --dir="${resolve(APP, 'dist')}" --site=${SITE}`, APP)
 lancer('node scripts/sync-app-version.mjs')

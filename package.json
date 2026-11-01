@@ -8,7 +8,7 @@
     "dev": "pnpm --filter web-v2 dev",
     "build": "pnpm --filter web-v2 build",
     "deploy:app": "node scripts/deployer-app.mjs",
-    "deploy:hub": "pnpm --filter hub-v2 build && cd apps/hub-v2 && netlify deploy --prod --no-build --dir dist --functions netlify/functions --site=5d04dcdd-6374-4e8b-a0f4-fcef64a707f3"
+    "deploy:hub": "node scripts/deployer-hub.mjs"
   },
   "devDependencies": {
     "sharp": "^0.34.5",

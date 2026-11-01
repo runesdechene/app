@@ -35,8 +35,10 @@ la CLI est installée en global par pnpm, `netlify deploy …` avec les mêmes o
   `packageManager` dans le `package.json` racine. Ne pas les retirer.
 
 **Raccourcis (01/11/2026)** : `pnpm deploy:app` (monte et commite la version mineure, build, déploie, annonce la version ;
-`scripts/deployer-app.mjs`) et
-`pnpm deploy:hub`, depuis la racine. Les vérifications ci-dessous restent à faire.
+`scripts/deployer-app.mjs`) et `pnpm deploy:hub` (`scripts/deployer-hub.mjs`), depuis la racine. Les vérifications
+ci-dessous restent à faire. Payé le jour même : Explore se désigne par son **nom** (son identifiant répond « Project
+not found »), le Hub par son **identifiant** ; et `--dir` en chemin absolu dans les deux, sinon la CLI cherche `dist`
+à la racine du dépôt.
 
 ## Explore se déploie depuis `apps/web-v2`, sur le site `runesdechene`
 
