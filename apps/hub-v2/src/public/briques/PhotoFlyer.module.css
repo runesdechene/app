@@ -9,7 +9,7 @@
   width: 100%;
   height: 260px;
   object-fit: cover;
-  object-position: 50% 40%;
+  object-position: 20% 30%;
   mask-image: url('/lisiere-bas.svg');
   mask-size: 100% 100%;
   mask-repeat: no-repeat;
@@ -24,7 +24,7 @@
   .photo[data-telephone='false'] {
     display: block;
     height: 100%;
-    object-position: 30% 50%;
+    object-position: 12% 50%; /* l'hoplite est dans le tiers gauche de la photo */
     mask-image: none;
   }
 }
