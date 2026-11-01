@@ -51,7 +51,7 @@ export function Newsletter() {
     <form className={styles.bloc} onSubmit={(e) => void envoyer(e)} noValidate>
       <h2 className={styles.titre}>Être prévenu du prochain Fragment</h2>
       <Champ
-        libelle="Ton e-mail"
+        aria-label="Ton e-mail"
         type="email"
         inputMode="email"
         autoComplete="email"

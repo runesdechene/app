@@ -8,7 +8,6 @@
   border: 1px solid var(--color-bord);
   border-radius: var(--radius-carte);
   background: color-mix(in srgb, var(--color-sur-accent) 60%, transparent);
-  text-align: center;
 }
 
 .titre {
@@ -18,18 +17,21 @@
   font-size: var(--titre-section-size);
   font-weight: var(--weight-normal);
   letter-spacing: var(--titre-tracking);
+  text-align: center;
 }
 
 .texte {
   margin: 0;
   color: var(--color-texte);
   font-size: var(--corps-size);
+  text-align: center;
 }
 
 .pied {
   margin: 0;
   color: var(--color-texte-pale);
   font-size: var(--legende-size);
+  text-align: center;
 }
 
 .pied a {
