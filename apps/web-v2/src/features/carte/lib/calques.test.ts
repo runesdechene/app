@@ -1,7 +1,7 @@
 import type { AddLayerObject, SourceSpecification } from 'maplibre-gl'
 import { expect, test, vi } from 'vitest'
 import type { LieuCarte } from '../api/lireCarte'
-import { ajouterCalques, echelleEcran, enGeoJSON, taille } from './calques'
+import { ajouterCalques, echelleEcran, enGeoJSON, filtrePilules, taille } from './calques'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 
 const CLASSIQUE = { couleurTypes: false, skyrim: false }
@@ -108,6 +108,14 @@ test('le nom de qui a revendiqué un lieu, dès le zoom 9, ni sur un lieu neuf (
       ['has', 'pilule'],
       ['!=', ['get', 'nouveau'], true],
       ['!=', ['get', 'etat'], 'inconnu'],
+      ['!', ['in', ['get', 'id'], ['literal', []]]],
     ],
   })
+})
+
+test('sous les lieux d’un territoire, le nom se tait : la banderole le dit', () => {
+  expect(filtrePilules(['a', 'b'])).toContainEqual([
+    '!',
+    ['in', ['get', 'id'], ['literal', ['a', 'b']]],
+  ])
 })

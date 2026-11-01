@@ -1,0 +1,83 @@
+/*
+ * QUOI     — le blason d'un territoire (Figma 878:2627) : l'écu à filet de couleur, le portrait
+ *            découpé dedans, la pastille « +N » et la banderole aux bouts entaillés.
+ * POURQUOI — `--couleur` vient du blason : vert chêne (le mien), ou l'encre.
+ */
+.blason {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  filter: drop-shadow(0 2px 3px color-mix(in srgb, var(--color-ombre) 45%, transparent));
+  cursor: pointer;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+.ecu {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 45px;
+  background: var(--couleur);
+  clip-path: path('M0 0 H38 V21 C38 34 28 41 19 45 C10 41 0 34 0 21 Z');
+}
+
+.portrait {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 40px;
+  overflow: hidden;
+  margin-top: -2.5px;
+  background: var(--color-sable);
+  clip-path: path('M0 0 H33 V18 C33 30 24 36 16.5 40 C9 36 0 30 0 18 Z');
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--sous-titre-size);
+}
+
+.portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plus {
+  position: absolute;
+  top: -4px;
+  right: -10px;
+  padding: 0 4px;
+  border-radius: var(--radius-rond);
+  background: var(--couleur);
+  color: var(--color-feuille);
+  font-family: var(--font-condensee);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-gras);
+}
+
+.banderole {
+  margin-top: -4px;
+  padding: 2px 13px;
+  border-block: 1px solid var(--couleur);
+  background: var(--color-feuille);
+  color: var(--couleur);
+  font-family: var(--font-condensee);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 5px) 50%, 100% 100%, 0 100%, 5px 50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blason {
+    transition: none;
+  }
+}

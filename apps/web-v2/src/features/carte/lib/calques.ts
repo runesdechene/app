@@ -58,6 +58,21 @@ export function enGeoJSON(
 }
 
 const estLieu: ExpressionSpecification = ['==', ['get', 'nature'], 'lieu']
+
+export const CALQUE_PILULES = 'pilules'
+
+// Qui montre son nom sous le sceau. Un lieu neuf montre « NOUVEAU » à la place (nouveaux.ts) : jamais
+// les deux empilés. Aucun nom sous un lieu encore inconnu (Uriel, 08/10), ni sous un lieu d'un
+// territoire : la banderole de son blason le dit déjà (Uriel, 01/11 ; `taire`, territoires).
+export function filtrePilules(taire: string[] = []): ExpressionSpecification {
+  return [
+    'all',
+    ['has', 'pilule'],
+    ['!=', ['get', 'nouveau'], true],
+    ['!=', ['get', 'etat'], 'inconnu'],
+    ['!', ['in', ['get', 'id'], ['literal', taire]]],
+  ]
+}
 const pasNeuf: ExpressionSpecification = ['!=', ['get', 'nouveau'], true]
 
 // La marque grandit avec le zoom : un point de loin, le sceau entier de près. L'anneau des lieux
@@ -158,20 +173,13 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
     layout: marque(ecran),
   })
   map.addLayer({
-    id: 'pilules',
+    id: CALQUE_PILULES,
     type: 'symbol',
     source: SOURCE,
     minzoom: DE_PRES_PILULES,
-    // Un lieu neuf montre « NOUVEAU » à la place du nom (nouveaux.ts) : jamais les deux empilés. Et
-    // aucun nom sous un lieu encore inconnu (Uriel, 08/10). Le nom seul, à l'encre, sur un halo
-    // parchemin comme les noms de la carte : ni fond ni bordure ; devant lui, l'étendard de la marque
-    // dit « revendiqué » (Uriel, 24/10).
-    filter: [
-      'all',
-      ['has', 'pilule'],
-      ['!=', ['get', 'nouveau'], true],
-      ['!=', ['get', 'etat'], 'inconnu'],
-    ],
+    // Le nom seul, à l'encre, sur un halo parchemin comme les noms de la carte : ni fond ni bordure ;
+    // devant lui, l'étendard de la marque dit « revendiqué » (Uriel, 24/10).
+    filter: filtrePilules(),
     layout: {
       'text-field': [
         'format',

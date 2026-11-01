@@ -52,11 +52,17 @@ export async function fetchTerritoire(lat: number, lng: number): Promise<Territo
   return lireTerritoire(data)
 }
 
-// Les territoires des revendications GPS, pour un compte seulement (migration 569).
+// Les territoires des revendications GPS et qui les tient, pour un compte seulement (569-571).
 export async function fetchTerritoiresRevendiques() {
   const { data, error } = await supabase.rpc('territoires_revendiques')
   if (error) throw error
   return lireTerritoiresRevendiques(data)
+}
+
+// Le nom se pose sur tous les lieux du territoire qui contient `lieu` ; le mien seulement.
+export async function renommerTerritoire(lieu: string, nom: string) {
+  const { error } = await supabase.rpc('renommer_territoire', { p_lieu: lieu, p_nom: nom })
+  if (error) throw error
 }
 
 // Les Explorateurs dont le nom commence par `debut` (la même recherche que les mentions).

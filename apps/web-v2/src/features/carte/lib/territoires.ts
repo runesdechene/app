@@ -1,99 +1,67 @@
 /**
- * QUOI     — les territoires sur la carte (migration 569) : un liseré de carte ancienne autour des
- *            lieux d'un même revendiquant — un trait, doublé de pointillés à l'intérieur — et son nom
- *            en capitales espacées, sous lui. Le mien au vert chêne, ceux des autres à l'encre
- *            (Uriel, 01/11, Figma 873:2576).
- * POURQUOI — sous les lieux : le liseré entoure les sceaux sans jamais les couvrir. La base oriente
- *            les anneaux comme GeoJSON (migration 570) : à gauche du trait, c'est toujours dedans, même
- *            autour d'une enclave — les pointillés s'y décalent. Le nom se lit de
- *            loin et s'efface au zoom 9, quand le nom de chaque lieu prend le relais (`calques.ts`).
- * ATTENTION — les textes de carte n'existent que dans les polices du fond OpenFreeMap (Noto Sans).
+ * QUOI     — la forme des territoires sur la carte (migrations 569-570) : une bordure en tirets
+ *            courts et une couleur qui part d'elle et s'efface vers l'intérieur. Le mien au vert
+ *            chêne, ceux des autres à l'encre (Uriel, 01/11, Figma 880:2780). Le nom et qui le tient
+ *            sont sur le blason (`blasons.ts`).
+ * POURQUOI — sous les lieux : la forme entoure les sceaux sans jamais les couvrir. La base oriente
+ *            les anneaux comme GeoJSON (migration 570) ; MapLibre décale un trait dans le repère de
+ *            l'écran, où le nord est en bas : à droite du trait, c'est toujours dedans, même autour
+ *            d'une enclave — le dégradé s'y décale.
  */
-import type { Feature, FeatureCollection, MultiPolygon, Point } from 'geojson'
+import type { FeatureCollection, MultiPolygon } from 'geojson'
 import type { ExpressionSpecification, Map as Carte } from 'maplibre-gl'
 import type { TerritoireRevendique } from '../api/lireCarte'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 
 export const SOURCE_TERRITOIRES = 'territoires'
 const AVANT = 'billes' // le premier calque des lieux (calques.ts)
-const NOMS_JUSQU_A = 9
-
-type Proprietes = { nom: string; moi: boolean }
 
 export function enGeoJSONTerritoires(
   territoires: TerritoireRevendique[],
-): FeatureCollection<MultiPolygon | Point, Proprietes> {
-  const features = territoires.flatMap((t): Feature<MultiPolygon | Point, Proprietes>[] => {
-    const proprietes = { nom: t.nom, moi: t.moi }
-    return [
-      {
-        type: 'Feature',
-        geometry: { type: 'MultiPolygon', coordinates: t.morceaux },
-        properties: proprietes,
-      },
-      {
-        type: 'Feature',
-        geometry: { type: 'Point', coordinates: t.etiquette },
-        properties: proprietes,
-      },
-    ]
-  })
-  return { type: 'FeatureCollection', features }
+): FeatureCollection<MultiPolygon, { moi: boolean }> {
+  return {
+    type: 'FeatureCollection',
+    features: territoires.map((t) => ({
+      type: 'Feature',
+      geometry: { type: 'MultiPolygon', coordinates: t.morceaux },
+      properties: { moi: t.moi },
+    })),
+  }
 }
 
 export function poserTerritoires(map: Carte, c: CouleursCarte) {
   const couleur: ExpressionSpecification = ['case', ['get', 'moi'], c.chene, c.encre]
-  const contour: ExpressionSpecification = ['!=', ['geometry-type'], 'Point']
   map.addSource(SOURCE_TERRITOIRES, {
     type: 'geojson',
     data: { type: 'FeatureCollection', features: [] },
   })
+  // Le dégradé : un trait large, flouté, glissé à l'intérieur — fort au bord, nul au centre.
   map.addLayer(
     {
-      id: 'territoires-pointilles',
+      id: 'territoires-degrade',
       type: 'line',
       source: SOURCE_TERRITOIRES,
-      filter: contour,
       paint: {
         'line-color': couleur,
         'line-opacity': 0.45,
-        'line-width': 5,
-        'line-offset': -4, // à gauche du trait : dedans
-        'line-dasharray': [0.3, 0.6], // en largeurs de trait : 1,5 px pleins, 3 px vides
+        'line-width': 18,
+        'line-offset': 9, // à droite du trait : dedans
+        'line-blur': 16,
       },
     },
     AVANT,
   )
   map.addLayer(
     {
-      id: 'territoires-trait',
+      id: 'territoires-bordure',
       type: 'line',
       source: SOURCE_TERRITOIRES,
-      filter: contour,
-      paint: { 'line-color': couleur, 'line-opacity': 0.75, 'line-width': 2 },
-    },
-    AVANT,
-  )
-  map.addLayer(
-    {
-      id: 'territoires-noms',
-      type: 'symbol',
-      source: SOURCE_TERRITOIRES,
-      maxzoom: NOMS_JUSQU_A,
-      filter: ['==', ['geometry-type'], 'Point'],
-      layout: {
-        'text-field': ['upcase', ['get', 'nom']],
-        'text-font': ['Noto Sans Bold'],
-        'text-size': 10,
-        'text-letter-spacing': 0.3,
-        'text-anchor': 'top',
-        'text-offset': [0, 0.4],
-      },
+      layout: { 'line-cap': 'round' },
       paint: {
-        'text-color': couleur,
-        'text-halo-color': c.fond,
-        'text-halo-width': 1.5,
-        'text-halo-blur': 1,
+        'line-color': couleur,
+        'line-opacity': 0.85,
+        'line-width': 1.6,
+        'line-dasharray': [2.5, 2.2], // en largeurs de trait : 4 px de tiret, 3,5 px de vide
       },
     },
     AVANT,

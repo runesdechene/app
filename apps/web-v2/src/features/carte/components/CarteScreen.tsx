@@ -35,7 +35,6 @@ import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useFiltresDeCarte } from '../hooks/useFiltresDeCarte'
 import { useMesPinsSurLaCarte } from '../hooks/useMesPinsSurLaCarte'
 import { useEnigmesSurLaCarte, type EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
-import { useTerritoiresSurLaCarte } from '../hooks/useTerritoiresSurLaCarte'
 import { FeuilleEnigme } from './FeuilleEnigme'
 import { useAPortee, type SurPlace } from '../hooks/useAPortee'
 import { useStyleDesMarques } from '../hooks/useReglageCarte'
@@ -67,6 +66,7 @@ import { Inscription } from './Inscription'
 import { Recherche } from './Recherche'
 import { RoseDesVents } from './RoseDesVents'
 import { Sablier } from './Sablier'
+import { TerritoiresSurLaCarte } from './TerritoiresSurLaCarte'
 
 const DUREE_MESSAGE = 3000
 
@@ -159,7 +159,6 @@ function CarteVivante({
   const [listeOuverte, setListeOuverte] = useState(false)
   useActifsSurLaCarte(visiteur ? null : carte, actifs, maPosition, soi, setExplorateurOuvert)
   useMesPinsSurLaCarte(visiteur ? null : carte, pins, tiroirMesure)
-  useTerritoiresSurLaCarte(visiteur ? null : carte, couleurs)
   const [enigmeTouchee, setEnigmeTouchee] = useState<EnigmeTouchee | null>(null)
   useEnigmesSurLaCarte(
     visiteur ? null : carte,
@@ -373,6 +372,7 @@ function CarteVivante({
         {!visiteur && <DateDuJour />}
       </div>
       <RoseDesVents carte={carte} />
+      <TerritoiresSurLaCarte carte={visiteur ? null : carte} couleurs={couleurs} />
       {sansPosition && (
         <p role="status" className={styles.message}>
           Position indisponible

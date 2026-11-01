@@ -7,7 +7,8 @@
  */
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
 
-export type Actif = {
+// Ce que la carte d'un Explorateur affiche : un Actif (ici), ou qui tient un territoire (lireCarte).
+export type Explorateur = {
   id: string
   nom: string
   avatar: string | null
@@ -15,6 +16,9 @@ export type Actif = {
   titre: string | null
   // Un Fragment sans illustration garde son nom (« sous le signe de… »), sans filigrane.
   signe: { nom: string; imageUrl: string | null } | null
+}
+
+export type Actif = Explorateur & {
   lat: number
   lng: number
   brouille: boolean
@@ -27,15 +31,22 @@ function lireSigne(v: unknown) {
   return { nom: chaine(s.nom), imageUrl: ouNull(chaine)(s.imageUrl) }
 }
 
+export function lireExplorateur(v: unknown): Explorateur {
+  const e = objet(v)
+  return {
+    id: chaine(e.id),
+    nom: chaine(e.nom),
+    avatar: ouNull(chaine)(e.avatar),
+    niveau: nombre(e.niveau),
+    titre: ouNull(chaine)(e.titre),
+    signe: ouNull(lireSigne)(e.signe),
+  }
+}
+
 export const lireActifs = liste((v): Actif => {
   const a = objet(v)
   return {
-    id: chaine(a.id),
-    nom: chaine(a.nom),
-    avatar: ouNull(chaine)(a.avatar),
-    niveau: nombre(a.niveau),
-    titre: ouNull(chaine)(a.titre),
-    signe: ouNull(lireSigne)(a.signe),
+    ...lireExplorateur(a),
     lat: nombre(a.lat),
     lng: nombre(a.lng),
     brouille: booleen(a.brouille),

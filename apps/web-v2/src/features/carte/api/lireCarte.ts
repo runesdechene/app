@@ -5,6 +5,7 @@
  *            demain s'affiche comme « inconnu » ou « lieu », jamais comme une carte vide.
  */
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
+import { lireExplorateur, type Explorateur } from './lireActifs'
 
 export type EtatLieu = 'inconnu' | 'connu' | 'visite'
 
@@ -34,16 +35,20 @@ export type FiltresDeCarte = { natures: NatureFiltre[]; epoques: EpoqueFiltre[] 
 
 export type Territoire = { territoire: string | null; pays: string | null }
 
-// Un territoire revendiqué (territoires_revendiques, migrations 569-570) : désigné par l'un de ses
-// lieux, ses morceaux (chacun un contour, puis ses enclaves) et le point où inscrire son nom, sous lui.
+// Un territoire revendiqué (territoires_revendiques, migrations 569-573) : désigné par l'un de ses
+// lieux, ses lieux, ses morceaux (chacun un contour, puis ses enclaves), l'ancre de son blason (en haut
+// de la forme), et le joueur qui le tient, avec ses compagnons d'expédition.
 export type Coordonnees = [lng: number, lat: number]
 export type TerritoireRevendique = {
   id: string
   nom: string
   moi: boolean
   lieux: number
+  ids: string[]
   morceaux: Coordonnees[][][]
-  etiquette: Coordonnees
+  ancre: Coordonnees
+  compagnons: number
+  joueur: Explorateur
 }
 
 // Un Explorateur trouvé par la recherche de la carte (chercher_explorateurs, migration 373).
@@ -133,8 +138,11 @@ export const lireTerritoiresRevendiques = liste((v): TerritoireRevendique => {
     nom: chaine(t.nom),
     moi: booleen(t.moi),
     lieux: nombre(t.lieux),
+    ids: liste(chaine)(t.ids),
     morceaux: lireMorceaux(t.forme),
-    etiquette: lirePoint(t.etiquette),
+    ancre: lirePoint(t.ancre),
+    compagnons: nombre(t.compagnons),
+    joueur: lireExplorateur(t.joueur),
   }
 })
 

@@ -76,8 +76,17 @@
   font-weight: var(--weight-semi);
 }
 
-.etat[data-recent] {
+.etat[data-ton='recent'] {
   color: var(--color-texte-pale);
+}
+
+/* Le territoire tenu, à la couleur de son liseré (Figma 878:2717). */
+.etat[data-ton='mien'] {
+  color: var(--color-carte-chene);
+}
+
+.etat[data-ton='autre'] {
+  color: var(--color-carte-encre);
 }
 
 .actions {
