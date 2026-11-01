@@ -20,6 +20,7 @@ const api = vi.hoisted(() => ({
   fetchCartePublique: vi.fn<() => Promise<LieuCarte[]>>(),
   fetchReglageCarte: vi.fn(() => Promise.resolve(false)),
   fetchTerritoire: vi.fn(() => Promise.resolve({ territoire: null, pays: null })),
+  fetchTerritoiresRevendiques: vi.fn(() => Promise.resolve([])),
   fetchFiltres: vi.fn(() =>
     Promise.resolve({
       natures: [],

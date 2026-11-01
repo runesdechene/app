@@ -13,6 +13,7 @@ import {
   lireFiltres,
   lireLieux,
   lireTerritoire,
+  lireTerritoiresRevendiques,
   type LieuCarte,
   type Territoire,
 } from './lireCarte'
@@ -49,6 +50,13 @@ export async function fetchTerritoire(lat: number, lng: number): Promise<Territo
   const { data, error } = await supabase.rpc('territoire_en', { p_lat: lat, p_lng: lng })
   if (error) throw error
   return lireTerritoire(data)
+}
+
+// Les territoires des revendications GPS, pour un compte seulement (migration 569).
+export async function fetchTerritoiresRevendiques() {
+  const { data, error } = await supabase.rpc('territoires_revendiques')
+  if (error) throw error
+  return lireTerritoiresRevendiques(data)
 }
 
 // Les Explorateurs dont le nom commence par `debut` (la même recherche que les mentions).

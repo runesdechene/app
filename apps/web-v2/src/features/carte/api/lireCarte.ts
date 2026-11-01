@@ -34,6 +34,18 @@ export type FiltresDeCarte = { natures: NatureFiltre[]; epoques: EpoqueFiltre[] 
 
 export type Territoire = { territoire: string | null; pays: string | null }
 
+// Un territoire revendiqué (territoires_revendiques, migration 569) : désigné par l'un de ses lieux,
+// son contour (un anneau de [lng, lat]) et le point où inscrire son nom, sous lui.
+export type Coordonnees = [lng: number, lat: number]
+export type TerritoireRevendique = {
+  id: string
+  nom: string
+  moi: boolean
+  lieux: number
+  contour: Coordonnees[]
+  etiquette: Coordonnees
+}
+
 // Un Explorateur trouvé par la recherche de la carte (chercher_explorateurs, migration 373).
 export type ExplorateurTrouve = { id: string; nom: string; avatar: string | null }
 
@@ -99,6 +111,29 @@ export function lireTerritoire(json: unknown): Territoire {
   const t = objet(json)
   return { territoire: ouNull(chaine)(t.territoire), pays: ouNull(chaine)(t.pays) }
 }
+
+function lirePoint(v: unknown): Coordonnees {
+  const [lng, lat] = liste(nombre)(v)
+  return [nombre(lng), nombre(lat)]
+}
+
+// Le contour : l'anneau extérieur du polygone GeoJSON (la base n'en rend pas d'autre).
+function lireContour(v: unknown): Coordonnees[] {
+  const [exterieur] = liste(liste(lirePoint))(objet(v).coordinates)
+  return exterieur ?? []
+}
+
+export const lireTerritoiresRevendiques = liste((v): TerritoireRevendique => {
+  const t = objet(v)
+  return {
+    id: chaine(t.id),
+    nom: chaine(t.nom),
+    moi: booleen(t.moi),
+    lieux: nombre(t.lieux),
+    contour: lireContour(t.forme),
+    etiquette: lirePoint(t.etiquette),
+  }
+})
 
 export const lireExplorateurs = liste((v): ExplorateurTrouve => {
   const e = objet(v)

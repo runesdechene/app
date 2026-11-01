@@ -2260,6 +2260,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "hub_photo_submission_tags_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "movement_wall_photos"
+            referencedColumns: ["submission_id"]
+          },
+          {
             foreignKeyName: "hub_photo_submission_tags_tag_id_fkey"
             columns: ["tag_id"]
             isOneToOne: false
@@ -2461,6 +2468,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "hub_photo_submissions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hub_submission_images_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "movement_wall_photos"
+            referencedColumns: ["submission_id"]
           },
         ]
       }
@@ -3026,6 +3040,35 @@ export type Database = {
             columns: ["de"]
             isOneToOne: false
             referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      noms_de_territoire: {
+        Row: {
+          cle: string
+          nom: string
+          nomme_le: string
+          place_id: string
+        }
+        Insert: {
+          cle: string
+          nom: string
+          nomme_le?: string
+          place_id: string
+        }
+        Update: {
+          cle?: string
+          nom?: string
+          nomme_le?: string
+          place_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "noms_de_territoire_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
             referencedColumns: ["id"]
           },
         ]
@@ -6661,11 +6704,13 @@ export type Database = {
           created_at: string | null
           image_id: string | null
           image_url: string | null
+          location_name: string | null
           message: string | null
           rating_experience: number | null
           rating_products: number | null
           shopify_product_handle: string | null
           shopify_product_title: string | null
+          submission_id: string | null
           submitter_instagram: string | null
           submitter_name: string | null
         }
@@ -7317,6 +7362,18 @@ export type Database = {
       _suite_permet: {
         Args: { p_missive: number; p_user: string }
         Returns: boolean
+      }
+      _territoire_a_moi: {
+        Args: { p_cle: string; p_moi: string }
+        Returns: boolean
+      }
+      _territoires: {
+        Args: never
+        Returns: {
+          cle: string
+          forme: unknown
+          lieux: string[]
+        }[]
       }
       _top_user_for_place: { Args: { p_place_id: string }; Returns: string }
       _total_connaissance: { Args: { p_theme: string }; Returns: number }
@@ -8901,6 +8958,10 @@ export type Database = {
         Args: { p_place_id: string; p_title: string; p_user_id: string }
         Returns: Json
       }
+      renommer_territoire: {
+        Args: { p_lieu: string; p_nom: string }
+        Returns: undefined
+      }
       repondre_demande: {
         Args: { p_id: string; p_oui: boolean; p_user: string }
         Returns: undefined
@@ -9103,6 +9164,7 @@ export type Database = {
         Returns: number
       }
       territoire_en: { Args: { p_lat: number; p_lng: number }; Returns: Json }
+      territoires_revendiques: { Args: never; Returns: Json }
       territory_radius_km: { Args: { p_score: number }; Returns: number }
       text_soundex: { Args: { "": string }; Returns: string }
       toggle_announcement_comment_like: {

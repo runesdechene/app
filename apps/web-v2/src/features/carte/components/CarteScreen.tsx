@@ -35,6 +35,7 @@ import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useFiltresDeCarte } from '../hooks/useFiltresDeCarte'
 import { useMesPinsSurLaCarte } from '../hooks/useMesPinsSurLaCarte'
 import { useEnigmesSurLaCarte, type EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
+import { useTerritoiresSurLaCarte } from '../hooks/useTerritoiresSurLaCarte'
 import { FeuilleEnigme } from './FeuilleEnigme'
 import { useAPortee, type SurPlace } from '../hooks/useAPortee'
 import { useStyleDesMarques } from '../hooks/useReglageCarte'
@@ -46,6 +47,7 @@ import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { poserMesPins, surUnPin, type PinsDeLaCarte } from '../lib/mesPins'
 import { poserEnigmes, surUneEnigme } from '../lib/enigmes'
 import { poserNouveaux } from '../lib/nouveaux'
+import { allerAMaPosition } from '../lib/allerAMaPosition'
 import { lireCentre } from '../lib/centre'
 import { retournerLeSceau } from '../lib/cire'
 import { dureeDouce } from '../lib/mouvement'
@@ -157,6 +159,7 @@ function CarteVivante({
   const [listeOuverte, setListeOuverte] = useState(false)
   useActifsSurLaCarte(visiteur ? null : carte, actifs, maPosition, soi, setExplorateurOuvert)
   useMesPinsSurLaCarte(visiteur ? null : carte, pins, tiroirMesure)
+  useTerritoiresSurLaCarte(visiteur ? null : carte, couleurs)
   const [enigmeTouchee, setEnigmeTouchee] = useState<EnigmeTouchee | null>(null)
   useEnigmesSurLaCarte(
     visiteur ? null : carte,
@@ -300,20 +303,6 @@ function CarteVivante({
     }
   }, [sansPosition])
 
-  function allerAMaPosition() {
-    if (!('geolocation' in navigator)) {
-      setSansPosition(true)
-      return
-    }
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => carte?.flyTo({ center: [coords.longitude, coords.latitude], zoom: 13 }),
-      () => {
-        setSansPosition(true)
-      },
-      { timeout: 10_000, maximumAge: 60_000 },
-    )
-  }
-
   return (
     <div
       className={styles.ecran}
@@ -404,7 +393,11 @@ function CarteVivante({
         className={styles.position}
         data-avec-ajouter={onAjouter ? true : undefined}
         aria-label="Ma position"
-        onClick={allerAMaPosition}
+        onClick={() => {
+          allerAMaPosition(carte, () => {
+            setSansPosition(true)
+          })
+        }}
       >
         <img src={position} alt="" />
       </button>
