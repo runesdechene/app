@@ -1,6 +1,7 @@
 /**
  * QUOI     — /flyer, la page du QR imprimé sur le flyer : le logo, puis les quatre liens de la marque.
  *            Le cadeau, c'est l'appli : pas de code promo sur un papier pris librement (Uriel, 01/11).
+ *            Dessous, l'inscription à la newsletter.
  *            La photo et le parchemin sont au cadre commun (CadreFlyer).
  * POURQUOI — c'est la porte d'entrée des gens qui n'ont jamais ouvert le Hub : une seule colonne,
  *            des liens francs, rien d'autre. Les liens s'ouvrent dans le même onglet, comme sur
@@ -14,6 +15,7 @@ import chevron from '@/assets/flyer/chevron.svg'
 import fellowship from '@/assets/flyer/fellowship.png'
 import instagram from '@/assets/flyer/instagram.svg'
 import logo from '@/assets/flyer/logo-slogan.webp'
+import { Newsletter } from './Newsletter'
 import styles from './PageFlyer.module.css'
 
 interface Lien {
@@ -36,7 +38,7 @@ const LIENS: Lien[] = [
   },
   {
     titre: 'Ton cadeau : l’appli Runes de Chêne',
-    sousTitre: 'La carte des lieux oubliés, offerte',
+    sousTitre: 'Explore, la carte des lieux oubliés',
     href: 'https://app.runesdechene.com',
     icone: <Icone src={carte} className={styles.icone} />,
   },
@@ -86,6 +88,7 @@ export function PageFlyer() {
           </li>
         ))}
       </ul>
+      <Newsletter />
       <p className={styles.pied}>runesdechene.com</p>
     </>
   )

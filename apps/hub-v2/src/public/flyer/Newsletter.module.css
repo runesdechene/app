@@ -1,0 +1,37 @@
+/* L'inscription de /flyer : une carte comme celle des liens, le titre en Bebas comme /flyercadeau. */
+.bloc {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 60%, transparent);
+  text-align: center;
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+.texte {
+  margin: 0;
+  color: var(--color-texte);
+  font-size: var(--corps-size);
+}
+
+.pied {
+  margin: 0;
+  color: var(--color-texte-pale);
+  font-size: var(--legende-size);
+}
+
+.pied a {
+  color: inherit;
+}

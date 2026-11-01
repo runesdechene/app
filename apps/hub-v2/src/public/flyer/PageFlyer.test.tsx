@@ -13,7 +13,7 @@ describe('PageFlyer', () => {
     const liens = within(screen.getByRole('list')).getAllByRole('link')
     expect(liens.map((l) => [l.textContent, l.getAttribute('href')])).toEqual([
       ['La boutiqueLes vêtements Runes de Chêne', 'https://runesdechene.com'],
-      ['Ton cadeau : l’appli Runes de ChêneLa carte des lieux oubliés, offerte', 'https://app.runesdechene.com'],
+      ['Ton cadeau : l’appli Runes de ChêneExplore, la carte des lieux oubliés', 'https://app.runesdechene.com'],
       ['Instagram@runesdechene', 'https://www.instagram.com/runesdechene'],
       ['Fellowship — nos événementsOù nous croiser cette saison', 'https://flw.sh/runesdechene'],
     ])
