@@ -1,6 +1,6 @@
 /**
  * QUOI     — le champ bordé du flyer cadeau (maquette Public/Champ 604:1440) : le libellé en
- *            Bebas dans la carte, la saisie soulignée dessous.
+ *            Bebas dans la carte, la saisie dessous.
  * POURQUOI — le libellé est un vrai <label> : on touche la carte, on écrit. Sans libellé (le titre
  *            voisin le dit déjà), le nom passe par `aria-label`.
  */

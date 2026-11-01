@@ -1,6 +1,6 @@
 /*
  * QUOI     — carte crème à 55 %, filet, coins de 15 px ; libellé Bebas 16, saisie Cabin 16
- *            soulignée (Figma 604:1440).
+ *            sans soulignement : la carte borde déjà le champ (Uriel, 01/11 ; Figma 604:1440).
  */
 .champ {
   display: grid;
@@ -25,9 +25,8 @@
 
 .saisie {
   width: 100%;
-  padding: 0 0 10px;
+  padding: 0;
   border: 0;
-  border-bottom: 1px solid var(--color-bord);
   outline: none;
   background: none;
   color: var(--color-encre);
