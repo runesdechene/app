@@ -34,7 +34,8 @@ la CLI est installée en global par pnpm, `netlify deploy …` avec les mêmes o
 - **Build Netlify** : pnpm 10 bloque le post-install d'esbuild → `onlyBuiltDependencies` +
   `packageManager` dans le `package.json` racine. Ne pas les retirer.
 
-**Raccourcis (01/11/2026)** : `pnpm deploy:app` (build, déploiement, annonce de la version) et
+**Raccourcis (01/11/2026)** : `pnpm deploy:app` (monte et commite la version mineure, build, déploie, annonce la version ;
+`scripts/deployer-app.mjs`) et
 `pnpm deploy:hub`, depuis la racine. Les vérifications ci-dessous restent à faire.
 
 ## Explore se déploie depuis `apps/web-v2`, sur le site `runesdechene`

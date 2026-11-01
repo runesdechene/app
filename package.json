@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "pnpm --filter web-v2 dev",
     "build": "pnpm --filter web-v2 build",
-    "deploy:app": "pnpm --filter web-v2 build && cd apps/web-v2 && netlify deploy --prod --no-build --dir dist --site=1b29da09-c7af-44bf-9c31-465bfaae9d74 && cd ../.. && node scripts/sync-app-version.mjs",
+    "deploy:app": "node scripts/deployer-app.mjs",
     "deploy:hub": "pnpm --filter hub-v2 build && cd apps/hub-v2 && netlify deploy --prod --no-build --dir dist --functions netlify/functions --site=5d04dcdd-6374-4e8b-a0f4-fcef64a707f3"
   },
   "devDependencies": {
