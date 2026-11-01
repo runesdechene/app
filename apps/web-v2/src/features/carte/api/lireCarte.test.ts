@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { lireFiltres, lireLieux, lireTerritoire, lireTerritoiresRevendiques } from './lireCarte'
+import { lireFiltres, lireLieux, lireTerritoire } from './lireCarte'
 
 test('un lieu complet se lit', () => {
   expect(
@@ -125,27 +125,4 @@ test('un lieu nouveau pour moi le dit ; sans la clé (ancienne réponse), il ne 
   ])
   expect(neuf?.nouveau).toBe(true)
   expect(ancien?.nouveau).toBe(false)
-})
-
-test('un territoire revendiqué se lit, en un morceau ou en plusieurs', () => {
-  const anneau = [
-    [1, 43],
-    [2, 43],
-    [2, 44],
-    [1, 43],
-  ]
-  const territoire = {
-    id: 'lieu-1',
-    nom: 'Tugdual',
-    moi: false,
-    lieux: 2,
-    ids: ['lieu-1', 'lieu-2'],
-    ancre: [1.5, 44],
-  }
-  const [un, deux] = lireTerritoiresRevendiques([
-    { ...territoire, forme: { type: 'Polygon', coordinates: [anneau] } },
-    { ...territoire, forme: { type: 'MultiPolygon', coordinates: [[anneau], [anneau]] } },
-  ])
-  expect(un).toEqual({ ...territoire, morceaux: [[anneau]] })
-  expect(deux?.morceaux).toEqual([[anneau], [anneau]])
 })

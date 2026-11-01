@@ -34,20 +34,6 @@ export type FiltresDeCarte = { natures: NatureFiltre[]; epoques: EpoqueFiltre[] 
 
 export type Territoire = { territoire: string | null; pays: string | null }
 
-// Un territoire revendiqué (territoires_revendiques, migrations 569-575) : désigné par l'un de ses
-// lieux, ses lieux, ses morceaux (chacun un contour, puis ses enclaves) et l'ancre de son nom, sur sa
-// bordure. `moi` : je le tiens (à mon nom, ou revendiqué avec le joueur) et peux le renommer.
-export type Coordonnees = [lng: number, lat: number]
-export type TerritoireRevendique = {
-  id: string
-  nom: string
-  moi: boolean
-  lieux: number
-  ids: string[]
-  morceaux: Coordonnees[][][]
-  ancre: Coordonnees
-}
-
 // Un Explorateur trouvé par la recherche de la carte (chercher_explorateurs, migration 373).
 export type ExplorateurTrouve = { id: string; nom: string; avatar: string | null }
 
@@ -113,33 +99,6 @@ export function lireTerritoire(json: unknown): Territoire {
   const t = objet(json)
   return { territoire: ouNull(chaine)(t.territoire), pays: ouNull(chaine)(t.pays) }
 }
-
-function lirePoint(v: unknown): Coordonnees {
-  const [lng, lat] = liste(nombre)(v)
-  return [nombre(lng), nombre(lat)]
-}
-
-// Un lieu tenu par un autre entaille la forme (migration 570) : une enclave, ou deux morceaux.
-function lireMorceaux(v: unknown): Coordonnees[][][] {
-  const forme = objet(v)
-  const anneaux = liste(liste(lirePoint))
-  return forme.type === 'MultiPolygon'
-    ? liste(anneaux)(forme.coordinates)
-    : [anneaux(forme.coordinates)]
-}
-
-export const lireTerritoiresRevendiques = liste((v): TerritoireRevendique => {
-  const t = objet(v)
-  return {
-    id: chaine(t.id),
-    nom: chaine(t.nom),
-    moi: booleen(t.moi),
-    lieux: nombre(t.lieux),
-    ids: liste(chaine)(t.ids),
-    morceaux: lireMorceaux(t.forme),
-    ancre: lirePoint(t.ancre),
-  }
-})
 
 export const lireExplorateurs = liste((v): ExplorateurTrouve => {
   const e = objet(v)

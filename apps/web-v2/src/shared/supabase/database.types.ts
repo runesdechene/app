@@ -3044,35 +3044,6 @@ export type Database = {
           },
         ]
       }
-      noms_de_territoire: {
-        Row: {
-          cle: string
-          nom: string
-          nomme_le: string
-          place_id: string
-        }
-        Insert: {
-          cle: string
-          nom: string
-          nomme_le?: string
-          place_id: string
-        }
-        Update: {
-          cle?: string
-          nom?: string
-          nomme_le?: string
-          place_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "noms_de_territoire_place_id_fkey"
-            columns: ["place_id"]
-            isOneToOne: false
-            referencedRelation: "places"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       notifications: {
         Row: {
           created_at: string
@@ -7363,18 +7334,6 @@ export type Database = {
         Args: { p_missive: number; p_user: string }
         Returns: boolean
       }
-      _territoire_a_moi: {
-        Args: { p_cle: string; p_moi: string }
-        Returns: boolean
-      }
-      _territoires: {
-        Args: never
-        Returns: {
-          cle: string
-          forme: unknown
-          lieux: string[]
-        }[]
-      }
       _top_user_for_place: { Args: { p_place_id: string }; Returns: string }
       _total_connaissance: { Args: { p_theme: string }; Returns: number }
       _unlike_contribution_internal: {
@@ -8958,10 +8917,6 @@ export type Database = {
         Args: { p_place_id: string; p_title: string; p_user_id: string }
         Returns: Json
       }
-      renommer_territoire: {
-        Args: { p_lieu: string; p_nom: string }
-        Returns: undefined
-      }
       repondre_demande: {
         Args: { p_id: string; p_oui: boolean; p_user: string }
         Returns: undefined
@@ -9164,7 +9119,6 @@ export type Database = {
         Returns: number
       }
       territoire_en: { Args: { p_lat: number; p_lng: number }; Returns: Json }
-      territoires_revendiques: { Args: never; Returns: Json }
       territory_radius_km: { Args: { p_score: number }; Returns: number }
       text_soundex: { Args: { "": string }; Returns: string }
       toggle_announcement_comment_like: {

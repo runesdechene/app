@@ -17,7 +17,6 @@ vi.mock('../api/carte', () => ({
   fetchCartePublique: vi.fn(() => Promise.resolve([])),
   fetchReglageCarte: vi.fn(() => Promise.resolve(false)),
   fetchTerritoire: vi.fn(() => Promise.resolve({ territoire: null, pays: null })),
-  fetchTerritoiresRevendiques: vi.fn(() => Promise.resolve([])),
   fetchFiltres: vi.fn(() => Promise.resolve({ natures: [], epoques: [] })),
 }))
 const navigations = vi.hoisted(() => vi.fn())

@@ -39,7 +39,6 @@ const couleurs: CouleursCarte = {
   foret: '#b9b58a',
   ombre: '#5a442c8c',
   cire: '#a94842',
-  chene: '#2f5434',
 }
 
 function carteAvecIcone() {

@@ -58,7 +58,6 @@
   --color-carte-foret: #b9b58a;
   --color-carte-ombre: #5a442c8c; /* 55 % : MapLibre lit le hex, pas color-mix */
   --color-carte-cire: #a94842; /* le sceau des énigmes : l'accent, en hex pour MapLibre */
-  --color-carte-chene: #2f5434; /* mon territoire (Figma 873:2576) ; ceux des autres, à l'encre */
   --color-carte-entete: #eadfca; /* le bas de la bande d'entrelacs (fond-parchemin) : le fondu de la carte en part */
 
   /* La fiche d'un lieu (Figma 229:128, palette de la maquette du 19/08) */

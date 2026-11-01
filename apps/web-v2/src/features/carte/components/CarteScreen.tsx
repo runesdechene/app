@@ -46,7 +46,6 @@ import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { poserMesPins, surUnPin, type PinsDeLaCarte } from '../lib/mesPins'
 import { poserEnigmes, surUneEnigme } from '../lib/enigmes'
 import { poserNouveaux } from '../lib/nouveaux'
-import { allerAMaPosition } from '../lib/allerAMaPosition'
 import { lireCentre } from '../lib/centre'
 import { retournerLeSceau } from '../lib/cire'
 import { dureeDouce } from '../lib/mouvement'
@@ -66,7 +65,6 @@ import { Inscription } from './Inscription'
 import { Recherche } from './Recherche'
 import { RoseDesVents } from './RoseDesVents'
 import { Sablier } from './Sablier'
-import { TerritoiresSurLaCarte } from './TerritoiresSurLaCarte'
 
 const DUREE_MESSAGE = 3000
 
@@ -302,6 +300,20 @@ function CarteVivante({
     }
   }, [sansPosition])
 
+  function allerAMaPosition() {
+    if (!('geolocation' in navigator)) {
+      setSansPosition(true)
+      return
+    }
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => carte?.flyTo({ center: [coords.longitude, coords.latitude], zoom: 13 }),
+      () => {
+        setSansPosition(true)
+      },
+      { timeout: 10_000, maximumAge: 60_000 },
+    )
+  }
+
   return (
     <div
       className={styles.ecran}
@@ -372,7 +384,6 @@ function CarteVivante({
         {!visiteur && <DateDuJour />}
       </div>
       <RoseDesVents carte={carte} />
-      <TerritoiresSurLaCarte carte={visiteur ? null : carte} couleurs={couleurs} />
       {sansPosition && (
         <p role="status" className={styles.message}>
           Position indisponible
@@ -393,11 +404,7 @@ function CarteVivante({
         className={styles.position}
         data-avec-ajouter={onAjouter ? true : undefined}
         aria-label="Ma position"
-        onClick={() => {
-          allerAMaPosition(carte, () => {
-            setSansPosition(true)
-          })
-        }}
+        onClick={allerAMaPosition}
       >
         <img src={position} alt="" />
       </button>
