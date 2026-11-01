@@ -127,38 +127,18 @@ test('un lieu nouveau pour moi le dit ; sans la clé (ancienne réponse), il ne 
   expect(ancien?.nouveau).toBe(false)
 })
 
-test('un territoire revendiqué se lit : son contour est l’anneau extérieur du polygone', () => {
-  const [t] = lireTerritoiresRevendiques([
-    {
-      id: 'lieu-1',
-      nom: 'Tugdual',
-      moi: false,
-      lieux: 2,
-      forme: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [1, 43],
-            [2, 43],
-            [2, 44],
-            [1, 43],
-          ],
-        ],
-      },
-      etiquette: [1.5, 43],
-    },
+test('un territoire revendiqué se lit, en un morceau ou en plusieurs', () => {
+  const anneau = [
+    [1, 43],
+    [2, 43],
+    [2, 44],
+    [1, 43],
+  ]
+  const territoire = { id: 'lieu-1', nom: 'Tugdual', moi: false, lieux: 2, etiquette: [1.5, 43] }
+  const [un, deux] = lireTerritoiresRevendiques([
+    { ...territoire, forme: { type: 'Polygon', coordinates: [anneau] } },
+    { ...territoire, forme: { type: 'MultiPolygon', coordinates: [[anneau], [anneau]] } },
   ])
-  expect(t).toEqual({
-    id: 'lieu-1',
-    nom: 'Tugdual',
-    moi: false,
-    lieux: 2,
-    contour: [
-      [1, 43],
-      [2, 43],
-      [2, 44],
-      [1, 43],
-    ],
-    etiquette: [1.5, 43],
-  })
+  expect(un).toEqual({ ...territoire, morceaux: [[anneau]] })
+  expect(deux?.morceaux).toEqual([[anneau], [anneau]])
 })

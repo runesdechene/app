@@ -1,12 +1,12 @@
 /**
- * QUOI     — les territoires sur la carte : l'anneau remis dans le sens trigonométrique (les
- *            pointillés vont dedans), et chaque territoire versé en contour plus point du nom.
+ * QUOI     — les territoires sur la carte : chaque territoire versé en morceaux (contour et
+ *            enclaves) plus le point de son nom.
  */
 import { expect, test } from 'vitest'
 import type { Coordonnees, TerritoireRevendique } from '../api/lireCarte'
-import { enGeoJSONTerritoires, sensTrigonometrique } from './territoires'
+import { enGeoJSONTerritoires } from './territoires'
 
-const direct: Coordonnees[] = [
+const contour: Coordonnees[] = [
   [0, 0],
   [1, 0],
   [1, 1],
@@ -14,25 +14,17 @@ const direct: Coordonnees[] = [
   [0, 0],
 ]
 
-test('un anneau déjà dans le sens trigonométrique reste tel quel', () => {
-  expect(sensTrigonometrique(direct)).toEqual(direct)
-})
-
-test('un anneau à l’envers est retourné', () => {
-  expect(sensTrigonometrique([...direct].reverse())).toEqual(direct)
-})
-
-test('un territoire donne son contour et le point de son nom, avec à qui il est', () => {
+test('un territoire donne ses morceaux et le point de son nom, avec à qui il est', () => {
   const t: TerritoireRevendique = {
     id: 'lieu-1',
     nom: 'La Garde du Comté',
     moi: true,
     lieux: 3,
-    contour: [...direct].reverse(),
+    morceaux: [[contour]],
     etiquette: [0.5, 0],
   }
-  const [contour, nom] = enGeoJSONTerritoires([t]).features
-  expect(contour?.geometry).toEqual({ type: 'Polygon', coordinates: [direct] })
+  const [forme, nom] = enGeoJSONTerritoires([t]).features
+  expect(forme?.geometry).toEqual({ type: 'MultiPolygon', coordinates: [[contour]] })
   expect(nom?.geometry).toEqual({ type: 'Point', coordinates: [0.5, 0] })
   expect(nom?.properties).toEqual({ nom: 'La Garde du Comté', moi: true })
 })

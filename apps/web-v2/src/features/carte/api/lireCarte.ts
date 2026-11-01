@@ -34,15 +34,15 @@ export type FiltresDeCarte = { natures: NatureFiltre[]; epoques: EpoqueFiltre[] 
 
 export type Territoire = { territoire: string | null; pays: string | null }
 
-// Un territoire revendiqué (territoires_revendiques, migration 569) : désigné par l'un de ses lieux,
-// son contour (un anneau de [lng, lat]) et le point où inscrire son nom, sous lui.
+// Un territoire revendiqué (territoires_revendiques, migrations 569-570) : désigné par l'un de ses
+// lieux, ses morceaux (chacun un contour, puis ses enclaves) et le point où inscrire son nom, sous lui.
 export type Coordonnees = [lng: number, lat: number]
 export type TerritoireRevendique = {
   id: string
   nom: string
   moi: boolean
   lieux: number
-  contour: Coordonnees[]
+  morceaux: Coordonnees[][][]
   etiquette: Coordonnees
 }
 
@@ -117,10 +117,13 @@ function lirePoint(v: unknown): Coordonnees {
   return [nombre(lng), nombre(lat)]
 }
 
-// Le contour : l'anneau extérieur du polygone GeoJSON (la base n'en rend pas d'autre).
-function lireContour(v: unknown): Coordonnees[] {
-  const [exterieur] = liste(liste(lirePoint))(objet(v).coordinates)
-  return exterieur ?? []
+// Un lieu tenu par un autre entaille la forme (migration 570) : une enclave, ou deux morceaux.
+function lireMorceaux(v: unknown): Coordonnees[][][] {
+  const forme = objet(v)
+  const anneaux = liste(liste(lirePoint))
+  return forme.type === 'MultiPolygon'
+    ? liste(anneaux)(forme.coordinates)
+    : [anneaux(forme.coordinates)]
 }
 
 export const lireTerritoiresRevendiques = liste((v): TerritoireRevendique => {
@@ -130,7 +133,7 @@ export const lireTerritoiresRevendiques = liste((v): TerritoireRevendique => {
     nom: chaine(t.nom),
     moi: booleen(t.moi),
     lieux: nombre(t.lieux),
-    contour: lireContour(t.forme),
+    morceaux: lireMorceaux(t.forme),
     etiquette: lirePoint(t.etiquette),
   }
 })
