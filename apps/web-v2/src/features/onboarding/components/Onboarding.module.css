@@ -117,17 +117,11 @@
   width: 100%;
   padding: var(--space-2) 0;
   border: none;
-  border-bottom: 1px solid var(--color-bord);
   outline: none;
   background: none;
   color: var(--color-encre);
   font-family: var(--font-corps);
   font-size: var(--corps-size);
-  transition: border-color var(--duree-douce) var(--courbe-douce);
-}
-
-.saisie:focus {
-  border-bottom-color: var(--color-encre);
 }
 
 .precision {
