@@ -76,18 +76,12 @@ export async function fetchCompagnons(id: string) {
   return lireCompagnons(data)
 }
 
-// `pourCompagnie` : une de mes Compagnies, ou null (migration 422).
-export async function revendiquerLieu(
-  id: string,
-  compagnons: string[],
-  nom: string | null,
-  pourCompagnie: string | null,
-) {
+// On ne revendique plus « pour » une Compagnie (Uriel, 01/11) : `p_pour_compagnie` n'est plus envoyé.
+export async function revendiquerLieu(id: string, compagnons: string[], nom: string | null) {
   const { data, error } = await supabase.rpc('revendiquer_lieu', {
     p_id: id,
     p_compagnons: compagnons,
     p_nom: nom ?? '',
-    ...(pourCompagnie !== null && { p_pour_compagnie: pourCompagnie }),
   })
   if (error) throw error
   return lireConquete(data)

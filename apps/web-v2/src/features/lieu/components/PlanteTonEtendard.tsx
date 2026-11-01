@@ -1,10 +1,9 @@
 /**
- * QUOI     — « Plante ton étendard » (maquette 679:1676) : le nom de la revendication, choisi parmi
- *            mon nom et mes Compagnies ou écrit à la main ; les Explorateurs présents, à cocher ;
- *            puis planter.
- * POURQUOI — spec « Revendiquer par GPS » (Uriel, 21/10). Toucher une Compagnie revendique « pour »
- *            elle ; retoucher le nom ensuite fait tomber le « pour ». En groupe, le nom est
- *            obligatoire (ou celui d'une Compagnie) : mon nom seul n'y est plus proposé.
+ * QUOI     — « Plante ton étendard » (maquette 679:1676) : le nom de la revendication, mon nom ou
+ *            écrit à la main ; les Explorateurs présents, à cocher ; puis planter.
+ * POURQUOI — spec « Revendiquer par GPS » (Uriel, 21/10). On ne revendique plus « pour » une
+ *            Compagnie : elles se retirent (Uriel, 01/11). En groupe, le nom est obligatoire : mon
+ *            nom seul n'y est plus proposé.
  * ATTENTION — le bruitage part au toucher (le navigateur ne laisse jouer un son que dans un geste) ;
  *            son coup sourd tombe à l'impact de « Conquis ! ».
  */
@@ -30,9 +29,8 @@ export function PlanteTonEtendard({
   onConquis: (conquete: Conquete) => void
   onFermer: () => void
 }) {
-  const { compagnons, compagnies, revendiquer, enCours, erreur } = useRevendication(fiche.id, true)
+  const { compagnons, revendiquer, enCours, erreur } = useRevendication(fiche.id, true)
   const [nom, setNom] = useState(monNom)
-  const [pour, setPour] = useState<string | null>(null)
   const [coches, setCoches] = useState<ReadonlySet<string>>(new Set())
   const [envoye, setEnvoye] = useState(false) // un double toucher ne plante qu'une fois
 
@@ -40,16 +38,6 @@ export function PlanteTonEtendard({
   const choisis = compagnons.filter((c) => coches.has(c.id)).map((c) => c.id)
   const enGroupe = choisis.length > 0
   const pret = !enCours && !envoye && (!enGroupe || nom.trim() !== '')
-
-  function choisirNom(texte: string, compagnie: string | null) {
-    setNom(texte)
-    setPour(compagnie)
-  }
-
-  function saisir(texte: string) {
-    setNom(texte)
-    if (texte !== compagnies.find((c) => c.id === pour)?.nom) setPour(null)
-  }
 
   function cocher(id: string) {
     const apres = new Set(coches)
@@ -63,7 +51,7 @@ export function PlanteTonEtendard({
     setEnvoye(true)
     const son = new Audio(BRUITAGE)
     void son.play().catch(() => undefined) // téléphone en silencieux : tant pis
-    revendiquer(choisis, nom.trim() || null, pour).then(onConquis, () => {
+    revendiquer(choisis, nom.trim() || null).then(onConquis, () => {
       son.pause() // pas d'applaudissements sur un refus
       setEnvoye(false) // le refus est écrit par `erreur`
     })
@@ -80,31 +68,21 @@ export function PlanteTonEtendard({
         </p>
 
         <div className={styles.champ}>
-          <Champ libelle="Nom de ta revendication" valeur={nom} onChange={saisir} max={40} />
+          <Champ libelle="Nom de ta revendication" valeur={nom} onChange={setNom} max={40} />
         </div>
-        <div className={styles.pastilles}>
-          <div className={styles.defile}>
-            {!enGroupe && (
+        {!enGroupe && (
+          <div className={styles.pastilles}>
+            <div className={styles.defile}>
               <PastilleChoix
                 libelle={monNom}
-                choisie={pour === null && nom === monNom}
+                choisie={nom === monNom}
                 onClick={() => {
-                  choisirNom(monNom, null)
+                  setNom(monNom)
                 }}
               />
-            )}
-            {compagnies.map((c) => (
-              <PastilleChoix
-                key={c.id}
-                libelle={c.nom}
-                choisie={pour === c.id}
-                onClick={() => {
-                  choisirNom(c.nom, c.id)
-                }}
-              />
-            ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {compagnons.length > 0 && (
           <div className={styles.avecToi}>

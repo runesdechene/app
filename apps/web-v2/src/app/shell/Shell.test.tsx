@@ -273,11 +273,12 @@ function curseur() {
 }
 
 test('sur PC, le fond de l’onglet actif glisse d’un onglet à l’autre (Carte exclue)', async () => {
+  // Plus d'onglet Compagnies (Uriel, 01/11) : Explore, Messages, Compte.
   renderAt('/messages')
   await screen.findByRole('button', { name: 'Messages' })
   expect(curseur()?.getAttribute('style')).toContain('--rang: 1')
-  await userEvent.click(screen.getByRole('button', { name: 'Compagnies' }))
-  expect(curseur()?.getAttribute('style')).toContain('--rang: 2')
+  await userEvent.click(screen.getByRole('button', { name: 'Explore' }))
+  expect(curseur()?.getAttribute('style')).toContain('--rang: 0')
   await userEvent.click(screen.getByRole('button', { name: 'Carte' }))
   expect(curseur()).toBeNull()
 })
@@ -354,4 +355,11 @@ test('sur PC, les énigmes, les titres, les préférences et la sortie sont dans
   await userEvent.click(screen.getByRole('button', { name: 'Préférences' }))
   expect(router.state.location.pathname).toBe('/accueil/preferences')
   expect(screen.getByRole('button', { name: 'Se déconnecter' })).toBeInTheDocument()
+})
+
+test('plus d’onglet Compagnies dans la barre (Uriel, 01/11)', async () => {
+  renderAt('/messages')
+  await screen.findByRole('button', { name: 'Messages' })
+  const barre = screen.getByRole('navigation', { name: 'Navigation principale' })
+  expect(within(barre).queryByRole('button', { name: 'Compagnies' })).toBeNull()
 })

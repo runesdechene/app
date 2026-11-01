@@ -13,8 +13,6 @@ const onConquis = vi.fn()
 const onFermer = vi.fn()
 const jouer = vi.spyOn(window.HTMLMediaElement.prototype, 'play')
 
-const GARDE = { id: 'c1', nom: 'La Garde du Comté', couleur: '#a94842' }
-const VEILLEURS = { id: 'c2', nom: 'Les Veilleurs de l’Estérel', couleur: '#46493c' }
 const REMY: Compagnon = { id: 'b', nom: 'Rémy', avatar: null, distance: 40 }
 
 beforeEach(() => {
@@ -29,7 +27,6 @@ function afficher({
 }: { compagnons?: Compagnon[]; erreur?: string | null } = {}) {
   revendication_.mockReturnValue({
     compagnons,
-    compagnies: [GARDE, VEILLEURS],
     revendiquer,
     enCours: false,
     erreur,
@@ -47,42 +44,25 @@ function afficher({
 const champ = () => screen.getByLabelText('Nom de ta revendication')
 const planter = () => screen.getByRole('button', { name: 'Planter mon étendard' })
 
-test('le champ porte mon nom ; les pastilles : mon nom puis mes Compagnies', () => {
+test('le champ porte mon nom ; une seule pastille, mon nom : plus de Compagnie', () => {
   afficher()
   expect(champ()).toHaveValue('Uriel')
-  for (const nom of ['Uriel', 'La Garde du Comté', 'Les Veilleurs de l’Estérel'])
-    expect(screen.getByRole('button', { name: nom })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Uriel' })).toBeInTheDocument()
 })
 
-test('seul, mon nom : envoyé tel quel, sans Compagnie, et le bruitage part', async () => {
+test('seul, mon nom : envoyé tel quel, et le bruitage part', async () => {
   afficher()
   await userEvent.click(planter())
   expect(jouer).toHaveBeenCalledOnce()
-  expect(revendiquer).toHaveBeenCalledWith([], 'Uriel', null)
+  expect(revendiquer).toHaveBeenCalledWith([], 'Uriel')
   expect(onConquis).toHaveBeenCalledWith(PRIS)
-})
-
-test('la pastille d’une Compagnie remplit le champ et revendique pour elle', async () => {
-  afficher()
-  await userEvent.click(screen.getByRole('button', { name: 'La Garde du Comté' }))
-  expect(champ()).toHaveValue('La Garde du Comté')
-  await userEvent.click(planter())
-  expect(revendiquer).toHaveBeenCalledWith([], 'La Garde du Comté', 'c1')
-})
-
-test('retoucher le nom à la main fait tomber le « pour »', async () => {
-  afficher()
-  await userEvent.click(screen.getByRole('button', { name: 'La Garde du Comté' }))
-  await userEvent.type(champ(), ' — Uriel')
-  await userEvent.click(planter())
-  expect(revendiquer).toHaveBeenCalledWith([], 'La Garde du Comté — Uriel', null)
 })
 
 test('seul, champ vidé : mon nom par défaut (le serveur le met)', async () => {
   afficher()
   await userEvent.clear(champ())
   await userEvent.click(planter())
-  expect(revendiquer).toHaveBeenCalledWith([], null, null)
+  expect(revendiquer).toHaveBeenCalledWith([], null)
 })
 
 test('un nom trop long est coupé à 40 caractères', async () => {
@@ -105,9 +85,9 @@ test('des Explorateurs autour : décochés ; en cocher un exige un nom de groupe
   expect(champ()).toHaveValue('')
   expect(screen.queryByRole('button', { name: 'Uriel' })).not.toBeInTheDocument()
   expect(planter()).toBeDisabled()
-  await userEvent.click(screen.getByRole('button', { name: 'La Garde du Comté' }))
+  await userEvent.type(champ(), 'Les Marcheurs du Comté')
   await userEvent.click(planter())
-  expect(revendiquer).toHaveBeenCalledWith(['b'], 'La Garde du Comté', 'c1')
+  expect(revendiquer).toHaveBeenCalledWith(['b'], 'Les Marcheurs du Comté')
 })
 
 test('un double toucher n’envoie qu’une revendication', async () => {

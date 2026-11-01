@@ -29,9 +29,13 @@ import { useTabMemory } from '../navigation/useTabMemory'
 import { MenuDuProfil } from './MenuDuProfil'
 import styles from './TabBar.module.css'
 
+// Les Compagnies se retirent peu à peu (Uriel, 01/11) : plus d'onglet ; leurs fiches restent
+// ouvertes par lien (invitations, profils).
+const ONGLETS = TABS.filter((tab) => tab.id !== 'compagnies')
+
 // Sur PC, la barre n'a pas d'onglet Carte (la carte y est toujours là) : le curseur se range
-// parmi les quatre autres, et disparaît quand la Carte est active.
-const ONGLETS_PC = TABS.filter((tab) => tab.id !== 'carte')
+// parmi les autres, et disparaît quand la Carte est active.
+const ONGLETS_PC = ONGLETS.filter((tab) => tab.id !== 'carte')
 
 const ICONS: Record<Exclude<TabId, 'compte'>, string> = {
   accueil: accueilIcon,
@@ -78,7 +82,7 @@ export function TabBar({
       {rang >= 0 && (
         <span className={styles.curseur} style={{ '--rang': String(rang) }} aria-hidden="true" />
       )}
-      {TABS.map((tab) => (
+      {ONGLETS.map((tab) => (
         <button
           key={tab.id}
           type="button"

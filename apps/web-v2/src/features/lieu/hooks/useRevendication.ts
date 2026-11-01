@@ -1,12 +1,9 @@
 /**
- * QUOI     — « Plante ton étendard » : qui est là, mes Compagnies (pour laquelle revendiquer,
- *            migration 422), revendiquer ; rend la conquête (mig 537).
+ * QUOI     — « Plante ton étendard » : qui est là, revendiquer ; rend la conquête (mig 537).
  * POURQUOI — les compagnons sont ceux que le serveur voit présents maintenant ; on relit la liste
  *            toutes les 20 s tant que la fenêtre est ouverte.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { canauxKey } from '@/shared/lib/cles'
-import { fetchCanaux } from '@/shared/supabase/canaux'
 import { fetchCompagnons, revendiquerLieu } from '../api/lieu'
 import { ficheKey } from './useFiche'
 
@@ -18,10 +15,9 @@ export function useRevendication(id: string, ouverte: boolean) {
     enabled: ouverte,
     refetchInterval: 20_000,
   })
-  const compagnies = useQuery({ queryKey: canauxKey, queryFn: fetchCanaux, enabled: ouverte })
   const mutation = useMutation({
-    mutationFn: ({ ids, nom, pour }: { ids: string[]; nom: string | null; pour: string | null }) =>
-      revendiquerLieu(id, ids, nom, pour),
+    mutationFn: ({ ids, nom }: { ids: string[]; nom: string | null }) =>
+      revendiquerLieu(id, ids, nom),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ficheKey(id) })
       void queryClient.invalidateQueries({ queryKey: ['carte', 'lieux'] })
@@ -37,9 +33,7 @@ export function useRevendication(id: string, ouverte: boolean) {
     : null
   return {
     compagnons: compagnons.data ?? [],
-    compagnies: compagnies.data ?? [],
-    revendiquer: (ids: string[], nom: string | null, pour: string | null) =>
-      mutation.mutateAsync({ ids, nom, pour }),
+    revendiquer: (ids: string[], nom: string | null) => mutation.mutateAsync({ ids, nom }),
     enCours: mutation.isPending,
     erreur,
   }
