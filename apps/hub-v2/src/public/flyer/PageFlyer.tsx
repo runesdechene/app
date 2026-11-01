@@ -1,5 +1,6 @@
 /**
- * QUOI     — /flyer, la page du QR imprimé sur le flyer : le logo, puis les cinq liens de la marque.
+ * QUOI     — /flyer, la page du QR imprimé sur le flyer : le logo, puis les quatre liens de la marque.
+ *            Le cadeau, c'est l'appli : pas de code promo sur un papier pris librement (Uriel, 01/11).
  *            La photo et le parchemin sont au cadre commun (CadreFlyer).
  * POURQUOI — c'est la porte d'entrée des gens qui n'ont jamais ouvert le Hub : une seule colonne,
  *            des liens francs, rien d'autre. Les liens s'ouvrent dans le même onglet, comme sur
@@ -8,7 +9,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import boutique from '@/assets/flyer/boutique.svg'
-import cadeau from '@/assets/flyer/cadeau.webp'
 import carte from '@/assets/flyer/carte.svg'
 import chevron from '@/assets/flyer/chevron.svg'
 import fellowship from '@/assets/flyer/fellowship.png'
@@ -35,16 +35,10 @@ const LIENS: Lien[] = [
     icone: <Icone src={boutique} className={styles.icone} />,
   },
   {
-    titre: 'L’application Explore',
-    sousTitre: 'Les lieux oubliés, autour de toi',
+    titre: 'Ton cadeau : l’appli Runes de Chêne',
+    sousTitre: 'La carte des lieux oubliés, offerte',
     href: 'https://app.runesdechene.com',
     icone: <Icone src={carte} className={styles.icone} />,
-  },
-  {
-    titre: 'Ton cadeau de bienvenue',
-    sousTitre: 'Un code pour ta première commande',
-    href: '/flyercadeau',
-    icone: <Icone src={cadeau} className={styles.iconeImage} />,
   },
   {
     titre: 'Instagram',

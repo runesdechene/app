@@ -1,5 +1,5 @@
 /**
- * QUOI     — /flyer : les cinq liens, dans l'ordre, avec leurs adresses exactes.
+ * QUOI     — /flyer : les quatre liens, dans l'ordre, avec leurs adresses exactes.
  * POURQUOI — le QR imprimé mène ici : un lien perdu ou faux se voit sur le papier, pas dans le code.
  */
 import { render, screen, within } from '@testing-library/react'
@@ -8,13 +8,12 @@ import { describe, expect, it } from 'vitest'
 import { PageFlyer } from './PageFlyer'
 
 describe('PageFlyer', () => {
-  it('liste les cinq liens, dans l’ordre, avec leurs adresses', () => {
+  it('liste les quatre liens, dans l’ordre, avec leurs adresses', () => {
     render(<MemoryRouter><PageFlyer /></MemoryRouter>)
     const liens = within(screen.getByRole('list')).getAllByRole('link')
     expect(liens.map((l) => [l.textContent, l.getAttribute('href')])).toEqual([
       ['La boutiqueLes vêtements Runes de Chêne', 'https://runesdechene.com'],
-      ['L’application ExploreLes lieux oubliés, autour de toi', 'https://app.runesdechene.com'],
-      ['Ton cadeau de bienvenueUn code pour ta première commande', '/flyercadeau'],
+      ['Ton cadeau : l’appli Runes de ChêneLa carte des lieux oubliés, offerte', 'https://app.runesdechene.com'],
       ['Instagram@runesdechene', 'https://www.instagram.com/runesdechene'],
       ['Fellowship — nos événementsOù nous croiser cette saison', 'https://flw.sh/runesdechene'],
     ])

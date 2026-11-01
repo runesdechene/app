@@ -110,14 +110,13 @@ describe.each([
   })
 })
 
-test('de /flyer au cadeau : le cadre reste (la même photo), seule la page change', async () => {
+test('du cadeau à /flyer : le cadre reste (le même parchemin), seule la page change', async () => {
   faux.session = null
-  monter('/flyer')
-  await screen.findByRole('heading', { name: /^Runes de Chêne/ })
-  const photo = document.querySelector('[data-photo] img')
-  expect(photo).not.toBeNull()
-  await userEvent.click(screen.getByRole('link', { name: /Ton cadeau de bienvenue/ }))
-  expect(await screen.findByRole('heading', { name: /un mouvement s’éveille$/ })).toBeInTheDocument()
-  expect(document.querySelector('[data-photo] img')).toBe(photo)
-  expect(document.title).toBe('Ton cadeau — Runes de Chêne')
+  monter('/flyercadeau')
+  await screen.findByRole('heading', { name: /un mouvement s’éveille$/ })
+  const fond = document.querySelector('[data-photo]')?.parentElement
+  expect(fond).toBeTruthy()
+  await userEvent.click(screen.getByRole('link', { name: /Retour/ }))
+  expect(await screen.findByRole('heading', { name: /^Runes de Chêne/ })).toBeInTheDocument()
+  expect(document.querySelector('[data-photo]')?.parentElement).toBe(fond)
 })
