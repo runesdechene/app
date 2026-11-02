@@ -5,7 +5,7 @@
  */
 import type { EtatFragment } from '@/shared/ui/CarteFragment'
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
-import type { Edition } from '../lib/edition'
+import { lireEdition, type Edition } from '@/shared/lib/edition'
 
 export type FragmentDuCodex = {
   id: number
@@ -36,16 +36,11 @@ export type Codex = {
 }
 
 const ETATS: readonly EtatFragment[] = ['inconnu', 'scanne', 'porte']
-const EDITIONS: readonly Edition[] = ['limitee', 'retire', 'exclusif']
 
 function lireEtat(v: unknown): EtatFragment {
   const etat = ETATS.find((e) => e === v)
   if (!etat) throw new Error(`état inconnu : ${String(v)}`)
   return etat
-}
-
-function lireEdition(v: unknown): Edition | null {
-  return EDITIONS.find((e) => e === v) ?? null
 }
 
 const texte = ouNull(chaine)

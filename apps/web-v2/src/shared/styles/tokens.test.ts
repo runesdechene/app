@@ -43,6 +43,7 @@ const PASSED_INLINE = new Set([
   '--recul',
   '--couleur-collection', // la couleur d'une collection du Codex (codex_collections, 02/11)
   '--part', // la part d'une barre du Codex (portés, scannés)
+  '--teinte-collection', // la couleur d'une collection, ou l'ocre (SectionCollection.module.css)
   '--teinte', // la couleur d'un insigne de rareté, posée par sa rareté (Insigne.module.css)
 ])
 

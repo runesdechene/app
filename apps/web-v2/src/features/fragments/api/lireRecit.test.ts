@@ -23,3 +23,31 @@ test('le récit d’un Fragment ; un Fragment absent ou masqué donne null', () 
   })
   expect(lireRecit(null)).toBeNull()
 })
+
+test('l’artiste, sa photo, son mot et l’édition (migration 577)', () => {
+  expect(
+    lireRecit({
+      id: 11,
+      nom: 'Hoplite',
+      heritage: null,
+      illustration: null,
+      resume: 'En bref',
+      histoire: null,
+      audio: null,
+      narrateur: null,
+      origine: null,
+      boutique: null,
+      artiste: 'Uriel',
+      artistePhoto: 'https://x/u.jpg',
+      motArtiste: 'Deux soirées pour le bouclier.',
+      edition: 'limitee',
+      editionPrecision: null,
+    }),
+  ).toMatchObject({
+    artiste: 'Uriel',
+    artistePhoto: 'https://x/u.jpg',
+    motArtiste: 'Deux soirées pour le bouclier.',
+    edition: 'limitee',
+    editionPrecision: null,
+  })
+})

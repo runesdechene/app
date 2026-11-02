@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { CarteFragment } from '@/shared/ui/CarteFragment'
 import type { Collection } from '../api/lireCodex'
-import { libelleEdition } from '../lib/edition'
+import { libelleEdition } from '@/shared/lib/edition'
 import styles from './SectionCollection.module.css'
 
 function phraseDuTitre(c: Collection): string | null {
@@ -56,21 +56,31 @@ export function SectionCollection({ collection: c }: { collection: Collection })
               </p>
             )}
             <ul className={styles.grille}>
-              {c.fragments.map((f) => (
-                <li key={f.id}>
-                  <Link className={styles.lien} to={`/codex/fragment/${String(f.id)}`}>
-                    <CarteFragment
-                      nom={f.nom}
-                      image={f.illustration}
-                      etat={f.etat}
-                      scans={f.scans}
-                      nouveau={f.nouveau}
-                      edition={libelleEdition(f.edition, f.editionPrecision)}
-                      couleur={c.couleur}
-                    />
-                  </Link>
-                </li>
-              ))}
+              {c.fragments.map((f) => {
+                const carte = (
+                  <CarteFragment
+                    nom={f.nom}
+                    image={f.illustration}
+                    etat={f.etat}
+                    scans={f.scans}
+                    nouveau={f.nouveau}
+                    edition={libelleEdition(f.edition, f.editionPrecision)}
+                    couleur={c.couleur}
+                  />
+                )
+                // Un Fragment inconnu reste une silhouette : on le découvre en le scannant.
+                return (
+                  <li key={f.id}>
+                    {f.etat === 'inconnu' ? (
+                      carte
+                    ) : (
+                      <Link className={styles.lien} to={`/codex/fragment/${String(f.id)}`}>
+                        {carte}
+                      </Link>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
           </div>
         )}

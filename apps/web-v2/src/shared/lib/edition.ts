@@ -11,6 +11,13 @@ const LIBELLES: Record<Edition, string> = {
   exclusif: 'Exclusif',
 }
 
+const EDITIONS: readonly Edition[] = ['limitee', 'retire', 'exclusif']
+
+/** Une marque inconnue ou absente se lit comme aucune marque. */
+export function lireEdition(v: unknown): Edition | null {
+  return EDITIONS.find((e) => e === v) ?? null
+}
+
 export function libelleEdition(edition: Edition | null, precision: string | null): string | null {
   if (!edition) return null
   return precision ? `${LIBELLES[edition]} ${precision}` : LIBELLES[edition]

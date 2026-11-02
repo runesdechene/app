@@ -37,7 +37,7 @@ import {
   RouteCarteVisiteur,
   RouteOnboarding,
 } from './routes/vitrine'
-import { RouteFragment } from './routes/fragments'
+import { RouteFragment, RouteHistoireFragment } from './routes/fragments'
 import { RouteScan, RouteScanFragment, RouteScanFragments } from './routes/scan'
 import {
   RouteExplorateur,
@@ -96,6 +96,7 @@ export const routes: RouteObject[] = [
               { path: 'lieu/:id/modifier', Component: RouteModifierLieu },
               { path: 'lieu/:id/carnet', Component: RouteCarnet },
               { path: 'fragment/:id', Component: RouteFragment },
+              { path: 'fragment/:id/histoire', Component: RouteHistoireFragment },
               { path: 'explorateur/:id', Component: RouteExplorateur },
               { path: 'explorateur/:id/modifier', Component: RouteModifier },
               { path: 'explorateur/:id/passeport', Component: RoutePasseport },

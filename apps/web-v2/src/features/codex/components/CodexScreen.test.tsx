@@ -128,3 +128,8 @@ test('un Codex vide dit quoi faire', () => {
   })
   expect(screen.getByText(/Scanne ton premier Fragment/)).toBeInTheDocument()
 })
+
+test('un Fragment inconnu n’ouvre rien : on le découvre en le scannant', () => {
+  afficher(plein)
+  expect(screen.queryByRole('link', { name: /Avalon|\?\?\?/ })).toBeNull()
+})

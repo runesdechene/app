@@ -1,0 +1,92 @@
+/*
+ * QUOI     — le mot de l'artiste (version A, 02/11) : carte parchemin, grand guillemet ocre qui
+ *            déborde en haut à gauche, texte coupé à quatre lignes, avatar cerclé.
+ */
+.mot {
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-4) 0 0;
+  padding: var(--space-6) var(--space-4) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-ocre) 50%, transparent);
+  border-radius: var(--radius-carte);
+  background: var(--color-feuille);
+}
+
+.guillemet {
+  position: absolute;
+  top: calc(-1 * var(--space-6));
+  left: var(--space-2);
+  color: var(--color-ocre);
+  font-family: var(--font-inscription);
+  font-size: var(--nom-profil-size);
+  line-height: 1;
+  opacity: 0.35;
+  scale: 2.4;
+  transform-origin: top left;
+}
+
+.etiquette {
+  color: var(--color-ocre);
+  font-family: var(--font-titre);
+  font-size: var(--sous-titre-size);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+}
+
+.texte {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-inscription);
+  font-size: var(--question-apprise-size);
+  line-height: var(--bio-leading);
+}
+
+.texte p {
+  margin: 0;
+}
+
+/* Coupé : les quatre premières lignes, le reste fondu. */
+.texte[data-coupe] {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.texte[data-coupe] p + p {
+  display: none;
+}
+
+.suite {
+  justify-self: start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-condensee);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+}
+
+.signature {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-condensee);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+}
+
+.signature img {
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--color-feuille);
+  border-radius: var(--radius-rond);
+  box-shadow: var(--ombre-flottante);
+  object-fit: cover;
+}
