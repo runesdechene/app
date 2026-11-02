@@ -1,0 +1,182 @@
+/*
+ * QUOI     — la carte d'un Fragment. Porté : la carte glacée du profil (dégradé de parchemin doré,
+ *            filet intérieur, reflet en biais, maquette 123:107) ; scanné : le parchemin clair, le
+ *            motif en gris ; inconnu : le parchemin éteint, une silhouette presque effacée.
+ */
+.carte {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 6px;
+  justify-items: center;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  min-height: 150px;
+  padding: 14px 8px 10px;
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius);
+  background: var(--color-feuille);
+  text-align: center;
+}
+
+.carte[data-etat='porte'] {
+  border-color: color-mix(in srgb, var(--color-ocre) 70%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--color-ocre) 45%, transparent); /* le filet intérieur */
+  outline-offset: -6px;
+  background: linear-gradient(
+    165deg,
+    var(--color-fond),
+    var(--color-pastille) 55%,
+    var(--color-vignette)
+  );
+}
+
+/* Un reflet en biais, comme sur une carte glacée : le seul effet, à peine visible (Uriel, 27/09). */
+.carte[data-etat='porte']::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    118deg,
+    transparent 35%,
+    color-mix(in srgb, var(--color-sur-accent) 25%, transparent) 48%,
+    transparent 60%
+  );
+  content: '';
+  pointer-events: none;
+}
+
+.carte[data-etat='inconnu'] {
+  background: var(--color-barre);
+}
+
+/* Le signe choisi au profil : un filet plein et une ✦ en tête de carte. */
+.carte[data-choisi] {
+  border-color: var(--color-ocre);
+  box-shadow: inset 0 0 0 0.5px var(--color-ocre);
+}
+
+.carte[data-choisi]::before {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  right: 0;
+  color: var(--color-ocre);
+  font-size: var(--legende-size);
+  line-height: 1;
+  content: '✦';
+}
+
+.motif {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 104px;
+}
+
+/* Le motif, imprimé dans le papier (Uriel, 27/09 : un dixième plus pâle que l'encre pleine). */
+.motif img {
+  width: 86px;
+  height: 104px;
+  object-fit: contain;
+  opacity: 0.9;
+  mix-blend-mode: multiply;
+}
+
+.carte[data-etat='scanne'] .motif img {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.carte[data-etat='inconnu'] .motif img {
+  filter: brightness(0) blur(4px);
+  opacity: 0.08;
+}
+
+.inconnu {
+  position: absolute;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--sceau-size); /* le même « ? » que le voile d’un lieu inconnu */
+  line-height: 1;
+  opacity: 0.28;
+}
+
+.nouveau {
+  position: absolute;
+  top: -6px;
+  left: -2px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+  font-family: var(--font-titre);
+  font-size: var(--legende-size);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+  box-shadow: 0 0 0 2px var(--color-feuille);
+}
+
+.scans {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--color-encre);
+  color: var(--color-feuille);
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+}
+
+.porte {
+  position: absolute;
+  top: -6px;
+  right: -2px;
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 0 1.5px var(--color-feuille));
+}
+
+.porte circle {
+  fill: var(--couleur-collection, var(--color-accent));
+}
+
+.porte path {
+  fill: none;
+  stroke: var(--color-feuille);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Le nom en Bebas Neue, sous un trait fin, comme une légende de gravure. */
+.nom {
+  padding-top: 6px;
+  background: linear-gradient(var(--color-ocre), var(--color-ocre)) top center / 56px 1px no-repeat;
+  color: var(--color-texte);
+  font-family: var(--font-titre);
+  font-size: var(--sous-titre-size);
+  line-height: var(--titre-leading);
+  letter-spacing: var(--libelle-tracking);
+}
+
+.carte[data-etat='inconnu'] .nom {
+  background: none;
+  opacity: 0.5;
+}
+
+.edition {
+  color: var(--color-rarete-rare);
+  font-family: var(--font-titre);
+  font-size: var(--legende-size);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+}
+
+.edition::before {
+  margin-right: 3px;
+  content: '✦';
+}

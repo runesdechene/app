@@ -14,6 +14,7 @@ declare module 'react' {
     '--nombre'?: string
     '--rang'?: string
     '--couleur'?: string // la couleur d'une Compagnie (gélule, message, fiche — mig 422)
+    '--couleur-collection'?: string // la couleur d'une collection du Codex (02/11)
     '--encre-compagnie'?: string // son encre lisible sur le parchemin (shared/lib/teinte.ts)
     '--sur-couleur'?: string // la lettre posée sur sa couleur (l'initiale de l'avatar)
     '--type'?: string // la couleur d'un type de lieu (le badge de la fiche)

@@ -1,0 +1,60 @@
+/*
+ * QUOI     — l'insigne et son libellé : en Bebas Neue, à la couleur de sa rareté ; la rare et la
+ *            peu commune rayonnent d'une lueur (Figma « Codex V1 / Rareté »).
+ */
+.insigne {
+  --teinte: var(--color-rarete-commune);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+[data-rarete='peu_commune'] {
+  --teinte: var(--color-rarete-peu-commune);
+}
+
+[data-rarete='rare'] {
+  --teinte: var(--color-rarete-rare);
+}
+
+.dessin {
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+
+.forme {
+  fill: var(--teinte);
+}
+
+.anneau {
+  fill: none;
+  stroke: var(--color-rarete-trait);
+  stroke-opacity: 0.6;
+  stroke-width: 1.2;
+}
+
+.signe {
+  fill: none;
+  stroke: var(--color-rarete-trait);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+[data-rarete='peu_commune'] .dessin {
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--teinte) 45%, transparent));
+}
+
+[data-rarete='rare'] .dessin {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-rarete-rare-lueur) 75%, transparent));
+}
+
+.libelle {
+  color: var(--teinte);
+  font-family: var(--font-titre);
+  font-size: var(--sous-titre-size);
+  letter-spacing: var(--libelle-tracking);
+  line-height: 1;
+}

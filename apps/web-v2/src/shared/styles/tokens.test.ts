@@ -41,6 +41,8 @@ const PASSED_INLINE = new Set([
   '--taille', // la taille d'un tampon photo, posée par la rangée qui le contient
   '--tire', // la visionneuse : la photo tirée vers le bas, et le recul qui en suit
   '--recul',
+  '--couleur-collection', // la couleur d'une collection du Codex (codex_collections, 02/11)
+  '--teinte', // la couleur d'un insigne de rareté, posée par sa rareté (Insigne.module.css)
 ])
 
 const cssFiles = readdirSync(SRC, { recursive: true, encoding: 'utf8' })

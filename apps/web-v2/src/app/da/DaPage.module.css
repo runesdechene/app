@@ -203,3 +203,8 @@
 .envols {
   position: relative;
 }
+
+/* La carte d'un Fragment prend la largeur de son parent : celle du profil, 112 px. */
+.carteFragment {
+  width: 112px;
+}

@@ -82,6 +82,12 @@
   --color-fiche-vignette: #937558; /* le cadre de la vignette choisie */
   --color-fiche-lisiere: #fdf1e0; /* le bord déchiré : la teinte du fond à la jonction */
   --color-accent-bord: #c96a6a; /* le filet du bouton rouge */
+  /* Le Codex (Figma « Codex V1 / Rareté », 02/11) : les trois raretés et leur dessin clair. */
+  --color-rarete-commune: #8a7a66;
+  --color-rarete-peu-commune: #3f8577;
+  --color-rarete-rare: #c9a043;
+  --color-rarete-rare-lueur: #f2c75c;
+  --color-rarete-trait: #fff9f0; /* le dessin clair posé sur l'insigne */
   --color-pilule: #f6ead0; /* la pilule de revendication */
   --color-pilule-texte: #5a4331;
 

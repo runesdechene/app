@@ -35,6 +35,8 @@ import { Recompense } from '@/shared/ui/Recompense'
 import { Segments } from '@/shared/ui/Segments'
 import { Text } from '@/shared/ui/Text'
 import { TexteAvecLiens } from '@/shared/ui/TexteAvecLiens'
+import { CarteFragment } from '@/shared/ui/CarteFragment'
+import { Insigne } from '@/shared/ui/Insigne'
 import { DaSection } from './DaSection'
 import styles from './DaPage.module.css'
 
@@ -173,6 +175,31 @@ export function DaBriques() {
         <div className={styles.rangee}>
           <BoutonEnvols />
           <Text variant="legende">touche le bouton : un cœur s’envole à chaque fois</Text>
+        </div>
+      </DaSection>
+
+      <DaSection name="CarteFragment">
+        <div className={styles.rangee}>
+          {(['inconnu', 'scanne', 'porte'] as const).map((etat) => (
+            <span key={etat} className={styles.carteFragment}>
+              <CarteFragment
+                nom="Hoplite"
+                image={null}
+                etat={etat}
+                scans={3}
+                nouveau={etat === 'inconnu'}
+                edition={etat === 'porte' ? 'Édition limitée' : null}
+              />
+            </span>
+          ))}
+        </div>
+      </DaSection>
+
+      <DaSection name="Insigne">
+        <div className={styles.rangee}>
+          <Insigne rarete="commune" avecLibelle />
+          <Insigne rarete="peu_commune" avecLibelle />
+          <Insigne rarete="rare" avecLibelle />
         </div>
       </DaSection>
 

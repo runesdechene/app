@@ -9,6 +9,7 @@
  *            jamais ce qu'il n'a pas (décision d'Uriel, 27/09 : ne pas pousser à l'achat).
  */
 import { aLaTaille } from '@/shared/lib/image'
+import { CarteFragment } from '@/shared/ui/CarteFragment'
 import { useState } from 'react'
 import { Button } from '@/shared/ui/Button'
 import { Feuille } from '@/shared/ui/Feuille'
@@ -27,23 +28,15 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
 
   if (profil.fragments.length === 0) return null
 
-  // Une carte de collection : le motif, un trait, son nom en entier (maquette 123:107).
+  // Une carte de collection (maquette 123:107) : la même que celle du Codex.
   function vignette(f: Fragment) {
     return (
-      <>
-        <span className={styles.motifVignette}>
-          {f.imageUrl && (
-            <img
-              src={aLaTaille(f.imageUrl, 104)}
-              alt=""
-              draggable={false}
-              loading="lazy"
-              decoding="async"
-            />
-          )}
-        </span>
-        <span className={styles.nomMotif}>{f.nom}</span>
-      </>
+      <CarteFragment
+        nom={f.nom}
+        image={f.imageUrl}
+        etat="porte"
+        choisi={profil.signe?.id === f.id}
+      />
     )
   }
 
@@ -61,9 +54,7 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
               <button
                 key={f.id}
                 type="button"
-                className={[styles.fragment, profil.signe?.id === f.id && styles.choisi]
-                  .filter(Boolean)
-                  .join(' ')}
+                className={styles.fragment}
                 onClick={() => {
                   setOuvert(f)
                 }}
