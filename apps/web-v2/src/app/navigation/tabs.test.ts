@@ -5,7 +5,15 @@
 import { aRetenir, isTabId, resolveTabPress, tabOf, TABS } from './tabs'
 
 test('les onglets, dans l’ordre de la maquette G (02/11)', () => {
-  expect(TABS.map((t) => t.id)).toEqual(['accueil', 'carte', 'codex', 'campement', 'messages', 'compagnies', 'compte'])
+  expect(TABS.map((t) => t.id)).toEqual([
+    'accueil',
+    'carte',
+    'codex',
+    'campement',
+    'messages',
+    'compagnies',
+    'compte',
+  ])
   expect(isTabId('codex')).toBe(true)
   expect(isTabId('campement')).toBe(true)
   expect(isTabId('compte')).toBe(true)

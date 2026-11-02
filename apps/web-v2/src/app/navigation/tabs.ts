@@ -7,13 +7,7 @@
  *            future adresse d'un écran doit donc commencer par son onglet.
  */
 export type TabId =
-  | 'accueil'
-  | 'carte'
-  | 'codex'
-  | 'campement'
-  | 'messages'
-  | 'compagnies'
-  | 'compte'
+  'accueil' | 'carte' | 'codex' | 'campement' | 'messages' | 'compagnies' | 'compte'
 
 export const TABS = [
   { id: 'accueil', label: 'Explore', path: '/accueil' }, // « Explore » (Uriel, 08/10) ; l'adresse reste /accueil
