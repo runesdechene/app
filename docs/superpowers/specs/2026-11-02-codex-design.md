@@ -101,7 +101,7 @@ que seule l'appli utilise vit en base ; ce qui se calcule n'est pas stocké.
 | Artiste : nom **et photo** | métaobjet Artiste (référencé par `artiste`) | seul le nom est lu → ajouter la photo |
 | Mot de l'artiste | métaobjet Illustration (un mot par motif) | **à créer** dans Shopify, puis lu |
 | Marque d'édition | métaobjet Illustration | **à créer** (liste : limitée, retiré, exclusif + précision) |
-| Icône et couleur d'une collection | métadonnées de la collection Shopify | **à vérifier** ; sinon réglées dans le Hub |
+| Icône, couleur et titre d'une collection | table `codex_collections`, réglée dans le Hub | **à créer** (la boutique ne les montre pas : pas de métadonnée Shopify connue) |
 | Qui porte quoi | `user_fragments` (caisse, Hub) | existe |
 | Les scans | `scans` (mig 474) | existe ; à lier au compte pour le compteur |
 | Anecdotes (texte, rareté, motif) | base, rédigées dans le Hub comme les énigmes | **à créer** |
