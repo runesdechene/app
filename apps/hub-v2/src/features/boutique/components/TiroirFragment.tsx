@@ -12,6 +12,7 @@ import type { Fragment } from '../api/fragments'
 import { useEcritureFragment, useFragments } from '../hooks/useFragments'
 import { texteRiche } from '../lib/texteRiche'
 import styles from './Boutique.module.css'
+import { AnecdotesDuFragment } from './AnecdotesDuFragment'
 import { CarteDOrigine } from './CarteDOrigine'
 import { ScanDuFragment } from './ScanDuFragment'
 
@@ -124,6 +125,10 @@ function Fiche({ fragment, tous, retour }: { fragment: Fragment; tous: Fragment[
       <section className={styles.section}>
         <h3>Le scan</h3>
         <ScanDuFragment fragment={fragment} />
+      </section>
+      <section className={styles.section}>
+        <h3>Ses anecdotes</h3>
+        <AnecdotesDuFragment fragment={fragment.id} />
       </section>
     </Tiroir>
   )

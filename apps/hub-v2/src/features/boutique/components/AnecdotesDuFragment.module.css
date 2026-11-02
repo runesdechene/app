@@ -1,0 +1,124 @@
+/*
+ * QUOI     — les anecdotes d'un Fragment au Hub : chaque ligne porte un liseré à la couleur de sa
+ *            rareté (les mêmes jetons que les insignes du Codex) ; une anecdote masquée pâlit.
+ */
+.anecdotes {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.calme {
+  margin: 0;
+  color: var(--color-texte-doux);
+}
+
+.liste {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.anecdote {
+  --teinte: var(--color-rarete-commune);
+
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  padding: var(--space-3);
+  border: 1px solid var(--color-sable);
+  border-left: 4px solid var(--teinte);
+  border-radius: var(--radius-petit);
+  background: var(--color-fond);
+}
+
+.anecdote[data-rarete='peu_commune'],
+.choix[data-rarete='peu_commune'] {
+  --teinte: var(--color-rarete-peu-commune);
+}
+
+.anecdote[data-rarete='rare'],
+.choix[data-rarete='rare'] {
+  --teinte: var(--color-rarete-rare);
+}
+
+.anecdote[data-masquee] {
+  opacity: 0.5;
+}
+
+.rarete {
+  grid-column: 1 / -1;
+  color: var(--teinte);
+  font-family: var(--font-titre);
+  font-size: var(--sous-titre-size);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+}
+
+.texte {
+  margin: 0;
+  color: var(--color-encre);
+}
+
+.trouvee {
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.ajout {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+
+.champ {
+  display: grid;
+  gap: var(--space-1);
+  width: 100%;
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.champ textarea {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-petit);
+  background: var(--color-fond);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+}
+
+.raretes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.raretes legend {
+  margin-bottom: var(--space-1);
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.choix {
+  --teinte: var(--color-rarete-commune);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border: 1.5px solid var(--teinte);
+  border-radius: var(--radius-rond);
+  color: var(--teinte);
+  font-weight: var(--weight-gras);
+}
+
+.alerte {
+  margin: 0;
+  color: var(--color-accent);
+}
