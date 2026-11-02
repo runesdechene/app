@@ -38,6 +38,11 @@ vi.mock('../hooks/useAnecdotes', () => ({
   }),
 }))
 
+const visiteur = vi.hoisted(() => ({ anecdote: null as { texte: string; rarete: 'rare' } | null }))
+vi.mock('../hooks/useAnecdoteDuVisiteur', () => ({
+  useAnecdoteDuVisiteur: () => visiteur.anecdote,
+}))
+
 const hoplite: Recit = {
   id: 11,
   nom: 'Hoplite',
@@ -247,4 +252,18 @@ test('un motif sans anecdote écrite n’en montre pas le bloc', () => {
   anecdotes.tirage = null
   afficher(hoplite, { ...scanne, restantes: 0, raresRestantes: 0 })
   expect(screen.queryByRole('heading', { name: 'Ses anecdotes' })).toBeNull()
+})
+
+test('sans compte : une anecdote à lire, et rien ne se garde', () => {
+  visiteur.anecdote = { texte: 'Le bouclier portait la lettre de sa cité.', rarete: 'rare' }
+  etat.recit = hoplite
+  etat.moi = undefined
+  render(
+    <MemoryRouter>
+      <FicheFragment id={11} connecte={false} equiper={vi.fn(() => Promise.resolve())} />
+    </MemoryRouter>,
+  )
+  expect(screen.getByText('Le bouclier portait la lettre de sa cité.')).toBeInTheDocument()
+  expect(screen.getByText(/se garde dans ton Codex/)).toBeInTheDocument()
+  visiteur.anecdote = null
 })

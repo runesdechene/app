@@ -1,7 +1,7 @@
 /**
  * QUOI     — « Ses anecdotes » : après un scan, la nouvelle en tête et « Creuser encore » (2 énergies) ;
  *            puis celles trouvées, chacune avec son insigne ; ce qui reste à découvrir ; depuis le
- *            Codex, « Scanner ce motif ».
+ *            Codex, « Scanner ce motif ». Sans compte, `AnecdoteDuVisiteur` : une seule, rien de gardé.
  * POURQUOI — spec du Codex (02/11) : une anecdote gratuite par motif et par jour, une de plus pour 2
  *            énergies, sur place seulement. Le Porteur les gagne aussi en scannant.
  */
@@ -107,6 +107,22 @@ export function Anecdotes({
         {reste > 0 &&
           !tirage &&
           ' Ta prochaine anecdote gratuite : à ton prochain scan, une par jour.'}
+      </p>
+    </section>
+  )
+}
+
+export function AnecdoteDuVisiteur({ anecdote }: { anecdote: AnecdoteTrouvee }) {
+  return (
+    <section className={styles.anecdotes} aria-labelledby="anecdotes">
+      <h2 id="anecdotes" className={styles.titre}>
+        Une de ses anecdotes
+      </h2>
+      <ul className={styles.liste}>
+        <Carte anecdote={anecdote} />
+      </ul>
+      <p className={styles.reste}>
+        Avec un compte, chaque anecdote trouvée se garde dans ton Codex.
       </p>
     </section>
   )

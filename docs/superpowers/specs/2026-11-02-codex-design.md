@@ -153,3 +153,8 @@ Dans ce chantier.
 Le Campement (sa première page a sa propre maquette), les croquis de l'artiste, le code débloqué
 par un scan, l'animation d'une collection complète, le Codex vide (première ouverture : à
 maquetter), les autres objets à collectionner.
+
+**Idée d'Uriel (02/11), à reprendre après jeudi** : le Porteur reçoit une anecdote gratuite de chaque
+motif qu'il porte tous les 2-3 jours, sans scanner (une notification qui l'invite à la lire). La
+mécanique existe déjà (`tirer_anecdote`, la cloche) ; reste à choisir le rythme et le déclencheur
+(tâche planifiée ou à l'ouverture de l'appli).

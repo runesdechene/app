@@ -7611,6 +7611,7 @@ export type Database = {
         Args: { p_fragment: number; p_modele: string; p_vecteur: Json }
         Returns: number
       }
+      anecdote_au_hasard: { Args: { p_fragment: number }; Returns: Json }
       answer_enigma: {
         Args: { p_answer: string; p_enigma_id: number; p_user_id: string }
         Returns: Json

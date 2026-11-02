@@ -3,7 +3,8 @@
  *            collection, l'artiste, son statut (scanné N fois, ou Porteur n° N et son rang) ;
  *            « En bref » et « Le mot de l'artiste » pour tous ; au Porteur, ses cadeaux ; aux autres,
  *            ce qu'on gagne en le portant et « Acquérir ce Fragment ». Puis ses anecdotes : après un
- *            scan, la nouvelle et « Creuser encore » ; depuis le Codex, « Scanner ce motif ».
+ *            scan, la nouvelle et « Creuser encore » ; depuis le Codex, « Scanner ce motif » ; sans
+ *            compte, une seule, tirée au hasard et jamais gardée.
  * POURQUOI — spec du Codex : le scan attire, l'achat ouvre tout. L'histoire entière (à lire ou à
  *            écouter) reste à l'acheteur ; la préhistoire et le mot de l'artiste, à tous.
  * ATTENTION — le skin du profil est le signe (`set_my_signe`) : la coquille passe `equiper`, une zone
@@ -19,11 +20,12 @@ import { Insigne } from '@/shared/ui/Insigne'
 import { Text } from '@/shared/ui/Text'
 import type { MonFragment } from '../api/lireMonFragment'
 import type { Recit } from '../api/lireRecit'
+import { useAnecdoteDuVisiteur } from '../hooks/useAnecdoteDuVisiteur'
 import { useAnecdotes } from '../hooks/useAnecdotes'
 import { useMonFragment } from '../hooks/useMonFragment'
 import { usePorterTitre } from '../hooks/usePorterTitre'
 import { useRecit } from '../hooks/useRecit'
-import { Anecdotes } from './Anecdotes'
+import { AnecdoteDuVisiteur, Anecdotes } from './Anecdotes'
 import { DecouverteFragment } from './DecouverteFragment'
 import { MotDeLArtiste } from './MotDeLArtiste'
 import styles from './FicheFragment.module.css'
@@ -248,6 +250,7 @@ export function FicheFragment({
   const { moi } = useMonFragment(id, connecte)
   const anecdotes = useAnecdotes(id, connecte ? scan : null)
   const titre = usePorterTitre(id)
+  const anecdoteDuVisiteur = useAnecdoteDuVisiteur(id, !connecte)
   const [decouverteVue, setDecouverteVue] = useState(false)
 
   if (erreur) {
@@ -348,6 +351,7 @@ export function FicheFragment({
           echec={anecdotes.echec}
         />
       )}
+      {anecdoteDuVisiteur && <AnecdoteDuVisiteur anecdote={anecdoteDuVisiteur} />}
       {moi?.etat !== 'porte' && <CeQueTuGagnes recit={recit} moi={moi} />}
     </article>
   )
