@@ -19,10 +19,12 @@ test('ajouter une vue envoie le vecteur arrondi et le modèle, et rend l’id', 
   })
 })
 
-test('noter un scan part sans qu’on l’attende (requête paresseuse : on appelle then)', () => {
-  const then = vi.fn()
+test('noter un scan envoie la requête (paresseuse : elle ne part qu’attendue)', async () => {
+  const then = vi.fn((resoudre: (v: unknown) => void) => {
+    resoudre({ data: null, error: null })
+  })
   rpc.mockReturnValueOnce({ then })
-  noterScan(11)
+  await noterScan(11)
   expect(rpc).toHaveBeenCalledWith('noter_scan', { p_fragment: 11 })
   expect(then).toHaveBeenCalled()
 })

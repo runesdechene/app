@@ -5,6 +5,7 @@
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 const etat = vi.hoisted(() => ({
@@ -23,7 +24,7 @@ const etat = vi.hoisted(() => ({
   surBip: null as ((f: number) => void) | null,
   connecte: true,
 }))
-const noterScan = vi.hoisted(() => vi.fn())
+const noterScan = vi.hoisted(() => vi.fn(() => Promise.resolve()))
 const debloquerSon = vi.hoisted(() =>
   vi.fn(() => {
     etat.son = true
@@ -68,16 +69,20 @@ function Retour() {
   )
 }
 
+const client = new QueryClient()
+
 function ouvrir(admin = false) {
   return render(
-    <MemoryRouter initialEntries={['/avant', '/scan']} initialIndex={1}>
-      <Routes>
-        <Route path="/scan" element={<ScanScreen connecte={etat.connecte} admin={admin} />} />
-        <Route path="/avant" element={<p>Avant le scan</p>} />
-        <Route path="/accueil/fragment/:id" element={<Retour />} />
-        <Route path="/scan/fragment/:id" element={<p>Récit visiteur</p>} />
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={['/avant', '/scan']} initialIndex={1}>
+        <Routes>
+          <Route path="/scan" element={<ScanScreen connecte={etat.connecte} admin={admin} />} />
+          <Route path="/avant" element={<p>Avant le scan</p>} />
+          <Route path="/codex/fragment/:id" element={<Retour />} />
+          <Route path="/scan/fragment/:id" element={<p>Récit visiteur</p>} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   )
 }
 
@@ -233,4 +238,16 @@ test('la feuille des admins ne reçoit une suggestion qu’au-dessus du seuil', 
   etat.analyse = { ...etat.analyse, meilleur: { fragment: 11, ressemblance: 0.8 } }
   ouvrir(true)
   expect(feuille.suggestion).toBe(11)
+})
+
+test('un scan noté fait relire le Codex et la fiche du Fragment', async () => {
+  const relire = vi.spyOn(client, 'invalidateQueries')
+  ouvrir()
+  act(() => {
+    etat.surBip?.(11)
+  })
+  await vi.waitFor(() => {
+    expect(relire).toHaveBeenCalledWith({ queryKey: ['codex'] })
+  })
+  expect(relire).toHaveBeenCalledWith({ queryKey: ['mon-fragment', 11] })
 })

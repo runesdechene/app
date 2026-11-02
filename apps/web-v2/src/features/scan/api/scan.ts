@@ -3,8 +3,8 @@
  *            retirées (admins), le scan noté (pour tous), la liste des Fragments visibles.
  * POURQUOI — migration 474. Les vecteurs partent arrondis : c'est le poids de l'appel de chaque
  *            joueur qui ouvre le scanner.
- * ATTENTION — `noterScan` ne s'attend pas : une requête supabase-js est paresseuse, d'où le `then`
- *            (règle v2.md).
+ * ATTENTION — une requête supabase-js est paresseuse (règle v2.md) : `noterScan` l'attend, et
+ *            l'écran du scan relit le Codex une fois le scan noté.
  */
 import { supabase } from '@/shared/supabase/client'
 import { chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
@@ -52,6 +52,6 @@ export async function retirerEmpreinte(id: number): Promise<void> {
   if (error) throw error
 }
 
-export function noterScan(fragment: number): void {
-  void supabase.rpc('noter_scan', { p_fragment: fragment }).then()
+export async function noterScan(fragment: number): Promise<void> {
+  await supabase.rpc('noter_scan', { p_fragment: fragment })
 }

@@ -7,6 +7,7 @@
  *            l'écran (un QR du stand), le son n'est pas débloqué : un grand bouton « Scanner » d'abord.
  * ATTENTION — la caméra ne s'allume qu'une fois le son débloqué ; elle s'éteint en quittant l'écran.
  */
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { aLaTaille } from '@/shared/lib/image'
@@ -35,6 +36,7 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
       fragments?.flatMap((f) => f.empreintes.map((e) => ({ fragment: f.id, vecteur: e.vecteur }))),
     [fragments],
   )
+  const client = useQueryClient()
   const [reconnu, setReconnu] = useState<number | null>(null)
   const analyse = useAnalyse(
     video,
@@ -42,7 +44,11 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
     camera === 'en-marche' && reconnu === null,
     (id) => {
       biper()
-      noterScan(id)
+      // Le Codex et la fiche du Fragment se relisent une fois le scan noté (clés de leurs hooks).
+      void noterScan(id).then(() => {
+        void client.invalidateQueries({ queryKey: ['codex'] })
+        void client.invalidateQueries({ queryKey: ['mon-fragment', id] })
+      })
       setReconnu(id)
     },
   )
