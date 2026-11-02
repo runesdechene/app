@@ -1,7 +1,7 @@
 /**
  * QUOI     — « Les Fragments » : une ligne par Fragment (vignette, nom, état de l'origine, « À filmer ») ;
  *            la fiche s'ouvre par-dessus (route enfant). En tête, la synchro depuis Shopify ; en bas, les
- *            motifs Shopify qui ne sont aucun Fragment.
+ *            collections du Codex (couleur, icône, titre) et les motifs Shopify qui ne sont aucun Fragment.
  * POURQUOI — le contenu des Fragments vient de Shopify : le Hub ne l'écrit pas, il le synchronise. « À filmer »
  *            = un Fragment visible dont aucune vue n'a encore servi de référence au scan.
  */
@@ -16,6 +16,7 @@ import { useAchats } from '../hooks/useAchats'
 import { useFragments, useScans } from '../hooks/useFragments'
 import { useSynchroFragments } from '../hooks/useSynchroFragments'
 import styles from './Boutique.module.css'
+import { Collections } from './Collections'
 import { MotifsSansFragment } from './MotifsSansFragment'
 import { OngletsFragments } from './OngletsFragments'
 
@@ -70,6 +71,7 @@ export function Fragments() {
       {synchro.erreur && <p className={styles.erreur} role="alert">{synchro.erreur}</p>}
       {isError && <p className={styles.erreur} role="alert">La base ne répond pas.</p>}
       {fragments && <Bloc>{fragments.map((f) => <LigneDeFragment key={f.id} fragment={f} aFilmer={aFilmer(f)} />)}</Bloc>}
+      {fragments && <Collections heritages={fragments.map((f) => f.heritage)} />}
       <MotifsSansFragment />
       <Outlet />
     </div>

@@ -522,6 +522,27 @@ export type Database = {
           },
         ]
       }
+      codex_collections: {
+        Row: {
+          couleur: string | null
+          heritage: string
+          icone_url: string | null
+          titre: string | null
+        }
+        Insert: {
+          couleur?: string | null
+          heritage: string
+          icone_url?: string | null
+          titre?: string | null
+        }
+        Update: {
+          couleur?: string | null
+          heritage?: string
+          icone_url?: string | null
+          titre?: string | null
+        }
+        Relationships: []
+      }
       coeurs_lieu: {
         Row: {
           dernier_le: string
@@ -2260,6 +2281,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "hub_photo_submission_tags_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "movement_wall_photos"
+            referencedColumns: ["submission_id"]
+          },
+          {
             foreignKeyName: "hub_photo_submission_tags_tag_id_fkey"
             columns: ["tag_id"]
             isOneToOne: false
@@ -2461,6 +2489,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "hub_photo_submissions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hub_submission_images_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "movement_wall_photos"
+            referencedColumns: ["submission_id"]
           },
         ]
       }
@@ -5453,12 +5488,15 @@ export type Database = {
           ability_type: string | null
           ability_value: number | null
           artiste: string | null
+          artiste_photo_url: string | null
           audio_url: string | null
           bonus_type: string | null
           bonus_value: number | null
           collection: string | null
           created_at: string | null
           description: string | null
+          edition: string | null
+          edition_precision: string | null
           fond_url: string | null
           heritage: string | null
           histoire: string | null
@@ -5469,6 +5507,7 @@ export type Database = {
           illustration_url: string | null
           image_url: string | null
           link_url: string | null
+          mot_artiste: string | null
           name: string
           narrateur: string | null
           origine_lat: number | null
@@ -5486,12 +5525,15 @@ export type Database = {
           ability_type?: string | null
           ability_value?: number | null
           artiste?: string | null
+          artiste_photo_url?: string | null
           audio_url?: string | null
           bonus_type?: string | null
           bonus_value?: number | null
           collection?: string | null
           created_at?: string | null
           description?: string | null
+          edition?: string | null
+          edition_precision?: string | null
           fond_url?: string | null
           heritage?: string | null
           histoire?: string | null
@@ -5502,6 +5544,7 @@ export type Database = {
           illustration_url?: string | null
           image_url?: string | null
           link_url?: string | null
+          mot_artiste?: string | null
           name: string
           narrateur?: string | null
           origine_lat?: number | null
@@ -5519,12 +5562,15 @@ export type Database = {
           ability_type?: string | null
           ability_value?: number | null
           artiste?: string | null
+          artiste_photo_url?: string | null
           audio_url?: string | null
           bonus_type?: string | null
           bonus_value?: number | null
           collection?: string | null
           created_at?: string | null
           description?: string | null
+          edition?: string | null
+          edition_precision?: string | null
           fond_url?: string | null
           heritage?: string | null
           histoire?: string | null
@@ -5535,6 +5581,7 @@ export type Database = {
           illustration_url?: string | null
           image_url?: string | null
           link_url?: string | null
+          mot_artiste?: string | null
           name?: string
           narrateur?: string | null
           origine_lat?: number | null
@@ -5719,18 +5766,21 @@ export type Database = {
       user_fragments: {
         Row: {
           fragment_id: number
+          numero: number
           source: string
           unlocked_at: string | null
           user_id: string
         }
         Insert: {
           fragment_id: number
+          numero: number
           source?: string
           unlocked_at?: string | null
           user_id: string
         }
         Update: {
           fragment_id?: number
+          numero?: number
           source?: string
           unlocked_at?: string | null
           user_id?: string
@@ -5821,6 +5871,7 @@ export type Database = {
           biography: string
           brouiller_pistes: boolean
           calendrier: string
+          carte_skyrim: boolean
           charte_signee_le: string | null
           conditions_acceptees_le: string | null
           conditions_version: string | null
@@ -5896,6 +5947,7 @@ export type Database = {
           biography?: string
           brouiller_pistes?: boolean
           calendrier?: string
+          carte_skyrim?: boolean
           charte_signee_le?: string | null
           conditions_acceptees_le?: string | null
           conditions_version?: string | null
@@ -5971,6 +6023,7 @@ export type Database = {
           biography?: string
           brouiller_pistes?: boolean
           calendrier?: string
+          carte_skyrim?: boolean
           charte_signee_le?: string | null
           conditions_acceptees_le?: string | null
           conditions_version?: string | null
@@ -6658,11 +6711,13 @@ export type Database = {
           created_at: string | null
           image_id: string | null
           image_url: string | null
+          location_name: string | null
           message: string | null
           rating_experience: number | null
           rating_products: number | null
           shopify_product_handle: string | null
           shopify_product_title: string | null
+          submission_id: string | null
           submitter_instagram: string | null
           submitter_name: string | null
         }
@@ -7176,6 +7231,13 @@ export type Database = {
       _member_grade_rank: {
         Args: { p_faction_id: string; p_user_id: string }
         Returns: number
+      }
+      _mes_scans: {
+        Args: { p_user: string }
+        Returns: {
+          fragment_id: number
+          scans: number
+        }[]
       }
       _mot: { Args: { p_id: number }; Returns: Json }
       _mot_mise_a_jour: { Args: { p_id: number }; Returns: Json }
@@ -8337,6 +8399,15 @@ export type Database = {
         }
         Returns: Json
       }
+      hub_ecrire_collection: {
+        Args: {
+          p_couleur: string
+          p_heritage: string
+          p_icone_url: string
+          p_titre: string
+        }
+        Returns: undefined
+      }
       hub_enigme: { Args: { p_id: number }; Returns: Json }
       hub_enigmes: {
         Args: {
@@ -8679,8 +8750,10 @@ export type Database = {
         Args: { p_murmure: number; p_texte: string }
         Returns: undefined
       }
+      mon_codex: { Args: never; Returns: Json }
       mon_energie: { Args: never; Returns: Json }
       mon_entree: { Args: never; Returns: Json }
+      mon_fragment: { Args: { p_id: number }; Returns: Json }
       murmurer: { Args: { p_a: string; p_texte: string }; Returns: Json }
       mute_user: { Args: { p_target_user_id: string }; Returns: Json }
       natures_de_lieu: { Args: never; Returns: Json }
