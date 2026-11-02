@@ -57,15 +57,6 @@
   opacity: 1;
 }
 
-/* La pastille des non-lus, à cheval sur le coin haut droit de l'icône. Elle vient après le
-   libellé dans le HTML, pour qu'on entende « Messages, 3 non lus ». */
-.nonLus {
-  position: absolute;
-  top: 0;
-  left: calc(50% + 6px);
-  display: grid;
-}
-
 /* Le curseur n'existe que sur PC. */
 .curseur {
   display: none;

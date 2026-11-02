@@ -1,15 +1,25 @@
 /**
- * QUOI     — la liste des cinq onglets et les règles qui répondent à un toucher.
+ * QUOI     — la liste des onglets et les règles qui répondent à un toucher. Messages et Compagnies
+ *            restent des onglets (une adresse, un écran monté) sans place dans la barre.
  * POURQUOI — conventions mobiles (spec socle §4bis) : chaque onglet se souvient de sa dernière
  *            adresse ; toucher l'onglet actif remonte à sa racine, puis en haut de page.
  * ATTENTION — l'onglet se lit dans le PREMIER segment de l'URL (/carte/compte → carte). Toute
  *            future adresse d'un écran doit donc commencer par son onglet.
  */
-export type TabId = 'accueil' | 'carte' | 'messages' | 'compagnies' | 'compte'
+export type TabId =
+  | 'accueil'
+  | 'carte'
+  | 'codex'
+  | 'campement'
+  | 'messages'
+  | 'compagnies'
+  | 'compte'
 
 export const TABS = [
   { id: 'accueil', label: 'Explore', path: '/accueil' }, // « Explore » (Uriel, 08/10) ; l'adresse reste /accueil
   { id: 'carte', label: 'Carte', path: '/carte' },
+  { id: 'codex', label: 'Codex', path: '/codex' },
+  { id: 'campement', label: 'Campement', path: '/campement' },
   { id: 'messages', label: 'Messages', path: '/messages' },
   { id: 'compagnies', label: 'Compagnies', path: '/compagnies' },
   { id: 'compte', label: 'Compte', path: '/compte' },

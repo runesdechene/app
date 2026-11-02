@@ -12,8 +12,8 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `gravure-boutique.webp`                                                                 | 1600 × 442       | vitrine, ordinateur : la gravure du site (thème Shopify), sous les lieux                                                         |
 | `immersif-gauche.webp`, `immersif-droite.webp`, `immersif-centre.webp`                  | 550 × 208 …      | vitrine : la forêt immersive du bas de page du site                                                                              |
 | `onglet-accueil.png`                                                                    | 120 × 120        | icône de l'onglet Accueil (affichée en 24 px)                                                                                    |
-| `onglet-carte.png`                                                                      | 120 × 120        | icône de l'onglet Carte                                                                                                          |
-| `onglet-messages.png`                                                                   | 122 × 175        | icône de l'onglet Messages                                                                                                       |
+| `onglet-carte.svg`, `onglet-codex.svg`, `onglet-campement.svg`                                                                      | dessins d'Uriel | icônes des onglets Carte, Codex, Campement (02/11)                                                                                                          |
+| `messages.svg`                                                                   | 24 × 24          | Messages dans l'en-tête, bulle au trait (02/11)                                                                                                       |
 | `partager.svg`                                                                          | vectoriel        | la fiche d'un lieu, en haut à droite de la photo (et l'exemple d'IconButton sur /v2/da)                                          |
 | `fleche-retour.svg`                                                                     | 24 × 24          | retour, en tête de chaque détail (maquette COMPTE)                                                                               |
 | `coche.svg`                                                                             | 10 × 10          | badge « Client Runes de Chêne »                                                                                                  |
@@ -39,7 +39,7 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `fleuron.svg`                                                                           | 70 × 14          | Carte, de part et d'autre du nom du territoire ; le second est retourné en CSS (200:193)                                         |
 | `position.svg`                                                                          | 22 × 22          | Carte, le bouton « Ma position » (162:130)                                                                                       |
 | `loupe.svg`, `filtre.svg`                                                               | 18 × 18, 20 × 20 | Carte, la recherche et le bouton Filtre (165:130, 165:135)                                                                       |
-| `ajouter.svg`, `cloche.svg`                                                             | 24 × 24          | « Ajouter » et la cloche de l'en-tête (pochoirs, maquette 162:107) ; le point rouge de la cloche est à part                      |
+| `ajouter.svg`, `cloche.svg`                                                             | 24 × 24          | « Ajouter » et la cloche de l'en-tête (cloche au trait depuis le 02/11, comme la bulle de Messages) ; le point rouge de la cloche est à part                      |
 | `coupe.svg`                                                                             | 24 × 24          | « Tous les titres », au-dessus de la cloche (PC) ou à sa gauche (téléphone) — même pochoir                                       |
 | `scanner.svg`                                                                           | 28 × 28          | en-tête de la coquille, devant la cloche : ouvre le scanner (Figma 102:107)                                                      |
 | `lieu.svg`, `point-interet.svg`, `pin-gps.svg`                                          | 24 × 24          | les trois choix de la feuille « Ajouter » (maquette 201:216)                                                                     |
@@ -55,7 +55,7 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `lavis-montagnes.svg`                                                                   | vectoriel        | Murmures : le lavis de montagnes très pâle au pied de l'écran (264:128)                                                          |
 
 Les icônes d'onglets servent de **pochoir** : seule leur forme compte (la transparence), leur
-couleur vient du jeton `--color-encre`. `onglet-carte.png` a été recalé (opacité 70 % → 100 %)
+couleur vient du jeton `--color-encre`. `onglet-carte.png` (remplacé le 02/11 par `onglet-carte.svg`) avait été recalé (opacité 70 % → 100 %)
 en attendant son remplacement par Uriel.
 
 L'avatar n'a pas d'image par défaut : la maquette montre la photo d'Uriel, qui ne peut pas

@@ -5,12 +5,13 @@
  *            autre usage du domaine (les pages /lieu de seo-pages, /mouvement ; spec
  *            2026-10-07-v2-bascule, « préfixes réservés »). Une liste blanche ne s'oublie pas
  *            quand un nouveau sous-dossier arrive. Le scan est un écran d'Explore (spec
- *            2026-10-09-v2-scan), les textes légaux aussi (/legal, 11/10) ; la zone Campement s'y
- *            ajoutera ('campement').
+ *            2026-10-09-v2-scan), les textes légaux aussi (/legal, 11/10) , le Codex et le Campement aussi (02/11).
  */
 const ECRANS = [
   'accueil',
   'carte',
+  'codex',
+  'campement',
   'messages',
   'compagnies',
   'compte',

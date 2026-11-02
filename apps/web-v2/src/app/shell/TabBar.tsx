@@ -1,5 +1,6 @@
 /**
- * QUOI     — la barre des cinq onglets : icône gravée + libellé, lisière de forêt au-dessus ;
+ * QUOI     — la barre : Explore · Carte · Codex · Campement · Compte (maquette G, 02/11), icône
+ *            gravée + libellé, lisière de forêt au-dessus ;
  *            l'onglet Compte montre l'avatar de l'Explorateur à la place d'une icône.
  * POURQUOI — un toucher est traduit par resolveTabPress (règles mobiles) puis appliqué ici.
  *            Sur PC, un fond clair glisse jusqu'à l'onglet actif : un seul élément, le curseur,
@@ -7,20 +8,16 @@
  * ATTENTION — ce sont des <button>, pas des <a> : un onglet n'ouvre pas toujours son adresse
  *            (mémoire, double toucher ; sur téléphone, le portrait ouvre le menu du profil). aria-current marque l'onglet actif pour les lecteurs
  *            d'écran. Les icônes sont décoratives (aria-hidden) : le libellé porte le nom.
- *            L'onglet Messages porte la pastille des murmures non lus, posée sur son icône.
  */
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
-import { useNonLus } from '@/features/messages/hooks/useMurmures'
-import { useRegistreNonLus } from '@/features/messages/hooks/useRegistre'
 import accueilIcon from '@/assets/ui/onglet-accueil.png'
-import carteIcon from '@/assets/ui/onglet-carte.png'
-import compagniesIcon from '@/assets/ui/onglet-compagnies.svg'
-import messagesIcon from '@/assets/ui/onglet-messages.png'
+import campementIcon from '@/assets/ui/onglet-campement.svg'
+import carteIcon from '@/assets/ui/onglet-carte.svg'
+import codexIcon from '@/assets/ui/onglet-codex.svg'
 import { Avatar } from '@/shared/ui/Avatar'
-import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
 import { useSurOrdinateur } from '@/shared/hooks/useSurOrdinateur'
 import { ROUVERT_PAR_UN_ONGLET } from '../navigation/closeDetail'
@@ -30,18 +27,22 @@ import { MenuDuProfil } from './MenuDuProfil'
 import styles from './TabBar.module.css'
 
 // Les Compagnies se retirent peu à peu (Uriel, 01/11) : plus d'onglet ; leurs fiches restent
-// ouvertes par lien (invitations, profils).
-const ONGLETS = TABS.filter((tab) => tab.id !== 'compagnies')
+// ouvertes par lien (invitations, profils). Messages passe dans l'en-tête (Uriel, 02/11).
+const DANS_LA_BARRE = ['accueil', 'carte', 'codex', 'campement', 'compte'] as const
+type OngletDeLaBarre = (typeof DANS_LA_BARRE)[number]
+const ONGLETS = TABS.filter((tab): tab is (typeof TABS)[number] & { id: OngletDeLaBarre } =>
+  (DANS_LA_BARRE as readonly TabId[]).includes(tab.id),
+)
 
 // Sur PC, la barre n'a pas d'onglet Carte (la carte y est toujours là) : le curseur se range
 // parmi les autres, et disparaît quand la Carte est active.
 const ONGLETS_PC = ONGLETS.filter((tab) => tab.id !== 'carte')
 
-const ICONS: Record<Exclude<TabId, 'compte'>, string> = {
+const ICONS: Record<Exclude<OngletDeLaBarre, 'compte'>, string> = {
   accueil: accueilIcon,
   carte: carteIcon,
-  messages: messagesIcon,
-  compagnies: compagniesIcon,
+  codex: codexIcon,
+  campement: campementIcon,
 }
 
 export function TabBar({
@@ -57,9 +58,6 @@ export function TabBar({
   const active = tabOf(pathname)
   const { profil } = useExplorateur(useMonIdentifiant())
   const rang = ONGLETS_PC.findIndex((tab) => tab.id === active)
-  const registre = useRegistreNonLus()
-  // Le rouge, pour ce qui m'est adressé : les Murmures non lus et les mentions de moi.
-  const pourMoi = useNonLus() + registre.mentions
 
   const [menuOuvert, setMenuOuvert] = useState(false)
   const surOrdinateur = useSurOrdinateur()
@@ -105,16 +103,6 @@ export function TabBar({
             />
           )}
           <Text variant="libelle">{tab.label}</Text>
-          {tab.id === 'messages' && (
-            <span className={styles.nonLus}>
-              {/* Rien pour moi : le point brun, si la communauté a parlé. */}
-              {pourMoi > 0 ? (
-                <Pastille count={pourMoi} />
-              ) : (
-                <Pastille count={registre.messages} discrete />
-              )}
-            </span>
-          )}
         </button>
       ))}
       {menuOuvert && (

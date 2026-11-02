@@ -31,6 +31,10 @@ import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { JaugeEnergie } from '@/features/energie/components/JaugeEnergie'
 import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
+import { useNonLus } from '@/features/messages/hooks/useMurmures'
+import { useRegistreNonLus } from '@/features/messages/hooks/useRegistre'
+import { CodexScreen } from '@/features/codex/components/CodexScreen'
+import { CampementScreen } from '@/features/campement/components/CampementScreen'
 import { PageCompagnies } from '@/features/compagnies/components/PageCompagnies'
 import { seDeconnecter } from '@/features/compte/api/session'
 import { InvitationPosition } from '@/features/carte/components/InvitationPosition'
@@ -46,6 +50,7 @@ import embleme from '@/assets/ui/embleme.png'
 import engrenage from '@/assets/ui/engrenage.svg'
 import enigmes from '@/assets/ui/menu-enigmes.svg'
 import logotype from '@/assets/ui/logotype.webp'
+import messages from '@/assets/ui/messages.svg'
 import replier from '@/assets/ui/replier.svg'
 import scanner from '@/assets/ui/scanner.svg'
 import sortie from '@/assets/ui/sortie.svg'
@@ -55,7 +60,9 @@ import { VERSION } from '@/shared/lib/version'
 import { useSurOrdinateur } from '@/shared/hooks/useSurOrdinateur'
 import { disposition } from '../navigation/disposition'
 import { useOuvrir } from '../navigation/useOuvrir'
-import { TABS, type TabId } from '../navigation/tabs'
+import { ROUVERT_PAR_UN_ONGLET } from '../navigation/closeDetail'
+import { resolveTabPress, TABS, type TabId } from '../navigation/tabs'
+import { useTabMemory } from '../navigation/useTabMemory'
 import { InvitationInstaller } from '../InvitationInstaller'
 import { TabBar } from './TabBar'
 import styles from './Shell.module.css'
@@ -64,6 +71,8 @@ const SCREENS: Record<TabId, () => ReactNode> = {
   // La carte des Nouveautés (zone notifications) dans l'emplacement de l'Accueil.
   accueil: () => <AccueilScreen nouveaute={<CarteNouveaute />} />,
   carte: CarteDeLaCoquille,
+  codex: CodexScreen,
+  campement: CampementScreen,
   messages: MessagesScreen,
   compagnies: PageCompagnies,
   compte: CompteScreen,
@@ -153,6 +162,9 @@ export function Shell() {
   // Au téléphone, l'app s'ouvre sur l'Accueil : la carte se prépare derrière.
   usePreparerLaCarte()
   const nonLues = useNonLues()
+  const memory = useTabMemory()
+  const registre = useRegistreNonLus()
+  const pourMoi = useNonLus() + registre.mentions
   const { actif: active, detail, feuille, tiroir } = disposition(pathname)
   const overlayOpen = detail || feuille
   // L'adresse sur laquelle on a replié le tiroir : ailleurs, il est déplié.
@@ -263,6 +275,31 @@ export function Shell() {
             }}
           >
             <img src={scanner} alt="" />
+          </button>
+          {/* Messages quitte la barre pour l'en-tête (maquette G, 02/11), avec sa pastille. */}
+          <button
+            type="button"
+            className={styles.action}
+            aria-current={active === 'messages' ? 'page' : undefined}
+            onClick={() => {
+              // Comme un onglet : Messages rouvre sa dernière adresse (resolveTabPress).
+              const action = resolveTabPress({ active, pressed: 'messages', pathname, memory })
+              if (action.kind === 'navigate') {
+                void navigate(action.to, { state: ROUVERT_PAR_UN_ONGLET })
+              }
+            }}
+          >
+            <img src={messages} alt="" />
+            {/* Un nom lu avec sa pastille : « Messages, 3 non lus ». */}
+            <span className={styles.horsEcran}>Messages</span>
+            <span className={styles.nonLues}>
+              {/* Le rouge pour ce qui m'est adressé (murmures, mentions) ; sinon le point brun. */}
+              {pourMoi > 0 ? (
+                <Pastille count={pourMoi} />
+              ) : (
+                <Pastille count={registre.messages} discrete />
+              )}
+            </span>
           </button>
           <button
             ref={boutonNotifications}

@@ -1,0 +1,6 @@
+/* QUOI — l'écran d'attente du Campement : un titre et une phrase, sur le parchemin de l'appli. */
+.ecran {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-6);
+}
