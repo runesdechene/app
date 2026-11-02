@@ -18,6 +18,7 @@ test('une anecdote gratuite', () => {
     restantes: 5,
     raresRestantes: 0,
     premiereDecouverte: true,
+    collection: null,
   })
 })
 
@@ -43,4 +44,17 @@ test('une raison inconnue lève', () => {
       premiereDecouverte: false,
     }),
   ).toThrow()
+})
+
+test('sa place dans sa collection (migration 581)', () => {
+  expect(
+    lireTirage({
+      anecdote: null,
+      raison: 'toutes_trouvees',
+      restantes: 0,
+      raresRestantes: 0,
+      premiereDecouverte: true,
+      collection: { nom: 'La Garde d’Acier', connus: 2, total: 5 },
+    }).collection,
+  ).toEqual({ nom: 'La Garde d’Acier', connus: 2, total: 5 })
 })

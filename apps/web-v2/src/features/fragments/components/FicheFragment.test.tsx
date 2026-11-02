@@ -4,7 +4,7 @@
  * POURQUOI — spec du Codex : la préhistoire et le mot de l'artiste pour tous ; l'histoire entière,
  *            le skin et le numéro de Porteur pour qui le porte ; un bloc vide ne s'affiche pas.
  */
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
@@ -160,6 +160,7 @@ test('après un scan : la nouvelle anecdote et « Creuser encore »', () => {
     restantes: 2,
     raresRestantes: 1,
     premiereDecouverte: false,
+    collection: null,
   }
   afficher(hoplite, porte, undefined, 1700000000000)
   expect(screen.getByText('La panoplie pesait vingt kilos.')).toBeInTheDocument()
@@ -190,4 +191,21 @@ test('trois titres déjà portés : il faut en retirer un', async () => {
   expect(screen.getByRole('alert')).toHaveTextContent(
     'Tu portes déjà trois titres : retire-en un depuis ton profil.',
   )
+})
+
+test('le premier scan d’un motif ouvre sa découverte, qu’on referme en creusant', async () => {
+  anecdotes.tirage = {
+    anecdote: { texte: 'Celle qui choisit les morts.', rarete: 'peu_commune' },
+    raison: 'gratuite',
+    restantes: 4,
+    raresRestantes: 1,
+    premiereDecouverte: true,
+    collection: { nom: 'La Garde d’Acier', connus: 2, total: 5 },
+  }
+  afficher(hoplite, scanne, undefined, 1700000000000)
+  expect(screen.getByRole('dialog', { name: 'Nouveau Fragment !' })).toBeInTheDocument()
+  await userEvent.click(
+    within(screen.getByRole('dialog')).getByRole('button', { name: /Creuser encore/ }),
+  )
+  expect(screen.queryByRole('dialog')).toBeNull()
 })

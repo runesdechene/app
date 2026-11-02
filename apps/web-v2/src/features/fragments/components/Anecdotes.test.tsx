@@ -38,6 +38,7 @@ const tirage = (t: Partial<Tirage>): Tirage => ({
   restantes: 5,
   raresRestantes: 0,
   premiereDecouverte: false,
+  collection: null,
   ...t,
 })
 

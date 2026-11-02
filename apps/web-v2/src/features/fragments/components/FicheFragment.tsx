@@ -24,6 +24,7 @@ import { useMonFragment } from '../hooks/useMonFragment'
 import { usePorterTitre } from '../hooks/usePorterTitre'
 import { useRecit } from '../hooks/useRecit'
 import { Anecdotes } from './Anecdotes'
+import { DecouverteFragment } from './DecouverteFragment'
 import { MotDeLArtiste } from './MotDeLArtiste'
 import styles from './FicheFragment.module.css'
 
@@ -237,6 +238,7 @@ export function FicheFragment({
   const { moi } = useMonFragment(id, connecte)
   const anecdotes = useAnecdotes(id, connecte ? scan : null)
   const titre = usePorterTitre(id)
+  const [decouverteVue, setDecouverteVue] = useState(false)
 
   if (erreur) {
     return (
@@ -265,6 +267,19 @@ export function FicheFragment({
   const edition = libelleEdition(recit.edition, recit.editionPrecision)
   return (
     <article className={styles.fiche}>
+      {anecdotes.tirage?.premiereDecouverte && !decouverteVue && (
+        <DecouverteFragment
+          nom={recit.nom}
+          illustration={recit.illustration}
+          collection={anecdotes.tirage.collection}
+          anecdote={anecdotes.tirage.anecdote}
+          boutique={recit.boutique}
+          creuser={anecdotes.creuser}
+          fermer={() => {
+            setDecouverteVue(true)
+          }}
+        />
+      )}
       <header className={styles.tete}>
         {recit.illustration && (
           <span className={styles.illustration} data-porte={moi?.etat === 'porte' || undefined}>
