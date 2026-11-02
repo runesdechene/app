@@ -42,6 +42,7 @@ const PASSED_INLINE = new Set([
   '--tire', // la visionneuse : la photo tirée vers le bas, et le recul qui en suit
   '--recul',
   '--couleur-collection', // la couleur d'une collection du Codex (codex_collections, 02/11)
+  '--part', // la part d'une barre du Codex (portés, scannés)
   '--teinte', // la couleur d'un insigne de rareté, posée par sa rareté (Insigne.module.css)
 ])
 
