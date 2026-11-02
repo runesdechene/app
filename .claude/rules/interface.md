@@ -357,3 +357,12 @@ maquettes du Codex (sous-titre, « de la collection… »). Uriel : « ne plus j
 **How to apply :** aucune police ni aucun style italique, dans l'appli, le Hub, les e-mails et les
 maquettes Figma. On garde la police choisie (IM Fell English, etc.), en romain : on retire
 l'italique, on ne change pas de police (Uriel, 02/11).
+
+## Un bouton porte une ombre (02/11/2026)
+
+**Le piège** : les boutons clairs (parchemin) se confondaient avec les cartes plates autour d'eux.
+Uriel, sur « Creuser encore » du Codex : « c'est bien que les boutons aient un ombrage ».
+
+**How to apply :** tout bouton clair = fond parchemin, fin contour sable (#C9BAAC, 1 px) et une
+ombre brune chaude (0 3px 8px -1px, rgba(89,64,31,.22)) ; le bouton rouge garde la sienne. Jamais
+d'ombre noire sur le parchemin. Référence : Figma « Codex V1 — C », bouton « Creuser encore ».
