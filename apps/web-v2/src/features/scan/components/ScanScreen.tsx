@@ -71,7 +71,11 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
     if (reconnu === null) return
     const minuteur = window.setTimeout(() => {
       // Le Récit remplace le scanner : le retour ne rouvre pas la caméra devant le t-shirt.
-      void navigate(cheminDuRecit(reconnu, connecte), { replace: true })
+      // L'heure du scan suit : la fiche tire l'anecdote de ce scan, une fois.
+      void navigate(cheminDuRecit(reconnu, connecte), {
+        replace: true,
+        state: { scan: Date.now() },
+      })
     }, VERS_LE_RECIT_MS)
     return () => {
       window.clearTimeout(minuteur)

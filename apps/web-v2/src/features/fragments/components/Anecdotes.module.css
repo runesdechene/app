@@ -1,0 +1,136 @@
+/*
+ * QUOI     — les anecdotes (maquettes C et D, 02/11) : une carte parchemin par anecdote, liseré à la
+ *            couleur de sa rareté ; la rare dorée et lumineuse. Le bouton clair (« Creuser encore »,
+ *            « Scanner ce motif ») porte un contour sable et une ombre chaude (interface.md).
+ */
+.anecdotes {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+  text-transform: uppercase;
+}
+
+.aide,
+.reste {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.liste {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.anecdote {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius);
+  background: var(--color-feuille);
+}
+
+.anecdote[data-rarete='peu_commune'] {
+  border-color: var(--color-rarete-peu-commune);
+}
+
+.anecdote[data-rarete='rare'] {
+  border: 1.5px solid var(--color-rarete-rare);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-rarete-rare-lueur) 22%, var(--color-feuille)),
+    var(--color-feuille)
+  );
+  box-shadow: 0 2px 14px color-mix(in srgb, var(--color-rarete-rare-lueur) 35%, transparent);
+}
+
+/* La nouvelle arrive en glissant : la récompense du scan. */
+.anecdote[data-nouvelle] {
+  translate: 0 0;
+  opacity: 1;
+  transition:
+    translate var(--duree-douce) var(--courbe-douce),
+    opacity var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    translate: 0 var(--space-4);
+    opacity: 0;
+  }
+}
+
+.tete {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.neuve {
+  color: var(--color-texte-doux);
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+}
+
+.texte {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+.creuser {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--cible-tactile);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius);
+  background: var(--color-feuille);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--bouton-size);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+  box-shadow: var(--ombre-flottante);
+}
+
+.creuser:disabled {
+  color: var(--color-texte-pale);
+  box-shadow: none;
+}
+
+.creuser img {
+  width: 18px;
+  height: 18px;
+}
+
+.cout {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-rarete-rare) 18%, transparent);
+  color: var(--color-rarete-rare);
+  font-size: var(--legende-size);
+}
+
+.cout img {
+  width: 12px;
+  height: 12px;
+}

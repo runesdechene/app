@@ -2,7 +2,8 @@
  * QUOI     — la fiche d'un Fragment (maquettes C et D, 02/11) : l'illustration, le nom, la
  *            collection, l'artiste, son statut (scanné N fois, ou Porteur n° N et son rang) ;
  *            « En bref » et « Le mot de l'artiste » pour tous ; au Porteur, ses cadeaux ; aux autres,
- *            ce qu'on gagne en le portant et « Acquérir ce Fragment ».
+ *            ce qu'on gagne en le portant et « Acquérir ce Fragment ». Puis ses anecdotes : après un
+ *            scan, la nouvelle et « Creuser encore » ; depuis le Codex, « Scanner ce motif ».
  * POURQUOI — spec du Codex : le scan attire, l'achat ouvre tout. L'histoire entière (à lire ou à
  *            écouter) reste à l'acheteur ; la préhistoire et le mot de l'artiste, à tous.
  * ATTENTION — le skin du profil est le signe (`set_my_signe`) : la coquille passe `equiper`, une zone
@@ -17,8 +18,10 @@ import { Insigne } from '@/shared/ui/Insigne'
 import { Text } from '@/shared/ui/Text'
 import type { MonFragment } from '../api/lireMonFragment'
 import type { Recit } from '../api/lireRecit'
+import { useAnecdotes } from '../hooks/useAnecdotes'
 import { useMonFragment } from '../hooks/useMonFragment'
 import { useRecit } from '../hooks/useRecit'
+import { Anecdotes } from './Anecdotes'
 import { MotDeLArtiste } from './MotDeLArtiste'
 import styles from './FicheFragment.module.css'
 
@@ -161,13 +164,16 @@ export function FicheFragment({
   id,
   connecte,
   equiper,
+  scan = null,
 }: {
   id: number
   connecte: boolean
   equiper: (id: number) => Promise<void>
+  scan?: number | null // l'heure du scan qui a ouvert la fiche ; null depuis le Codex
 }) {
   const { recit, erreur, reessayer } = useRecit(id)
   const { moi } = useMonFragment(id, connecte)
+  const anecdotes = useAnecdotes(id, connecte ? scan : null)
 
   if (erreur) {
     return (
@@ -231,11 +237,19 @@ export function FicheFragment({
         <MotDeLArtiste mot={recit.motArtiste} artiste={recit.artiste} photo={recit.artistePhoto} />
       )}
 
-      {moi?.etat === 'porte' ? (
-        <Cadeaux recit={recit} moi={moi} equiper={equiper} />
-      ) : (
-        <CeQueTuGagnes recit={recit} moi={moi} />
+      {moi?.etat === 'porte' && <Cadeaux recit={recit} moi={moi} equiper={equiper} />}
+      {moi && (
+        <Anecdotes
+          anecdotes={moi.anecdotes}
+          restantes={moi.restantes}
+          raresRestantes={moi.raresRestantes}
+          tirage={anecdotes.tirage}
+          creuser={anecdotes.creuser}
+          enCours={anecdotes.enCours}
+          plusDEnergie={anecdotes.plusDEnergie}
+        />
       )}
+      {moi?.etat !== 'porte' && <CeQueTuGagnes recit={recit} moi={moi} />}
     </article>
   )
 }

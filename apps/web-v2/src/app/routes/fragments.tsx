@@ -6,7 +6,7 @@
  *            barre de titre : la flèche se pose sur le parchemin (`titreCache`).
  */
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'react-router'
+import { useLocation, useParams } from 'react-router'
 import { useChoisirSigne } from '@/features/compte/hooks/useChoisirSigne'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { FicheFragment } from '@/features/fragments/components/FicheFragment'
@@ -20,6 +20,12 @@ export function RouteFragment() {
   const { recit } = useRecit(id)
   const { choisir } = useChoisirSigne(useMonIdentifiant() ?? '')
   const client = useQueryClient()
+  // Ouverte par un scan, la fiche reçoit son heure (ScanScreen) : elle en tire l'anecdote.
+  const etat: unknown = useLocation().state
+  const scan =
+    typeof etat === 'object' && etat !== null && 'scan' in etat && typeof etat.scan === 'number'
+      ? etat.scan
+      : null
 
   async function equiper(fragment: number) {
     await choisir(fragment)
@@ -28,7 +34,7 @@ export function RouteFragment() {
 
   return (
     <DetailPane title={recit?.nom ?? 'Fragment'} titreCache>
-      <FicheFragment key={id} id={id} connecte equiper={equiper} />
+      <FicheFragment key={id} id={id} connecte equiper={equiper} scan={scan} />
     </DetailPane>
   )
 }

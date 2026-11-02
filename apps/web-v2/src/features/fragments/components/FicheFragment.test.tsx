@@ -10,6 +10,7 @@ import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
 import type { Recit } from '../api/lireRecit'
 import type { MonFragment } from '../api/lireMonFragment'
+import type { Tirage } from '../api/lireTirage'
 import { FicheFragment } from './FicheFragment'
 
 const etat = vi.hoisted(() => ({
@@ -21,6 +22,15 @@ vi.mock('../hooks/useRecit', () => ({
 }))
 vi.mock('../hooks/useMonFragment', () => ({
   useMonFragment: () => ({ moi: etat.moi, erreur: false }),
+}))
+const anecdotes = vi.hoisted(() => ({ tirage: null as Tirage | null }))
+vi.mock('../hooks/useAnecdotes', () => ({
+  useAnecdotes: () => ({
+    tirage: anecdotes.tirage,
+    creuser: vi.fn(),
+    enCours: false,
+    plusDEnergie: false,
+  }),
 }))
 
 const hoplite: Recit = {
@@ -41,7 +51,12 @@ const hoplite: Recit = {
   editionPrecision: null,
 }
 
-function afficher(recit: Recit, moi: MonFragment, equiper = vi.fn(() => Promise.resolve())) {
+function afficher(
+  recit: Recit,
+  moi: MonFragment,
+  equiper = vi.fn(() => Promise.resolve()),
+  scan: number | null = null,
+) {
   etat.recit = recit
   etat.moi = moi
   render(
@@ -49,7 +64,7 @@ function afficher(recit: Recit, moi: MonFragment, equiper = vi.fn(() => Promise.
       <Routes>
         <Route
           path="/codex/fragment/:id"
-          element={<FicheFragment id={11} connecte equiper={equiper} />}
+          element={<FicheFragment id={11} connecte equiper={equiper} scan={scan} />}
         />
       </Routes>
     </MemoryRouter>,
@@ -57,8 +72,23 @@ function afficher(recit: Recit, moi: MonFragment, equiper = vi.fn(() => Promise.
   return equiper
 }
 
-const porte: MonFragment = { etat: 'porte', scans: 0, numero: 37, porteurs: 112, signe: false }
-const scanne: MonFragment = { etat: 'scanne', scans: 5, numero: null, porteurs: 112, signe: false }
+const vide = { anecdotes: [], restantes: 3, raresRestantes: 1 }
+const porte: MonFragment = {
+  etat: 'porte',
+  scans: 0,
+  numero: 37,
+  porteurs: 112,
+  signe: false,
+  ...vide,
+}
+const scanne: MonFragment = {
+  etat: 'scanne',
+  scans: 5,
+  numero: null,
+  porteurs: 112,
+  signe: false,
+  ...vide,
+}
 
 test('porté : le numéro et son rang, l’histoire entière, le skin à équiper', async () => {
   const equiper = afficher(hoplite, porte)
@@ -110,4 +140,24 @@ test('un mot long se coupe, « Lire la suite » le déplie', async () => {
   expect(suite).toHaveAttribute('aria-expanded', 'false')
   await userEvent.click(suite)
   expect(screen.getByRole('button', { name: 'Replier' })).toHaveAttribute('aria-expanded', 'true')
+})
+
+test('depuis le Codex : « Scanner ce motif », jamais « Creuser encore »', () => {
+  anecdotes.tirage = null
+  afficher(hoplite, scanne)
+  expect(screen.getByRole('link', { name: /Scanner ce motif/ })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: /Creuser encore/ })).toBeNull()
+})
+
+test('après un scan : la nouvelle anecdote et « Creuser encore »', () => {
+  anecdotes.tirage = {
+    anecdote: { texte: 'La panoplie pesait vingt kilos.', rarete: 'commune' },
+    raison: 'gratuite',
+    restantes: 2,
+    raresRestantes: 1,
+    premiereDecouverte: false,
+  }
+  afficher(hoplite, porte, undefined, 1700000000000)
+  expect(screen.getByText('La panoplie pesait vingt kilos.')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Creuser encore/ })).toBeInTheDocument()
 })
