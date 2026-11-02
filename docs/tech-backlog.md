@@ -168,3 +168,4 @@ ne correspond plus à la fiche. À faire : qu'elle passe par une version (auteur
 - **Hub V2 — plan 5 (RGPD)** : `flyer_signup_log` garde chaque e-mail pour toujours — il faut une purge (durée de conservation).
 - **Hub V2 — plan 5 (perf)** : charger les écrans d'administration à la demande, pour que les pages publiques ne téléchargent pas leur code.
 - **Hub V2 — plan 5 (durcissement)** : une migration pour retirer à anon et authenticated les droits DELETE, INSERT et UPDATE qu'ils gardent sur `flyer_signup_log` (la RLS les bloque déjà).
+- **Hub V2 — fonctions Netlify** : la version de l'API Shopify (`2026-01`) est écrite en dur dans une vingtaine d'appels : une seule constante dans `netlify/functions/lib/shopify.ts`, puis passer en `2026-10` (version de l'appli depuis le 02/11) après lecture des changements. 2026-01 tient jusque vers janvier 2027.
