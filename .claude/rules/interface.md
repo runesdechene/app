@@ -81,7 +81,7 @@ Pour toute UI RdC : viser **logiciel sobre + atmosphère parchemin discrète**. 
 - Titres narratifs au lieu d'administratifs ("Mon parcours" plutôt que "Stats", "Mes routes" plutôt que "Lieux explorés")
 - Une seule touche "physique" assumée (ex: punaise rouge sur la note épinglée)
 - Atmosphère parchemin chaud uniforme, voile très léger en bas si pertinent
-- Cards parchemin sobres, pills sépia, polices serif italiques pour les titres
+- Cards parchemin sobres, pills sépia, jamais d'italique (voir « Jamais d'italique »)
 - Préserver le **style actuel de l'application** (cards, pills, fragments existants) — ne pas réinventer la roue à chaque écran
 
 **À NE PAS faire** (rejeté explicitement par Uriel) :
@@ -348,3 +348,11 @@ largeur, d'un bord à l'autre de l'e-mail, légèrement penchée, sans arrondi n
 l'application alors qu'on est en train de vendre la marque ? ») : un Fragment, son illustration,
 quelqu'un qui le porte, l'atelier, le stand. Les photos de lieux du Figma (`549:*`, `566:*`, `211:*`)
 sont celles des Explorateurs : elles appartiennent à l'appli, jamais à un e-mail de vente.
+
+## Jamais d'italique, nulle part (02/11/2026)
+
+**Le piège** : la règle ne visait que les e-mails (22/10) ; j'ai remis de l'IM Fell italique dans les
+maquettes du Codex (sous-titre, « de la collection… »). Uriel : « ne plus jamais utiliser d'italique ».
+
+**How to apply :** aucune police ni aucun style italique, dans l'appli, le Hub, les e-mails et les
+maquettes Figma. Un sous-titre se fait en Cabin, plus pâle ou plus petit.
