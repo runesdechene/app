@@ -355,4 +355,5 @@ sont celles des Explorateurs : elles appartiennent à l'appli, jamais à un e-ma
 maquettes du Codex (sous-titre, « de la collection… »). Uriel : « ne plus jamais utiliser d'italique ».
 
 **How to apply :** aucune police ni aucun style italique, dans l'appli, le Hub, les e-mails et les
-maquettes Figma. Un sous-titre se fait en Cabin, plus pâle ou plus petit.
+maquettes Figma. On garde la police choisie (IM Fell English, etc.), en romain : on retire
+l'italique, on ne change pas de police (Uriel, 02/11).
