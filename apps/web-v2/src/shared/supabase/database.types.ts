@@ -189,6 +189,81 @@ export type Database = {
           },
         ]
       }
+      anecdotes: {
+        Row: {
+          cree_le: string
+          fragment_id: number
+          id: number
+          rarete: string
+          texte: string
+          visible: boolean
+        }
+        Insert: {
+          cree_le?: string
+          fragment_id: number
+          id?: never
+          rarete: string
+          texte: string
+          visible?: boolean
+        }
+        Update: {
+          cree_le?: string
+          fragment_id?: number
+          id?: never
+          rarete?: string
+          texte?: string
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anecdotes_fragment_id_fkey"
+            columns: ["fragment_id"]
+            isOneToOne: false
+            referencedRelation: "title_fragments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      anecdotes_trouvees: {
+        Row: {
+          anecdote_id: number
+          quand: string
+          user_id: string
+        }
+        Insert: {
+          anecdote_id: number
+          quand?: string
+          user_id: string
+        }
+        Update: {
+          anecdote_id?: number
+          quand?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anecdotes_trouvees_anecdote_id_fkey"
+            columns: ["anecdote_id"]
+            isOneToOne: false
+            referencedRelation: "anecdotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anecdotes_trouvees_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anecdotes_trouvees_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       announcement_comment_likes: {
         Row: {
           comment_id: number
@@ -8365,6 +8440,7 @@ export type Database = {
         Returns: undefined
       }
       hub_ambassadeurs: { Args: never; Returns: Json }
+      hub_anecdotes: { Args: { p_fragment: number }; Returns: Json }
       hub_associer_achat: {
         Args: { p_achat: number; p_fragment: number }
         Returns: undefined
@@ -8398,6 +8474,16 @@ export type Database = {
           p_statut?: string
         }
         Returns: Json
+      }
+      hub_ecrire_anecdote: {
+        Args: {
+          p_fragment: number
+          p_id: number
+          p_rarete: string
+          p_texte: string
+          p_visible: boolean
+        }
+        Returns: number
       }
       hub_ecrire_collection: {
         Args: {
@@ -9175,6 +9261,10 @@ export type Database = {
       territoire_en: { Args: { p_lat: number; p_lng: number }; Returns: Json }
       territory_radius_km: { Args: { p_score: number }; Returns: number }
       text_soundex: { Args: { "": string }; Returns: string }
+      tirer_anecdote: {
+        Args: { p_creuser: boolean; p_fragment: number }
+        Returns: Json
+      }
       toggle_announcement_comment_like: {
         Args: { p_comment_id: number }
         Returns: Json
