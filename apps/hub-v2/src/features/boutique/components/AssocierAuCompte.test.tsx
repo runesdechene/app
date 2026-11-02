@@ -13,7 +13,7 @@ vi.mock('../api/fragments', () => ({ lireFragments: m.lire, associerAuCompte: m.
 const fragment = (id: number, name: string): Fragment => ({
   id, name, link_url: null, visible: true, shopify_handle: null, resume: null, histoire: null, illustration_url: null,
   image_url: null, illustration_sombre_url: null, audio_url: null, artiste: null, narrateur: null, heritage: null,
-  synchronise_le: null, origine_lat: null, origine_lng: null, origine_nom: null, theme: null,
+  synchronise_le: null, origine_lat: null, origine_lng: null, origine_nom: null, theme: null, mot_artiste: null, edition: null, edition_precision: null,
 })
 const fragments = [fragment(1, 'Hoplite'), fragment(2, 'Yggdrasil')]
 const contribution = (compte: string | null): Contribution => ({

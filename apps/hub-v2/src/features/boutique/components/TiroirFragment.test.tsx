@@ -14,7 +14,8 @@ const api = vi.hoisted(() => ({
   retirerEmpreinte: vi.fn(),
   lireCultures: vi.fn(),
 }))
-vi.mock('../api/fragments', () => ({ lireFragments: api.lireFragments, enregistrerFragment: api.enregistrerFragment }))
+vi.mock('../api/fragments', () => ({ lireFragments: api.lireFragments, enregistrerFragment: api.enregistrerFragment, resynchroniser: vi.fn() }))
+vi.mock('../api/contenuMotif', () => ({ ecrireContenuMotif: vi.fn() }))
 vi.mock('../api/scan', () => ({
   lireScans: api.lireScans, recalculerEmpreintes: api.recalculerEmpreintes, retirerEmpreinte: api.retirerEmpreinte,
 }))
@@ -32,7 +33,7 @@ vi.mock('./CarteDOrigine', () => ({
 const fragment = (surcharge: Partial<Fragment> = {}): Fragment => ({
   id: 7, name: 'Hoplite', link_url: null, visible: true, shopify_handle: null, resume: null, histoire: null,
   illustration_url: null, image_url: null, illustration_sombre_url: null, audio_url: null, artiste: null, narrateur: null,
-  heritage: null, synchronise_le: null, origine_lat: null, origine_lng: null, origine_nom: null, theme: null,
+  heritage: null, synchronise_le: null, origine_lat: null, origine_lng: null, origine_nom: null, theme: null, mot_artiste: null, edition: null, edition_precision: null,
   ...surcharge,
 })
 

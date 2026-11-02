@@ -14,6 +14,7 @@ import { texteRiche } from '../lib/texteRiche'
 import styles from './Boutique.module.css'
 import { AnecdotesDuFragment } from './AnecdotesDuFragment'
 import { CarteDOrigine } from './CarteDOrigine'
+import { ContenuDuMotif } from './ContenuDuMotif'
 import { ScanDuFragment } from './ScanDuFragment'
 import { TitreDuFragment } from './TitreDuFragment'
 
@@ -39,7 +40,6 @@ function DansShopify({ fragment }: { fragment: Fragment }) {
           {`Aucune fiche Shopify reliée : synchronise, ou vérifie que sa collection (${fragment.link_url ?? 'aucun lien'}) est bien celle de son métaobjet.`}
         </p>
       )}
-      <Texte titre="Résumé" texte={fragment.resume ?? ''} />
       <Texte titre="Son histoire" texte={texteRiche(fragment.histoire)} />
       <div>
         <strong>Récit audio</strong>
@@ -51,7 +51,7 @@ function DansShopify({ fragment }: { fragment: Fragment }) {
         ) : <p className={styles.calme}>{VIDE}</p>}
       </div>
       <Texte titre="Artiste" texte={fragment.artiste ?? ''} />
-      <p className={styles.calme}>Ce contenu se corrige dans Shopify (Contenu → Métaobjets → Illustrations), puis « Synchroniser ».</p>
+      <p className={styles.calme}>L’histoire, l’audio et l’artiste se corrigent dans Shopify (Contenu → Métaobjets → Illustrations), puis « Synchroniser ».</p>
     </section>
   )
 }
@@ -122,6 +122,10 @@ function Fiche({ fragment, tous, retour }: { fragment: Fragment; tous: Fragment[
   return (
     <Tiroir titre={fragment.name} retour={retour}>
       <DansShopify fragment={fragment} />
+      <section className={styles.section}>
+        <h3>Sur la fiche produit</h3>
+        <ContenuDuMotif fragment={fragment} />
+      </section>
       <Formulaire fragment={fragment} tous={tous} />
       <section className={styles.section}>
         <h3>Le scan</h3>

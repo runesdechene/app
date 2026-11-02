@@ -29,7 +29,7 @@ const fragment = (id: number, name: string, surcharge: Partial<Fragment> = {}): 
   id, name, link_url: null, visible: true, shopify_handle: name.toLowerCase(), resume: null, histoire: null,
   illustration_url: `https://cdn/${name}.png`, image_url: null, illustration_sombre_url: null, audio_url: null, artiste: null,
   narrateur: null, heritage: null, synchronise_le: null, origine_lat: null, origine_lng: null,
-  origine_nom: null, theme: null, ...surcharge,
+  origine_nom: null, theme: null, mot_artiste: null, edition: null, edition_precision: null, ...surcharge,
 })
 const motif = (handle: string, collection: string): Illustration => ({
   handle, nom: handle, collection, resume: '', histoire: '', illustration_url: '', illustration_sombre_url: '',
