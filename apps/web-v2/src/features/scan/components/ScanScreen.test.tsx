@@ -109,11 +109,10 @@ test('sans son débloqué (arrivée par un QR), le bouton « Scanner » d’abor
   expect(screen.getByText('Vise le motif, de près. Ça bipe tout seul.')).toBeInTheDocument()
 })
 
-test('le bip montre le Fragment, note le scan, puis ouvre son Récit dans l’appli', () => {
+test('le bip montre le Fragment, note le scan, puis ouvre son Récit dans l’appli', async () => {
   ouvrir()
-  act(() => {
-    etat.surBip?.(11)
-  })
+  // Asynchrone : le scan noté (une promesse) ouvre la fiche.
+  await act(() => Promise.resolve(etat.surBip?.(11)))
   expect(screen.getByText('Fragment reconnu')).toBeInTheDocument()
   expect(screen.getByText('Hoplite')).toBeInTheDocument()
   expect(noterScan).toHaveBeenCalledWith(11)
@@ -123,12 +122,23 @@ test('le bip montre le Fragment, note le scan, puis ouvre son Récit dans l’ap
   expect(screen.getByText('Récit membre')).toBeInTheDocument()
 })
 
-test('un visiteur arrive sur le Récit du scan', () => {
-  etat.connecte = false
+test('tant que le scan n’est pas noté, la fiche attend', () => {
+  noterScan.mockReturnValueOnce(new Promise(() => undefined))
   ouvrir()
   act(() => {
     etat.surBip?.(11)
   })
+  act(() => {
+    vi.advanceTimersByTime(5000)
+  })
+  expect(screen.queryByText('Récit membre')).toBeNull()
+})
+
+test('un visiteur arrive sur le Récit du scan', async () => {
+  etat.connecte = false
+  ouvrir()
+  // Asynchrone : le scan noté (une promesse) ouvre la fiche.
+  await act(() => Promise.resolve(etat.surBip?.(11)))
   act(() => {
     vi.advanceTimersByTime(600)
   })
@@ -220,9 +230,8 @@ test('pendant que le modèle se prépare : « Préparation du scan… », et pas
 
 test('le Récit remplace le scanner : le retour ramène avant le scan, sans rebiper', async () => {
   ouvrir()
-  act(() => {
-    etat.surBip?.(11)
-  })
+  // Asynchrone : le scan noté (une promesse) ouvre la fiche.
+  await act(() => Promise.resolve(etat.surBip?.(11)))
   act(() => {
     vi.advanceTimersByTime(600)
   })
@@ -243,9 +252,8 @@ test('la feuille des admins ne reçoit une suggestion qu’au-dessus du seuil', 
 test('un scan noté fait relire le Codex et la fiche du Fragment', async () => {
   const relire = vi.spyOn(client, 'invalidateQueries')
   ouvrir()
-  act(() => {
-    etat.surBip?.(11)
-  })
+  // Asynchrone : le scan noté (une promesse) ouvre la fiche.
+  await act(() => Promise.resolve(etat.surBip?.(11)))
   await vi.waitFor(() => {
     expect(relire).toHaveBeenCalledWith({ queryKey: ['codex'] })
   })

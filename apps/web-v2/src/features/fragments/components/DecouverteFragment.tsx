@@ -2,11 +2,13 @@
  * QUOI     — la découverte d'un nouveau Fragment, par-dessus sa fiche (maquette « Scan — un nouveau
  *            Fragment sort de l'ombre », 02/11) : la carte monte de l'ombre, de dos (la rune d'or),
  *            se retourne dans un halo, un reflet la balaie ; « Nouveau Fragment ! », son nom, sa place
- *            dans sa collection, sa première anecdote ; puis « Creuser encore » et « Voir dans le
- *            Codex ».
+ *            dans sa collection, sa première anecdote ; puis « Creuser encore », « Voir dans le
+ *            Codex » et « Voir sa fiche », qui ferme sans rien coûter.
  * POURQUOI — le premier scan d'un motif est le moment qui donne envie de scanner les autres. Toute
  *            la chorégraphie vit dans le CSS (transform, opacity) ; `prefers-reduced-motion` la coupe.
+ *            Le <dialog> du navigateur garde le focus dedans, et Échap ferme.
  */
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router'
 import eclair from '@/assets/ui/eclair.svg'
 import { aLaTaille } from '@/shared/lib/image'
@@ -28,16 +30,28 @@ export function DecouverteFragment({
   illustration: string | null
   collection: Tirage['collection']
   anecdote: AnecdoteTrouvee | null
-  boutique: string | null
-  creuser: () => void
+  boutique: string | null // null pour qui le porte déjà
+  creuser: (() => void) | null // null : plus rien à creuser
   fermer: () => void
 }) {
+  const fenetre = useRef<HTMLDialogElement>(null)
+  const fiche = useRef<HTMLButtonElement>(null)
+
+  // Le focus va sur « Voir sa fiche », pas sur « Creuser encore » qui coûte de l'énergie.
+  useEffect(() => {
+    if (fenetre.current?.open === false) fenetre.current.showModal()
+    fiche.current?.focus()
+  }, [])
+
   return (
-    <div
+    <dialog
+      ref={fenetre}
       className={styles.voile}
-      role="dialog"
-      aria-modal="true"
       aria-labelledby="decouverte-titre"
+      onCancel={(e) => {
+        e.preventDefault()
+        fermer()
+      }}
     >
       <div className={styles.scene}>
         <span className={styles.rayons} aria-hidden="true" />
@@ -78,28 +92,33 @@ export function DecouverteFragment({
       )}
 
       <div className={styles.gestes}>
-        <button
-          type="button"
-          className={styles.creuser}
-          onClick={() => {
-            creuser()
-            fermer()
-          }}
-        >
-          Creuser encore
-          <span className={styles.cout}>
-            <img src={eclair} alt="" />2
-          </span>
-        </button>
+        {creuser && (
+          <button
+            type="button"
+            className={styles.creuser}
+            onClick={() => {
+              creuser()
+              fermer()
+            }}
+          >
+            Creuser encore
+            <span className={styles.cout}>
+              <img src={eclair} alt="" />2
+            </span>
+          </button>
+        )}
         <Link className={styles.codex} to="/codex">
           Voir dans le Codex →
         </Link>
+        <button ref={fiche} type="button" className={styles.fiche} onClick={fermer}>
+          Voir sa fiche
+        </button>
         {boutique && (
           <a className={styles.acquerir} href={boutique} target="_blank" rel="noreferrer">
             Acquérir ce Fragment pour ouvrir son histoire
           </a>
         )}
       </div>
-    </div>
+    </dialog>
   )
 }

@@ -46,6 +46,7 @@ export function Anecdotes({
   creuser,
   enCours,
   plusDEnergie,
+  echec,
 }: {
   anecdotes: AnecdoteTrouvee[]
   restantes: number
@@ -54,6 +55,7 @@ export function Anecdotes({
   creuser: () => void
   enCours: boolean
   plusDEnergie: boolean
+  echec: boolean // le tirage ou le creusage a échoué, pour une autre raison que l'énergie
 }) {
   const nouvelle = tirage?.anecdote ?? null
   // La nouvelle est en tête : on ne la répète pas dans la liste.
@@ -68,6 +70,11 @@ export function Anecdotes({
       {tirage?.raison === 'deja_aujourdhui' && (
         <p className={styles.aide}>
           Ton anecdote gratuite du jour est déjà trouvée : creuse encore, ou reviens demain.
+        </p>
+      )}
+      {echec && (
+        <p role="alert" className={styles.aide}>
+          L’anecdote n’a pas pu être tirée. Réessaie dans un instant.
         </p>
       )}
       <ul className={styles.liste}>

@@ -1,21 +1,12 @@
 /**
  * QUOI     — la visionneuse s'ouvre et se ferme avec la fiche ; la croix, Échap et un glissé assez
  *            long vers le bas demandent à la refermer, un glissé court non.
- * ATTENTION — jsdom ne connaît pas `showModal` : on le simule par l'attribut `open`.
+ * ATTENTION — jsdom ne connaît pas `showModal` : `test/setup.ts` le simule par l'attribut `open`.
  */
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeAll, expect, test, vi } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import { Visionneuse } from './Visionneuse'
-
-beforeAll(() => {
-  HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
-    this.open = true
-  }
-  HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
-    this.open = false
-  }
-})
 
 const PHOTOS = [
   { url: 'u1', vignette: 'v1' },

@@ -3,7 +3,7 @@
  * POURQUOI — ajoute les vérifications DOM lisibles (toBeInTheDocument, toBeVisible…), et
  *            remplace MapLibre : il lui faut WebGL, que jsdom n'a pas. Tout test qui monte la
  *            coquille monte aussi l'onglet Carte. jsdom n'a pas non plus ResizeObserver,
- *            Element.scrollTo, matchMedia ni de canevas qui dessine : des faux, muets, en tiennent
+ *            Element.scrollTo, matchMedia, showModal ni de canevas qui dessine : des faux, muets, en tiennent
  *            lieu (un test peut les remplacer).
  */
 import '@testing-library/jest-dom/vitest'
@@ -43,6 +43,14 @@ class FausseRequeteMedia extends EventTarget implements MediaQueryList {
   removeListener() {}
 }
 window.matchMedia = (requete: string) => new FausseRequeteMedia(requete)
+
+// jsdom ne connaît pas le <dialog> modal : on le simule par l'attribut `open`.
+HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
+  this.open = true
+}
+HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
+  this.open = false
+}
 
 // jsdom ne dessine pas : un canevas sans contexte (le voile d'un lieu inconnu ne peint rien).
 HTMLCanvasElement.prototype.getContext = () => null

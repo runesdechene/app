@@ -6,17 +6,29 @@
  * ATTENTION — seulement transform et opacity ; sous prefers-reduced-motion, tout est posé d'emblée.
  */
 .voile {
-  position: fixed;
-  z-index: 30;
-  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  overflow-y: auto;
+  padding: var(--space-8) var(--space-4) var(--space-6);
+  border: none;
+  background: var(--color-fond);
+  color: var(--color-encre);
+  text-align: center;
+}
+
+/* `display` seulement ouvert : fermé, la feuille du navigateur le cache. */
+.voile[open] {
   display: grid;
   align-content: start;
   justify-items: center;
   gap: var(--space-2);
-  overflow-y: auto;
-  padding: var(--space-8) var(--space-4) var(--space-6);
-  background: var(--color-fond);
-  text-align: center;
+}
+
+.voile::backdrop {
+  background: none; /* le voile est opaque : il couvre déjà la fiche */
 }
 
 .scene {
@@ -301,6 +313,16 @@
   color: var(--color-sur-accent);
   text-transform: uppercase;
   box-shadow: var(--ombre-bouton);
+}
+
+.fiche {
+  min-height: var(--cible-tactile);
+  border: none;
+  background: none;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--bouton-size);
+  text-decoration: underline;
 }
 
 .acquerir {

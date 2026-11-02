@@ -38,6 +38,7 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
   )
   const client = useQueryClient()
   const [reconnu, setReconnu] = useState<number | null>(null)
+  const [note, setNote] = useState(false)
   const analyse = useAnalyse(
     video,
     references,
@@ -48,6 +49,7 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
       void noterScan(id).then(() => {
         void client.invalidateQueries({ queryKey: ['codex'] })
         void client.invalidateQueries({ queryKey: ['mon-fragment', id] })
+        setNote(true)
       })
       setReconnu(id)
     },
@@ -67,8 +69,9 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
     }
   }, [vise, reconnu])
 
+  // La fiche attend le scan noté : sinon, sur un réseau lent, elle le croirait le premier.
   useEffect(() => {
-    if (reconnu === null) return
+    if (reconnu === null || !note) return
     const minuteur = window.setTimeout(() => {
       // Le Récit remplace le scanner : le retour ne rouvre pas la caméra devant le t-shirt.
       // L'heure du scan suit : la fiche tire l'anecdote de ce scan, une fois.
@@ -80,7 +83,7 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
     return () => {
       window.clearTimeout(minuteur)
     }
-  }, [reconnu, connecte, navigate])
+  }, [reconnu, note, connecte, navigate])
 
   const fragment = fragments?.find((f) => f.id === reconnu)
   const echec = analyse.erreur || erreurEmpreintes

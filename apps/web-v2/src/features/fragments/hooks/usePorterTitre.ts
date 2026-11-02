@@ -21,5 +21,6 @@ export function usePorterTitre(id: number) {
       mutation.mutate(ids)
     },
     enCours: mutation.isPending,
+    echec: mutation.isError,
   }
 }

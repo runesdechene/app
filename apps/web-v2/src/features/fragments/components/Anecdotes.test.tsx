@@ -25,6 +25,7 @@ function afficher(props: Partial<Parameters<typeof Anecdotes>[0]> = {}) {
         creuser={creuser}
         enCours={false}
         plusDEnergie={false}
+        echec={false}
         {...props}
       />
     </MemoryRouter>,

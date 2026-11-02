@@ -46,11 +46,13 @@ function TitreDuPorteur({
   portes,
   porter,
   enCours,
+  echec,
 }: {
   titre: { id: number; nom: string }
   portes: number[]
   porter: (ids: number[]) => void
   enCours: boolean
+  echec: boolean
 }) {
   const [trop, setTrop] = useState(false)
   const porte = portes.includes(titre.id)
@@ -63,6 +65,11 @@ function TitreDuPorteur({
         {trop && (
           <span role="alert" className={styles.alerte}>
             Tu portes déjà trois titres : retire-en un depuis ton profil.
+          </span>
+        )}
+        {echec && (
+          <span role="alert" className={styles.alerte}>
+            Ce titre n’a pas pu être porté : vérifie tes titres depuis ton profil.
           </span>
         )}
       </span>
@@ -123,12 +130,14 @@ function Cadeaux({
   equiper,
   porter,
   enCours,
+  echec,
 }: {
   recit: Recit
   moi: MonFragment
   equiper: (id: number) => Promise<void>
   porter: (ids: number[]) => void
   enCours: boolean
+  echec: boolean
 }) {
   return (
     <section className={styles.cadeaux} aria-labelledby="cadeaux">
@@ -165,6 +174,7 @@ function Cadeaux({
             portes={moi.titresPortes}
             porter={porter}
             enCours={enCours}
+            echec={echec}
           />
         )}
         {moi.numero !== null && (
@@ -273,8 +283,8 @@ export function FicheFragment({
           illustration={recit.illustration}
           collection={anecdotes.tirage.collection}
           anecdote={anecdotes.tirage.anecdote}
-          boutique={recit.boutique}
-          creuser={anecdotes.creuser}
+          boutique={moi?.etat === 'porte' ? null : recit.boutique}
+          creuser={anecdotes.tirage.restantes > 0 ? anecdotes.creuser : null}
           fermer={() => {
             setDecouverteVue(true)
           }}
@@ -322,9 +332,11 @@ export function FicheFragment({
           equiper={equiper}
           porter={titre.porter}
           enCours={titre.enCours}
+          echec={titre.echec}
         />
       )}
-      {moi && (
+      {/* Un motif sans anecdote écrite n'en montre pas le bloc. */}
+      {moi && (moi.anecdotes.length > 0 || moi.restantes > 0) && (
         <Anecdotes
           anecdotes={moi.anecdotes}
           restantes={moi.restantes}
@@ -333,6 +345,7 @@ export function FicheFragment({
           creuser={anecdotes.creuser}
           enCours={anecdotes.enCours}
           plusDEnergie={anecdotes.plusDEnergie}
+          echec={anecdotes.echec}
         />
       )}
       {moi?.etat !== 'porte' && <CeQueTuGagnes recit={recit} moi={moi} />}

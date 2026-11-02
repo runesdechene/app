@@ -25,7 +25,7 @@ vi.mock('../hooks/useMonFragment', () => ({
 }))
 const titres = vi.hoisted(() => ({ porter: vi.fn() }))
 vi.mock('../hooks/usePorterTitre', () => ({
-  usePorterTitre: () => ({ porter: titres.porter, enCours: false, trop: false }),
+  usePorterTitre: () => ({ porter: titres.porter, enCours: false, echec: false }),
 }))
 const anecdotes = vi.hoisted(() => ({ tirage: null as Tirage | null }))
 vi.mock('../hooks/useAnecdotes', () => ({
@@ -34,6 +34,7 @@ vi.mock('../hooks/useAnecdotes', () => ({
     creuser: vi.fn(),
     enCours: false,
     plusDEnergie: false,
+    echec: false,
   }),
 }))
 
@@ -208,4 +209,42 @@ test('le premier scan d’un motif ouvre sa découverte, qu’on referme en creu
     within(screen.getByRole('dialog')).getByRole('button', { name: /Creuser encore/ }),
   )
   expect(screen.queryByRole('dialog')).toBeNull()
+})
+
+test('la découverte se referme sans rien coûter : « Voir sa fiche »', async () => {
+  anecdotes.tirage = {
+    anecdote: null,
+    raison: 'gratuite',
+    restantes: 4,
+    raresRestantes: 1,
+    premiereDecouverte: true,
+    collection: null,
+  }
+  afficher(hoplite, scanne, undefined, 1700000000000)
+  const dialogue = screen.getByRole('dialog', { name: 'Nouveau Fragment !' })
+  expect(within(dialogue).getByRole('button', { name: 'Voir sa fiche' })).toHaveFocus()
+  await userEvent.click(within(dialogue).getByRole('button', { name: 'Voir sa fiche' }))
+  expect(screen.queryByRole('dialog')).toBeNull()
+})
+
+test('le Porteur qui découvre son Fragment n’est pas invité à l’acheter', () => {
+  anecdotes.tirage = {
+    anecdote: null,
+    raison: 'gratuite',
+    restantes: 0,
+    raresRestantes: 0,
+    premiereDecouverte: true,
+    collection: null,
+  }
+  afficher(hoplite, porte, undefined, 1700000000000)
+  const dialogue = screen.getByRole('dialog', { name: 'Nouveau Fragment !' })
+  expect(within(dialogue).queryByRole('link', { name: /Acquérir/ })).toBeNull()
+  // Plus rien à creuser : le bouton disparaît.
+  expect(within(dialogue).queryByRole('button', { name: /Creuser encore/ })).toBeNull()
+})
+
+test('un motif sans anecdote écrite n’en montre pas le bloc', () => {
+  anecdotes.tirage = null
+  afficher(hoplite, { ...scanne, restantes: 0, raresRestantes: 0 })
+  expect(screen.queryByRole('heading', { name: 'Ses anecdotes' })).toBeNull()
 })
