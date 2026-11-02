@@ -44,6 +44,17 @@ test('une Illustration lue', async () => {
   expect(await lireIllustrations()).toEqual([expect.objectContaining({ handle: 'hoplite', nom: 'Hoplite', collection: 'hoplite', audio_url: '' })])
 })
 
+test('lit la photo de l’artiste et les nouveaux champs du Codex', async () => {
+  repond({ data: { metaobjects: { pageInfo: { hasNextPage: false }, nodes: [{ handle: 'hoplite', displayName: 'Hoplite', fields: [
+    { key: 'artiste', value: 'gid://shopify/Metaobject/1', reference: { displayName: 'Uriel', nom: { value: 'Uriel' }, photo: { reference: { image: { url: 'https://x/a.jpg' } } } } },
+    { key: 'mot_de_l_artiste', value: 'Trois essais', reference: null },
+    { key: 'edition', value: 'limitee', reference: null },
+  ] }] } } })
+  expect(await lireIllustrations()).toEqual([expect.objectContaining({
+    artiste: 'Uriel', artiste_photo_url: 'https://x/a.jpg', mot_artiste: 'Trois essais', edition: 'limitee', edition_precision: '',
+  })])
+})
+
 describe('retirerImage', () => {
   const NETLIFY = 'Les fonctions Netlify ne répondent pas (HTTP 404). En local elles ne tournent pas : tester sur le site de préparation.'
 

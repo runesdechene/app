@@ -57,6 +57,7 @@ export type Illustration = {
   handle: string; nom: string; collection: string; resume: string; histoire: string
   illustration_url: string; illustration_sombre_url: string; fond_url: string; audio_url: string
   artiste: string; narrateur: string; heritage: string
+  artiste_photo_url: string; mot_artiste: string; edition: string; edition_precision: string
 }
 
 type Champ = {
@@ -65,6 +66,7 @@ type Champ = {
   reference: {
     image?: { url: string }; url?: string; sources?: { url: string }[]
     handle?: string; title?: string; displayName?: string; nom?: { value: string | null } | null
+    photo?: { reference: { image?: { url: string } } | null } | null
   } | null
 }
 
@@ -92,7 +94,11 @@ const REQUETE_ILLUSTRATIONS = `{
           ... on GenericFile { url }
           ... on Video { sources { url } }
           ... on Collection { handle title }
-          ... on Metaobject { displayName nom: field(key: "nom") { value } }
+          ... on Metaobject {
+            displayName
+            nom: field(key: "nom") { value }
+            photo: field(key: "image") { reference { ... on MediaImage { image { url } } } }
+          }
         }
       }
     }
@@ -127,6 +133,11 @@ export async function lireIllustrations(): Promise<Illustration[]> {
     artiste: lire(fields, 'artiste'),
     narrateur: lire(fields, 'narrateur_audio'),
     heritage: lire(fields, 'collection_d_heritage'),
+    // La photo de l'artiste vit sur son métaobjet Artiste, comme pour l'avatar du narrateur du thème.
+    artiste_photo_url: fields.find((c) => c.key === 'artiste')?.reference?.photo?.reference?.image?.url ?? '',
+    mot_artiste: lire(fields, 'mot_de_l_artiste'),
+    edition: lire(fields, 'edition'),
+    edition_precision: lire(fields, 'edition_precision'),
   }))
 }
 

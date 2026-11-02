@@ -34,6 +34,7 @@ const fragment = (id: number, name: string, surcharge: Partial<Fragment> = {}): 
 const motif = (handle: string, collection: string): Illustration => ({
   handle, nom: handle, collection, resume: '', histoire: '', illustration_url: '', illustration_sombre_url: '',
   fond_url: '', audio_url: '', artiste: '', narrateur: '', heritage: '',
+  artiste_photo_url: '', mot_artiste: '', edition: '', edition_precision: '',
 })
 
 const hoplite = fragment(1, 'Hoplite') // visible, origine à poser, sans vue : à filmer
