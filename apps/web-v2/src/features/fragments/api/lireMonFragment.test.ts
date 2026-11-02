@@ -15,7 +15,23 @@ test('un Fragment porté, avant la migration 579 : pas encore d’anecdotes', ()
     anecdotes: [],
     restantes: 0,
     raresRestantes: 0,
+    titre: null,
+    titresPortes: [],
   })
+})
+
+test('le titre du Porteur et les titres portés (migration 580)', () => {
+  expect(
+    lireMonFragment({
+      etat: 'porte',
+      scans: 0,
+      numero: 19,
+      porteurs: 53,
+      signe: false,
+      titre: { id: 275, nom: 'Fils de Sparte' },
+      titresPortes: [31],
+    }),
+  ).toMatchObject({ titre: { id: 275, nom: 'Fils de Sparte' }, titresPortes: [31] })
 })
 
 test('ses anecdotes trouvées et ce qui reste (migration 579)', () => {

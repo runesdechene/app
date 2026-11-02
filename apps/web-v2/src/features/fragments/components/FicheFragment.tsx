@@ -9,6 +9,7 @@
  * ATTENTION — le skin du profil est le signe (`set_my_signe`) : la coquille passe `equiper`, une zone
  *            n'en importe pas une autre. Sans compte (`connecte` faux), rien de personnel.
  */
+import { useState } from 'react'
 import { Link } from 'react-router'
 import { libelleEdition } from '@/shared/lib/edition'
 import { aLaTaille } from '@/shared/lib/image'
@@ -20,6 +21,7 @@ import type { MonFragment } from '../api/lireMonFragment'
 import type { Recit } from '../api/lireRecit'
 import { useAnecdotes } from '../hooks/useAnecdotes'
 import { useMonFragment } from '../hooks/useMonFragment'
+import { usePorterTitre } from '../hooks/usePorterTitre'
 import { useRecit } from '../hooks/useRecit'
 import { Anecdotes } from './Anecdotes'
 import { MotDeLArtiste } from './MotDeLArtiste'
@@ -31,7 +33,55 @@ const ICONES = {
     'M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z',
   skin: 'M12 3a5 5 0 1 0 0 10a5 5 0 1 0 0-10ZM20 21a8 8 0 0 0-16 0',
   numero: 'M4 9h16M4 15h16M10 3 8 21M16 3l-2 18',
+  titre:
+    'M15.48 12.89 17 21.42a.5.5 0 0 1-.81.47l-3.58-2.69a1 1 0 0 0-1.2 0l-3.59 2.69a.5.5 0 0 1-.81-.47l1.51-8.53M12 2a6 6 0 1 0 0 12a6 6 0 1 0 0-12Z',
 } as const
+
+// Trois titres portés au plus (set_my_displayed_titles).
+const TITRES_PORTES_MAX = 3
+
+function TitreDuPorteur({
+  titre,
+  portes,
+  porter,
+  enCours,
+}: {
+  titre: { id: number; nom: string }
+  portes: number[]
+  porter: (ids: number[]) => void
+  enCours: boolean
+}) {
+  const [trop, setTrop] = useState(false)
+  const porte = portes.includes(titre.id)
+  return (
+    <li className={styles.cadeau}>
+      <Pastille icone="titre" />
+      <span className={styles.texteCadeau}>
+        <strong>Le titre « {titre.nom} »</strong>
+        <span>À porter sous ton nom</span>
+        {trop && (
+          <span role="alert" className={styles.alerte}>
+            Tu portes déjà trois titres : retire-en un depuis ton profil.
+          </span>
+        )}
+      </span>
+      {porte ? (
+        <span className={styles.equipe}>Porté</span>
+      ) : (
+        <Button
+          kind="secondaire"
+          disabled={enCours}
+          onClick={() => {
+            if (portes.length >= TITRES_PORTES_MAX) setTrop(true)
+            else porter([...portes, titre.id])
+          }}
+        >
+          Porter
+        </Button>
+      )}
+    </li>
+  )
+}
 
 function Pastille({ icone }: { icone: keyof typeof ICONES }) {
   return (
@@ -70,10 +120,14 @@ function Cadeaux({
   recit,
   moi,
   equiper,
+  porter,
+  enCours,
 }: {
   recit: Recit
   moi: MonFragment
   equiper: (id: number) => Promise<void>
+  porter: (ids: number[]) => void
+  enCours: boolean
 }) {
   return (
     <section className={styles.cadeaux} aria-labelledby="cadeaux">
@@ -104,6 +158,14 @@ function Cadeaux({
             </Button>
           )}
         </li>
+        {moi.titre && (
+          <TitreDuPorteur
+            titre={moi.titre}
+            portes={moi.titresPortes}
+            porter={porter}
+            enCours={enCours}
+          />
+        )}
         {moi.numero !== null && (
           <li className={styles.cadeau}>
             <Insigne rarete={rangDuNumero(moi.numero)} />
@@ -174,6 +236,7 @@ export function FicheFragment({
   const { recit, erreur, reessayer } = useRecit(id)
   const { moi } = useMonFragment(id, connecte)
   const anecdotes = useAnecdotes(id, connecte ? scan : null)
+  const titre = usePorterTitre(id)
 
   if (erreur) {
     return (
@@ -237,7 +300,15 @@ export function FicheFragment({
         <MotDeLArtiste mot={recit.motArtiste} artiste={recit.artiste} photo={recit.artistePhoto} />
       )}
 
-      {moi?.etat === 'porte' && <Cadeaux recit={recit} moi={moi} equiper={equiper} />}
+      {moi?.etat === 'porte' && (
+        <Cadeaux
+          recit={recit}
+          moi={moi}
+          equiper={equiper}
+          porter={titre.porter}
+          enCours={titre.enCours}
+        />
+      )}
       {moi && (
         <Anecdotes
           anecdotes={moi.anecdotes}

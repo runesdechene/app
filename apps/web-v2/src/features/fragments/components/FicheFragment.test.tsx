@@ -23,6 +23,10 @@ vi.mock('../hooks/useRecit', () => ({
 vi.mock('../hooks/useMonFragment', () => ({
   useMonFragment: () => ({ moi: etat.moi, erreur: false }),
 }))
+const titres = vi.hoisted(() => ({ porter: vi.fn() }))
+vi.mock('../hooks/usePorterTitre', () => ({
+  usePorterTitre: () => ({ porter: titres.porter, enCours: false, trop: false }),
+}))
 const anecdotes = vi.hoisted(() => ({ tirage: null as Tirage | null }))
 vi.mock('../hooks/useAnecdotes', () => ({
   useAnecdotes: () => ({
@@ -72,7 +76,7 @@ function afficher(
   return equiper
 }
 
-const vide = { anecdotes: [], restantes: 3, raresRestantes: 1 }
+const vide = { anecdotes: [], restantes: 3, raresRestantes: 1, titre: null, titresPortes: [] }
 const porte: MonFragment = {
   etat: 'porte',
   scans: 0,
@@ -160,4 +164,30 @@ test('après un scan : la nouvelle anecdote et « Creuser encore »', () => {
   afficher(hoplite, porte, undefined, 1700000000000)
   expect(screen.getByText('La panoplie pesait vingt kilos.')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: /Creuser encore/ })).toBeInTheDocument()
+})
+
+test('porté : le titre du Porteur, à porter sous son nom', async () => {
+  afficher(hoplite, { ...porte, titre: { id: 275, nom: 'Fils de Sparte' }, titresPortes: [31] })
+  expect(screen.getByText('Le titre « Fils de Sparte »')).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Porter' }))
+  expect(titres.porter).toHaveBeenCalledWith([31, 275])
+})
+
+test('un titre déjà porté se dit « Porté »', () => {
+  afficher(hoplite, { ...porte, titre: { id: 275, nom: 'Fils de Sparte' }, titresPortes: [275] })
+  expect(screen.getByText('Porté')).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Porter' })).toBeNull()
+})
+
+test('trois titres déjà portés : il faut en retirer un', async () => {
+  afficher(hoplite, {
+    ...porte,
+    titre: { id: 275, nom: 'Fils de Sparte' },
+    titresPortes: [1, 2, 3],
+  })
+  await userEvent.click(screen.getByRole('button', { name: 'Porter' }))
+  expect(titres.porter).not.toHaveBeenCalled()
+  expect(screen.getByRole('alert')).toHaveTextContent(
+    'Tu portes déjà trois titres : retire-en un depuis ton profil.',
+  )
 })

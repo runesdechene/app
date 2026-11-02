@@ -1,7 +1,8 @@
 /**
  * QUOI     — l'état d'un Fragment pour l'Explorateur connecté, lu depuis `mon_fragment` (mig. 578 et
  *            579) : inconnu, scanné ou porté, ses scans, son numéro de Porteur, le nombre de
- *            Porteurs, s'il est le signe de son profil (le skin), ses anecdotes et ce qui reste.
+ *            Porteurs, s'il est le signe de son profil (le skin), ses anecdotes et ce qui reste, le
+ *            titre de qui le porte et les titres que je porte déjà (mig. 580).
  * POURQUOI — `null` quand le Fragment est masqué.
  */
 import type { Rarete } from '@/shared/lib/rang'
@@ -19,6 +20,8 @@ export type MonFragment = {
   anecdotes: AnecdoteTrouvee[]
   restantes: number
   raresRestantes: number
+  titre: { id: number; nom: string } | null
+  titresPortes: number[]
 }
 
 const ETATS: readonly EtatFragment[] = ['inconnu', 'scanne', 'porte']
@@ -33,6 +36,11 @@ export function lireRarete(v: unknown): Rarete {
 export function lireAnecdote(v: unknown): AnecdoteTrouvee {
   const o = objet(v)
   return { texte: chaine(o.texte), rarete: lireRarete(o.rarete) }
+}
+
+function lireTitre(v: unknown): { id: number; nom: string } {
+  const o = objet(v)
+  return { id: nombre(o.id), nom: chaine(o.nom) }
 }
 
 export function lireMonFragment(v: unknown): MonFragment | null {
@@ -50,5 +58,8 @@ export function lireMonFragment(v: unknown): MonFragment | null {
     anecdotes: liste(lireAnecdote)(o.anecdotes ?? []),
     restantes: nombre(o.restantes ?? 0),
     raresRestantes: nombre(o.raresRestantes ?? 0),
+    // Avant la migration 580 : pas de titre de Porteur, rien de porté connu.
+    titre: ouNull(lireTitre)(o.titre ?? null),
+    titresPortes: liste(nombre)(o.titresPortes ?? []),
   }
 }

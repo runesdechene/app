@@ -250,3 +250,7 @@
   font-family: var(--font-condensee);
   font-size: var(--sous-titre-size);
 }
+
+.alerte {
+  color: var(--color-accent);
+}
