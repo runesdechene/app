@@ -15,6 +15,7 @@ import styles from './Boutique.module.css'
 import { AnecdotesDuFragment } from './AnecdotesDuFragment'
 import { CarteDOrigine } from './CarteDOrigine'
 import { ScanDuFragment } from './ScanDuFragment'
+import { TitreDuFragment } from './TitreDuFragment'
 
 const LISTE = '/boutique/fragments'
 const VIDE = 'vide dans Shopify'
@@ -125,6 +126,10 @@ function Fiche({ fragment, tous, retour }: { fragment: Fragment; tous: Fragment[
       <section className={styles.section}>
         <h3>Le scan</h3>
         <ScanDuFragment fragment={fragment} />
+      </section>
+      <section className={styles.section}>
+        <h3>Le titre du Porteur</h3>
+        <TitreDuFragment fragment={fragment.id} />
       </section>
       <section className={styles.section}>
         <h3>Ses anecdotes</h3>

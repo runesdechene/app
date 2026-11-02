@@ -21,6 +21,7 @@ vi.mock('../api/scan', () => ({
 vi.mock('@/shared/cultures/api', () => ({ lireCulturesDuHub: api.lireCultures }))
 // Les anecdotes ont leurs propres tests (AnecdotesDuFragment.test.tsx) : ici, aucune.
 vi.mock('../api/anecdotes', () => ({ lireAnecdotes: () => Promise.resolve([]), ecrireAnecdote: vi.fn() }))
+vi.mock('../api/collections', () => ({ lireTitreDuFragment: () => Promise.resolve(null), ecrireTitreDuFragment: vi.fn() }))
 // La carte simulée : un bouton « poser » appelle la prop onPoser.
 vi.mock('./CarteDOrigine', () => ({
   CarteDOrigine: ({ onPoser }: { onPoser: (lat: number, lng: number) => void }) => (

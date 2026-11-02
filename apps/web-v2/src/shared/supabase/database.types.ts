@@ -7138,6 +7138,10 @@ export type Database = {
         Args: { p_lat1: number; p_lat2: number; p_lng1: number; p_lng2: number }
         Returns: number
       }
+      _ecrire_titre_du_codex: {
+        Args: { p_condition: Json; p_nom: string }
+        Returns: undefined
+      }
       _energie_max: { Args: { p_user: string }; Returns: number }
       _enigma_answer_matches: {
         Args: { p_correct: string; p_user: string }
@@ -8450,6 +8454,7 @@ export type Database = {
         Returns: undefined
       }
       hub_classer_achat: { Args: { p_achat: number }; Returns: undefined }
+      hub_collections: { Args: never; Returns: Json }
       hub_compagnie: { Args: { p_id: string }; Returns: Json }
       hub_compagnies: { Args: never; Returns: Json }
       hub_compte: { Args: { p_id: string }; Returns: Json }
@@ -8492,6 +8497,10 @@ export type Database = {
           p_icone_url: string
           p_titre: string
         }
+        Returns: undefined
+      }
+      hub_ecrire_titre_fragment: {
+        Args: { p_fragment: number; p_nom: string }
         Returns: undefined
       }
       hub_enigme: { Args: { p_id: number }; Returns: Json }
@@ -8579,6 +8588,7 @@ export type Database = {
       }
       hub_ses_missives: { Args: { p_user: string }; Returns: Json }
       hub_suites: { Args: never; Returns: Json }
+      hub_titre_fragment: { Args: { p_fragment: number }; Returns: string }
       increment_community_quest: {
         Args: {
           p_amount?: number
