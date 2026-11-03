@@ -26,6 +26,13 @@
   font-size: var(--legende-size);
 }
 
+/* Tout trouvé : la phrase devient une victoire. */
+.reste[data-complet] {
+  color: var(--color-encre);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+}
+
 .liste {
   display: grid;
   gap: var(--space-2);

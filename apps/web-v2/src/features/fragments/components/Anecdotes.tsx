@@ -30,7 +30,7 @@ function Carte({ anecdote, nouvelle = false }: { anecdote: AnecdoteTrouvee; nouv
 }
 
 function phraseDuReste(restantes: number, raresRestantes: number): string {
-  if (restantes === 0) return 'Tu connais toutes ses anecdotes.'
+  if (restantes === 0) return 'Félicitations, tu as découvert toutes ses anecdotes !'
   const rares =
     raresRestantes > 0
       ? `, dont ${String(raresRestantes)} rare${raresRestantes > 1 ? 's' : ''}`
@@ -102,7 +102,7 @@ export function Anecdotes({
           Scanner ce motif
         </Link>
       )}
-      <p className={styles.reste}>
+      <p className={styles.reste} data-complet={reste === 0 || undefined}>
         {phraseDuReste(reste, raresReste)}
         {reste > 0 &&
           !tirage &&

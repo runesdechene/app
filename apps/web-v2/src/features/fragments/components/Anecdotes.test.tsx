@@ -77,6 +77,6 @@ test('toutes trouvées : plus de bouton', () => {
     tirage: tirage({ anecdote: null, raison: 'toutes_trouvees', restantes: 0 }),
     restantes: 0,
   })
-  expect(screen.getByText('Tu connais toutes ses anecdotes.')).toBeInTheDocument()
+  expect(screen.getByText('Félicitations, tu as découvert toutes ses anecdotes !')).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: /Creuser encore/ })).toBeNull()
 })

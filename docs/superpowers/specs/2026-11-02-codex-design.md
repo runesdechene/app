@@ -157,4 +157,5 @@ maquetter), les autres objets à collectionner.
 **Idée d'Uriel (02/11), à reprendre après jeudi** : le Porteur reçoit une anecdote gratuite de chaque
 motif qu'il porte tous les 2-3 jours, sans scanner (une notification qui l'invite à la lire). La
 mécanique existe déjà (`tirer_anecdote`, la cloche) ; reste à choisir le rythme et le déclencheur
-(tâche planifiée ou à l'ouverture de l'appli).
+(tâche planifiée ou à l'ouverture de l'appli). Stock visé : une vingtaine d'anecdotes par motif. Tout trouvé :
+« Creuser encore » disparaît, des félicitations le disent (fait le 03/11).
