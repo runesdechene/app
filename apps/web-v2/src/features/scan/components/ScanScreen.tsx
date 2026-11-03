@@ -43,11 +43,15 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
   const [reconnu, setReconnu] = useState<number | null>(null)
   const [note, setNote] = useState(false)
   const [rescan, setRescan] = useState<Rescan | null>(null)
+  // Les motifs écartés par « Ce n'est pas lui » : plus de bip pour eux sur cet écran, le temps de
+  // viser le bon (et, pour un admin, d'apprendre sa vue).
+  const ecartes = useRef(new Set<number>())
   const analyse = useAnalyse(
     video,
     references,
     camera === 'en-marche' && reconnu === null,
     (id) => {
+      if (ecartes.current.has(id)) return
       biper()
       // Le Codex et la fiche du Fragment se relisent une fois le scan noté (clés de leurs hooks).
       void noterScan(id)
@@ -93,8 +97,9 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
     }
   }, [reconnu, note, rescan, connecte, navigate])
 
-  // Le scan a confondu deux motifs : on oublie ce bip et l'on vise encore.
+  // Le scan a confondu deux motifs : on oublie ce bip, on écarte ce motif, et l'on vise encore.
   function viserEncore() {
+    if (reconnu !== null) ecartes.current.add(reconnu)
     setReconnu(null)
     setRescan(null)
     setNote(false)

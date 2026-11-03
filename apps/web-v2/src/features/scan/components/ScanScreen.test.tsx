@@ -310,4 +310,9 @@ test('le scan a confondu deux motifs : « Viser encore » relance la visée', as
   await userEvent.click(screen.getByRole('button', { name: /Viser encore/ }))
   expect(screen.queryByRole('button', { name: /anecdote/ })).toBeNull()
   expect(screen.getByText('Vise le motif, de près. Ça bipe tout seul.')).toBeInTheDocument()
+  // Le motif écarté ne rebipe pas : on a le temps de viser le bon.
+  noterScan.mockClear()
+  await act(() => Promise.resolve(etat.surBip?.(11)))
+  expect(noterScan).not.toHaveBeenCalled()
+  expect(screen.getByText('Vise le motif, de près. Ça bipe tout seul.')).toBeInTheDocument()
 })
