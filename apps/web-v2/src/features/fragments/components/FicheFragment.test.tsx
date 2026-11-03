@@ -27,11 +27,11 @@ const titres = vi.hoisted(() => ({ porter: vi.fn() }))
 vi.mock('../hooks/usePorterTitre', () => ({
   usePorterTitre: () => ({ porter: titres.porter, enCours: false, echec: false }),
 }))
-const anecdotes = vi.hoisted(() => ({ tirage: null as Tirage | null }))
+const anecdotes = vi.hoisted(() => ({ tirage: null as Tirage | null, creuser: vi.fn() }))
 vi.mock('../hooks/useAnecdotes', () => ({
   useAnecdotes: () => ({
     tirage: anecdotes.tirage,
-    creuser: vi.fn(),
+    creuser: anecdotes.creuser,
     enCours: false,
     plusDEnergie: false,
     echec: false,
@@ -159,7 +159,7 @@ test('depuis le Codex : « Scanner ce motif », jamais « Creuser encore »', ()
   expect(screen.queryByRole('button', { name: /Creuser encore/ })).toBeNull()
 })
 
-test('après un scan : la nouvelle anecdote et « Creuser encore »', () => {
+test('après un scan : la nouvelle anecdote se révèle, avec « Creuser encore »', () => {
   anecdotes.tirage = {
     anecdote: { texte: 'La panoplie pesait vingt kilos.', rarete: 'commune' },
     raison: 'gratuite',
@@ -169,8 +169,9 @@ test('après un scan : la nouvelle anecdote et « Creuser encore »', () => {
     collection: null,
   }
   afficher(hoplite, porte, undefined, 1700000000000)
-  expect(screen.getByText('La panoplie pesait vingt kilos.')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: /Creuser encore/ })).toBeInTheDocument()
+  const dialogue = screen.getByRole('dialog', { name: 'Nouvelle anecdote !' })
+  expect(within(dialogue).getByText('La panoplie pesait vingt kilos.')).toBeInTheDocument()
+  expect(within(dialogue).getByRole('button', { name: /Creuser encore/ })).toBeInTheDocument()
 })
 
 test('porté : le titre du Porteur, à porter sous son nom', async () => {
@@ -199,7 +200,7 @@ test('trois titres déjà portés : il faut en retirer un', async () => {
   )
 })
 
-test('le premier scan d’un motif ouvre sa découverte, qu’on referme en creusant', async () => {
+test('le premier scan d’un motif ouvre sa découverte ; creuser y reste', async () => {
   anecdotes.tirage = {
     anecdote: { texte: 'Celle qui choisit les morts.', rarete: 'peu_commune' },
     raison: 'gratuite',
@@ -213,7 +214,8 @@ test('le premier scan d’un motif ouvre sa découverte, qu’on referme en creu
   await userEvent.click(
     within(screen.getByRole('dialog')).getByRole('button', { name: /Creuser encore/ }),
   )
-  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(anecdotes.creuser).toHaveBeenCalled()
+  expect(screen.getByRole('dialog')).toBeInTheDocument()
 })
 
 test('la découverte se referme sans rien coûter : « Voir sa fiche »', async () => {

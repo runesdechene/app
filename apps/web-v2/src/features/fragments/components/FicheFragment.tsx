@@ -20,6 +20,7 @@ import { Insigne } from '@/shared/ui/Insigne'
 import { Text } from '@/shared/ui/Text'
 import type { MonFragment } from '../api/lireMonFragment'
 import type { Recit } from '../api/lireRecit'
+import type { Tirage } from '../api/lireTirage'
 import { useAnecdoteDuVisiteur } from '../hooks/useAnecdoteDuVisiteur'
 import { useAnecdotes } from '../hooks/useAnecdotes'
 import { useMonFragment } from '../hooks/useMonFragment'
@@ -251,7 +252,7 @@ export function FicheFragment({
   const anecdotes = useAnecdotes(id, connecte ? scan : null)
   const titre = usePorterTitre(id)
   const anecdoteDuVisiteur = useAnecdoteDuVisiteur(id, !connecte)
-  const [decouverteVue, setDecouverteVue] = useState(false)
+  const [revelationFermee, setRevelationFermee] = useState<Tirage | null>(null)
 
   if (erreur) {
     return (
@@ -278,18 +279,24 @@ export function FicheFragment({
   }
 
   const edition = libelleEdition(recit.edition, recit.editionPrecision)
+  const { tirage } = anecdotes
   return (
     <article className={styles.fiche}>
-      {anecdotes.tirage?.premiereDecouverte && !decouverteVue && (
+      {/* Chaque tirage qui rapporte (un Fragment neuf, une anecdote) a sa révélation ; en creuser une
+          autre rejoue l'animation (la clé change). */}
+      {tirage && tirage !== revelationFermee && (tirage.premiereDecouverte || tirage.anecdote) && (
         <DecouverteFragment
+          key={tirage.anecdote?.texte ?? 'fragment'}
           nom={recit.nom}
           illustration={recit.illustration}
-          collection={anecdotes.tirage.collection}
-          anecdote={anecdotes.tirage.anecdote}
+          tirage={tirage}
+          total={moi ? moi.anecdotes.length + moi.restantes : 0}
           boutique={moi?.etat === 'porte' ? null : recit.boutique}
-          creuser={anecdotes.tirage.restantes > 0 ? anecdotes.creuser : null}
+          creuser={anecdotes.creuser}
+          enCours={anecdotes.enCours}
+          plusDEnergie={anecdotes.plusDEnergie}
           fermer={() => {
-            setDecouverteVue(true)
+            setRevelationFermee(tirage)
           }}
         />
       )}

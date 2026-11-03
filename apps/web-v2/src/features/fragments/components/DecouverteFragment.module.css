@@ -3,6 +3,8 @@
  *            de dos (0-0,55 s), se retourne (0,75-1,35 s) dans un halo et des rayons, un reflet
  *            holographique la balaie (1,3-1,95 s puis 2,7-3,3 s) ; le titre est frappé (1,25 s), le
  *            reste suit, l'insigne éclate (2,15 s).
+ *            Une nouvelle anecdote va plus vite (1,6 s) : la carte connue monte sans se retourner, plus
+ *            petite, et l'anecdote se déplie ; les rayons ne tournent que pour une rare.
  * ATTENTION — seulement transform et opacity ; sous prefers-reduced-motion, tout est posé d'emblée.
  */
 .voile {
@@ -331,6 +333,85 @@
   font-size: var(--sous-titre-size);
 }
 
+/* Une nouvelle anecdote : le Fragment est déjà connu, c'est l'anecdote qui compte. */
+.voile[data-genre='anecdote'] .scene {
+  height: 230px;
+}
+
+.voile[data-genre='anecdote'] .carte {
+  width: 140px;
+  height: 190px;
+}
+
+.voile[data-genre='anecdote'] .face {
+  translate: 0 40px;
+  scale: 0.85;
+  animation: monter 500ms ease-out forwards;
+}
+
+.voile[data-genre='anecdote'] .face img {
+  width: 123px;
+  height: 162px;
+}
+
+.voile[data-genre='anecdote'] .halo {
+  width: 300px;
+  height: 300px;
+  animation-delay: 0.2s;
+}
+
+.voile[data-genre='anecdote'] .rayons {
+  width: 340px;
+  height: 340px;
+  animation-delay: 0.35s;
+}
+
+.voile[data-genre='anecdote'] .reflet {
+  animation: balayer 600ms ease-in-out 0.55s;
+}
+
+.voile[data-genre='anecdote'] .titre {
+  animation-delay: 0.45s;
+}
+
+.voile[data-genre='anecdote'] .nom {
+  animation-delay: 0.6s;
+}
+
+.voile[data-genre='anecdote'] .place {
+  animation-delay: 0.7s;
+}
+
+.voile[data-genre='anecdote'] .anecdote {
+  animation-delay: 0.85s;
+}
+
+.voile[data-genre='anecdote'] .anecdote p {
+  font-size: var(--anecdote-revelee-size);
+  line-height: var(--anecdote-revelee-leading);
+}
+
+.voile[data-genre='anecdote'] .insigne > span:first-child svg {
+  animation-delay: 1.1s;
+}
+
+.voile[data-genre='anecdote'] .gestes {
+  animation-delay: 1.3s;
+}
+
+.creuser:disabled {
+  opacity: 0.6;
+}
+
+.bravo {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  letter-spacing: var(--titre-tracking);
+  text-transform: uppercase;
+}
+
 @keyframes apparaitre {
   to {
     opacity: 1;
@@ -439,6 +520,10 @@
   .gestes,
   .insigne > span:first-child svg {
     opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+  .voile[data-genre='anecdote'] .face {
     translate: 0 0;
     scale: 1;
   }
