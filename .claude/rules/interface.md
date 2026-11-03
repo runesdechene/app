@@ -366,3 +366,12 @@ Uriel, sur « Creuser encore » du Codex : « c'est bien que les boutons aient u
 **How to apply :** tout bouton clair = fond parchemin, fin contour sable (#C9BAAC, 1 px) et une
 ombre brune chaude (0 3px 8px -1px, rgba(89,64,31,.22)) ; le bouton rouge garde la sienne. Jamais
 d'ombre noire sur le parchemin. Référence : Figma « Codex V1 — C », bouton « Creuser encore ».
+
+## Un `url()` construit à la volée prend toujours des guillemets (03/11/2026)
+
+**Le piège** : l'icône de l'onglet Carte (3 Ko) montrait un carré gris sur mobile. Sous 4 Ko, Vite
+inline l'image en `data:image/svg+xml,…` avec des espaces ; dans `url(${icone})` sans guillemets,
+la valeur est invalide, le `mask` tombe et seul le fond reste. En dev, rien : Vite sert un fichier.
+
+**How to apply :** toujours `` `url("${icone}")` `` dans un style en ligne ou une variable CSS.
+Vérifier une icône en masque sur le build (`pnpm build` puis `vite preview`), pas seulement en dev.
