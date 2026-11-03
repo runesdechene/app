@@ -27,11 +27,16 @@ const titres = vi.hoisted(() => ({ porter: vi.fn() }))
 vi.mock('../hooks/usePorterTitre', () => ({
   usePorterTitre: () => ({ porter: titres.porter, enCours: false, echec: false }),
 }))
-const anecdotes = vi.hoisted(() => ({ tirage: null as Tirage | null, creuser: vi.fn() }))
+const anecdotes = vi.hoisted(() => ({
+  tirage: null as Tirage | null,
+  creuser: vi.fn(),
+  enAttente: false,
+}))
 vi.mock('../hooks/useAnecdotes', () => ({
   useAnecdotes: () => ({
     tirage: anecdotes.tirage,
     creuser: anecdotes.creuser,
+    enAttente: anecdotes.enAttente,
     enCours: false,
     plusDEnergie: false,
     echec: false,
@@ -67,6 +72,7 @@ function afficher(
   equiper = vi.fn(() => Promise.resolve()),
   scan: number | null = null,
 ) {
+  const arrivee = scan === null ? null : { scan, creuser: false }
   etat.recit = recit
   etat.moi = moi
   render(
@@ -74,7 +80,7 @@ function afficher(
       <Routes>
         <Route
           path="/codex/fragment/:id"
-          element={<FicheFragment id={11} connecte equiper={equiper} scan={scan} />}
+          element={<FicheFragment id={11} connecte equiper={equiper} arrivee={arrivee} />}
         />
       </Routes>
     </MemoryRouter>,
@@ -268,4 +274,11 @@ test('sans compte : une anecdote à lire, et rien ne se garde', () => {
   expect(screen.getByText('Le bouclier portait la lettre de sa cité.')).toBeInTheDocument()
   expect(screen.getByText(/se garde dans ton Codex/)).toBeInTheDocument()
   visiteur.anecdote = null
+})
+
+test('le tirage d’un scan en route : la fiche ne passe pas sous la révélation', () => {
+  anecdotes.enAttente = true
+  afficher(hoplite, scanne, undefined, 1700000000000)
+  expect(screen.queryByRole('heading', { name: 'Hoplite' })).toBeNull()
+  anecdotes.enAttente = false
 })

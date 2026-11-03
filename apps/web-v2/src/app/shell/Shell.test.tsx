@@ -66,7 +66,7 @@ vi.mock('@/features/titres/api/mesTitres', () => ({
 const ecran = vi.hoisted(() => ({ pc: false }))
 vi.mock('@/shared/hooks/useSurOrdinateur', () => ({ useSurOrdinateur: () => ecran.pc }))
 const son = vi.hoisted(() => ({ debloquerSon: vi.fn(), sonDebloque: () => false, biper: vi.fn() }))
-vi.mock('@/features/scan/lib/son', () => son)
+vi.mock('@/shared/lib/son', () => son)
 
 beforeEach(() => {
   ecran.pc = false

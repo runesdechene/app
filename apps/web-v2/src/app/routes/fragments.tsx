@@ -13,8 +13,9 @@ import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { FicheFragment } from '@/features/fragments/components/FicheFragment'
 import { RecitFragment } from '@/features/fragments/components/RecitFragment'
 import { cleMonFragment } from '@/features/fragments/hooks/useMonFragment'
+import { lireArrivee } from '@/features/fragments/lib/arrivee'
 import { useRecit } from '@/features/fragments/hooks/useRecit'
-import { debloquerSon } from '@/features/scan/lib/son'
+import { debloquerSon } from '@/shared/lib/son'
 import { DetailPane } from '../shell/DetailPane'
 import styles from './fragments.module.css'
 
@@ -41,12 +42,8 @@ export function RouteFragment() {
   const { recit } = useRecit(id)
   const { choisir } = useChoisirSigne(useMonIdentifiant() ?? '')
   const client = useQueryClient()
-  // Ouverte par un scan, la fiche reçoit son heure (ScanScreen) : elle en tire l'anecdote.
-  const etat: unknown = useLocation().state
-  const scan =
-    typeof etat === 'object' && etat !== null && 'scan' in etat && typeof etat.scan === 'number'
-      ? etat.scan
-      : null
+  // Ouverte par un scan, la fiche reçoit son arrivée (ScanScreen) : elle en tire l'anecdote.
+  const arrivee = lireArrivee(useLocation().state)
 
   async function equiper(fragment: number) {
     await choisir(fragment)
@@ -55,7 +52,7 @@ export function RouteFragment() {
 
   return (
     <DetailPane title={recit?.nom ?? 'Fragment'} titreCache actions={<Scanner />}>
-      <FicheFragment key={id} id={id} connecte equiper={equiper} scan={scan} />
+      <FicheFragment key={id} id={id} connecte equiper={equiper} arrivee={arrivee} />
     </DetailPane>
   )
 }

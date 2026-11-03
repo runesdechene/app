@@ -3,12 +3,13 @@
  *            - un nouveau Fragment, au premier scan d'un motif : la carte monte de l'ombre, de dos (la
  *              rune d'or), se retourne dans un halo, un reflet la balaie ; « Nouveau Fragment ! », son
  *              nom, sa place dans sa collection, sa première anecdote ;
- *            - une nouvelle anecdote (celle du jour, ou une de plus en creusant) : la carte, déjà
- *              connue, monte sans se retourner ; l'anecdote se déplie dessous, teintée de sa rareté.
+ *            - une nouvelle anecdote (celle du jour, ou une de plus en creusant) : la même carte qui se
+ *              retourne, plus petite ; l'anecdote se déplie dessous, teintée de sa rareté.
  *            - un rescan le même jour, l'anecdote gratuite déjà prise : la carte, et l'offre d'en creuser
  *              une autre.
  *            Puis « Creuser encore », qui rejoue la révélation sur place (ou les félicitations quand
- *            tout est trouvé), et de quoi fermer sans rien coûter.
+ *            tout est trouvé), et de quoi fermer sans rien coûter. Quand la carte se retourne, les
+ *            applaudissements de la conquête d'un lieu.
  * POURQUOI — chaque anecdote gagnée mérite son moment : c'est ce qui donne envie de creuser et de
  *            scanner. Toute la chorégraphie vit dans le CSS (transform, opacity) ; `prefers-reduced-motion`
  *            la coupe. Le <dialog> du navigateur garde le focus dedans, et Échap ferme.
@@ -17,9 +18,12 @@ import { useEffect, useRef } from 'react'
 import { Link } from 'react-router'
 import eclair from '@/assets/ui/eclair.svg'
 import { aLaTaille } from '@/shared/lib/image'
+import { applaudir } from '@/shared/lib/son'
 import { Insigne } from '@/shared/ui/Insigne'
 import type { Tirage } from '../api/lireTirage'
 import styles from './DecouverteFragment.module.css'
+
+const RETOURNEMENT_MS = 1000 // la face apparaît (DecouverteFragment.module.css, .face)
 
 function etiquette(tirage: Tirage, nouveauFragment: boolean): string {
   if (nouveauFragment) return '· ta première anecdote'
@@ -55,6 +59,10 @@ export function DecouverteFragment({
   useEffect(() => {
     if (fenetre.current?.open === false) fenetre.current.showModal()
     fiche.current?.focus()
+    const minuteur = window.setTimeout(applaudir, RETOURNEMENT_MS)
+    return () => {
+      window.clearTimeout(minuteur)
+    }
   }, [])
 
   // Creuser après la découverte d'un Fragment rend aussi premiereDecouverte : c'est alors une anecdote.
@@ -82,14 +90,12 @@ export function DecouverteFragment({
       }}
     >
       <div className={styles.scene}>
-        {(nouveauFragment || rare) && <span className={styles.rayons} aria-hidden="true" />}
+        <span className={styles.rayons} aria-hidden="true" />
         <span className={styles.halo} aria-hidden="true" />
         <div className={styles.carte} aria-hidden="true">
-          {nouveauFragment && (
-            <span className={styles.dos}>
-              <span className={styles.rune} />
-            </span>
-          )}
+          <span className={styles.dos}>
+            <span className={styles.rune} />
+          </span>
           <span className={styles.face}>
             {illustration && <img src={aLaTaille(illustration, 176)} alt="" />}
             {nouveauFragment && <span className={styles.nouveau}>Nouveau</span>}

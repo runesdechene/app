@@ -3,6 +3,8 @@
  *            en continu, le bip qui montre le Fragment puis ouvre son Récit ; au bout de 8 s, un conseil
  *            et « Voir tous les Fragments » ; pour les admins, la feuille « Apprendre cette vue » (530:1013).
  *            En bas, toujours, « Découvrir l'appli » : le QR du dépliant mène ici, souvent sans vêtement.
+ *            Un membre qui rescanne un motif déjà connu choisit sur la caméra (maquette 929:3010) :
+ *            l'anecdote du jour (ou en creuser une, 2 énergies), son histoire, ou sa fiche.
  * POURQUOI — comme un QR code, sans QR code (spec 2026-10-09-v2-scan). Arrivé sans avoir touché
  *            l'écran (un QR du stand), le son n'est pas débloqué : un grand bouton « Scanner » d'abord.
  * ATTENTION — la caméra ne s'allume qu'une fois le son débloqué ; elle s'éteint en quittant l'écran.
@@ -11,14 +13,15 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { aLaTaille } from '@/shared/lib/image'
+import eclair from '@/assets/ui/eclair.svg'
 import fleche from '@/assets/ui/fleche-retour-claire.svg'
-import { noterScan } from '../api/scan'
+import { biper, debloquerSon, sonDebloque } from '@/shared/lib/son'
+import { fetchRescan, noterScan, type Rescan } from '../api/scan'
 import { useAnalyse } from '../hooks/useAnalyse'
 import { useCamera } from '../hooks/useCamera'
 import { useEmpreintes } from '../hooks/useEmpreintes'
 import { cheminDuRecit } from '../lib/chemin'
 import { SEUIL } from '../lib/regleDuBip'
-import { biper, debloquerSon, sonDebloque } from '../lib/son'
 import { FeuilleApprendre } from './FeuilleApprendre'
 import styles from './ScanScreen.module.css'
 
@@ -39,6 +42,7 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
   const client = useQueryClient()
   const [reconnu, setReconnu] = useState<number | null>(null)
   const [note, setNote] = useState(false)
+  const [rescan, setRescan] = useState<Rescan | null>(null)
   const analyse = useAnalyse(
     video,
     references,
@@ -46,11 +50,15 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
     (id) => {
       biper()
       // Le Codex et la fiche du Fragment se relisent une fois le scan noté (clés de leurs hooks).
-      void noterScan(id).then(() => {
-        void client.invalidateQueries({ queryKey: ['codex'] })
-        void client.invalidateQueries({ queryKey: ['mon-fragment', id] })
-        setNote(true)
-      })
+      void noterScan(id)
+        // Un membre qui connaît déjà ce motif choisit ici ; sinon (ou en cas d'échec), la fiche s'ouvre.
+        .then(() => (connecte ? fetchRescan(id).catch(() => null) : null))
+        .then((offre) => {
+          void client.invalidateQueries({ queryKey: ['codex'] })
+          void client.invalidateQueries({ queryKey: ['mon-fragment', id] })
+          setRescan(offre)
+          setNote(true)
+        })
       setReconnu(id)
     },
   )
@@ -71,7 +79,7 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
 
   // La fiche attend le scan noté : sinon, sur un réseau lent, elle le croirait le premier.
   useEffect(() => {
-    if (reconnu === null || !note) return
+    if (reconnu === null || !note || rescan) return
     const minuteur = window.setTimeout(() => {
       // Le Récit remplace le scanner : le retour ne rouvre pas la caméra devant le t-shirt.
       // L'heure du scan suit : la fiche tire l'anecdote de ce scan, une fois.
@@ -83,7 +91,15 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
     return () => {
       window.clearTimeout(minuteur)
     }
-  }, [reconnu, note, connecte, navigate])
+  }, [reconnu, note, rescan, connecte, navigate])
+
+  // Un choix du rescan remplace le scanner, comme le bip ; seule l'anecdote emporte l'heure du scan.
+  function ouvrir(chemin: string, anecdote?: { creuser: boolean }) {
+    void navigate(chemin, {
+      replace: true,
+      state: anecdote ? { scan: Date.now(), creuser: anecdote.creuser } : null,
+    })
+  }
 
   const fragment = fragments?.find((f) => f.id === reconnu)
   const echec = analyse.erreur || erreurEmpreintes
@@ -99,8 +115,9 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
         <h1 className={styles.titre}>Scanner un Fragment</h1>
       </header>
 
-      <div className={styles.viseur} data-reconnu={reconnu !== null}>
+      <div className={styles.viseur} data-reconnu={reconnu !== null} data-connu={rescan !== null}>
         <span /> <span /> <span /> <span />
+        {rescan && fragment && <p className={styles.accroche}>{fragment.nom}</p>}
         {reconnu === null && camera === 'en-marche' && <i className={styles.lecture} />}
       </div>
 
@@ -132,6 +149,8 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
             Voir tous les Fragments
           </Link>
         </div>
+      ) : rescan && fragment && reconnu !== null ? (
+        <Choix rescan={rescan} fiche={cheminDuRecit(reconnu, connecte)} ouvrir={ouvrir} />
       ) : fragment ? (
         <div className={styles.reconnu}>
           {fragment.illustration && <img src={aLaTaille(fragment.illustration, 104)} alt="" />}
@@ -180,5 +199,67 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
         />
       )}
     </main>
+  )
+}
+
+// Les choix d'un rescan, posés sur la caméra sous le motif accroché.
+function Choix({
+  rescan,
+  fiche,
+  ouvrir,
+}: {
+  rescan: Rescan
+  fiche: string
+  ouvrir: (chemin: string, anecdote?: { creuser: boolean }) => void
+}) {
+  const { porte, restantes, gratuiteDuJour } = rescan
+  return (
+    <div className={styles.choix}>
+      <p className={styles.connu}>
+        {gratuiteDuJour ? 'Tu le connais' : 'Ton anecdote du jour est trouvée'}
+        {restantes > 0 && ` · ${String(restantes)} anecdote${restantes > 1 ? 's' : ''} à découvrir`}
+      </p>
+      {restantes > 0 && (
+        <button
+          type="button"
+          className={styles.anecdote}
+          onClick={() => {
+            debloquerSon() // dans le geste : les applaudissements de la révélation pourront jouer
+            ouvrir(fiche, { creuser: !gratuiteDuJour })
+          }}
+        >
+          {gratuiteDuJour ? 'Découvrir l’anecdote du jour' : 'Creuser une anecdote'}
+          <span className={styles.cout}>
+            {gratuiteDuJour ? (
+              'gratuite'
+            ) : (
+              <>
+                <img src={eclair} alt="" />2
+              </>
+            )}
+          </span>
+        </button>
+      )}
+      <button
+        type="button"
+        className={styles.principal}
+        onClick={() => {
+          ouvrir(porte ? `${fiche}/histoire` : fiche)
+        }}
+      >
+        {porte ? 'Lire son histoire →' : 'Voir sa fiche →'}
+      </button>
+      {porte && (
+        <button
+          type="button"
+          className={styles.fiche}
+          onClick={() => {
+            ouvrir(fiche)
+          }}
+        >
+          Voir sa fiche
+        </button>
+      )}
+    </div>
   )
 }

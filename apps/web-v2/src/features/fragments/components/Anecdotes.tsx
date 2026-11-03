@@ -72,6 +72,11 @@ export function Anecdotes({
           Ton anecdote gratuite du jour est déjà trouvée : creuse encore, ou reviens demain.
         </p>
       )}
+      {plusDEnergie && !tirage && (
+        <p role="alert" className={styles.aide}>
+          Plus assez d’énergie pour creuser : elle revient avec le temps.
+        </p>
+      )}
       {echec && (
         <p role="alert" className={styles.aide}>
           L’anecdote n’a pas pu être tirée. Réessaie dans un instant.

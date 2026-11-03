@@ -1,10 +1,11 @@
 /**
  * QUOI     — l'écran du scanner : le bouton « Scanner » quand le son n'est pas débloqué (arrivée par
- *            un QR), la visée, le bip qui mène au Récit, le conseil, la caméra refusée, l'échec.
+ *            un QR), la visée, le bip qui mène au Récit, le conseil, la caméra refusée, l'échec ; le
+ *            rescan d'un motif connu et ses choix sur la caméra.
  */
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes, useNavigate } from 'react-router'
+import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
@@ -25,12 +26,14 @@ const etat = vi.hoisted(() => ({
   connecte: true,
 }))
 const noterScan = vi.hoisted(() => vi.fn(() => Promise.resolve()))
+type Offre = { porte: boolean; restantes: number; gratuiteDuJour: boolean } | null
+const fetchRescan = vi.hoisted(() => vi.fn(() => Promise.resolve<Offre>(null)))
 const debloquerSon = vi.hoisted(() =>
   vi.fn(() => {
     etat.son = true
   }),
 )
-vi.mock('../lib/son', () => ({ sonDebloque: () => etat.son, debloquerSon, biper: vi.fn() }))
+vi.mock('@/shared/lib/son', () => ({ sonDebloque: () => etat.son, debloquerSon, biper: vi.fn() }))
 vi.mock('../hooks/useCamera', () => ({
   useCamera: (_v: unknown, actif: boolean) => (actif ? etat.camera : 'attente'),
 }))
@@ -44,7 +47,7 @@ vi.mock('../hooks/useEmpreintes', () => ({
   useEmpreintes: () => etat.empreintes,
   useFragmentsVisibles: () => ({ fragments: [], erreur: false }),
 }))
-vi.mock('../api/scan', () => ({ noterScan }))
+vi.mock('../api/scan', () => ({ noterScan, fetchRescan }))
 const feuille = vi.hoisted(() => ({ suggestion: undefined as number | null | undefined }))
 vi.mock('./FeuilleApprendre', () => ({
   FeuilleApprendre: ({ suggestion }: { suggestion: number | null }) => {
@@ -57,15 +60,19 @@ import { ScanScreen } from './ScanScreen'
 
 function Retour() {
   const navigate = useNavigate()
+  const etatRecu: unknown = useLocation().state
   return (
-    <button
-      type="button"
-      onClick={() => {
-        void navigate(-1)
-      }}
-    >
-      Récit membre
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => {
+          void navigate(-1)
+        }}
+      >
+        Récit membre
+      </button>
+      <p data-testid="arrivee">{JSON.stringify(etatRecu)}</p>
+    </>
   )
 }
 
@@ -79,6 +86,7 @@ function ouvrir(admin = false) {
           <Route path="/scan" element={<ScanScreen connecte={etat.connecte} admin={admin} />} />
           <Route path="/avant" element={<p>Avant le scan</p>} />
           <Route path="/codex/fragment/:id" element={<Retour />} />
+          <Route path="/codex/fragment/:id/histoire" element={<p>Son histoire</p>} />
           <Route path="/scan/fragment/:id" element={<p>Récit visiteur</p>} />
         </Routes>
       </MemoryRouter>
@@ -258,4 +266,38 @@ test('un scan noté fait relire le Codex et la fiche du Fragment', async () => {
     expect(relire).toHaveBeenCalledWith({ queryKey: ['codex'] })
   })
   expect(relire).toHaveBeenCalledWith({ queryKey: ['mon-fragment', 11] })
+})
+
+test('rescan d’un motif connu, la gratuite du jour à prendre : les choix sur la caméra', async () => {
+  fetchRescan.mockResolvedValueOnce({ porte: false, restantes: 4, gratuiteDuJour: true })
+  ouvrir()
+  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await act(() => Promise.resolve())
+  expect(screen.getByText('Tu le connais · 4 anecdotes à découvrir')).toBeInTheDocument()
+  act(() => {
+    vi.advanceTimersByTime(5000)
+  })
+  expect(screen.queryByText('Récit membre')).toBeNull() // pas de bip qui emmène ailleurs
+  await userEvent.click(screen.getByRole('button', { name: /Découvrir l’anecdote du jour/ }))
+  expect(screen.getByTestId('arrivee').textContent).toContain('"creuser":false')
+})
+
+test('rescan, la gratuite déjà prise, porté : creuser, ou lire son histoire', async () => {
+  fetchRescan.mockResolvedValue({ porte: true, restantes: 2, gratuiteDuJour: false })
+  ouvrir()
+  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await act(() => Promise.resolve())
+  await userEvent.click(screen.getByRole('button', { name: /Creuser une anecdote/ }))
+  expect(screen.getByTestId('arrivee').textContent).toContain('"creuser":true')
+  fetchRescan.mockResolvedValue(null)
+})
+
+test('rescan d’un Fragment porté : « Lire son histoire » ouvre son histoire', async () => {
+  fetchRescan.mockResolvedValueOnce({ porte: true, restantes: 0, gratuiteDuJour: true })
+  ouvrir()
+  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await act(() => Promise.resolve())
+  expect(screen.queryByRole('button', { name: /anecdote/ })).toBeNull() // tout est trouvé
+  await userEvent.click(screen.getByRole('button', { name: /Lire son histoire/ }))
+  expect(screen.getByText('Son histoire')).toBeInTheDocument()
 })

@@ -21,6 +21,7 @@ import { Text } from '@/shared/ui/Text'
 import type { MonFragment } from '../api/lireMonFragment'
 import type { Recit } from '../api/lireRecit'
 import type { Tirage } from '../api/lireTirage'
+import type { ArriveeDuScan } from '../lib/arrivee'
 import { useAnecdoteDuVisiteur } from '../hooks/useAnecdoteDuVisiteur'
 import { useAnecdotes } from '../hooks/useAnecdotes'
 import { useMonFragment } from '../hooks/useMonFragment'
@@ -245,16 +246,16 @@ export function FicheFragment({
   id,
   connecte,
   equiper,
-  scan = null,
+  arrivee = null,
 }: {
   id: number
   connecte: boolean
   equiper: (id: number) => Promise<void>
-  scan?: number | null // l'heure du scan qui a ouvert la fiche ; null depuis le Codex
+  arrivee?: ArriveeDuScan | null // le scan qui a ouvert la fiche ; null depuis le Codex
 }) {
   const { recit, erreur, reessayer } = useRecit(id)
   const { moi } = useMonFragment(id, connecte)
-  const anecdotes = useAnecdotes(id, connecte ? scan : null)
+  const anecdotes = useAnecdotes(id, connecte ? arrivee : null)
   const titre = usePorterTitre(id)
   const anecdoteDuVisiteur = useAnecdoteDuVisiteur(id, !connecte)
   const [revelationFermee, setRevelationFermee] = useState<Tirage | null>(null)
@@ -274,6 +275,8 @@ export function FicheFragment({
       </div>
     )
   }
+  // Le tirage d'un scan d'abord : la révélation s'ouvre sans laisser voir la fiche passer dessous.
+  if (anecdotes.enAttente) return <div className={styles.attente} aria-busy="true" />
   if (recit === undefined) return null
   if (recit === null) {
     return (

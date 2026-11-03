@@ -7,6 +7,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { MemoryRouter, useLocation } from 'react-router'
 import { expect, test, vi } from 'vitest'
+import { lireArrivee } from '../lib/arrivee'
 import { useAnecdotes } from './useAnecdotes'
 
 const api = vi.hoisted(() => ({ tirerAnecdote: vi.fn(), PasAssezDEnergie: class extends Error {} }))
@@ -33,11 +34,7 @@ function monter(etat: unknown) {
     () => {
       const location = useLocation()
       const recu: unknown = location.state
-      const scan =
-        typeof recu === 'object' && recu !== null && 'scan' in recu && typeof recu.scan === 'number'
-          ? recu.scan
-          : null
-      return { anecdotes: useAnecdotes(3, scan), etat: recu }
+      return { anecdotes: useAnecdotes(3, lireArrivee(recu)), etat: recu }
     },
     { wrapper },
   )
@@ -59,4 +56,14 @@ test('rouverte sans scan (retour, rechargement) : rien n’est tiré', () => {
   const { result } = monter(null)
   expect(result.current.anecdotes.tirage).toBeNull()
   expect(api.tirerAnecdote).not.toHaveBeenCalled()
+})
+
+test('le rescan a choisi de creuser : le tirage creuse', async () => {
+  api.tirerAnecdote.mockClear()
+  api.tirerAnecdote.mockResolvedValue({ ...TIRAGE, raison: 'creusee' })
+  const { result } = monter({ scan: 2000, creuser: true })
+  await waitFor(() => {
+    expect(result.current.anecdotes.tirage?.raison).toBe('creusee')
+  })
+  expect(api.tirerAnecdote).toHaveBeenCalledWith(3, true)
 })
