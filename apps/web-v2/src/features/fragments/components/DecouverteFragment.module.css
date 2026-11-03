@@ -17,7 +17,8 @@
   border: none;
 
   /* Le fond de la maquette (parchemin et forêt gravée), celui de la conquête d'un lieu. */
-  background: var(--color-fond) url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto;
+  background: var(--color-fond) url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto
+    no-repeat;
   color: var(--color-encre);
   text-align: center;
 }

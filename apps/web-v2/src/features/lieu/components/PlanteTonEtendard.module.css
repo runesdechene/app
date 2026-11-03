@@ -10,7 +10,8 @@
   grid-template-rows: minmax(0, 1fr) auto;
   grid-template-columns: minmax(0, 1fr); /* le défilé des pastilles n'élargit pas l'écran */
   justify-items: center;
-  background: var(--color-fond) url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto;
+  background: var(--color-fond) url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto
+    no-repeat;
 }
 
 .contenu {
