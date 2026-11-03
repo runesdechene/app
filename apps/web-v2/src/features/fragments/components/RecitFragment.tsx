@@ -1,15 +1,13 @@
 /**
  * QUOI     — le récit d'un Fragment (maquette 99:145) : d'où il vient, son nom, sa collection
- *            d'héritage, son illustration, les onglets « Son histoire » et « Ses énigmes »
- *            (verrouillé), sa voix off, le début de son histoire (« Lire tout le récit » déplie la
- *            suite), et « Acheter ce Fragment ».
- * POURQUOI — scanner un Fragment (ou suivre son adresse) ouvre son histoire, ouverte à tous ; ses énigmes, à
- *            créer, seront réservées à ses Porteurs (décision du 08/10).
- * ATTENTION — pas encore de Campement : son entrée de la maquette (« Déjà Porteur ? Entrer au
- *            Campement ») attend qu'il existe. On arrive ici aussi par le scan (/scan).
+ *            d'héritage, son motif à nu, sa voix off et son histoire. Au Porteur (`porteur`, depuis
+ *            sa fiche du Codex) : l'histoire entière, rien à acheter. Ailleurs (la vitrine) : le
+ *            début, « Lire tout le récit », et « Acheter ce Fragment ».
+ * POURQUOI — ses énigmes ne se feront pas pour l'instant (Uriel, 03/11) : les anecdotes en tiennent
+ *            lieu. La vraie page « histoire » du Porteur se maquettera après jeudi (spec du Codex).
+ *            Jamais d'italique (.claude/rules/interface.md) : un passage en italique se lit en romain.
  */
 import { useState } from 'react'
-import cadenas from '@/assets/ui/cadenas.svg'
 import { aLaTaille } from '@/shared/lib/image'
 import { Button } from '@/shared/ui/Button'
 import { Text } from '@/shared/ui/Text'
@@ -25,14 +23,13 @@ function Paragraphe({ bloc }: { bloc: Bloc }) {
     <p className={styles.paragraphe}>
       {bloc.map((s, i) => {
         if (s.gras) return <strong key={i}>{s.texte}</strong>
-        if (s.italique) return <em key={i}>{s.texte}</em>
         return <span key={i}>{s.texte}</span>
       })}
     </p>
   )
 }
 
-export function RecitFragment({ id }: { id: number }) {
+export function RecitFragment({ id, porteur = false }: { id: number; porteur?: boolean }) {
   const { recit, erreur, reessayer } = useRecit(id)
   const [toutLire, setToutLire] = useState(false)
 
@@ -61,7 +58,7 @@ export function RecitFragment({ id }: { id: number }) {
   }
 
   const blocs = lireTexteRiche(recit.histoire)
-  const montres = toutLire ? blocs : blocs.slice(0, DEBUT)
+  const montres = porteur || toutLire ? blocs : blocs.slice(0, DEBUT)
   return (
     <div className={styles.page}>
       <p className={styles.surtitre}>{recit.origine ?? 'Fragment'}</p>
@@ -69,24 +66,9 @@ export function RecitFragment({ id }: { id: number }) {
       {recit.heritage && <p className={styles.heritage}>de la collection {recit.heritage}</p>}
       {recit.illustration && (
         <div className={styles.motif}>
-          <img
-            src={aLaTaille(recit.illustration, 164)}
-            alt={`L’illustration de ${recit.nom}`}
-            width={164}
-            height={227}
-          />
+          <img src={aLaTaille(recit.illustration, 280)} alt={`L’illustration de ${recit.nom}`} />
         </div>
       )}
-
-      <div className={styles.onglets}>
-        <span className={styles.onglet} aria-current="page">
-          Son histoire
-        </span>
-        <span className={styles.ferme} title="Réservé aux Porteurs de ce Fragment">
-          <img src={cadenas} alt="" width={12} height={15} />
-          Ses énigmes
-        </span>
-      </div>
 
       {recit.audio && (
         <LecteurAudio
@@ -100,7 +82,7 @@ export function RecitFragment({ id }: { id: number }) {
           <Paragraphe key={i} bloc={b} />
         ))}
       </div>
-      {!toutLire && blocs.length > DEBUT && (
+      {!porteur && !toutLire && blocs.length > DEBUT && (
         <button
           type="button"
           className={styles.lireTout}
@@ -112,7 +94,7 @@ export function RecitFragment({ id }: { id: number }) {
         </button>
       )}
 
-      {recit.boutique && (
+      {!porteur && recit.boutique && (
         <div className={styles.acheter}>
           <Button href={recit.boutique}>Acheter ce Fragment</Button>
         </div>

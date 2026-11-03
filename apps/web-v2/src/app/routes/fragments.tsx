@@ -70,7 +70,7 @@ export function RouteHistoireFragment() {
   const { recit } = useRecit(id)
   return (
     <DetailPane title={recit?.nom ?? 'Fragment'} titreCache>
-      <RecitFragment key={id} id={id} />
+      <RecitFragment key={id} id={id} porteur />
     </DetailPane>
   )
 }

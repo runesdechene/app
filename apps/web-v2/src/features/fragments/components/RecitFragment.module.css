@@ -1,6 +1,6 @@
 /*
  * QUOI     — le récit d'un Fragment (maquette 99:145) : le parchemin et ses arbres en tête, tout centré
- *            sur 334 px, le motif dans sa carte, les onglets soulignés, le récit en Cabin 16 px.
+ *            sur 334 px, le motif à nu, le récit en Cabin 16 px.
  */
 .page {
   display: flex;
@@ -46,49 +46,19 @@
   text-align: center;
 }
 
+/* Le motif à nu sur le parchemin, comme sur sa fiche. */
 .motif {
   display: grid;
   place-items: center;
-  width: auto;
-  padding: 16px 32px;
-  border: 1px solid var(--color-bord);
-  border-radius: var(--radius-carte);
-  background: var(--color-surface);
 }
 
 .motif img {
   display: block;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
   object-fit: contain;
-  opacity: 0.8;
-}
-
-/* Les onglets : « Son histoire » choisi, souligné ; « Ses énigmes » verrouillé. */
-.onglets {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin-top: 8px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-onglet) 20%, transparent);
-  font-family: var(--font-titre);
-  font-size: var(--rangee-size);
-}
-
-.onglet,
-.ferme {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 0 9px;
-}
-
-.onglet {
-  color: var(--color-onglet);
-  box-shadow: inset 0 -3px 0 var(--color-onglet);
-}
-
-.ferme {
-  color: var(--color-onglet-ferme);
+  mix-blend-mode: multiply;
 }
 
 .histoire {
