@@ -19,21 +19,14 @@
 .illustration {
   display: grid;
   place-items: center;
-  width: 210px;
-  aspect-ratio: 210 / 236;
+  width: 100%;
   margin-bottom: var(--space-2);
-  border: 1px solid var(--color-sable);
-  border-radius: var(--radius-carte);
-  background: var(--color-feuille);
-}
-
-.illustration[data-porte] {
-  border: 2px solid var(--color-ocre);
 }
 
 .illustration img {
-  width: 186px;
-  height: 212px;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
   object-fit: contain;
   mix-blend-mode: multiply;
 }

@@ -5,6 +5,8 @@
  *              nom, sa place dans sa collection, sa première anecdote ;
  *            - une nouvelle anecdote (celle du jour, ou une de plus en creusant) : la carte, déjà
  *              connue, monte sans se retourner ; l'anecdote se déplie dessous, teintée de sa rareté.
+ *            - un rescan le même jour, l'anecdote gratuite déjà prise : la carte, et l'offre d'en creuser
+ *              une autre.
  *            Puis « Creuser encore », qui rejoue la révélation sur place (ou les félicitations quand
  *            tout est trouvé), et de quoi fermer sans rien coûter.
  * POURQUOI — chaque anecdote gagnée mérite son moment : c'est ce qui donne envie de creuser et de
@@ -61,9 +63,11 @@ export function DecouverteFragment({
   const rare = anecdote?.rarete === 'rare'
   const titre = nouveauFragment
     ? 'Nouveau Fragment !'
-    : rare
-      ? 'Anecdote rare !'
-      : 'Nouvelle anecdote !'
+    : !anecdote
+      ? 'Une de plus ?'
+      : rare
+        ? 'Anecdote rare !'
+        : 'Nouvelle anecdote !'
   const trouvees = total - tirage.restantes
 
   return (
@@ -109,6 +113,12 @@ export function DecouverteFragment({
       {!nouveauFragment && total > 0 && (
         <p className={styles.place}>
           {trouvees} sur {total} anecdotes trouvées
+        </p>
+      )}
+
+      {!nouveauFragment && !anecdote && (
+        <p className={styles.collection}>
+          Ton anecdote gratuite du jour est déjà trouvée : creuse pour en découvrir une autre.
         </p>
       )}
 

@@ -1,0 +1,17 @@
+/*
+ * QUOI     — le scanner en haut à droite de la fiche d'un Fragment (maquettes C et D).
+ */
+.scanner {
+  display: grid;
+  place-content: center;
+  width: var(--cible-tactile);
+  height: var(--cible-tactile);
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.scanner img {
+  width: 24px;
+  height: 24px;
+}

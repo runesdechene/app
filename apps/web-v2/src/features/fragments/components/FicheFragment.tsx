@@ -236,6 +236,11 @@ function CeQueTuGagnes({ recit, moi }: { recit: Recit; moi: MonFragment | null |
   )
 }
 
+function aReveler(tirage: Tirage): boolean {
+  if (tirage.premiereDecouverte || tirage.anecdote) return true
+  return tirage.raison === 'deja_aujourdhui' && tirage.restantes > 0
+}
+
 export function FicheFragment({
   id,
   connecte,
@@ -282,9 +287,9 @@ export function FicheFragment({
   const { tirage } = anecdotes
   return (
     <article className={styles.fiche}>
-      {/* Chaque tirage qui rapporte (un Fragment neuf, une anecdote) a sa révélation ; en creuser une
-          autre rejoue l'animation (la clé change). */}
-      {tirage && tirage !== revelationFermee && (tirage.premiereDecouverte || tirage.anecdote) && (
+      {/* Chaque tirage qui rapporte (un Fragment neuf, une anecdote) a sa révélation, et un rescan
+          du même jour y propose de creuser ; en creuser une autre rejoue l'animation (la clé change). */}
+      {tirage && tirage !== revelationFermee && aReveler(tirage) && (
         <DecouverteFragment
           key={tirage.anecdote?.texte ?? 'fragment'}
           nom={recit.nom}
@@ -302,8 +307,8 @@ export function FicheFragment({
       )}
       <header className={styles.tete}>
         {recit.illustration && (
-          <span className={styles.illustration} data-porte={moi?.etat === 'porte' || undefined}>
-            <img src={aLaTaille(recit.illustration, 186)} alt={`L’illustration de ${recit.nom}`} />
+          <span className={styles.illustration}>
+            <img src={aLaTaille(recit.illustration, 280)} alt={`L’illustration de ${recit.nom}`} />
           </span>
         )}
         <h1 className={styles.nom}>{recit.nom}</h1>

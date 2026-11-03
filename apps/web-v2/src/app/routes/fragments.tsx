@@ -3,17 +3,38 @@
  *            /<onglet>/fragment/<id>/histoire : son histoire entière, à lire ou à écouter (le Récit).
  * POURQUOI — la zone ne connaît pas la coquille (règle ESLint) : c'est ici que la fiche reçoit le
  *            cadre de détail, et le skin (le signe du profil, zone Compte). La maquette n'a pas de
- *            barre de titre : la flèche se pose sur le parchemin (`titreCache`).
+ *            barre de titre : la flèche se pose sur le parchemin (`titreCache`), le scanner en face.
  */
 import { useQueryClient } from '@tanstack/react-query'
-import { useLocation, useParams } from 'react-router'
+import { useLocation, useNavigate, useParams } from 'react-router'
+import scanner from '@/assets/ui/scanner.svg'
 import { useChoisirSigne } from '@/features/compte/hooks/useChoisirSigne'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { FicheFragment } from '@/features/fragments/components/FicheFragment'
 import { RecitFragment } from '@/features/fragments/components/RecitFragment'
 import { cleMonFragment } from '@/features/fragments/hooks/useMonFragment'
 import { useRecit } from '@/features/fragments/hooks/useRecit'
+import { debloquerSon } from '@/features/scan/lib/son'
 import { DetailPane } from '../shell/DetailPane'
+import styles from './fragments.module.css'
+
+// Le scanner de la coquille, en haut à droite de la fiche (maquettes C et D).
+function Scanner() {
+  const navigate = useNavigate()
+  return (
+    <button
+      type="button"
+      className={styles.scanner}
+      aria-label="Scanner un Fragment"
+      onClick={() => {
+        debloquerSon() // ce toucher débloque le son du bip (Safari)
+        void navigate('/scan')
+      }}
+    >
+      <img src={scanner} alt="" />
+    </button>
+  )
+}
 
 export function RouteFragment() {
   const id = Number(useParams().id)
@@ -33,7 +54,7 @@ export function RouteFragment() {
   }
 
   return (
-    <DetailPane title={recit?.nom ?? 'Fragment'} titreCache>
+    <DetailPane title={recit?.nom ?? 'Fragment'} titreCache actions={<Scanner />}>
       <FicheFragment key={id} id={id} connecte equiper={equiper} scan={scan} />
     </DetailPane>
   )

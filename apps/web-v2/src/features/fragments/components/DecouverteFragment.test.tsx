@@ -96,3 +96,11 @@ test('la dernière anecdote : des félicitations à la place de « Creuser encor
   expect(screen.getByText('· ta dernière anecdote')).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: /Creuser encore/ })).toBeNull()
 })
+
+test('un rescan le même jour : l’offre de creuser, sans anecdote', () => {
+  afficher({ ...duJour, raison: 'deja_aujourdhui', anecdote: null })
+  expect(screen.getByRole('dialog', { name: 'Une de plus ?' })).toBeInTheDocument()
+  expect(screen.getByText(/déjà trouvée/)).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Creuser encore/ })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Voir sa fiche/ })).toBeInTheDocument()
+})
