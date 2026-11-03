@@ -1,24 +1,26 @@
 /**
  * QUOI     — la découverte, par-dessus la fiche, en deux genres (maquettes Figma du 02/11 et du 03/11) :
- *            - un nouveau Fragment, au premier scan d'un motif : la carte monte de l'ombre, de dos (la
- *              rune d'or), se retourne dans un halo, un reflet la balaie ; « Nouveau Fragment ! », son
- *              nom, sa place dans sa collection, sa première anecdote ;
- *            - une nouvelle anecdote (celle du jour, ou une de plus en creusant) : la même carte qui se
- *              retourne, plus petite ; l'anecdote se déplie dessous, teintée de sa rareté.
- *            - un rescan le même jour, l'anecdote gratuite déjà prise : la carte, et l'offre d'en creuser
+ *            - un nouveau Fragment, au premier scan d'un motif : la rune d'or monte de l'ombre et pivote,
+ *              le motif apparaît en tournant, à nu, dans un halo ; « Nouveau Fragment ! », son nom, sa
+ *              place dans sa collection, sa première anecdote ;
+ *            - une nouvelle anecdote (celle du jour, ou une de plus en creusant) : le même motif qui
+ *              tourne, plus petit ; l'anecdote se déplie dessous, teintée de sa rareté.
+ *            - un rescan le même jour, l'anecdote gratuite déjà prise : le motif, et l'offre d'en creuser
  *              une autre.
  *            Puis « Creuser encore », qui rejoue la révélation sur place (ou les félicitations quand
- *            tout est trouvé), et de quoi fermer sans rien coûter. Quand la carte se retourne, les
- *            applaudissements de la conquête d'un lieu.
+ *            tout est trouvé), et de quoi fermer sans rien coûter. Quand le motif apparaît, les
+ *            applaudissements de la conquête d'un lieu. En haut, le scanner (rescanner) et la croix.
  * POURQUOI — chaque anecdote gagnée mérite son moment : c'est ce qui donne envie de creuser et de
  *            scanner. Toute la chorégraphie vit dans le CSS (transform, opacity) ; `prefers-reduced-motion`
  *            la coupe. Le <dialog> du navigateur garde le focus dedans, et Échap ferme.
  */
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router'
+import croix from '@/assets/ui/croix.svg'
 import eclair from '@/assets/ui/eclair.svg'
+import scanner from '@/assets/ui/scanner.svg'
 import { aLaTaille } from '@/shared/lib/image'
-import { applaudir } from '@/shared/lib/son'
+import { applaudir, debloquerSon } from '@/shared/lib/son'
 import { Insigne } from '@/shared/ui/Insigne'
 import type { Tirage } from '../api/lireTirage'
 import styles from './DecouverteFragment.module.css'
@@ -89,17 +91,27 @@ export function DecouverteFragment({
         fermer()
       }}
     >
+      <Link
+        className={styles.rescanner}
+        to="/scan"
+        aria-label="Scanner un Fragment"
+        onClick={debloquerSon} // ce toucher débloque le son du bip (Safari)
+      >
+        <img src={scanner} alt="" width={24} height={24} />
+      </Link>
+      <button type="button" className={styles.fermer} aria-label="Fermer" onClick={fermer}>
+        <img src={croix} alt="" width={24} height={24} />
+      </button>
+
       <div className={styles.scene}>
         <span className={styles.rayons} aria-hidden="true" />
         <span className={styles.halo} aria-hidden="true" />
-        <div className={styles.carte} aria-hidden="true">
+        <div className={styles.motif} aria-hidden="true">
           <span className={styles.dos}>
             <span className={styles.rune} />
           </span>
           <span className={styles.face}>
-            {illustration && <img src={aLaTaille(illustration, 176)} alt="" />}
-            {nouveauFragment && <span className={styles.nouveau}>Nouveau</span>}
-            <span className={styles.reflet} />
+            {illustration && <img src={aLaTaille(illustration, 220)} alt="" />}
           </span>
         </div>
       </div>

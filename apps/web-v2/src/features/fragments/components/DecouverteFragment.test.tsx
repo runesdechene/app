@@ -104,3 +104,10 @@ test('un rescan le même jour : l’offre de creuser, sans anecdote', () => {
   expect(screen.getByRole('button', { name: /Creuser encore/ })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: /Voir sa fiche/ })).toBeInTheDocument()
 })
+
+test('la croix ferme ; le scanner mène au scan', async () => {
+  const { fermer } = afficher(duJour)
+  expect(screen.getByRole('link', { name: 'Scanner un Fragment' })).toHaveAttribute('href', '/scan')
+  await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+  expect(fermer).toHaveBeenCalled()
+})

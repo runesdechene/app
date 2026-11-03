@@ -1,9 +1,9 @@
 /*
- * QUOI     — la chorégraphie de la découverte (3,4 s, maquette du 02/11) : la carte monte de l'ombre
- *            de dos (0-0,55 s), se retourne (0,75-1,35 s) dans un halo et des rayons, un reflet
- *            holographique la balaie (1,3-1,95 s puis 2,7-3,3 s) ; le titre est frappé (1,25 s), le
- *            reste suit, l'insigne éclate (2,15 s).
- *            Une nouvelle anecdote suit la même chorégraphie, sur une carte plus petite.
+ * QUOI     — la chorégraphie de la découverte (3,4 s, maquette du 02/11) : la rune d'or monte de
+ *            l'ombre (0-0,55 s) et pivote, le motif apparaît en tournant à sa place (0,75-1,35 s), à nu
+ *            sur le parchemin comme sur sa fiche (Uriel, 03/11 : on collectionne des illustrations, pas
+ *            des cartes), dans un halo et des rayons ; le titre est frappé (1,25 s), le reste suit,
+ *            l'insigne éclate (2,15 s). Une nouvelle anecdote suit la même chorégraphie, en plus petit.
  * ATTENTION — seulement transform et opacity ; sous prefers-reduced-motion, tout est posé d'emblée.
  */
 .voile {
@@ -33,6 +33,29 @@
 
 .voile::backdrop {
   background: none; /* le voile est opaque : il couvre déjà la fiche */
+}
+
+/* En haut : le scanner à gauche, la croix à droite. */
+.rescanner,
+.fermer {
+  position: absolute;
+  top: calc(var(--space-2) + env(safe-area-inset-top));
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--cible-tactile);
+  height: var(--cible-tactile);
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.rescanner {
+  left: var(--space-2);
+}
+
+.fermer {
+  right: var(--space-2);
 }
 
 .scene {
@@ -78,11 +101,11 @@
   animation: halo 1.25s ease-out 0.95s forwards;
 }
 
-.carte {
+.motif {
   position: relative;
   display: grid;
-  width: 200px;
-  height: 272px;
+  width: 220px;
+  height: 290px;
 }
 
 .dos,
@@ -90,16 +113,9 @@
   grid-area: 1 / 1;
   display: grid;
   place-items: center;
-  overflow: hidden;
-  border-radius: var(--radius-carte);
 }
 
 .dos {
-  border: 1.5px solid color-mix(in srgb, var(--color-rarete-rare) 60%, transparent);
-  background: var(--color-carte-encre);
-  box-shadow:
-    inset 0 0 0 8px var(--color-carte-encre),
-    inset 0 0 0 9px color-mix(in srgb, var(--color-rarete-rare) 45%, transparent);
   opacity: 0;
   translate: 0 50px;
   scale: 0.85;
@@ -117,53 +133,16 @@
 }
 
 .face {
-  border: 2px solid var(--color-rarete-rare);
-  background: var(--color-feuille);
-  box-shadow: 0 0 24px color-mix(in srgb, var(--color-rarete-rare-lueur) 55%, transparent);
   opacity: 0;
   scale: 0 1;
   animation: retourner-face 350ms ease-out 1s forwards;
 }
 
 .face img {
-  width: 176px;
-  height: 232px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  filter: grayscale(1);
   mix-blend-mode: multiply;
-}
-
-.nouveau {
-  position: absolute;
-  top: var(--space-2);
-  left: var(--space-2);
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-petit);
-  background: var(--color-accent);
-  color: var(--color-sur-accent);
-  font-family: var(--font-titre);
-  font-size: var(--sous-titre-size);
-  letter-spacing: var(--libelle-tracking);
-  text-transform: uppercase;
-}
-
-/* Le reflet holographique : une bande de lumière irisée qui balaie la carte, deux fois. */
-.reflet {
-  position: absolute;
-  inset: -60px auto -60px -160px;
-  width: 160px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in srgb, var(--color-feuille) 85%, transparent) 45%,
-    color-mix(in srgb, var(--color-rarete-rare-lueur) 45%, transparent) 55%,
-    transparent
-  );
-  mix-blend-mode: screen;
-  rotate: -24deg;
-  animation:
-    balayer 650ms ease-in-out 1.3s,
-    balayer 600ms ease-in-out 2.7s;
 }
 
 .titre {
@@ -340,14 +319,9 @@
   height: 230px;
 }
 
-.voile[data-genre='anecdote'] .carte {
-  width: 140px;
-  height: 190px;
-}
-
-.voile[data-genre='anecdote'] .face img {
-  width: 123px;
-  height: 162px;
+.voile[data-genre='anecdote'] .motif {
+  width: 160px;
+  height: 210px;
 }
 
 .voile[data-genre='anecdote'] .rune {
@@ -438,12 +412,6 @@
   }
 }
 
-@keyframes balayer {
-  to {
-    translate: 520px 0;
-  }
-}
-
 @keyframes frapper {
   to {
     opacity: 1;
@@ -476,8 +444,7 @@
   }
 
   .dos,
-  .rayons,
-  .reflet {
+  .rayons {
     display: none;
   }
 
