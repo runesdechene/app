@@ -42,6 +42,7 @@ function afficher(tirage: Tirage, props: Partial<Parameters<typeof DecouverteFra
         creuser={creuser}
         enCours={false}
         plusDEnergie={false}
+        jauge={<p>Énergie : 7 sur 10</p>}
         fermer={fermer}
         {...props}
       />
@@ -110,4 +111,9 @@ test('la croix ferme ; le scanner mène au scan', async () => {
   expect(screen.getByRole('link', { name: 'Scanner un Fragment' })).toHaveAttribute('href', '/scan')
   await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
   expect(fermer).toHaveBeenCalled()
+})
+
+test('l’énergie qui reste se lit en haut', () => {
+  afficher(duJour)
+  expect(screen.getByText('Énergie : 7 sur 10')).toBeInTheDocument()
 })

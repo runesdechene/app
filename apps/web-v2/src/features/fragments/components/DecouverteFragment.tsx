@@ -9,12 +9,12 @@
  *              une autre.
  *            Puis « Creuser encore », qui rejoue la révélation sur place (ou les félicitations quand
  *            tout est trouvé), et de quoi fermer sans rien coûter. Quand le motif apparaît, les
- *            applaudissements de la conquête d'un lieu. En haut, le scanner (rescanner) et la croix.
+ *            applaudissements de la conquête d'un lieu. En haut, le scanner (rescanner), l'énergie qui reste et la croix.
  * POURQUOI — chaque anecdote gagnée mérite son moment : c'est ce qui donne envie de creuser et de
  *            scanner. Toute la chorégraphie vit dans le CSS (transform, opacity) ; `prefers-reduced-motion`
  *            la coupe. Le <dialog> du navigateur garde le focus dedans, et Échap ferme.
  */
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import croix from '@/assets/ui/croix.svg'
 import eclair from '@/assets/ui/eclair.svg'
@@ -22,6 +22,7 @@ import scanner from '@/assets/ui/scanner.svg'
 import { aLaTaille } from '@/shared/lib/image'
 import { applaudir, debloquerSon } from '@/shared/lib/son'
 import { Insigne } from '@/shared/ui/Insigne'
+import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import type { Tirage } from '../api/lireTirage'
 import styles from './DecouverteFragment.module.css'
 
@@ -42,6 +43,7 @@ export function DecouverteFragment({
   creuser,
   enCours,
   plusDEnergie,
+  jauge,
   fermer,
 }: {
   nom: string
@@ -52,6 +54,7 @@ export function DecouverteFragment({
   creuser: () => void
   enCours: boolean
   plusDEnergie: boolean
+  jauge: ReactNode // l'énergie qui reste, en haut : creuser en coûte
   fermer: () => void
 }) {
   const fenetre = useRef<HTMLDialogElement>(null)
@@ -99,6 +102,10 @@ export function DecouverteFragment({
       >
         <img src={scanner} alt="" width={24} height={24} />
       </Link>
+      {/* Sa règle s'ouvre dans la fenêtre, pas sous elle (.claude/rules/v2.md). */}
+      <div className={styles.jauge}>
+        <RacineDesFeuilles.Provider value={null}>{jauge}</RacineDesFeuilles.Provider>
+      </div>
       <button type="button" className={styles.fermer} aria-label="Fermer" onClick={fermer}>
         <img src={croix} alt="" width={24} height={24} />
       </button>

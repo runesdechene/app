@@ -8,6 +8,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import scanner from '@/assets/ui/scanner.svg'
+import { JaugeEnergie } from '@/features/energie/components/JaugeEnergie'
 import { useChoisirSigne } from '@/features/compte/hooks/useChoisirSigne'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { FicheFragment } from '@/features/fragments/components/FicheFragment'
@@ -52,7 +53,14 @@ export function RouteFragment() {
 
   return (
     <DetailPane title={recit?.nom ?? 'Fragment'} titreCache actions={<Scanner />}>
-      <FicheFragment key={id} id={id} connecte equiper={equiper} arrivee={arrivee} />
+      <FicheFragment
+        key={id}
+        id={id}
+        connecte
+        equiper={equiper}
+        arrivee={arrivee}
+        jauge={<JaugeEnergie />}
+      />
     </DetailPane>
   )
 }

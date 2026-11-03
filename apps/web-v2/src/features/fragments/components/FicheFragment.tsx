@@ -10,7 +10,7 @@
  * ATTENTION — le skin du profil est le signe (`set_my_signe`) : la coquille passe `equiper`, une zone
  *            n'en importe pas une autre. Sans compte (`connecte` faux), rien de personnel.
  */
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import { libelleEdition } from '@/shared/lib/edition'
 import { aLaTaille } from '@/shared/lib/image'
@@ -247,11 +247,13 @@ export function FicheFragment({
   connecte,
   equiper,
   arrivee = null,
+  jauge = null,
 }: {
   id: number
   connecte: boolean
   equiper: (id: number) => Promise<void>
   arrivee?: ArriveeDuScan | null // le scan qui a ouvert la fiche ; null depuis le Codex
+  jauge?: ReactNode // la jauge d'énergie (zone énergie), en haut de la révélation
 }) {
   const { recit, erreur, reessayer } = useRecit(id)
   const { moi } = useMonFragment(id, connecte)
@@ -303,6 +305,7 @@ export function FicheFragment({
           creuser={anecdotes.creuser}
           enCours={anecdotes.enCours}
           plusDEnergie={anecdotes.plusDEnergie}
+          jauge={jauge}
           fermer={() => {
             setRevelationFermee(tirage)
           }}

@@ -35,7 +35,18 @@
   background: none; /* le voile est opaque : il couvre déjà la fiche */
 }
 
-/* En haut : le scanner à gauche, la croix à droite. */
+/* En haut : le scanner à gauche, l'énergie au milieu, la croix à droite. */
+.jauge {
+  position: absolute;
+  top: calc(var(--space-2) + env(safe-area-inset-top));
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  align-items: center;
+  height: var(--cible-tactile);
+  translate: -50% 0;
+}
+
 .rescanner,
 .fermer {
   position: absolute;
