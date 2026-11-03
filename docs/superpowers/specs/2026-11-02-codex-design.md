@@ -159,3 +159,16 @@ motif qu'il porte tous les 2-3 jours, sans scanner (une notification qui l'invit
 mécanique existe déjà (`tirer_anecdote`, la cloche) ; reste à choisir le rythme et le déclencheur
 (tâche planifiée ou à l'ouverture de l'appli). Stock visé : une vingtaine d'anecdotes par motif. Tout trouvé :
 « Creuser encore » disparaît, des félicitations le disent (fait le 03/11).
+
+**Les scans qui nourrissent la reconnaissance (Uriel, 03/11), à reprendre après jeudi** : un scan
+validé (un choix touché sur la caméra, pas « Ce n'est pas lui ») garde l'**empreinte** du viseur,
+jamais la photo (rien de personnel ne quitte le téléphone). Ces empreintes restent **en attente** :
+une page du Hub les montre, motif par motif, pour les vérifier (garder ou jeter) avant qu'elles
+servent à tous — une validation peut être fausse (le Druide pris pour le Varègue). « Ce n'est pas
+lui » se garde aussi : il dit quels motifs se confondent. Un plafond par motif (la trentaine) tient
+léger le téléchargement des empreintes.
+
+**La page « histoire » du Porteur (03/11), à maquetter après jeudi** : on y arrive encore sur l'ancien
+Récit (08/10). Pour jeudi, seulement nettoyé : plus d'onglet « Ses énigmes » sous cadenas, l'histoire
+entière, pas d'« Acheter » au Porteur, le motif à nu, pas d'italique. À trancher : elle s'ouvre à tous
+par son adresse, alors que la spec la réserve au Porteur.
