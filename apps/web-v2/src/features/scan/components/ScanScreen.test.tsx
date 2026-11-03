@@ -301,3 +301,13 @@ test('rescan d’un Fragment porté : « Lire son histoire » ouvre son histoire
   await userEvent.click(screen.getByRole('button', { name: /Lire son histoire/ }))
   expect(screen.getByText('Son histoire')).toBeInTheDocument()
 })
+
+test('le scan a confondu deux motifs : « Viser encore » relance la visée', async () => {
+  fetchRescan.mockResolvedValueOnce({ porte: false, restantes: 4, gratuiteDuJour: true })
+  ouvrir()
+  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await act(() => Promise.resolve())
+  await userEvent.click(screen.getByRole('button', { name: /Viser encore/ }))
+  expect(screen.queryByRole('button', { name: /anecdote/ })).toBeNull()
+  expect(screen.getByText('Vise le motif, de près. Ça bipe tout seul.')).toBeInTheDocument()
+})

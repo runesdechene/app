@@ -93,6 +93,13 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
     }
   }, [reconnu, note, rescan, connecte, navigate])
 
+  // Le scan a confondu deux motifs : on oublie ce bip et l'on vise encore.
+  function viserEncore() {
+    setReconnu(null)
+    setRescan(null)
+    setNote(false)
+  }
+
   // Un choix du rescan remplace le scanner, comme le bip ; seule l'anecdote emporte l'heure du scan.
   function ouvrir(chemin: string, anecdote?: { creuser: boolean }) {
     void navigate(chemin, {
@@ -150,7 +157,12 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
           </Link>
         </div>
       ) : rescan && fragment && reconnu !== null ? (
-        <Choix rescan={rescan} fiche={cheminDuRecit(reconnu, connecte)} ouvrir={ouvrir} />
+        <Choix
+          rescan={rescan}
+          fiche={cheminDuRecit(reconnu, connecte)}
+          ouvrir={ouvrir}
+          viserEncore={viserEncore}
+        />
       ) : fragment ? (
         <div className={styles.reconnu}>
           {fragment.illustration && <img src={aLaTaille(fragment.illustration, 104)} alt="" />}
@@ -207,10 +219,12 @@ function Choix({
   rescan,
   fiche,
   ouvrir,
+  viserEncore,
 }: {
   rescan: Rescan
   fiche: string
   ouvrir: (chemin: string, anecdote?: { creuser: boolean }) => void
+  viserEncore: () => void
 }) {
   const { porte, restantes, gratuiteDuJour } = rescan
   return (
@@ -260,6 +274,9 @@ function Choix({
           Voir sa fiche
         </button>
       )}
+      <button type="button" className={styles.fiche} onClick={viserEncore}>
+        Ce n’est pas lui ? Viser encore
+      </button>
     </div>
   )
 }
