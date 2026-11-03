@@ -85,7 +85,7 @@ export function LieuCarte({
           {lieu.categorie && (
             <span
               className={styles.categorie}
-              style={{ '--icone': `url(${lieu.categorie.icone})` }}
+              style={{ '--icone': `url("${lieu.categorie.icone}")` }}
               aria-hidden="true"
             />
           )}

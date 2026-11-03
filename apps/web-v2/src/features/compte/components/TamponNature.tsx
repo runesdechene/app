@@ -31,7 +31,7 @@ export function TamponNature({
       data-encre={encre ?? undefined}
       data-absent={encre === null ? '' : undefined}
       data-taille={taille}
-      style={{ '--couleur': nature.couleur, '--icone': `url(${nature.icone})` }}
+      style={{ '--couleur': nature.couleur, '--icone': `url("${nature.icone}")` }}
     >
       <span className={styles.icone} aria-hidden="true" />
       {encre !== null && taille !== 'coin' && (

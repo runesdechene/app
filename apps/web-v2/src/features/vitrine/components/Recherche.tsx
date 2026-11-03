@@ -48,7 +48,7 @@ export function Recherche({
             {nature.icone && (
               <span
                 className={styles.icone}
-                style={{ '--icone': `url(${nature.icone})` }}
+                style={{ '--icone': `url("${nature.icone}")` }}
                 aria-hidden="true"
               />
             )}

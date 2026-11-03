@@ -214,7 +214,7 @@ export function DaBriques() {
       </DaSection>
 
       <DaSection name="Recompense">
-        <div className={styles.fete} style={{ '--avatar': `url(${fondFiche})` }}>
+        <div className={styles.fete} style={{ '--avatar': `url("${fondFiche}")` }}>
           <Recompense
             nom="Château de Colomars"
             type="Châteaux & fortins"

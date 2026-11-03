@@ -1,5 +1,6 @@
 /**
- * QUOI     — la barre : Explore · Carte · Codex · Campement · Compte (maquette G, 02/11), icône
+ * QUOI     — la barre : Explore · Carte · Codex · Campement · Compte (maquette G, 02/11), sur PC
+ *            Accueil · Codex · Campement · Compte ; icône
  *            gravée + libellé, lisière de forêt au-dessus ;
  *            l'onglet Compte montre l'avatar de l'Explorateur à la place d'une icône.
  * POURQUOI — un toucher est traduit par resolveTabPress (règles mobiles) puis appliqué ici.
@@ -43,6 +44,11 @@ const ICONS: Record<Exclude<OngletDeLaBarre, 'compte'>, string> = {
   carte: carteIcon,
   codex: codexIcon,
   campement: campementIcon,
+}
+
+// Sur PC, la carte est toujours là : l'onglet « Explore » y redevient « Accueil » (Uriel, 03/11).
+function libelle(tab: (typeof ONGLETS)[number], surOrdinateur: boolean): string {
+  return surOrdinateur && tab.id === 'accueil' ? 'Accueil' : tab.label
 }
 
 export function TabBar({
@@ -98,11 +104,11 @@ export function TabBar({
           ) : (
             <span
               className={styles.icon}
-              style={{ '--icone': `url(${ICONS[tab.id]})` }}
+              style={{ '--icone': `url("${ICONS[tab.id]}")` }}
               aria-hidden="true"
             />
           )}
-          <Text variant="libelle">{tab.label}</Text>
+          <Text variant="libelle">{libelle(tab, surOrdinateur)}</Text>
         </button>
       ))}
       {menuOuvert && (

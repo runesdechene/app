@@ -57,7 +57,7 @@ export function LieuxAuHasard({
                     {lieu.nature.icone && (
                       <span
                         className={styles.icone}
-                        style={{ '--icone': `url(${lieu.nature.icone})` }}
+                        style={{ '--icone': `url("${lieu.nature.icone}")` }}
                         aria-hidden="true"
                       />
                     )}

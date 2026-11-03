@@ -71,7 +71,7 @@ export function ApercuLieu() {
             {lieu.nature.icone && (
               <span
                 className={styles.badgeIcone}
-                style={{ '--icone': `url(${lieu.nature.icone})` }}
+                style={{ '--icone': `url("${lieu.nature.icone}")` }}
                 aria-hidden="true"
               />
             )}

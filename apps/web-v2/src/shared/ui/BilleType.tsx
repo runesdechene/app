@@ -15,7 +15,7 @@ export function BilleType({ icone, couleur }: { icone: string; couleur: string |
       aria-hidden="true"
       style={couleur ? { '--type': couleur } : undefined}
     >
-      <span className={styles.icone} style={{ '--icone': `url(${icone})` }} />
+      <span className={styles.icone} style={{ '--icone': `url("${icone}")` }} />
     </span>
   )
 }

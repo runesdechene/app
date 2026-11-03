@@ -44,7 +44,7 @@ export function DefileNatures({
             {n.icone && (
               <span
                 className={styles.icone}
-                style={{ '--icone': `url(${n.icone})` }}
+                style={{ '--icone': `url("${n.icone}")` }}
                 aria-hidden="true"
               />
             )}

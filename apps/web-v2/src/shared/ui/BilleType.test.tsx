@@ -10,7 +10,7 @@ test('le rond prend la couleur du type, l’icône en est le pochoir', () => {
   const bille = container.querySelector<HTMLElement>('[data-bille-type]')
   const icone = bille?.firstElementChild as HTMLElement | null
   expect(bille?.style.getPropertyValue('--type')).toBe('#80974e')
-  expect(icone?.style.getPropertyValue('--icone')).toBe('url(menhir.svg)')
+  expect(icone?.style.getPropertyValue('--icone')).toBe('url("menhir.svg")')
 })
 
 test('sans couleur, le rond garde sa teinte par défaut', () => {

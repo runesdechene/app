@@ -26,7 +26,7 @@ export function TamponPhoto({
       aria-label={`${tampon.nom}, ${date}`}
       style={{
         '--couleur': nature?.couleur ?? 'var(--color-ocre)',
-        '--icone': nature ? `url(${nature.icone})` : 'none',
+        '--icone': nature ? `url("${nature.icone}")` : 'none',
       }}
     >
       <span className={styles.disque} aria-hidden="true">

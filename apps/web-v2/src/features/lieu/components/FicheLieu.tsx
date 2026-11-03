@@ -130,7 +130,7 @@ export function FicheLieu({
           />
         ) : (
           fiche.type?.icone && (
-            <span className={styles.sansPhoto} style={{ '--icone': `url(${fiche.type.icone})` }} />
+            <span className={styles.sansPhoto} style={{ '--icone': `url("${fiche.type.icone}")` }} />
           )
         )}
         <button
@@ -192,7 +192,7 @@ export function FicheLieu({
             {fiche.type.icone && (
               <span
                 className={styles.badgeIcone}
-                style={{ '--icone': `url(${fiche.type.icone})` }}
+                style={{ '--icone': `url("${fiche.type.icone}")` }}
               />
             )}
             {fiche.type.nom}

@@ -293,11 +293,12 @@ function curseur() {
 }
 
 test('sur PC, le fond de l’onglet actif glisse d’un onglet à l’autre (Carte exclue)', async () => {
-  // Sur PC : Explore, Codex, Campement, Compte (maquette G, 02/11).
+  // Sur PC : Accueil, Codex, Campement, Compte (maquette G, 02/11 ; « Accueil », Uriel 03/11).
+  ecran.pc = true
   renderAt('/codex')
   await screen.findByRole('button', { name: 'Codex' })
   expect(curseur()?.getAttribute('style')).toContain('--rang: 1')
-  await userEvent.click(screen.getByRole('button', { name: 'Explore' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Accueil' }))
   expect(curseur()?.getAttribute('style')).toContain('--rang: 0')
   await userEvent.click(screen.getByRole('button', { name: 'Carte' }))
   expect(curseur()).toBeNull()
