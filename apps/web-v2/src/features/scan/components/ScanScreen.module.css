@@ -209,6 +209,11 @@
   }
 }
 
+/* Au premier scan, la carte du Fragment reconnu se pose dans les choix, au-dessus de « Viser encore ». */
+.choix > .reconnu {
+  margin: 0;
+}
+
 .reconnu img {
   width: 52px;
   height: 72px;

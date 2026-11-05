@@ -55,7 +55,7 @@ export type Apprendre = 'non' | 'porteur' | 'admin'
 export async function peutApprendreVue(): Promise<boolean> {
   const { data, error } = await supabase.rpc('peut_apprendre_vue')
   if (error) throw error
-  return data === true
+  return data
 }
 
 export async function retirerEmpreinte(id: number): Promise<void> {

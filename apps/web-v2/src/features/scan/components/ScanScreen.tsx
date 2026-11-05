@@ -28,6 +28,8 @@ import type { Apprendre } from '../api/scan'
 
 const CONSEIL_MS = 8000
 const VERS_LE_RECIT_MS = 600
+// Le temps de dire « Ce n'est pas lui » avant que le scan ne s'écrive (Uriel, 05/11).
+const CONFIRMER_MS = 1500
 
 export function ScanScreen({ connecte, apprendre }: { connecte: boolean; apprendre: Apprendre }) {
   const navigate = useNavigate()
@@ -47,6 +49,8 @@ export function ScanScreen({ connecte, apprendre }: { connecte: boolean; apprend
   // Les motifs écartés par « Ce n'est pas lui » : plus de bip pour eux sur cet écran, le temps de
   // viser le bon (et, pour un Porteur, d'apprendre sa vue).
   const ecartes = useRef(new Set<number>())
+  // Le scan qu'on est en train de noter : « Viser encore » l'abandonne, sa réponse tardive est ignorée.
+  const enCours = useRef<number | null>(null)
   const analyse = useAnalyse(
     video,
     references,
@@ -54,6 +58,17 @@ export function ScanScreen({ connecte, apprendre }: { connecte: boolean; apprend
     (id) => {
       if (ecartes.current.has(id)) return
       biper()
+      setReconnu(id)
+    },
+  )
+
+  // Le scan ne s'écrit qu'après le temps de dire « Ce n'est pas lui » : viser encore avant, et le
+  // mauvais Fragment n'entre jamais dans le Codex.
+  useEffect(() => {
+    if (reconnu === null || note) return
+    const id = reconnu
+    const minuteur = window.setTimeout(() => {
+      enCours.current = id
       // Le Codex et la fiche du Fragment se relisent une fois le scan noté (clés de leurs hooks).
       void noterScan(id)
         // Un membre qui connaît déjà ce motif choisit ici ; sinon (ou en cas d'échec), la fiche s'ouvre.
@@ -61,12 +76,15 @@ export function ScanScreen({ connecte, apprendre }: { connecte: boolean; apprend
         .then((offre) => {
           void client.invalidateQueries({ queryKey: ['codex'] })
           void client.invalidateQueries({ queryKey: ['mon-fragment', id] })
+          if (enCours.current !== id) return
           setRescan(offre)
           setNote(true)
         })
-      setReconnu(id)
-    },
-  )
+    }, CONFIRMER_MS)
+    return () => {
+      window.clearTimeout(minuteur)
+    }
+  }, [reconnu, note, connecte, client])
   const [conseil, setConseil] = useState(false)
 
   // Le conseil ne compte qu'à partir du moment où l'on peut vraiment reconnaître : à la première
@@ -101,6 +119,7 @@ export function ScanScreen({ connecte, apprendre }: { connecte: boolean; apprend
   // Le scan a confondu deux motifs : on oublie ce bip, on écarte ce motif, et l'on vise encore.
   function viserEncore() {
     if (reconnu !== null) ecartes.current.add(reconnu)
+    enCours.current = null
     setReconnu(null)
     setRescan(null)
     setNote(false)
@@ -170,12 +189,19 @@ export function ScanScreen({ connecte, apprendre }: { connecte: boolean; apprend
           viserEncore={viserEncore}
         />
       ) : fragment ? (
-        <div className={styles.reconnu}>
-          {fragment.illustration && <img src={aLaTaille(fragment.illustration, 104)} alt="" />}
-          <div>
-            <p className={styles.etiquette}>Fragment reconnu</p>
-            <p className={styles.nom}>{fragment.nom}</p>
+        <div className={styles.choix}>
+          <div className={styles.reconnu}>
+            {fragment.illustration && <img src={aLaTaille(fragment.illustration, 104)} alt="" />}
+            <div>
+              <p className={styles.etiquette}>Fragment reconnu</p>
+              <p className={styles.nom}>{fragment.nom}</p>
+            </div>
           </div>
+          {!note && (
+            <button type="button" className={styles.fiche} onClick={viserEncore}>
+              Ce n’est pas lui ? Viser encore
+            </button>
+          )}
         </div>
       ) : !vise ? (
         <div className={styles.consigne}>

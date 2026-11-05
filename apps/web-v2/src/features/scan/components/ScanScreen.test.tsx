@@ -98,6 +98,15 @@ function ouvrir(apprendre: Apprendre = 'non') {
   )
 }
 
+// Le bip, puis le temps de dire « Ce n'est pas lui » : le scan se note ensuite.
+async function biperEtNoter() {
+  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await act(async () => {
+    vi.advanceTimersByTime(1500)
+    await Promise.resolve()
+  })
+}
+
 beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true })
   Object.assign(etat, { son: true, camera: 'en-marche', connecte: true })
@@ -124,7 +133,7 @@ test('sans son débloqué (arrivée par un QR), le bouton « Scanner » d’abor
 test('le bip montre le Fragment, note le scan, puis ouvre son Récit dans l’appli', async () => {
   ouvrir()
   // Asynchrone : le scan noté (une promesse) ouvre la fiche.
-  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await biperEtNoter()
   expect(screen.getByText('Fragment reconnu')).toBeInTheDocument()
   expect(screen.getByText('Hoplite')).toBeInTheDocument()
   expect(noterScan).toHaveBeenCalledWith(11)
@@ -150,7 +159,7 @@ test('un visiteur arrive sur le Récit du scan', async () => {
   etat.connecte = false
   ouvrir()
   // Asynchrone : le scan noté (une promesse) ouvre la fiche.
-  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await biperEtNoter()
   act(() => {
     vi.advanceTimersByTime(600)
   })
@@ -243,7 +252,7 @@ test('pendant que le modèle se prépare : « Préparation du scan… », et pas
 test('le Récit remplace le scanner : le retour ramène avant le scan, sans rebiper', async () => {
   ouvrir()
   // Asynchrone : le scan noté (une promesse) ouvre la fiche.
-  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await biperEtNoter()
   act(() => {
     vi.advanceTimersByTime(600)
   })
@@ -265,7 +274,7 @@ test('un scan noté fait relire le Codex et la fiche du Fragment', async () => {
   const relire = vi.spyOn(client, 'invalidateQueries')
   ouvrir()
   // Asynchrone : le scan noté (une promesse) ouvre la fiche.
-  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await biperEtNoter()
   await vi.waitFor(() => {
     expect(relire).toHaveBeenCalledWith({ queryKey: ['codex'] })
   })
@@ -275,7 +284,7 @@ test('un scan noté fait relire le Codex et la fiche du Fragment', async () => {
 test('rescan d’un motif connu, la gratuite du jour à prendre : les choix sur la caméra', async () => {
   fetchRescan.mockResolvedValueOnce({ porte: false, restantes: 4, gratuiteDuJour: true })
   ouvrir()
-  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await biperEtNoter()
   await act(() => Promise.resolve())
   expect(screen.getByText('Tu le connais · 4 anecdotes à découvrir')).toBeInTheDocument()
   act(() => {
@@ -289,7 +298,7 @@ test('rescan d’un motif connu, la gratuite du jour à prendre : les choix sur 
 test('rescan, la gratuite déjà prise, porté : creuser, ou lire son histoire', async () => {
   fetchRescan.mockResolvedValue({ porte: true, restantes: 2, gratuiteDuJour: false })
   ouvrir()
-  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await biperEtNoter()
   await act(() => Promise.resolve())
   await userEvent.click(screen.getByRole('button', { name: /Creuser une anecdote/ }))
   expect(screen.getByTestId('arrivee').textContent).toContain('"creuser":true')
@@ -299,7 +308,7 @@ test('rescan, la gratuite déjà prise, porté : creuser, ou lire son histoire',
 test('rescan d’un Fragment porté : « Lire son histoire » ouvre son histoire', async () => {
   fetchRescan.mockResolvedValueOnce({ porte: true, restantes: 0, gratuiteDuJour: true })
   ouvrir()
-  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await biperEtNoter()
   await act(() => Promise.resolve())
   expect(screen.queryByRole('button', { name: /anecdote/ })).toBeNull() // tout est trouvé
   await userEvent.click(screen.getByRole('button', { name: /Lire son histoire/ }))
@@ -309,14 +318,27 @@ test('rescan d’un Fragment porté : « Lire son histoire » ouvre son histoire
 test('le scan a confondu deux motifs : « Viser encore » relance la visée', async () => {
   fetchRescan.mockResolvedValueOnce({ porte: false, restantes: 4, gratuiteDuJour: true })
   ouvrir()
-  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await biperEtNoter()
   await act(() => Promise.resolve())
   await userEvent.click(screen.getByRole('button', { name: /Viser encore/ }))
   expect(screen.queryByRole('button', { name: /anecdote/ })).toBeNull()
   expect(screen.getByText('Vise le motif, de près. Ça bipe tout seul.')).toBeInTheDocument()
   // Le motif écarté ne rebipe pas : on a le temps de viser le bon.
   noterScan.mockClear()
-  await act(() => Promise.resolve(etat.surBip?.(11)))
+  await biperEtNoter()
   expect(noterScan).not.toHaveBeenCalled()
+  expect(screen.getByText('Vise le motif, de près. Ça bipe tout seul.')).toBeInTheDocument()
+})
+
+test('au premier scan, « Ce n’est pas lui » avant que le scan s’écrive : rien n’est noté', async () => {
+  ouvrir()
+  await act(() => Promise.resolve(etat.surBip?.(11)))
+  expect(screen.getByText('Fragment reconnu')).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: /Ce n’est pas lui/ }))
+  act(() => {
+    vi.advanceTimersByTime(5000)
+  })
+  expect(noterScan).not.toHaveBeenCalled()
+  expect(screen.queryByText('Récit membre')).toBeNull()
   expect(screen.getByText('Vise le motif, de près. Ça bipe tout seul.')).toBeInTheDocument()
 })
