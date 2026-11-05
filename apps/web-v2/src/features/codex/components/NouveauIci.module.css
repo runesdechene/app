@@ -1,0 +1,58 @@
+/* QUOI — le cartouche « Nouveau ici ? » (maquette B, 05/11) : une carte parchemin bordée de sable. */
+.cartouche {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: var(--color-sur-accent);
+}
+
+.tete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* La croix garde une cible tactile entière, sans pousser le titre. */
+.fermer {
+  display: grid;
+  place-items: center;
+  min-width: var(--cible-tactile);
+  min-height: var(--cible-tactile);
+  margin: calc(var(--space-2) * -1);
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+/* La croix blanche des photos, en pochoir : ici, à l'encre douce sur le parchemin. */
+.croix {
+  width: 20px;
+  height: 20px;
+  background: var(--color-texte-doux);
+  mask: url('../../../assets/ui/croix.svg') center / contain no-repeat;
+}
+
+.lignes {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+/* Le ✦ des titres, à l'ocre, devant chaque ligne. */
+.lignes li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2);
+}
+
+.lignes li::before {
+  content: '✦';
+  color: var(--color-ocre);
+}

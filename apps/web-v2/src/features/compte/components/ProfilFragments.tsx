@@ -8,6 +8,7 @@
  * ATTENTION — sur le profil d'un autre, les Fragments ne sont que montrés : aucun bouton, et
  *            jamais ce qu'il n'a pas (décision d'Uriel, 27/09 : ne pas pousser à l'achat).
  */
+import { BOUTIQUE_URL } from '@/shared/lib/boutique'
 import { aLaTaille } from '@/shared/lib/image'
 import { CarteFragment } from '@/shared/ui/CarteFragment'
 import { useState } from 'react'
@@ -18,8 +19,6 @@ import type { ExplorateurProfile, Fragment } from '../api/lireProfil'
 import { useChoisirSigne } from '../hooks/useChoisirSigne'
 import { useGlisser } from '@/shared/hooks/useGlisser'
 import styles from './ProfilFragments.module.css'
-
-const BOUTIQUE_URL = 'https://runesdechene.com/collections/all'
 
 export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
   const [ouvert, setOuvert] = useState<Fragment | null>(null)

@@ -2,27 +2,47 @@
  * QUOI     — l'onglet Codex (maquette F) : le compte de la collection, les filtres par collection,
  *            puis une section par collection thématique.
  * POURQUOI — le Codex est le Pokédex de Runes de Chêne (spec 2026-11-02-codex-design) : on doit
- *            avoir envie de compléter sa collection et de scanner le t-shirt des autres.
+ *            avoir envie de compléter sa collection et de scanner le t-shirt des autres. Qui
+ *            découvre l'appli lit « Nouveau ici ? » et peut ouvrir « Comment ça marche ? » (05/11).
  */
 import { useState } from 'react'
 import { Button } from '@/shared/ui/Button'
 import { Text } from '@/shared/ui/Text'
 import { useCodex } from '../hooks/useCodex'
+import { cartoucheFerme, fermerCartouche } from '../lib/cartouche'
+import { CommentCaMarche, LienExplication } from './CommentCaMarche'
 import { CompteTotal } from './CompteTotal'
 import { FiltresCollections } from './FiltresCollections'
+import { NouveauIci } from './NouveauIci'
 import { SectionCollection } from './SectionCollection'
 import styles from './CodexScreen.module.css'
 
 export function CodexScreen() {
   const { codex, erreur, reessayer } = useCodex()
   const [choisie, choisir] = useState<string | null>(null)
+  const [cartouche, setCartouche] = useState(() => !cartoucheFerme())
+  const [explication, setExplication] = useState(false)
+  const expliquer = () => {
+    setExplication(true)
+  }
 
   return (
     <section className={styles.ecran}>
       <header className={styles.entete}>
         <Text variant="titre-ecran">Le Codex</Text>
-        <p className={styles.sousTitre}>Tout ce que tu as trouvé en chemin</p>
+        <p className={styles.sousTitre}>Collectionne tes Fragments d’histoire</p>
+        {/* Le cartouche fermé, l'explication reste à un toucher. */}
+        {!cartouche && <LienExplication onClick={expliquer} />}
       </header>
+      {cartouche && (
+        <NouveauIci
+          onFermer={() => {
+            fermerCartouche()
+            setCartouche(false)
+          }}
+          onExpliquer={expliquer}
+        />
+      )}
       {erreur && (
         <div className={styles.erreur}>
           <Text variant="corps">Ton Codex n’a pas pu se charger.</Text>
@@ -52,6 +72,13 @@ export function CodexScreen() {
               <SectionCollection key={c.nom} collection={c} />
             ))}
         </>
+      )}
+      {explication && (
+        <CommentCaMarche
+          onFermer={() => {
+            setExplication(false)
+          }}
+        />
       )}
     </section>
   )

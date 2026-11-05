@@ -7,3 +7,5 @@ scanné, porté), sa fiche, ses anecdotes.
 - `api/` — `mon_codex`, `mon_fragment`, `tirer_anecdote` et leurs lecteurs.
 - `hooks/` — les requêtes TanStack Query.
 - `components/` — la page, ses sections, la fiche d'un Fragment, la découverte animée.
+  Pour qui découvre : le cartouche « Nouveau ici ? » et la feuille « Comment ça marche ? ».
+- `lib/` — le cartouche fermé, gardé sur l'appareil.

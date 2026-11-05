@@ -1,0 +1,57 @@
+/* QUOI — la feuille « Comment ça marche ? » (maquette C, 05/11) : trois étapes, chacune son sceau. */
+.etapes {
+  display: grid;
+  gap: var(--space-4);
+  margin: var(--space-2) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.etape {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+/* Le numéro dans un sceau de cire claire, cerclé d'ocre. */
+.sceau {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-ocre);
+  border-radius: var(--radius-rond);
+  background: var(--color-carte-fond);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  line-height: 1;
+}
+
+.texte {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: start;
+}
+
+.texte p {
+  margin: 0;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+/* Le lien rouge souligné : « Comment ça marche ? », « Voir la boutique ». */
+.lien {
+  justify-self: start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  text-decoration: underline;
+  cursor: pointer;
+}
