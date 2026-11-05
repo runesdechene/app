@@ -374,6 +374,14 @@ test('sur PC, les énigmes, les titres, les préférences et la sortie sont dans
   expect(screen.getByRole('button', { name: 'Se déconnecter' })).toBeInTheDocument()
 })
 
+test('sur PC, la boutique s’ouvre dans un nouvel onglet', async () => {
+  ecran.pc = true
+  renderAt('/accueil')
+  const lien = await screen.findByRole('link', { name: 'La boutique' })
+  expect(lien).toHaveAttribute('href', 'https://runesdechene.com')
+  expect(lien).toHaveAttribute('target', '_blank')
+})
+
 test('plus d’onglet Compagnies dans la barre (Uriel, 01/11)', async () => {
   renderAt('/messages')
   await screen.findByRole('button', { name: 'Messages' })

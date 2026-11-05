@@ -1,5 +1,5 @@
 /**
- * QUOI     — la coquille : logotype, le scanner (téléphone) et la cloche (et sur PC les énigmes, la coupe, l'engrenage, la
+ * QUOI     — la coquille : logotype, le scanner (téléphone) et la cloche (et sur PC les énigmes, la coupe, la boutique, l'engrenage, la
  *            sortie), barre d'onglets, les cinq écrans
  *            racines, le détail, et sur desktop le tiroir et son bouton pour le replier.
  * POURQUOI — les cinq écrans restent MONTÉS : leur état et leur défilement survivent au
@@ -43,6 +43,8 @@ import { useSuivrePosition } from '@/shared/hooks/useSuivrePosition'
 import { useEnvoyerPins, useMesPinsCharges } from '@/features/pin/hooks/usePins'
 import { useNonLues } from '@/features/notifications/hooks/useNotifications'
 import { debloquerSon } from '@/shared/lib/son'
+import { BOUTIQUE_URL } from '@/shared/lib/boutique'
+import boutique from '@/assets/ui/boutique.webp'
 import cloche from '@/assets/ui/cloche.svg'
 import coupe from '@/assets/ui/coupe.svg'
 import embleme from '@/assets/ui/embleme.png'
@@ -290,6 +292,16 @@ export function Shell() {
           </button>
           {surOrdinateur && (
             <>
+              {/* La boutique à portée de clic, comme dans la V1 (Uriel, 05/11). */}
+              <a
+                className={styles.action}
+                href={BOUTIQUE_URL}
+                target="_blank"
+                rel="noopener"
+                aria-label="La boutique"
+              >
+                <img src={boutique} alt="" />
+              </a>
               <button
                 type="button"
                 className={styles.action}
