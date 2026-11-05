@@ -312,13 +312,3 @@
     transition: none;
   }
 }
-
-/* Un mot lu par les lecteurs d'écran, invisible à l'œil (le nom du bouton Messages). */
-.horsEcran {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}

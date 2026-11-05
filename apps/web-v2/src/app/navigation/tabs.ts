@@ -1,5 +1,5 @@
 /**
- * QUOI     — la liste des onglets et les règles qui répondent à un toucher. Messages et Compagnies
+ * QUOI     — la liste des onglets et les règles qui répondent à un toucher. Campement et Compagnies
  *            restent des onglets (une adresse, un écran monté) sans place dans la barre.
  * POURQUOI — conventions mobiles (spec socle §4bis) : chaque onglet se souvient de sa dernière
  *            adresse ; toucher l'onglet actif remonte à sa racine, puis en haut de page.

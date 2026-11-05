@@ -132,21 +132,13 @@ test('changer d’onglet ajoute une entrée : le retour ramène à l’onglet pr
   expect(router.state.location.pathname).toBe('/accueil')
 })
 
-test('la barre : Explore, Carte, Codex, Campement, Compte (maquette G, 02/11)', async () => {
+test('la barre : Explore, Carte, Codex, Messages, Compte (Uriel, 05/11)', async () => {
   renderAt('/accueil')
   const barre = await screen.findByRole('navigation', { name: 'Navigation principale' })
   const libelles = within(barre)
     .getAllByRole('button')
     .map((b) => b.textContent)
-  expect(libelles).toEqual(['Explore', 'Carte', 'Codex', 'Campement', 'Compte'])
-})
-
-test('Messages vit dans l’en-tête et ouvre /messages', async () => {
-  const router = renderAt('/accueil')
-  const barre = await screen.findByRole('navigation', { name: 'Navigation principale' })
-  expect(within(barre).queryByRole('button', { name: /Messages/ })).toBeNull()
-  await userEvent.click(screen.getByRole('button', { name: 'Messages' }))
-  expect(router.state.location.pathname).toBe('/messages')
+  expect(libelles).toEqual(['Explore', 'Carte', 'Codex', 'Messages', 'Compte'])
 })
 
 test('l’onglet actif est annoncé', async () => {
@@ -228,13 +220,10 @@ test('l’en-tête porte « Notifications », la barre porte le Compte ; un seul
   expect(screen.getByRole('button', { name: /Compte/ })).toBeInTheDocument()
 })
 
-test('l’icône du scanner, devant Messages et la cloche, ouvre /scan et débloque le son du bip', async () => {
+test('l’icône du scanner, devant la cloche, ouvre /scan et débloque le son du bip', async () => {
   const router = renderAt('/accueil')
   const scanner = await screen.findByRole('button', { name: 'Scanner un Fragment' })
-  expect(scanner.nextElementSibling).toBe(screen.getByRole('button', { name: 'Messages' }))
-  expect(scanner.nextElementSibling?.nextElementSibling).toBe(
-    screen.getByRole('button', { name: 'Notifications' }),
-  )
+  expect(scanner.nextElementSibling).toBe(screen.getByRole('button', { name: 'Notifications' }))
   await userEvent.click(scanner)
   expect(son.debloquerSon).toHaveBeenCalled()
   expect(router.state.location.pathname).toBe('/scan')
@@ -293,7 +282,7 @@ function curseur() {
 }
 
 test('sur PC, le fond de l’onglet actif glisse d’un onglet à l’autre (Carte exclue)', async () => {
-  // Sur PC : Accueil, Codex, Campement, Compte (maquette G, 02/11 ; « Accueil », Uriel 03/11).
+  // Sur PC : Accueil, Codex, Messages, Compte (« Accueil », Uriel 03/11).
   ecran.pc = true
   renderAt('/codex')
   await screen.findByRole('button', { name: 'Codex' })

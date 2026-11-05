@@ -1,6 +1,6 @@
 /**
- * QUOI     — la barre : Explore · Carte · Codex · Campement · Compte (maquette G, 02/11), sur PC
- *            Accueil · Codex · Campement · Compte ; icône
+ * QUOI     — la barre : Explore · Carte · Codex · Messages · Compte, sur PC
+ *            Accueil · Codex · Messages · Compte ; icône
  *            gravée + libellé, lisière de forêt au-dessus ;
  *            l'onglet Compte montre l'avatar de l'Explorateur à la place d'une icône.
  * POURQUOI — un toucher est traduit par resolveTabPress (règles mobiles) puis appliqué ici.
@@ -9,16 +9,20 @@
  * ATTENTION — ce sont des <button>, pas des <a> : un onglet n'ouvre pas toujours son adresse
  *            (mémoire, double toucher ; sur téléphone, le portrait ouvre le menu du profil). aria-current marque l'onglet actif pour les lecteurs
  *            d'écran. Les icônes sont décoratives (aria-hidden) : le libellé porte le nom.
+ *            L'onglet Messages porte la pastille des non-lus, posée sur son icône.
  */
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
+import { useNonLus } from '@/features/messages/hooks/useMurmures'
+import { useRegistreNonLus } from '@/features/messages/hooks/useRegistre'
 import accueilIcon from '@/assets/ui/onglet-accueil.png'
-import campementIcon from '@/assets/ui/onglet-campement.svg'
 import carteIcon from '@/assets/ui/onglet-carte.svg'
 import codexIcon from '@/assets/ui/onglet-codex.svg'
+import messagesIcon from '@/assets/ui/messages.svg'
 import { Avatar } from '@/shared/ui/Avatar'
+import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
 import { useSurOrdinateur } from '@/shared/hooks/useSurOrdinateur'
 import { ROUVERT_PAR_UN_ONGLET } from '../navigation/closeDetail'
@@ -28,8 +32,9 @@ import { MenuDuProfil } from './MenuDuProfil'
 import styles from './TabBar.module.css'
 
 // Les Compagnies se retirent peu à peu (Uriel, 01/11) : plus d'onglet ; leurs fiches restent
-// ouvertes par lien (invitations, profils). Messages passe dans l'en-tête (Uriel, 02/11).
-const DANS_LA_BARRE = ['accueil', 'carte', 'codex', 'campement', 'compte'] as const
+// ouvertes par lien (invitations, profils). Messages revient dans la barre, à la place du
+// Campement, encore inutilisé (Uriel, 05/11 : les gens le préféraient en bas).
+const DANS_LA_BARRE = ['accueil', 'carte', 'codex', 'messages', 'compte'] as const
 type OngletDeLaBarre = (typeof DANS_LA_BARRE)[number]
 const ONGLETS = TABS.filter((tab): tab is (typeof TABS)[number] & { id: OngletDeLaBarre } =>
   (DANS_LA_BARRE as readonly TabId[]).includes(tab.id),
@@ -43,7 +48,7 @@ const ICONS: Record<Exclude<OngletDeLaBarre, 'compte'>, string> = {
   accueil: accueilIcon,
   carte: carteIcon,
   codex: codexIcon,
-  campement: campementIcon,
+  messages: messagesIcon,
 }
 
 // Sur PC, la carte est toujours là : l'onglet « Explore » y redevient « Accueil » (Uriel, 03/11).
@@ -64,6 +69,9 @@ export function TabBar({
   const active = tabOf(pathname)
   const { profil } = useExplorateur(useMonIdentifiant())
   const rang = ONGLETS_PC.findIndex((tab) => tab.id === active)
+  const registre = useRegistreNonLus()
+  // Le rouge, pour ce qui m'est adressé : les Murmures non lus et les mentions de moi.
+  const pourMoi = useNonLus() + registre.mentions
 
   const [menuOuvert, setMenuOuvert] = useState(false)
   const surOrdinateur = useSurOrdinateur()
@@ -109,6 +117,16 @@ export function TabBar({
             />
           )}
           <Text variant="libelle">{libelle(tab, surOrdinateur)}</Text>
+          {tab.id === 'messages' && (
+            <span className={styles.nonLus}>
+              {/* Rien pour moi : le point brun, si la communauté a parlé. */}
+              {pourMoi > 0 ? (
+                <Pastille count={pourMoi} />
+              ) : (
+                <Pastille count={registre.messages} discrete />
+              )}
+            </span>
+          )}
         </button>
       ))}
       {menuOuvert && (
