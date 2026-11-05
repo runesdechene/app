@@ -15,10 +15,11 @@ import { Link, useNavigate } from 'react-router'
 import { aLaTaille } from '@/shared/lib/image'
 import eclair from '@/assets/ui/eclair.svg'
 import fleche from '@/assets/ui/fleche-retour-claire.svg'
+import retourner from '@/assets/ui/retourner-camera.svg'
 import { biper, debloquerSon, sonDebloque } from '@/shared/lib/son'
 import { fetchRescan, noterScan, type Rescan } from '../api/scan'
 import { useAnalyse } from '../hooks/useAnalyse'
-import { useCamera } from '../hooks/useCamera'
+import { useCamera, type Face } from '../hooks/useCamera'
 import { useEmpreintes } from '../hooks/useEmpreintes'
 import { cheminDuRecit } from '../lib/chemin'
 import { SEUIL } from '../lib/regleDuBip'
@@ -35,7 +36,9 @@ export function ScanScreen({ connecte, apprendre }: { connecte: boolean; apprend
   const navigate = useNavigate()
   const video = useRef<HTMLVideoElement>(null)
   const [demarre, setDemarre] = useState(sonDebloque)
-  const camera = useCamera(video, demarre)
+  // L'avant pour scanner le t-shirt qu'on porte, comme un selfie (05/11).
+  const [face, setFace] = useState<Face>('arriere')
+  const camera = useCamera(video, demarre, face)
   const { fragments, erreur: erreurEmpreintes } = useEmpreintes()
   const references = useMemo(
     () =>
@@ -139,12 +142,24 @@ export function ScanScreen({ connecte, apprendre }: { connecte: boolean; apprend
 
   return (
     <main className={styles.ecran}>
-      <video ref={video} className={styles.video} playsInline muted />
+      <video ref={video} className={styles.video} data-face={face} playsInline muted />
       <header className={styles.entete}>
         <Link className={styles.retour} to={accueil} aria-label="Retour">
           <img src={fleche} alt="" />
         </Link>
         <h1 className={styles.titre}>Scanner un Fragment</h1>
+        {camera === 'en-marche' && (
+          <button
+            type="button"
+            className={styles.retour}
+            aria-label={face === 'arriere' ? 'Scanner le t-shirt que je porte' : 'Caméra arrière'}
+            onClick={() => {
+              setFace(face === 'arriere' ? 'avant' : 'arriere')
+            }}
+          >
+            <img src={retourner} alt="" />
+          </button>
+        )}
       </header>
 
       <div className={styles.viseur} data-reconnu={reconnu !== null} data-connu={rescan !== null}>

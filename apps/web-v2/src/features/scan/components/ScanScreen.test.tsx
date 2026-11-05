@@ -342,3 +342,11 @@ test('au premier scan, « Ce n’est pas lui » avant que le scan s’écrive : 
   expect(screen.queryByText('Récit membre')).toBeNull()
   expect(screen.getByText('Vise le motif, de près. Ça bipe tout seul.')).toBeInTheDocument()
 })
+
+test('le bouton de la caméra la retourne vers soi, pour scanner le t-shirt qu’on porte', async () => {
+  ouvrir()
+  await userEvent.click(screen.getByRole('button', { name: 'Scanner le t-shirt que je porte' }))
+  expect(document.querySelector('video')).toHaveAttribute('data-face', 'avant')
+  await userEvent.click(screen.getByRole('button', { name: 'Caméra arrière' }))
+  expect(document.querySelector('video')).toHaveAttribute('data-face', 'arriere')
+})
