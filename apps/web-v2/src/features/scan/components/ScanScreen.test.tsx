@@ -57,6 +57,7 @@ vi.mock('./FeuilleApprendre', () => ({
 }))
 
 import { ScanScreen } from './ScanScreen'
+import type { Apprendre } from '../api/scan'
 
 function Retour() {
   const navigate = useNavigate()
@@ -78,12 +79,15 @@ function Retour() {
 
 const client = new QueryClient()
 
-function ouvrir(admin = false) {
+function ouvrir(apprendre: Apprendre = 'non') {
   return render(
     <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={['/avant', '/scan']} initialIndex={1}>
         <Routes>
-          <Route path="/scan" element={<ScanScreen connecte={etat.connecte} admin={admin} />} />
+          <Route
+            path="/scan"
+            element={<ScanScreen connecte={etat.connecte} apprendre={apprendre} />}
+          />
           <Route path="/avant" element={<p>Avant le scan</p>} />
           <Route path="/codex/fragment/:id" element={<Retour />} />
           <Route path="/codex/fragment/:id/histoire" element={<p>Son histoire</p>} />
@@ -218,8 +222,8 @@ test('le modèle ou les empreintes en échec : un message, pas une attente sans 
   expect(screen.getAllByText('Le scan n’a pas pu se préparer.').length).toBeGreaterThan(0)
 })
 
-test('un admin voit « Apprendre cette vue » ; un joueur, non', () => {
-  const { unmount } = ouvrir(true)
+test('un Porteur voit « Apprendre cette vue » ; un joueur sans Fragment, non', () => {
+  const { unmount } = ouvrir('porteur')
   expect(screen.getByRole('region', { name: 'Apprendre cette vue' })).toBeInTheDocument()
   unmount()
   ouvrir()
@@ -247,13 +251,13 @@ test('le Récit remplace le scanner : le retour ramène avant le scan, sans rebi
   expect(screen.getByText('Avant le scan')).toBeInTheDocument()
 })
 
-test('la feuille des admins ne reçoit une suggestion qu’au-dessus du seuil', () => {
+test('la feuille ne reçoit une suggestion qu’au-dessus du seuil', () => {
   etat.analyse = { ...etat.analyse, meilleur: { fragment: 11, ressemblance: 0.2 } }
-  const { unmount } = ouvrir(true)
+  const { unmount } = ouvrir('admin')
   expect(feuille.suggestion).toBeNull()
   unmount()
   etat.analyse = { ...etat.analyse, meilleur: { fragment: 11, ressemblance: 0.8 } }
-  ouvrir(true)
+  ouvrir('admin')
   expect(feuille.suggestion).toBe(11)
 })
 

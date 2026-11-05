@@ -48,6 +48,16 @@ export async function ajouterVue(fragment: number, vecteur: ArrayLike<number>): 
   return nombre(data)
 }
 
+// Ce que le scanner permet d'apprendre : rien, ajouter des vues (Porteur), ou aussi les retirer (admin).
+export type Apprendre = 'non' | 'porteur' | 'admin'
+
+// Tout Porteur, ou un admin (mig 585).
+export async function peutApprendreVue(): Promise<boolean> {
+  const { data, error } = await supabase.rpc('peut_apprendre_vue')
+  if (error) throw error
+  return data === true
+}
+
 export async function retirerEmpreinte(id: number): Promise<void> {
   const { error } = await supabase.rpc('retirer_empreinte', { p_id: id })
   if (error) throw error

@@ -8880,6 +8880,7 @@ export type Database = {
         Args: { p_eveil: number; p_reponse: string }
         Returns: Json
       }
+      peut_apprendre_vue: { Args: never; Returns: boolean }
       plant_flag: {
         Args: {
           p_expedition_name?: string

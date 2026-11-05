@@ -1,7 +1,7 @@
 /**
  * QUOI     — l'analyse du viseur : plusieurs fois par seconde, le carré du viseur passe au modèle,
  *            se classe contre les références, et la règle dit quand biper.
- * POURQUOI — `meilleur` sert de suggestion à la feuille des admins ; `empreinteActuelle` leur donne
+ * POURQUOI — `meilleur` sert de suggestion à la feuille « Apprendre » ; `empreinteActuelle` lui donne
  *            la vue à ajouter. `erreur` évite une attente sans fin si le modèle ne se charge pas.
  * ATTENTION — `surBip` est lu par référence : changer de fonction ne relance pas la boucle.
  */

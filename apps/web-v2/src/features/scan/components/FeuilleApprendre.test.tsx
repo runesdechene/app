@@ -1,5 +1,6 @@
 /**
- * QUOI     — la feuille des admins : le Fragment suggéré, ajouter la vue du viseur, retirer la dernière.
+ * QUOI     — la feuille « Apprendre cette vue » : le Fragment suggéré, ajouter la vue du viseur, et
+ *            pour un admin seulement, retirer la dernière.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
@@ -36,10 +37,10 @@ vi.mock('../hooks/useEmpreintes', () => ({
 
 import { FeuilleApprendre } from './FeuilleApprendre'
 
-function ouvrir(suggestion: number | null, vue: number[] | null = [0.1]) {
+function ouvrir(suggestion: number | null, vue: number[] | null = [0.1], retirer = true) {
   render(
     <QueryClientProvider client={new QueryClient()}>
-      <FeuilleApprendre suggestion={suggestion} empreinteActuelle={() => vue} />
+      <FeuilleApprendre suggestion={suggestion} empreinteActuelle={() => vue} retirer={retirer} />
     </QueryClientProvider>,
   )
 }
@@ -92,4 +93,10 @@ test('sans suggestion, aucun Fragment choisi d’office : on choisit avant d’a
   ouvrir(null)
   expect(screen.getByRole('combobox')).toHaveValue('')
   expect(screen.getByRole('button', { name: 'Ajouter cette vue' })).toBeDisabled()
+})
+
+test('un Porteur ajoute des vues, sans pouvoir retirer celles des autres', () => {
+  ouvrir(11, [0.1], false)
+  expect(screen.getByRole('button', { name: 'Ajouter cette vue' })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Retirer la dernière' })).toBeNull()
 })

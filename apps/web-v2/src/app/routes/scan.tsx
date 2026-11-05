@@ -11,7 +11,7 @@ import { FicheFragment } from '@/features/fragments/components/FicheFragment'
 import { useConnecte } from '@/features/vitrine/hooks/useVitrine'
 import { ListeFragments } from '@/features/scan/components/ListeFragments'
 import fleche from '@/assets/ui/fleche-retour.svg'
-import { useScannerAdmin } from './scannerAdmin'
+import { useApprendre } from './droitsDuScanner'
 import styles from './scan.module.css'
 
 const ScanScreenCharge = lazy(() =>
@@ -20,10 +20,10 @@ const ScanScreenCharge = lazy(() =>
 
 export function RouteScan() {
   const connecte = useConnecte()
-  const admin = useScannerAdmin() ?? false
+  const apprendre = useApprendre()
   return (
     <Suspense fallback={null}>
-      <ScanScreenCharge connecte={connecte} admin={admin} />
+      <ScanScreenCharge connecte={connecte} apprendre={apprendre} />
     </Suspense>
   )
 }

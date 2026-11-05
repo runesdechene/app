@@ -1,6 +1,7 @@
 /**
- * QUOI     — « Apprendre cette vue » (maquette 530:1013), pour les admins : choisir le Fragment (celui
- *            que le modèle croit voir, d'office), ajouter la vue du viseur, retirer la dernière.
+ * QUOI     — « Apprendre cette vue » (maquette 530:1013), pour tout Porteur : choisir le Fragment
+ *            (celui que le modèle croit voir, d'office), ajouter la vue du viseur. Retirer la dernière
+ *            reste aux admins : elle efface la vue de n'importe qui (Uriel, 05/11).
  * POURQUOI — les vues du vrai t-shirt font passer la ressemblance au-delà de 0,9 (essai du 09/10) ;
  *            ajoutée, une vue sert aussitôt à tout le monde. À refaire par coloris.
  */
@@ -10,9 +11,13 @@ import { ajouterVue, retirerEmpreinte } from '../api/scan'
 import { useEmpreintes, useFragmentsVisibles } from '../hooks/useEmpreintes'
 import styles from './FeuilleApprendre.module.css'
 
-type Props = { suggestion: number | null; empreinteActuelle: () => number[] | null }
+type Props = {
+  suggestion: number | null
+  empreinteActuelle: () => number[] | null
+  retirer: boolean
+}
 
-export function FeuilleApprendre({ suggestion, empreinteActuelle }: Props) {
+export function FeuilleApprendre({ suggestion, empreinteActuelle, retirer }: Props) {
   const client = useQueryClient()
   const tous = useFragmentsVisibles().fragments ?? []
   const { fragments } = useEmpreintes()
@@ -72,7 +77,7 @@ export function FeuilleApprendre({ suggestion, empreinteActuelle }: Props) {
       </button>
       <p className={styles.compte}>
         {vues.length} vue{vues.length > 1 ? 's' : ''} apprise{vues.length > 1 ? 's' : ''}
-        {derniere !== null && (
+        {retirer && derniere !== null && (
           <>
             {' · '}
             <button

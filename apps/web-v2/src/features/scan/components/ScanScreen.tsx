@@ -1,7 +1,7 @@
 /**
  * QUOI     — le scanner (maquettes 530:915, 530:946, 530:982) : la caméra derrière un viseur, l'analyse
  *            en continu, le bip qui montre le Fragment puis ouvre son Récit ; au bout de 8 s, un conseil
- *            et « Voir tous les Fragments » ; pour les admins, la feuille « Apprendre cette vue » (530:1013).
+ *            et « Voir tous les Fragments » ; pour les Porteurs et les admins, la feuille « Apprendre cette vue » (530:1013).
  *            En bas, toujours, « Découvrir l'appli » : le QR du dépliant mène ici, souvent sans vêtement.
  *            Un membre qui rescanne un motif déjà connu choisit sur la caméra (maquette 929:3010) :
  *            l'anecdote du jour (ou en creuser une, 2 énergies), son histoire, ou sa fiche.
@@ -24,11 +24,12 @@ import { cheminDuRecit } from '../lib/chemin'
 import { SEUIL } from '../lib/regleDuBip'
 import { FeuilleApprendre } from './FeuilleApprendre'
 import styles from './ScanScreen.module.css'
+import type { Apprendre } from '../api/scan'
 
 const CONSEIL_MS = 8000
 const VERS_LE_RECIT_MS = 600
 
-export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: boolean }) {
+export function ScanScreen({ connecte, apprendre }: { connecte: boolean; apprendre: Apprendre }) {
   const navigate = useNavigate()
   const video = useRef<HTMLVideoElement>(null)
   const [demarre, setDemarre] = useState(sonDebloque)
@@ -44,7 +45,7 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
   const [note, setNote] = useState(false)
   const [rescan, setRescan] = useState<Rescan | null>(null)
   // Les motifs écartés par « Ce n'est pas lui » : plus de bip pour eux sur cet écran, le temps de
-  // viser le bon (et, pour un admin, d'apprendre sa vue).
+  // viser le bon (et, pour un Porteur, d'apprendre sa vue).
   const ecartes = useRef(new Set<number>())
   const analyse = useAnalyse(
     video,
@@ -205,7 +206,7 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
         )}
         {!connecte && <p className={styles.mention}>Aucun compte nécessaire</p>}
       </footer>
-      {admin && camera === 'en-marche' && reconnu === null && (
+      {apprendre !== 'non' && camera === 'en-marche' && reconnu === null && (
         <FeuilleApprendre
           suggestion={
             analyse.meilleur && analyse.meilleur.ressemblance >= SEUIL
@@ -213,6 +214,7 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
               : null
           }
           empreinteActuelle={analyse.empreinteActuelle}
+          retirer={apprendre === 'admin'}
         />
       )}
     </main>
