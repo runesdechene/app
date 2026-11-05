@@ -322,6 +322,14 @@ test('toucher le portrait ouvre le menu du profil, même depuis Compte', async (
   }
 })
 
+test('sur téléphone, la boutique est dans le menu du profil', async () => {
+  renderAt('/accueil')
+  const menu = await ouvrirLeMenu()
+  const lien = within(menu).getByRole('link', { name: /La boutique/ })
+  expect(lien).toHaveAttribute('href', 'https://runesdechene.com')
+  expect(lien).toHaveAttribute('target', '_blank')
+})
+
 test('« Mon profil » ferme le menu et ouvre l’onglet Compte', async () => {
   const router = renderAt('/accueil')
   const menu = await ouvrirLeMenu()

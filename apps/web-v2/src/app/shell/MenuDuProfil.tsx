@@ -1,6 +1,7 @@
 /**
  * QUOI     — le menu du profil (maquette 476:434, Uriel 07/10) : qui je suis (portrait, nom, niveau,
- *            premier titre porté), puis Mon profil · Les énigmes · Tous les titres · Préférences
+ *            premier titre porté), puis Mon profil · Les énigmes · Tous les titres · Préférences ·
+ *            La boutique
  *            (· Installer l'appli, tant qu'elle ne l'est pas), et « Se déconnecter » à part.
  * POURQUOI — le portrait de la barre ouvre ce menu, téléphone comme PC : la coupe, l'engrenage et la
  *            sortie y sont entrés ; la cloche reste dans la barre.
@@ -19,6 +20,8 @@ import iconePreferences from '@/assets/ui/menu-preferences.svg'
 import iconeProfil from '@/assets/ui/menu-profil.svg'
 import iconeSortie from '@/assets/ui/menu-sortie.svg'
 import iconeTitres from '@/assets/ui/menu-titres.svg'
+import iconeBoutique from '@/assets/ui/boutique.webp'
+import { BOUTIQUE_URL } from '@/shared/lib/boutique'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Feuille } from '@/shared/ui/Feuille'
 import {
@@ -97,6 +100,13 @@ export function MenuDuProfil({ onFermer }: { onFermer: () => void }) {
               ouvrir('preferences')
             })}
           />
+          {/* Sur téléphone, la boutique vit ici ; sur PC, dans la barre de gauche (Uriel, 05/11). */}
+          <Ligne
+            icone={iconeBoutique}
+            libelle="La boutique"
+            href={BOUTIQUE_URL}
+            onToucher={onFermer}
+          />
           {/* Pour qui a fermé l'invitation : la fenêtre du navigateur, ou sur iPhone la carte
               qui montre le geste. */}
           {installable && (
@@ -137,23 +147,36 @@ function Ligne({
   icone,
   libelle,
   detail = null,
+  href,
   onToucher,
 }: {
   icone: string
   libelle: string
   detail?: string | null
+  href?: string // une adresse hors de l'appli : la ligne devient un lien, ouvert dans un onglet
   onToucher: () => void
 }) {
+  const contenu = (
+    <>
+      <img src={icone} alt="" />
+      <span className={styles.libelle}>{libelle}</span>
+      {detail && <span className={styles.detail}>{detail}</span>}
+      <span className={styles.chevron} aria-hidden="true">
+        ›
+      </span>
+    </>
+  )
   return (
     <li>
-      <button type="button" className={styles.ligne} onClick={onToucher}>
-        <img src={icone} alt="" />
-        <span className={styles.libelle}>{libelle}</span>
-        {detail && <span className={styles.detail}>{detail}</span>}
-        <span className={styles.chevron} aria-hidden="true">
-          ›
-        </span>
-      </button>
+      {href ? (
+        <a className={styles.ligne} href={href} target="_blank" rel="noopener" onClick={onToucher}>
+          {contenu}
+        </a>
+      ) : (
+        <button type="button" className={styles.ligne} onClick={onToucher}>
+          {contenu}
+        </button>
+      )}
     </li>
   )
 }

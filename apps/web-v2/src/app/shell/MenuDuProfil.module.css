@@ -52,6 +52,7 @@
   font: inherit;
   font-size: var(--corps-size);
   text-align: left;
+  text-decoration: none; /* la ligne de la boutique est un lien */
   cursor: pointer;
   transition: opacity var(--duree-douce) var(--courbe-douce);
 }
