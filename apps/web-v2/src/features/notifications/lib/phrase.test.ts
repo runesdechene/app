@@ -48,7 +48,7 @@ test('les paliers comptent, au singulier comme au pluriel', () => {
 
 test('une mention cite le message ; un salut dit ce qui est salué', () => {
   expect(texte({ ...base, type: 'mention', lieu: null, extrait: 'tu passes samedi ?' })).toBe(
-    'Kelpie t’a mentionné dans le Registre : « tu passes samedi ? »',
+    'Kelpie t’a mentionné sur Runes de Chêne : « tu passes samedi ? »',
   )
   expect(texte({ ...base, type: 'salut', evenement: 'visite' })).toBe(
     'Kelpie a salué ta visite de Château de Jonjeac',
@@ -57,7 +57,7 @@ test('une mention cite le message ; un salut dit ce qui est salué', () => {
     'Kelpie a salué ton arrivée',
   )
   expect(texte({ ...base, type: 'salut', evenement: 'message', lieu: null })).toBe(
-    'Kelpie a aimé ton message',
+    'Kelpie a aimé ton message sur Runes de Chêne',
   )
   expect(texte({ ...base, type: 'salut', evenement: 'connexion', lieu: null })).toBe(
     'Kelpie a salué ton passage',

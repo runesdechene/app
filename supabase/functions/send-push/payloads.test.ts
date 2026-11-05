@@ -16,7 +16,7 @@ Deno.test('sans nom ni lieu, des replis sobres', () => {
 
 Deno.test('une mention ouvre les Messages', () => {
   const p = formatPayload('mention', { actorName: 'Luna', extrait: 'On y va samedi ?' })
-  assertEquals(p?.title, 'Luna t’a mentionné')
+  assertEquals(p?.title, 'Luna t’a mentionné sur Runes de Chêne')
   assertEquals(p?.body, 'On y va samedi ?')
   assertEquals(p?.url, '/messages')
 })

@@ -66,7 +66,8 @@ export function phraseDe(n: Notification): Morceau[] {
     case 'nouveau_membre':
       return [qui, t(' a rejoint '), { texte: n.compagnie?.nom ?? 'ta Compagnie', sorte: 'lieu' }]
     case 'mention':
-      return [qui, t(` t’a mentionné dans le Registre : « ${n.extrait ?? ''} »`)]
+      // « Registre » ne parle qu'à l'équipe (Uriel, 05/11).
+      return [qui, t(` t’a mentionné sur Runes de Chêne : « ${n.extrait ?? ''} »`)]
     case 'enigme_acceptee':
       return [
         t('Ta réponse à l’énigme '),
@@ -90,7 +91,7 @@ export function phraseDe(n: Notification): Morceau[] {
     case 'salut':
       if (n.evenement === 'visite') return [qui, t(' a salué ta visite de '), lieu]
       if (n.evenement === 'ajout') return [qui, t(' a salué ton ajout de '), lieu]
-      if (n.evenement === 'message') return [qui, t(' a aimé ton message')]
+      if (n.evenement === 'message') return [qui, t(' a aimé ton message sur Runes de Chêne')]
       if (n.evenement === 'connexion') return [qui, t(' a salué ton passage')]
       if (n.evenement === 'revendication') return [qui, t(' a salué ta revendication')]
       if (n.evenement === 'enrichi') return [qui, t(' a salué ton récit')]

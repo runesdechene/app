@@ -74,14 +74,19 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
 
     case 'mention':
       return {
-        title: `${qui} t’a mentionné`,
-        body: texte(data.extrait, 'Dans le Registre.').slice(0, 120),
+        // « Registre » ne parle qu'à l'équipe (Uriel, 05/11) : on dit où, en clair.
+        title: `${qui} t’a mentionné sur Runes de Chêne`,
+        body: texte(data.extrait, 'Dans les messages.').slice(0, 120),
         url: '/messages',
       }
     case 'salut': {
       const evenement = texte(data.evenement).split(':')[0]
       if (evenement === 'message') {
-        return { title: `${qui} a aimé ton message`, body: 'Dans le Registre.', url: '/messages' }
+        return {
+          title: `${qui} a aimé ton message sur Runes de Chêne`,
+          body: 'Dans les messages.',
+          url: '/messages',
+        }
       }
       return data.placeId
         ? surLeLieu(`${qui} t’a salué`, `Pour ${lieu}.`)
