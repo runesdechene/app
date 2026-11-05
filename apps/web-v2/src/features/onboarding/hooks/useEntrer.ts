@@ -8,15 +8,10 @@
  * ATTENTION — réclamer les Fragments ne doit pas bloquer l'entrée : un échec vaut « aucun ».
  */
 import { useMutation } from '@tanstack/react-query'
+import { donnerAccordNouvelles } from '@/shared/supabase/nouvelles'
 import { VERSION_DES_CONDITIONS } from '@/shared/lib/conditions'
 import { accepterConditions } from '@/shared/supabase/conditions'
-import {
-  donnerAccordNouvelles,
-  fetchEntree,
-  reclamerFragments,
-  signerCharte,
-  verifierCode,
-} from '../api/entree'
+import { fetchEntree, reclamerFragments, signerCharte, verifierCode } from '../api/entree'
 import type { Entree } from '../api/lireEntree'
 import { useParcours } from './useParcours'
 

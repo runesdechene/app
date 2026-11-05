@@ -24,6 +24,9 @@ const api = vi.hoisted(() => ({
   fetchEntree: vi.fn(),
 }))
 vi.mock('../api/entree', () => api)
+vi.mock('@/shared/supabase/nouvelles', () => ({
+  donnerAccordNouvelles: api.donnerAccordNouvelles,
+}))
 
 const conditions = vi.hoisted(() => ({
   mesConditions: vi.fn(() => Promise.resolve(null)),

@@ -52,7 +52,7 @@ export async function estAbonne(): Promise<boolean> {
 // Le joueur a coupé le push sur ce téléphone : on ne le rétablit pas de soi-même.
 const COUPE = 'push-coupe-ici'
 
-function coupeIci() {
+export function coupeIci() {
   try {
     return localStorage.getItem(COUPE) === '1'
   } catch {

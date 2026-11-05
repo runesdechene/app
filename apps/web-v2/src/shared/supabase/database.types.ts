@@ -8848,6 +8848,7 @@ export type Database = {
         Returns: undefined
       }
       mon_codex: { Args: never; Returns: Json }
+      mon_accord_nouvelles: { Args: never; Returns: boolean }
       mon_energie: { Args: never; Returns: Json }
       mon_entree: { Args: never; Returns: Json }
       mon_fragment: { Args: { p_id: number }; Returns: Json }

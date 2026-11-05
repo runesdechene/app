@@ -60,6 +60,7 @@ import { disposition } from '../navigation/disposition'
 import { useOuvrir } from '../navigation/useOuvrir'
 import { TABS, type TabId } from '../navigation/tabs'
 import { InvitationInstaller } from '../InvitationInstaller'
+import { InvitationNotifications } from '../InvitationNotifications'
 import { TabBar } from './TabBar'
 import styles from './Shell.module.css'
 
@@ -341,6 +342,8 @@ export function Shell() {
         <InvitationPosition />
         {/* Tant que l'appli n'est pas installée, à chaque ouverture, après celle de la position. */}
         <InvitationInstaller />
+        {/* Puis, une fois l'installation réglée, les notifications (et leur récompense). */}
+        <InvitationNotifications />
         <TabBar
           onScrollTop={scrollTop}
           onToucher={() => {
