@@ -2,7 +2,7 @@
  * QUOI     — une collection du Codex : son panneau teinté à sa couleur, son icône, son compte, sa
  *            barre, son titre à gagner (ou obtenu), et la grille de ses Fragments ; repliable.
  * POURQUOI — maquette F (02/11) : à 50 Fragments, une collection où l'on n'a rien reste repliée
- *            sur une ligne. Porter toute la collection donne son titre.
+ *            sur une ligne ; une petite (3 motifs ou moins) s'ouvre toujours. Porter toute la collection donne son titre.
  */
 import { useState } from 'react'
 import { Link } from 'react-router'
@@ -18,8 +18,13 @@ function phraseDuTitre(c: Collection): string | null {
     : `Porte les ${String(c.total)} pour gagner le titre « ${c.titre} »`
 }
 
+// Repliée, une petite collection ressemble à une case vide (Uriel, 05/11) : elle s'ouvre d'office.
+const PETITE = 3
+
 export function SectionCollection({ collection: c }: { collection: Collection }) {
-  const [ouverte, setOuverte] = useState(c.fragments.some((f) => f.etat !== 'inconnu'))
+  const [ouverte, setOuverte] = useState(
+    c.total <= PETITE || c.fragments.some((f) => f.etat !== 'inconnu'),
+  )
   const titre = phraseDuTitre(c)
   return (
     <section

@@ -57,11 +57,38 @@ const plein: Codex = {
       icone: null,
       titre: null,
       portes: 0,
-      total: 1,
-      fragments: [f(6, 'Valkyrie', 'inconnu')],
+      total: 4,
+      fragments: [
+        f(6, 'Valkyrie', 'inconnu'),
+        f(7, 'Huscarl', 'inconnu'),
+        f(8, 'Berserker', 'inconnu'),
+        f(9, 'Skald', 'inconnu'),
+      ],
     },
   ],
 }
+
+test('une petite collection où l’on n’a rien s’ouvre quand même : repliée, elle paraît vide', () => {
+  afficher({
+    totaux: { portes: 0, scannes: 0, inconnus: 1, total: 1 },
+    collections: [
+      {
+        heritage: null,
+        nom: 'Hors collection',
+        couleur: null,
+        icone: null,
+        titre: null,
+        portes: 0,
+        total: 1,
+        fragments: [f(14, 'Jeanne de Flandre', 'inconnu')],
+      },
+    ],
+  })
+  const tete = within(screen.getByRole('region', { name: 'Hors collection' })).getAllByRole(
+    'button',
+  )[0]
+  expect(tete).toHaveAttribute('aria-expanded', 'true')
+})
 
 function afficher(codex: Codex) {
   etat.codex = codex
