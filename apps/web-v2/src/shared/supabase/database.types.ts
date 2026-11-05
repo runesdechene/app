@@ -8847,8 +8847,8 @@ export type Database = {
         Args: { p_murmure: number; p_texte: string }
         Returns: undefined
       }
-      mon_codex: { Args: never; Returns: Json }
       mon_accord_nouvelles: { Args: never; Returns: boolean }
+      mon_codex: { Args: never; Returns: Json }
       mon_energie: { Args: never; Returns: Json }
       mon_entree: { Args: never; Returns: Json }
       mon_fragment: { Args: { p_id: number }; Returns: Json }
