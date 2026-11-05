@@ -15,7 +15,7 @@
 import { useState, type ReactNode } from 'react'
 import calendrier from '@/assets/ui/calendrier.svg'
 import chevron from '@/assets/ui/chevron.svg'
-import cloche from '@/assets/ui/cloche.svg'
+import cloche from '@/assets/ui/cloche-trait.svg'
 import coeur from '@/assets/ui/coeur.svg'
 import cartePliee from '@/assets/ui/carte-pliee.svg'
 import courriel from '@/assets/ui/courriel.svg'
