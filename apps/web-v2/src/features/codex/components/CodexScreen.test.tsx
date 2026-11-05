@@ -167,7 +167,7 @@ test('« Comment ça marche ? », sous le titre, ouvre la feuille : la boutique,
   const feuille = screen.getByRole('dialog', { name: 'Comment ça marche ?' })
   expect(within(feuille).getByRole('link', { name: 'Voir la boutique' })).toHaveAttribute(
     'href',
-    'https://runesdechene.com/collections/all',
+    'https://runesdechene.com',
   )
   expect(within(feuille).getByRole('button', { name: 'Scanner un t-shirt' })).toBeInTheDocument()
 })

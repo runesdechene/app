@@ -237,7 +237,7 @@ test('sur mon profil, une tuile invite à découvrir les autres Fragments, sur l
   afficher(PROFIL)
   expect(await screen.findByRole('link', { name: /5 à découvrir/ })).toHaveAttribute(
     'href',
-    'https://runesdechene.com/collections/all',
+    'https://runesdechene.com',
   )
 })
 
