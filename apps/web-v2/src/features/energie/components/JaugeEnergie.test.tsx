@@ -89,5 +89,5 @@ test('la toucher explique la règle', async () => {
   expect(feuille).toHaveTextContent('gratuit à moins de 80 km')
   expect(feuille).toHaveTextContent('2 jusqu’à 400 km, 3 jusqu’à 1 200 km, 5 au-delà')
   expect(feuille).toHaveTextContent('Un point revient toutes les 30 min')
-  expect(feuille).toHaveTextContent('ajoute un point à ta jauge')
+  expect(feuille).not.toHaveTextContent('Fragment')
 })

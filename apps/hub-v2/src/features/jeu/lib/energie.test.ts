@@ -14,7 +14,7 @@ test('chaque valeur est un entier positif ou nul', () => {
 })
 
 test('la jauge compte au moins un point', () => {
-  expect(erreurReglages(avec({ maxSansFragment: 0 }))).toBe('La jauge doit compter au moins 1 point.')
+  expect(erreurReglages(avec({ maxDeBase: 0 }))).toBe('La jauge doit compter au moins 1 point.')
 })
 
 test('un point met au moins dix minutes à revenir', () => {
@@ -23,8 +23,8 @@ test('un point met au moins dix minutes à revenir', () => {
 })
 
 test('les bornes hautes : acceptées pile, refusées au-dessus', () => {
-  expect(erreurReglages(avec({ maxSansFragment: 1000 }))).toBeNull()
-  expect(erreurReglages(avec({ maxSansFragment: 1001 }))).toBe('La jauge ne dépasse pas 1000 points.')
+  expect(erreurReglages(avec({ maxDeBase: 1000 }))).toBeNull()
+  expect(erreurReglages(avec({ maxDeBase: 1001 }))).toBe('La jauge ne dépasse pas 1000 points.')
   expect(erreurReglages(avec({ minutesParPoint: 1440 }))).toBeNull()
   expect(erreurReglages(avec({ minutesParPoint: 1441 }))).toBe('Un point se recharge en 24 h au plus.')
   expect(erreurReglages(avec({ palier3Km: 20000 }))).toBeNull()
@@ -48,7 +48,7 @@ test('plus un lieu est loin, plus il coûte', () => {
 })
 
 test('versLignes(depuisLignes(x)) rend x, le cycle passant des minutes aux secondes', () => {
-  const reglages = avec({ maxSansFragment: 12, minutesParPoint: 45, cout4: 7 })
+  const reglages = avec({ maxDeBase: 12, minutesParPoint: 45, cout4: 7 })
   const lignes = versLignes(reglages)
   expect(lignes).toHaveLength(10)
   expect(lignes).toContainEqual({ key: 'energy_base_cycle', value: '2700' })

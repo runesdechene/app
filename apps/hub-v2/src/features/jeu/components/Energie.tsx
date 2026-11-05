@@ -19,7 +19,7 @@ type Saisie = Record<keyof Reglages, string>
 const POINTS_MONTRES = 30
 
 const LA_JAUGE: [keyof Reglages, string][] = [
-  ['maxSansFragment', 'Points sans Fragment'],
+  ['maxDeBase', 'Points de la jauge'],
   ['minutesParPoint', 'Minutes par point'],
 ]
 const LE_PRIX: [keyof Reglages, string][] = [
@@ -34,7 +34,7 @@ const LE_PRIX: [keyof Reglages, string][] = [
 ]
 
 const enTexte = (r: Reglages): Saisie => ({
-  maxSansFragment: String(r.maxSansFragment), minutesParPoint: String(r.minutesParPoint),
+  maxDeBase: String(r.maxDeBase), minutesParPoint: String(r.minutesParPoint),
   gratuitKm: String(r.gratuitKm), palier1Km: String(r.palier1Km), palier2Km: String(r.palier2Km), palier3Km: String(r.palier3Km),
   cout1: String(r.cout1), cout2: String(r.cout2), cout3: String(r.cout3), cout4: String(r.cout4),
 })
@@ -43,7 +43,7 @@ const enTexte = (r: Reglages): Saisie => ({
 const nombre = (texte: string) => (texte.trim() === '' ? Number.NaN : Number(texte))
 
 const enNombres = (s: Saisie): Reglages => ({
-  maxSansFragment: nombre(s.maxSansFragment), minutesParPoint: nombre(s.minutesParPoint),
+  maxDeBase: nombre(s.maxDeBase), minutesParPoint: nombre(s.minutesParPoint),
   gratuitKm: nombre(s.gratuitKm), palier1Km: nombre(s.palier1Km), palier2Km: nombre(s.palier2Km), palier3Km: nombre(s.palier3Km),
   cout1: nombre(s.cout1), cout2: nombre(s.cout2), cout3: nombre(s.cout3), cout4: nombre(s.cout4),
 })
@@ -58,7 +58,7 @@ function RegleRedessinee({ r }: { r: Reglages }) {
     { de: r.palier2Km, a: r.palier3Km, prix: prix(r.cout3) },
     { de: r.palier3Km, a: null, prix: prix(r.cout4) },
   ]
-  const pleins = Number.isFinite(r.maxSansFragment) ? Math.max(0, Math.min(r.maxSansFragment, POINTS_MONTRES)) : 0
+  const pleins = Number.isFinite(r.maxDeBase) ? Math.max(0, Math.min(r.maxDeBase, POINTS_MONTRES)) : 0
   return (
     <div className={energie.regle}>
       <p className={energie.legende}>Le prix d’une découverte selon la distance</p>
@@ -70,7 +70,7 @@ function RegleRedessinee({ r }: { r: Reglages }) {
           </li>
         ))}
       </ul>
-      <p className={energie.legende}>La jauge d’un joueur : {pleins} sur {POINTS_MONTRES} points montrés, +1 par Fragment</p>
+      <p className={energie.legende}>La jauge d’un joueur : {pleins} sur {POINTS_MONTRES} points montrés</p>
       <ul className={energie.jauge} aria-hidden="true">
         {Array.from({ length: POINTS_MONTRES }, (_, i) => (
           <li key={i} className={i < pleins ? `${energie.point ?? ''} ${energie.plein ?? ''}` : energie.point} />

@@ -24,7 +24,6 @@ function phrasesDeLaRegle({ regle: r, parPoint }: Energie) {
     parPoint === 3600
       ? 'Un point revient chaque heure.'
       : `Un point revient toutes les ${attente(parPoint)}.`,
-    'Chaque Fragment que tu possèdes ajoute un point à ta jauge.',
   ]
 }
 

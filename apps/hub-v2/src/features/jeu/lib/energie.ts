@@ -8,7 +8,7 @@
 import { pluriel } from '@/shared/lib/texte'
 
 export type Reglages = {
-  maxSansFragment: number
+  maxDeBase: number
   minutesParPoint: number
   gratuitKm: number
   palier1Km: number
@@ -23,7 +23,7 @@ export type Reglages = {
 export type LigneDeReglage = { key: string; value: string }
 
 export const CLES: Record<keyof Reglages, string> = {
-  maxSansFragment: 'default_max_energy',
+  maxDeBase: 'default_max_energy',
   minutesParPoint: 'energy_base_cycle',
   gratuitKm: 'decouverte_gratuite_km',
   palier1Km: 'decouverte_palier_1_km',
@@ -36,7 +36,7 @@ export const CLES: Record<keyof Reglages, string> = {
 }
 
 export const DEFAUTS: Reglages = {
-  maxSansFragment: 10,
+  maxDeBase: 10,
   minutesParPoint: 120,
   gratuitKm: 50,
   palier1Km: 150,
@@ -71,9 +71,9 @@ export function versLignes(r: Reglages): LigneDeReglage[] {
 // Une phrase par erreur, ou null si tout va bien.
 export function erreurReglages(r: Reglages): string | null {
   if (Object.values(r).some((v) => !Number.isInteger(v) || v < 0)) return 'Chaque valeur doit être un nombre entier positif.'
-  if (r.maxSansFragment < 1) return 'La jauge doit compter au moins 1 point.'
+  if (r.maxDeBase < 1) return 'La jauge doit compter au moins 1 point.'
   if (r.minutesParPoint < 10) return 'Un point ne peut pas revenir en moins de 10 minutes.'
-  if (r.maxSansFragment > 1000) return 'La jauge ne dépasse pas 1000 points.'
+  if (r.maxDeBase > 1000) return 'La jauge ne dépasse pas 1000 points.'
   if (r.minutesParPoint > 1440) return 'Un point se recharge en 24 h au plus.'
   if ([r.gratuitKm, r.palier1Km, r.palier2Km, r.palier3Km].some((km) => km > 20000)) return 'Une distance ne dépasse pas 20 000 km.'
   if ([r.cout1, r.cout2, r.cout3, r.cout4].some((cout) => cout > 1000)) return 'Un coût ne dépasse pas 1000 points.'
