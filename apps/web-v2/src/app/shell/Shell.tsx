@@ -1,5 +1,5 @@
 /**
- * QUOI     — la coquille : logotype, le scanner et la cloche (et sur PC les énigmes, la coupe, l'engrenage, la
+ * QUOI     — la coquille : logotype, le scanner (téléphone) et la cloche (et sur PC les énigmes, la coupe, l'engrenage, la
  *            sortie), barre d'onglets, les cinq écrans
  *            racines, le détail, et sur desktop le tiroir et son bouton pour le replier.
  * POURQUOI — les cinq écrans restent MONTÉS : leur état et leur défilement survivent au
@@ -256,18 +256,21 @@ export function Shell() {
               </button>
             </>
           )}
-          {/* Le scanner (spec 2026-10-09-v2-scan) : ce toucher débloque aussi le son du bip (Safari). */}
-          <button
-            type="button"
-            className={styles.action}
-            aria-label="Scanner un Fragment"
-            onClick={() => {
-              debloquerSon()
-              void navigate('/scan')
-            }}
-          >
-            <img src={scanner} alt="" />
-          </button>
+          {/* Le scanner (spec 2026-10-09-v2-scan) : ce toucher débloque aussi le son du bip (Safari).
+              Téléphone seulement : on ne vise pas un t-shirt avec un PC (Uriel, 05/11). */}
+          {!surOrdinateur && (
+            <button
+              type="button"
+              className={styles.action}
+              aria-label="Scanner un Fragment"
+              onClick={() => {
+                debloquerSon()
+                void navigate('/scan')
+              }}
+            >
+              <img src={scanner} alt="" />
+            </button>
+          )}
           <button
             ref={boutonNotifications}
             type="button"

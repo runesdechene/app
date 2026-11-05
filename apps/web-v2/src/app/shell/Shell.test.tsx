@@ -220,6 +220,13 @@ test('l’en-tête porte « Notifications », la barre porte le Compte ; un seul
   expect(screen.getByRole('button', { name: /Compte/ })).toBeInTheDocument()
 })
 
+test('sur PC, pas de scanner dans l’en-tête', async () => {
+  ecran.pc = true
+  renderAt('/accueil')
+  await screen.findByRole('button', { name: 'Notifications' })
+  expect(screen.queryByRole('button', { name: 'Scanner un Fragment' })).toBeNull()
+})
+
 test('l’icône du scanner, devant la cloche, ouvre /scan et débloque le son du bip', async () => {
   const router = renderAt('/accueil')
   const scanner = await screen.findByRole('button', { name: 'Scanner un Fragment' })
