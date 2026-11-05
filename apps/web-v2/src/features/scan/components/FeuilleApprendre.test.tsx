@@ -78,12 +78,12 @@ test('la suggestion se fige : le modèle qui change d’avis ne change pas le Fr
   const vue = () => [0.1]
   const { rerender } = render(
     <QueryClientProvider client={client}>
-      <FeuilleApprendre suggestion={11} empreinteActuelle={vue} />
+      <FeuilleApprendre suggestion={11} empreinteActuelle={vue} retirer />
     </QueryClientProvider>,
   )
   rerender(
     <QueryClientProvider client={client}>
-      <FeuilleApprendre suggestion={12} empreinteActuelle={vue} />
+      <FeuilleApprendre suggestion={12} empreinteActuelle={vue} retirer />
     </QueryClientProvider>,
   )
   expect(screen.getByRole('combobox')).toHaveValue('11')
