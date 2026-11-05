@@ -132,13 +132,13 @@ test('changer d’onglet ajoute une entrée : le retour ramène à l’onglet pr
   expect(router.state.location.pathname).toBe('/accueil')
 })
 
-test('la barre : Explore, Carte, Codex, Messages, Compte (Uriel, 05/11)', async () => {
+test('la barre : Accueil, Carte, Codex, Messages, Compte (Uriel, 05/11)', async () => {
   renderAt('/accueil')
   const barre = await screen.findByRole('navigation', { name: 'Navigation principale' })
   const libelles = within(barre)
     .getAllByRole('button')
     .map((b) => b.textContent)
-  expect(libelles).toEqual(['Explore', 'Carte', 'Codex', 'Messages', 'Compte'])
+  expect(libelles).toEqual(['Accueil', 'Carte', 'Codex', 'Messages', 'Compte'])
 })
 
 test('l’onglet actif est annoncé', async () => {
@@ -180,7 +180,7 @@ test('mentionné dans la communauté : du rouge, comme un murmure, et les deux s
 
 test('un détail rouvert par son onglet se ferme sur l’onglet, pas sur l’onglet d’avant', async () => {
   const router = renderAt('/messages/preferences')
-  await userEvent.click(await screen.findByRole('button', { name: 'Explore' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Accueil' }))
   await userEvent.click(screen.getByRole('button', { name: 'Messages' }))
   expect(router.state.location.pathname).toBe('/messages/preferences')
   await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))

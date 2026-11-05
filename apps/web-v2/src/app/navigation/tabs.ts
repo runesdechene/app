@@ -10,7 +10,7 @@ export type TabId =
   'accueil' | 'carte' | 'codex' | 'campement' | 'messages' | 'compagnies' | 'compte'
 
 export const TABS = [
-  { id: 'accueil', label: 'Explore', path: '/accueil' }, // « Explore » (Uriel, 08/10) ; l'adresse reste /accueil
+  { id: 'accueil', label: 'Accueil', path: '/accueil' }, // « Accueil », téléphone comme PC (Uriel, 05/11)
   { id: 'carte', label: 'Carte', path: '/carte' },
   { id: 'codex', label: 'Codex', path: '/codex' },
   { id: 'campement', label: 'Campement', path: '/campement' },

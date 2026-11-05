@@ -1,5 +1,5 @@
 /**
- * QUOI     — la barre : Explore · Carte · Codex · Messages · Compte, sur PC
+ * QUOI     — la barre : Accueil · Carte · Codex · Messages · Compte, sur PC
  *            Accueil · Codex · Messages · Compte ; icône
  *            gravée + libellé, lisière de forêt au-dessus ;
  *            l'onglet Compte montre l'avatar de l'Explorateur à la place d'une icône.
@@ -17,10 +17,10 @@ import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { useNonLus } from '@/features/messages/hooks/useMurmures'
 import { useRegistreNonLus } from '@/features/messages/hooks/useRegistre'
-import accueilIcon from '@/assets/ui/onglet-accueil.png'
+import accueilIcon from '@/assets/ui/onglet-accueil.svg'
 import carteIcon from '@/assets/ui/onglet-carte.svg'
 import codexIcon from '@/assets/ui/onglet-codex.svg'
-import messagesIcon from '@/assets/ui/messages.svg'
+import messagesIcon from '@/assets/ui/onglet-messages.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
@@ -49,11 +49,6 @@ const ICONS: Record<Exclude<OngletDeLaBarre, 'compte'>, string> = {
   carte: carteIcon,
   codex: codexIcon,
   messages: messagesIcon,
-}
-
-// Sur PC, la carte est toujours là : l'onglet « Explore » y redevient « Accueil » (Uriel, 03/11).
-function libelle(tab: (typeof ONGLETS)[number], surOrdinateur: boolean): string {
-  return surOrdinateur && tab.id === 'accueil' ? 'Accueil' : tab.label
 }
 
 export function TabBar({
@@ -116,7 +111,7 @@ export function TabBar({
               aria-hidden="true"
             />
           )}
-          <Text variant="libelle">{libelle(tab, surOrdinateur)}</Text>
+          <Text variant="libelle">{tab.label}</Text>
           {tab.id === 'messages' && (
             <span className={styles.nonLus}>
               {/* Rien pour moi : le point brun, si la communauté a parlé. */}
