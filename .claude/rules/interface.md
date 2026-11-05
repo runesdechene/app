@@ -375,3 +375,22 @@ la valeur est invalide, le `mask` tombe et seul le fond reste. En dev, rien : Vi
 
 **How to apply :** toujours `` `url("${icone}")` `` dans un style en ligne ou une variable CSS.
 Vérifier une icône en masque sur le build (`pnpm build` puis `vite preview`), pas seulement en dev.
+
+## Un écran qu'on ne voit pas en temps normal se regarde quand même avant de livrer (05/11/2026)
+
+**Le piège** (payé du 23/10 au 05/11) : la case « nouvelles » a été ajoutée au bas de la Charte,
+une rangée flex sans retour à la ligne pensée pour deux éléments. Quatre éléments sur 390 px : les
+cases écrasées, le cercle aplati en ovale, en prod pendant deux semaines. Personne ne l'a vue : la
+Charte n'apparaît qu'à un compte connecté qui ne l'a pas signée, et les tests vérifient les cases, pas
+leur place. Même chose pour tous les écrans d'entrée (`features/onboarding/`) et tout écran derrière
+une garde (`<Navigate>` sur un état du compte).
+
+**How to apply :** toucher un tel écran, c'est le regarder en mobile avant de commiter.
+1. Lever la garde en local seulement (`if (!parcours.connecte && false)`), `pnpm dev`.
+2. La fenêtre Chrome ne descend pas sous la largeur PC : sur la page du dev server, remplacer le
+   document par `<iframe src="/bienvenue/charte" width="390" height="844">` (javascript_tool), puis
+   capture.
+3. Remettre la garde, `git diff` pour s'assurer qu'aucun `&& false` ne part.
+
+Et ajouter un élément dans une rangée existante, c'est relire la disposition de la rangée : un
+`display: flex` sans `flex-wrap` ne s'agrandit pas, il écrase.
