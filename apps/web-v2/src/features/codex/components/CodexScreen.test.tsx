@@ -3,7 +3,7 @@
  * POURQUOI — spec du Codex (02/11) : repliée si l'on n'y a rien, le titre d'une collection
  *            complète, une page vide qui dit quoi faire.
  */
-import { cleanup, render, screen, within } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { vi } from 'vitest'
@@ -161,35 +161,13 @@ test('un Fragment inconnu n’ouvre rien : on le découvre en le scannant', () =
   expect(screen.queryByRole('link', { name: /Avalon|\?\?\?/ })).toBeNull()
 })
 
-describe('Nouveau ici ?', () => {
-  beforeEach(() => {
-    localStorage.clear()
-  })
-
-  test('le cartouche explique d’où viennent les Fragments', () => {
-    afficher(plein)
-    const cartouche = screen.getByRole('complementary', { name: 'Nouveau ici ?' })
-    expect(within(cartouche).getByText(/achetés sur la boutique/)).toBeInTheDocument()
-  })
-
-  test('fermé, il ne revient pas, et l’explication reste à un toucher', async () => {
-    afficher(plein)
-    await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
-    expect(screen.queryByRole('complementary', { name: 'Nouveau ici ?' })).toBeNull()
-    expect(screen.getByRole('button', { name: 'Comment ça marche ?' })).toBeInTheDocument()
-    cleanup()
-    afficher(plein)
-    expect(screen.queryByRole('complementary', { name: 'Nouveau ici ?' })).toBeNull()
-  })
-
-  test('« Comment ça marche ? » ouvre la feuille : la boutique, le scan', async () => {
-    afficher(plein)
-    await userEvent.click(screen.getByRole('button', { name: 'Comment ça marche ?' }))
-    const feuille = screen.getByRole('dialog', { name: 'Comment ça marche ?' })
-    expect(within(feuille).getByRole('link', { name: 'Voir la boutique' })).toHaveAttribute(
-      'href',
-      'https://runesdechene.com/collections/all',
-    )
-    expect(within(feuille).getByRole('button', { name: 'Scanner un t-shirt' })).toBeInTheDocument()
-  })
+test('« Comment ça marche ? », sous le titre, ouvre la feuille : la boutique, le scan', async () => {
+  afficher(plein)
+  await userEvent.click(screen.getByRole('button', { name: 'Comment ça marche ?' }))
+  const feuille = screen.getByRole('dialog', { name: 'Comment ça marche ?' })
+  expect(within(feuille).getByRole('link', { name: 'Voir la boutique' })).toHaveAttribute(
+    'href',
+    'https://runesdechene.com/collections/all',
+  )
+  expect(within(feuille).getByRole('button', { name: 'Scanner un t-shirt' })).toBeInTheDocument()
 })

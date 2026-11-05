@@ -41,7 +41,14 @@ export function SectionCollection({ collection: c }: { collection: Collection })
           setOuverte(!ouverte)
         }}
       >
-        {c.icone && <img className={styles.icone} src={c.icone} alt="" />}
+        {/* L'icône en pochoir, à la teinte de la collection (Uriel, 05/11). */}
+        {c.icone && (
+          <span
+            className={styles.icone}
+            style={{ '--icone': `url("${c.icone}")` }}
+            aria-hidden="true"
+          />
+        )}
         <span className={styles.nom}>{c.nom}</span>
         <span className={styles.compte}>
           {c.portes} sur {c.total} {c.portes > 1 ? 'portés' : 'porté'}

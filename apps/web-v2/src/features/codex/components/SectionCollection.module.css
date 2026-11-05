@@ -31,9 +31,11 @@
 }
 
 .icone {
+  flex: none;
   width: 24px;
   height: 24px;
-  object-fit: contain;
+  background: currentcolor;
+  mask: var(--icone) center / contain no-repeat;
 }
 
 .nom {
