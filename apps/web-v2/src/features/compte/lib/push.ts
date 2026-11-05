@@ -5,8 +5,12 @@
  *            d'envoi par les RPC register_push_subscription / unregister_push_subscription
  *            (migration 147), et `send-push` s'en sert. La clé publique VAPID vient du .env racine,
  *            comme pour la V1.
+ *            À chaque ouverture, `retablir` réinscrit l'adresse de ce téléphone : la base avait pu la
+ *            perdre (service worker désinscrit du 07 au 26/10, refus d'un service de push) pendant que
+ *            le téléphone, lui, restait abonné. Payé le 05/11 : 52 joueurs joignables sur 5 000.
  * ATTENTION — sur iPhone, le push n'existe que dans l'appli ajoutée à l'écran d'accueil.
  */
+import { chaine, objet } from '@/shared/lib/lire'
 import { supabase } from '@/shared/supabase/client'
 
 const CLE_VAPID = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined
@@ -45,6 +49,41 @@ export async function estAbonne(): Promise<boolean> {
   return (await abonnementActuel()) !== null
 }
 
+// Le joueur a coupé le push sur ce téléphone : on ne le rétablit pas de soi-même.
+const COUPE = 'push-coupe-ici'
+
+function coupeIci() {
+  try {
+    return localStorage.getItem(COUPE) === '1'
+  } catch {
+    return false
+  }
+}
+
+function noterCoupe(coupe: boolean) {
+  try {
+    if (coupe) localStorage.setItem(COUPE, '1')
+    else localStorage.removeItem(COUPE)
+  } catch {
+    // Sans stockage, on le rétablira à la prochaine ouverture : il pourra le recouper.
+  }
+}
+
+// La règle, sans navigateur : rétablir l'abonnement de ce téléphone ? Jamais de demande d'office.
+export function aRetablir(t: {
+  push: QuelPush
+  permission: NotificationPermission
+  coupe: boolean
+}): boolean {
+  return t.push === 'possible' && t.permission === 'granted' && !t.coupe
+}
+
+export async function retablir(): Promise<void> {
+  const push = pushDeCeTelephone()
+  if (push !== 'possible') return
+  if (aRetablir({ push, permission: Notification.permission, coupe: coupeIci() })) await abonner()
+}
+
 // Demande la permission si besoin, puis inscrit l'adresse d'envoi en base. Lève en cas d'échec.
 export async function abonner(): Promise<void> {
   if (!CLE_VAPID) throw new Error('Clé VAPID absente')
@@ -56,16 +95,21 @@ export async function abonner(): Promise<void> {
       applicationServerKey: cleEnOctets(CLE_VAPID),
     }))
   const { endpoint, keys } = abonnement.toJSON()
-  const { error } = await supabase.rpc('register_push_subscription', {
+  const { data, error } = await supabase.rpc('register_push_subscription', {
     p_endpoint: endpoint ?? '',
     p_p256dh: keys?.p256dh ?? '',
     p_auth: keys?.auth ?? '',
     p_user_agent: navigator.userAgent,
   })
   if (error) throw error
+  // La fonction rend son refus ({ error }) au lieu de le lever : sans cette ligne, il passait inaperçu.
+  const refus = objet(data).error
+  if (refus !== undefined) throw new Error(chaine(refus))
+  noterCoupe(false)
 }
 
 export async function desabonner(): Promise<void> {
+  noterCoupe(true)
   const abonnement = await abonnementActuel()
   if (!abonnement) return
   await supabase.rpc('unregister_push_subscription', { p_endpoint: abonnement.endpoint })

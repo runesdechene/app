@@ -27,6 +27,7 @@ import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router'
 import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { CarteNouveaute } from '@/features/notifications/components/CarteNouveaute'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
+import { useRetablirPush } from '@/features/compte/hooks/useRetablirPush'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { JaugeEnergie } from '@/features/energie/components/JaugeEnergie'
 import { CompteScreen } from '@/features/compte/components/CompteScreen'
@@ -154,6 +155,7 @@ export function Shell() {
   useSuivrePosition()
   useSignalerPresence()
   useEnvoyerPins() // les pins posés sans réseau partent dès qu'il revient
+  useRetablirPush() // la base retrouve l'adresse push de ce téléphone
   // Au téléphone, l'app s'ouvre sur l'Accueil : la carte se prépare derrière.
   usePreparerLaCarte()
   const nonLues = useNonLues()
