@@ -45,7 +45,8 @@
   display: grid;
   gap: var(--space-1);
   padding: var(--space-3) var(--space-6) calc(env(safe-area-inset-bottom) + var(--space-4));
-  background: linear-gradient(to bottom, transparent, var(--color-fond) 30%);
+  /* Le fondu tient dans la marge du haut : rien ne transparaît sous l'action, quelle que soit sa hauteur. */
+  background: linear-gradient(to bottom, transparent, var(--color-fond) var(--space-3));
 }
 
 .titre {

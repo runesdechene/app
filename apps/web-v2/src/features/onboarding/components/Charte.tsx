@@ -119,34 +119,36 @@ export function Charte() {
             />
             <span>Recevoir les nouvelles de Runes de Chêne.</span>
           </label>
-          <p className={styles.consigne}>
-            <span className={styles.mot}>Signer</span>
-            {!lu
-              ? 'Lis la Charte jusqu’au bout'
-              : accepte
-                ? 'Tenir son doigt appuyé dans le cercle'
-                : 'Coche la case pour signer'}
-          </p>
-          <button
-            type="button"
-            className={appui ? styles.cercleAppui : styles.cercle}
-            aria-label="Signer la Charte : maintenir appuyé, ou maintenir la touche Espace"
-            disabled={!lu || !accepte}
-            onPointerDown={appuyer}
-            onPointerUp={relacher}
-            onPointerLeave={relacher}
-            onKeyDown={(e) => {
-              if (e.key === ' ' && !e.repeat) appuyer()
-            }}
-            onKeyUp={relacher}
-            onAnimationEnd={signer}
-          >
-            <svg viewBox="0 0 78 78" aria-hidden="true">
-              <circle className={styles.piste} cx="39" cy="39" r="36" />
-              <circle className={styles.remplissage} cx="39" cy="39" r="36" />
-            </svg>
-            <span className={styles.coche} aria-hidden="true" />
-          </button>
+          <div className={styles.geste}>
+            <p className={styles.consigne}>
+              <span className={styles.mot}>Signer</span>
+              {!lu
+                ? 'Lis la Charte jusqu’au bout'
+                : accepte
+                  ? 'Tenir son doigt appuyé dans le cercle'
+                  : 'Coche la case pour signer'}
+            </p>
+            <button
+              type="button"
+              className={appui ? styles.cercleAppui : styles.cercle}
+              aria-label="Signer la Charte : maintenir appuyé, ou maintenir la touche Espace"
+              disabled={!lu || !accepte}
+              onPointerDown={appuyer}
+              onPointerUp={relacher}
+              onPointerLeave={relacher}
+              onKeyDown={(e) => {
+                if (e.key === ' ' && !e.repeat) appuyer()
+              }}
+              onKeyUp={relacher}
+              onAnimationEnd={signer}
+            >
+              <svg viewBox="0 0 78 78" aria-hidden="true">
+                <circle className={styles.piste} cx="39" cy="39" r="36" />
+                <circle className={styles.remplissage} cx="39" cy="39" r="36" />
+              </svg>
+              <span className={styles.coche} aria-hidden="true" />
+            </button>
+          </div>
         </div>
       }
     >
