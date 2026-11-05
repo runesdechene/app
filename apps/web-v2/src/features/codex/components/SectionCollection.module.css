@@ -1,5 +1,5 @@
 /*
- * QUOI     — le panneau d'une collection (maquette F) : un dégradé de sa couleur, un filet, la
+ * QUOI     — le panneau d'une collection (maquette F) : un dégradé de sa couleur, sans filet, la
  *            grille qui s'adapte à la largeur (3 cartes sur téléphone, davantage sur PC). Le contenu
  *            s'ouvre en glissant (@starting-style), le chevron tourne.
  */
@@ -9,8 +9,7 @@
   display: grid;
   gap: var(--space-2);
   padding: var(--space-4) var(--space-3);
-  border: 1.5px solid color-mix(in srgb, var(--teinte-collection) 45%, transparent);
-  border-radius: var(--radius-carte);
+  border-radius: var(--radius-feuille);
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--teinte-collection) 30%, transparent),
