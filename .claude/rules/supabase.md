@@ -399,3 +399,15 @@ porter d'image depuis la bascule, sans que personne ne le voie (mig 567).
 
 **How to apply :** un seau où le Hub dépose a ses quatre politiques réservées à `_is_admin()` —
 déposer, remplacer (UPDATE), lire (SELECT, ou lecture publique), effacer — comme `missives` (mig 543).
+
+## Une colonne UNIQUE ne se « vide » pas avec `''`
+
+**Le piège** (payé du 02/11 au 11/11/2026, mig 590) : « Supprimer mon compte » posait
+`email_address = ''`. La colonne est `UNIQUE NOT NULL` : le premier compte supprimé a pris `''`, et
+toutes les suppressions suivantes ont échoué sur `users_email_address_unique`, sans que personne le
+voie. `handle_new_user` et `migrate_user_to_auth_id` posent encore `''` à la fusion d'un compte :
+même risque, pas encore traité.
+
+**How to apply :** pour effacer une valeur d'une colonne unique, une pierre tombale unique
+(`'supprime:' || id`), ou NULL si la colonne l'accepte. Un test de suppression se joue avec un compte
+déjà supprimé en base.
