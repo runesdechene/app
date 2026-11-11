@@ -171,7 +171,6 @@
     padding-top: var(--space-6);
     color: var(--color-canal-activite);
     font-size: var(--sous-titre-size);
-    font-style: italic;
     text-shadow: 0 1px 4px color-mix(in srgb, var(--color-ombre) 50%, transparent);
   }
 

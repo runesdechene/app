@@ -1,6 +1,6 @@
 /**
- * QUOI     — /soumettre-contenu de bout en bout : la mission présélectionnée, les quatre étapes et
- *            leurs verrous, l'envoi fichier par fichier, le dépôt et ses refus.
+ * QUOI     — /soumettre-contenu de bout en bout : le choix, les deux chemins (un avis, des photos) et
+ *            leurs verrous, la mission présélectionnée, l'envoi fichier par fichier, le dépôt et ses refus.
  * POURQUOI — un joueur arrive d'un QR imprimé, sans compte : chaque verrou et chaque échec doit se
  *            lire. Supabase est simulé ; la compression aussi (jsdom ne dessine pas d'image).
  */
@@ -80,10 +80,10 @@ async function deposer(...noms: string[]) {
   await userEvent.upload(screen.getByLabelText(/Glisse ou clique pour ajouter/), noms.map(photo))
 }
 
-/** Les trois premières étapes passées, une taille M pour chaque fichier. */
+/** Des photos : une taille M pour chacune, l'avis passé sans rien remplir. */
 async function jusquAToi(noms = ['a.jpg', 'b.jpg'], adresse = '/soumettre-contenu?chemin=photos') {
   ouvrir(adresse)
-  await screen.findByRole('heading', { name: 'Tes contenus' })
+  await screen.findByRole('heading', { name: 'Tes photos' })
   await deposer(...noms)
   await userEvent.click(bouton(/^Suivant/))
   for (let i = 0; i < noms.length; i++) {
@@ -105,16 +105,25 @@ async function envoyer() {
   await userEvent.click(bouton(/^Envoyer mes contenus/))
 }
 
+const etoile = (note: string, n: number) =>
+  within(screen.getByRole('group', { name: note })).getByRole('button', { name: `${String(n)} sur 5` })
+
+async function remplirAvis() {
+  await userEvent.click(await screen.findByRole('button', { name: 'Sweatshirt' }))
+  await userEvent.click(etoile('La qualité du produit', 4))
+}
+
 describe('le choix', () => {
   it('sans chemin, la page demande ce qu’on veut partager', async () => {
     ouvrir('/soumettre-contenu')
     expect(await screen.findByRole('heading', { name: 'Que veux-tu partager ?' })).toBeInTheDocument()
+    expect(screen.getByText('Étape 1 sur 4')).toBeInTheDocument()
     expect(bouton(/^Commencer/)).toBeDisabled()
   })
 
-  it('« Un avis seul » puis « Commencer » ouvre l’avis, dans l’adresse', async () => {
+  it('« Un avis » puis « Commencer » ouvre l’avis, dans l’adresse', async () => {
     const { router } = ouvrir('/soumettre-contenu')
-    await userEvent.click(await screen.findByRole('button', { name: /Un avis seul/ }))
+    await userEvent.click(await screen.findByRole('button', { name: /^Un avis/ }))
     await userEvent.click(bouton(/^Commencer/))
     expect(await screen.findByRole('heading', { name: 'Ton avis', level: 1 })).toBeInTheDocument()
     expect(router.state.location.search).toContain('chemin=avis')
@@ -122,7 +131,8 @@ describe('le choix', () => {
 
   it('un lien de mission déjà imprimé ouvre directement les photos', async () => {
     ouvrir('/soumettre-contenu?quete=hoplite')
-    expect(await screen.findByRole('heading', { name: 'Tes contenus' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Tes photos' })).toBeInTheDocument()
+    expect(screen.getByText('Étape 2 sur 4')).toBeInTheDocument()
   })
 })
 
@@ -141,9 +151,9 @@ describe('la mission', () => {
 })
 
 describe('les étapes', () => {
-  it('on n’avance pas sans fichier, même en tapant ?etape=3', async () => {
-    ouvrir('/soumettre-contenu?chemin=photos&etape=3')
-    expect(await screen.findByRole('heading', { name: 'Tes contenus' })).toBeInTheDocument()
+  it('des photos : on n’avance pas sans fichier, même en tapant ?etape=5', async () => {
+    ouvrir('/soumettre-contenu?chemin=photos&etape=5')
+    expect(await screen.findByRole('heading', { name: 'Tes photos' })).toBeInTheDocument()
     expect(bouton(/^Suivant/)).toBeDisabled()
   })
 
@@ -162,7 +172,7 @@ describe('les étapes', () => {
     await userEvent.click(bouton(/^Suivant/))
     expect(await screen.findByRole('heading', { name: 'Quelle taille portes-tu ?' })).toBeInTheDocument()
     const params = new URLSearchParams(router.state.location.search)
-    expect(params.get('etape')).toBe('2')
+    expect(params.get('etape')).toBe('3')
     expect(params.get('quete')).toBe('hoplite')
   })
 
@@ -177,7 +187,8 @@ describe('les étapes', () => {
     expect(bouton(/^Continuer/)).toBeDisabled()
     await userEvent.click(bouton('Aucun produit'))
     await userEvent.click(bouton(/^Continuer/))
-    expect(await screen.findByRole('heading', { name: 'Ton histoire' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Ton avis', level: 2 })).toBeInTheDocument()
+    expect(screen.getByText('Étape 3 sur 4')).toBeInTheDocument()
   })
 
   it('on n’envoie pas sans prénom, e-mail et les deux accords', async () => {
@@ -291,15 +302,7 @@ describe('l’envoi', () => {
   })
 })
 
-describe('l’avis seul', () => {
-  const etoile = (note: string, n: number) =>
-    within(screen.getByRole('group', { name: note })).getByRole('button', { name: `${String(n)} sur 5` })
-
-  async function remplirAvis() {
-    await userEvent.click(await screen.findByRole('button', { name: 'Sweatshirt' }))
-    await userEvent.click(etoile('La qualité du produit', 4))
-  }
-
+describe('un avis', () => {
   it('« Suivant » attend un vêtement et une note', async () => {
     ouvrir('/soumettre-contenu?chemin=avis')
     expect(await screen.findByRole('heading', { name: 'Ton avis', level: 2 })).toBeInTheDocument()
@@ -313,7 +316,8 @@ describe('l’avis seul', () => {
     await remplirAvis()
     await userEvent.type(screen.getByRole('textbox', { name: 'Ton avis, en quelques mots' }), 'Très doux')
     await userEvent.click(bouton(/^Suivant/))
-    expect(await screen.findByText('Étape 2 sur 2')).toBeInTheDocument()
+    await userEvent.click(await screen.findByRole('button', { name: /^Continuer sans photo/ }))
+    expect(await screen.findByText('Étape 4 sur 4')).toBeInTheDocument()
     await userEvent.type(screen.getByRole('textbox', { name: 'Prénom *' }), 'Claire')
     await userEvent.type(screen.getByRole('textbox', { name: 'E-mail *' }), 'claire@exemple.fr')
     await userEvent.click(bouton(/^Publier mon avis/))
@@ -339,6 +343,7 @@ describe('l’avis seul', () => {
     expect(await screen.findByRole('button', { name: 'Sweatshirt' })).toHaveAttribute('aria-pressed', 'true')
     await userEvent.click(etoile('Ton expérience avec Runes de Chêne', 5))
     await userEvent.click(bouton(/^Suivant/))
+    await userEvent.click(await screen.findByRole('button', { name: /^Continuer sans photo/ }))
     expect(await screen.findByRole('textbox', { name: 'E-mail *' })).toHaveValue('claire@exemple.fr')
   })
 
@@ -359,21 +364,42 @@ describe('l’avis seul', () => {
     expect(screen.getByRole('link', { name: 'contact@runesdechene.com' })).toHaveAttribute('href', 'mailto:contact@runesdechene.com')
   })
 
-  it('?etape=2 sans avis rempli reste sur « Ton avis »', async () => {
-    ouvrir('/soumettre-contenu?chemin=avis&etape=2')
+  it('?etape=5 sans avis rempli reste sur « Ton avis »', async () => {
+    ouvrir('/soumettre-contenu?chemin=avis&etape=5')
     expect(await screen.findByRole('heading', { name: 'Ton avis', level: 2 })).toBeInTheDocument()
   })
 
-  it('avec photos, « Ton histoire » demande aussi le vêtement, et les notes ont leurs nouveaux noms', async () => {
+  it('après l’avis, on peut ajouter une photo : ses tailles, puis les accords', async () => {
+    ouvrir('/soumettre-contenu?chemin=avis')
+    await remplirAvis()
+    await userEvent.click(bouton(/^Suivant/))
+    expect(await screen.findByRole('heading', { name: 'Tes photos' })).toBeInTheDocument()
+    expect(screen.getByText('Étape 3 sur 4')).toBeInTheDocument()
+    await deposer('a.jpg')
+    await userEvent.click(bouton(/^Suivant/))
+    await userEvent.click(bouton('M'))
+    await userEvent.click(bouton(/^(Suivant|Continuer)/))
+    await screen.findByRole('heading', { name: 'Toi' })
+    await remplirToi()
+    await envoyer()
+    await screen.findByRole('heading', { name: 'Bienvenue dans le Mouvement !' })
+    expect(faux.deposer).toHaveBeenCalledWith(
+      expect.objectContaining({ p_garment_type: 'sweatshirt', p_rating_products: 4, p_consent_account: true }),
+    )
+  })
+})
+
+describe('des photos', () => {
+  it('l’avis est facultatif ; rempli, il part avec les photos', async () => {
     ouvrir()
     await deposer('a.jpg')
     await userEvent.click(bouton(/^Suivant/))
     await userEvent.click(bouton('M'))
     await userEvent.click(bouton(/^(Suivant|Continuer)/))
-    await screen.findByRole('heading', { name: 'Ton histoire' })
+    await screen.findByRole('heading', { name: 'Ton avis', level: 2 })
+    expect(bouton(/^Suivant/)).toBeEnabled()
     await userEvent.click(bouton('Veste Zip'))
     await userEvent.click(etoile('La qualité du produit', 3))
-    expect(screen.getByRole('group', { name: 'Ton expérience avec Runes de Chêne' })).toBeInTheDocument()
     await userEvent.click(bouton(/^Suivant/))
     await remplirToi()
     await envoyer()

@@ -1,12 +1,13 @@
 /**
- * QUOI     — /soumettre-contenu : un client partage un avis, avec ses photos en tenue Runes de Chêne
- *            (quatre étapes : contenus, tailles, histoire, toi) ou seul (deux : ton avis, toi). Le
- *            premier écran fait choisir ; le lien d'une mission (`?quete=<slug>`) ouvre les photos.
+ * QUOI     — /soumettre-contenu : un client partage ce qu'il vit avec Runes de Chêne. Étape 1, il
+ *            choisit : « Un avis » (son avis, puis des photos s'il veut, puis lui) ou « Des photos »
+ *            (ses photos et leurs tailles, puis un avis s'il veut, puis lui). Le lien d'une mission
+ *            (`?quete=<slug>`) ouvre directement les photos.
  * POURQUOI — le design de la page en ligne (ancien StudioSubmit), gardé par Uriel le 15/10 : sur PC,
  *            une carte à deux panneaux posée sur la photo du réglage Studio ; au téléphone, le
  *            formulaire seul, plein écran. Le chemin et l'étape sont dans l'adresse
- *            (`?chemin=avis&etape=2`) : le retour du navigateur revient d'un écran, et une étape tapée
- *            à la main n'ouvre jamais plus loin que ce qui est rempli.
+ *            (`?chemin=avis&etape=3`) : le retour du navigateur revient d'un écran, et un écran tapé à
+ *            la main n'ouvre jamais plus loin que ce qui est rempli.
  */
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
@@ -16,25 +17,29 @@ import { lireConfigStudio, lireMissions } from './api'
 import { ChoixDuChemin } from './ChoixDuChemin'
 import { EtapeAvis } from './EtapeAvis'
 import { EtapeContenus } from './EtapeContenus'
-import { EtapeHistoire } from './EtapeHistoire'
 import { EtapeTailles } from './EtapeTailles'
 import { EtapeToi } from './EtapeToi'
 import { Frise } from './Frise'
 import {
   cheminDe,
+  ecranAffiche,
   ETAPES,
-  ETAPES_AVIS,
-  etapeAffichee,
-  etapeAvisAffichee,
+  etapeDeLaFrise,
   HISTOIRE_VIDE,
+  numeroDeLEcran,
   TOI_VIDE,
   VETEMENTS,
+  voisin,
   type Chemin,
   type Contenu,
+  type Ecran,
+  type Histoire,
 } from './lib/formulaire'
 import { Succes } from './Succes'
 import { useEnvoi } from './useEnvoi'
 import styles from './PageSoumettre.module.css'
+
+const TITRES: Record<Chemin | 'choix', string> = { choix: 'Partager ton aventure', avis: 'Ton avis', photos: 'Envoyer mes contenus' }
 
 function liberer(apercus: Set<string>) {
   for (const apercu of apercus) URL.revokeObjectURL(apercu)
@@ -64,15 +69,15 @@ export function PageSoumettre() {
   )
 
   const chemin = cheminDe(params)
-  const etape = etapeAffichee(params.get('etape'), contenus)
-  const etapeAvis = etapeAvisAffichee(params.get('etape'), histoire)
+  const ecran = chemin && ecranAffiche(chemin, params.get('etape'), histoire, contenus)
+  const avecPhotos = contenus.length > 0
   const quete = params.get('quete') ?? ''
   const mission = missions.data?.some((m) => m.slug === quete) ? quete : ''
 
-  function allerA(n: number) {
+  function allerA(c: Chemin, e: Ecran) {
     setParams((p) => {
       const suite = new URLSearchParams(p)
-      suite.set('etape', String(n))
+      suite.set('etape', String(numeroDeLEcran(c, e)))
       return suite
     })
   }
@@ -81,6 +86,15 @@ export function PageSoumettre() {
     setParams((p) => {
       const suite = new URLSearchParams(p)
       suite.set('chemin', c)
+      suite.delete('etape')
+      return suite
+    })
+  }
+
+  function revenirAuChoix() {
+    setParams((p) => {
+      const suite = new URLSearchParams(p)
+      suite.delete('chemin')
       suite.delete('etape')
       return suite
     })
@@ -117,19 +131,71 @@ export function PageSoumettre() {
     setContenus((cs) => cs.map((c, i) => (i === rang ? { ...c, taille } : c)))
   }
 
+  function changerHistoire(modif: Partial<Histoire>) {
+    setHistoire((h) => ({ ...h, ...modif }))
+  }
+
+  /** Le panneau de l'écran en cours : chaque écran sait seulement aller au précédent et au suivant. */
+  function panneau(c: Chemin, e: Ecran) {
+    const surTitre = `Étape ${String(etapeDeLaFrise(c, e))} sur 4`
+    const precedent = () => {
+      const avant = voisin(c, e, -1, contenus)
+      if (avant === e) revenirAuChoix()
+      else allerA(c, avant)
+    }
+    const suivant = () => {
+      allerA(c, voisin(c, e, 1, contenus))
+    }
+    switch (e) {
+      case 'avis':
+        return <EtapeAvis surTitre={surTitre} facultatif={c === 'photos'} histoire={histoire} changer={changerHistoire} precedent={precedent} suivant={suivant} />
+      case 'photos':
+        return (
+          <EtapeContenus
+            surTitre={surTitre}
+            facultatif={c === 'avis'}
+            missions={missions.data ?? []}
+            mission={mission}
+            choisirMission={choisirMission}
+            contenus={contenus}
+            ajouter={ajouter}
+            retirer={retirer}
+            precedent={precedent}
+            suivant={suivant}
+          />
+        )
+      case 'tailles':
+        return <EtapeTailles surTitre={surTitre} contenus={contenus} choisirTaille={choisirTaille} precedent={precedent} suivant={suivant} />
+      case 'toi':
+        return (
+          <EtapeToi
+            avecPhotos={avecPhotos}
+            toi={toi}
+            changer={(modif) => {
+              setToi((t) => ({ ...t, ...modif }))
+            }}
+            histoire={histoire}
+            changerHistoire={changerHistoire}
+            erreur={erreur}
+            precedent={precedent}
+            envoyer={() => {
+              void envoyer(contenus, histoire, toi, mission).then((reussi) => {
+                if (reussi) liberer(apercus)
+              })
+            }}
+          />
+        )
+    }
+  }
+
   const fond = config.data?.fond
   const colonne = config.data?.colonne
-
-  // La colonne et la frise suivent le chemin : le choix, l'avis seul, ou l'avis avec photos.
-  const colonneDuChemin = {
-    choix: { titre: <>Partager <br />ton aventure</>, etapes: ['Ton choix'], etape: 1 },
-    avis: { titre: <>Ton avis</>, etapes: ETAPES_AVIS, etape: etapeAvis },
-    photos: { titre: <>Envoyer <br />mes contenus</>, etapes: ETAPES, etape },
-  }[chemin ?? 'choix']
+  const etapes = ETAPES[chemin ?? 'avis']
+  const etape = chemin && ecran ? etapeDeLaFrise(chemin, ecran) : 1
 
   let corps
   if (reussite) {
-    corps = <Succes reussite={reussite} couronnes={config.data?.couronnes ?? 0} chemin={chemin ?? 'photos'} />
+    corps = <Succes reussite={reussite} couronnes={config.data?.couronnes ?? 0} avisSeul={!avecPhotos} />
   } else if (progression) {
     corps = (
       <div className={styles.attente}>
@@ -144,85 +210,15 @@ export function PageSoumettre() {
           {colonne && <img className={styles.imageColonne} src={colonne} alt="" />}
           <div className={styles.colonneDedans}>
             <p className={styles.marque}>Runes de Chêne</p>
-            <h1 className={styles.titre}>{colonneDuChemin.titre}</h1>
-            <Frise etapes={colonneDuChemin.etapes} etape={colonneDuChemin.etape} sens="vertical" />
-            <p className={styles.citation}>
-              « On te guide pas à pas. Quelques minutes, et tes clichés rejoignent le Mouvement. »
-            </p>
+            <h1 className={styles.titre}>{TITRES[chemin ?? 'choix']}</h1>
+            <Frise etapes={etapes} etape={etape} sens="vertical" />
+            <p className={styles.citation}>« On te guide pas à pas. Quelques minutes, et ce que tu partages rejoint le Mouvement. »</p>
           </div>
         </aside>
 
         <section className={styles.panneau}>
-          <Frise etapes={colonneDuChemin.etapes} etape={colonneDuChemin.etape} sens="horizontal" />
-          {chemin === null && <ChoixDuChemin choisir={choisirChemin} />}
-          {chemin === 'avis' && etapeAvis === 1 && (
-            <EtapeAvis
-              histoire={histoire}
-              changer={(modif) => {
-                setHistoire((h) => ({ ...h, ...modif }))
-              }}
-              suivant={() => {
-                allerA(2)
-              }}
-            />
-          )}
-          {chemin === 'photos' && etape === 1 && (
-            <EtapeContenus
-              missions={missions.data ?? []}
-              mission={mission}
-              choisirMission={choisirMission}
-              contenus={contenus}
-              ajouter={ajouter}
-              retirer={retirer}
-              suivant={() => {
-                allerA(2)
-              }}
-            />
-          )}
-          {chemin === 'photos' && etape === 2 && (
-            <EtapeTailles
-              contenus={contenus}
-              choisirTaille={choisirTaille}
-              precedent={() => {
-                allerA(1)
-              }}
-              suivant={() => {
-                allerA(3)
-              }}
-            />
-          )}
-          {chemin === 'photos' && etape === 3 && (
-            <EtapeHistoire
-              histoire={histoire}
-              changer={(modif) => {
-                setHistoire((h) => ({ ...h, ...modif }))
-              }}
-              precedent={() => {
-                allerA(2)
-              }}
-              suivant={() => {
-                allerA(4)
-              }}
-            />
-          )}
-          {((chemin === 'photos' && etape === 4) || (chemin === 'avis' && etapeAvis === 2)) && (
-            <EtapeToi
-              chemin={chemin}
-              toi={toi}
-              changer={(modif) => {
-                setToi((t) => ({ ...t, ...modif }))
-              }}
-              erreur={erreur}
-              precedent={() => {
-                allerA(chemin === 'avis' ? 1 : 3)
-              }}
-              envoyer={() => {
-                void envoyer(contenus, histoire, toi, mission, chemin).then((reussi) => {
-                  if (reussi) liberer(apercus)
-                })
-              }}
-            />
-          )}
+          <Frise etapes={etapes} etape={etape} sens="horizontal" />
+          {chemin && ecran ? panneau(chemin, ecran) : <ChoixDuChemin choisir={choisirChemin} />}
         </section>
       </div>
     )

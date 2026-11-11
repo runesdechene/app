@@ -1,16 +1,30 @@
 /**
- * QUOI     — les deux chemins (un avis avec photos, un avis seul), les trois parts du formulaire (les
- *            contenus, l'histoire, toi), leurs valeurs de départ, et les verrous : jusqu'où on peut
+ * QUOI     — les deux chemins (un avis, des photos), leurs écrans dans l'ordre, les parts du formulaire
+ *            (les contenus, l'avis, toi), leurs valeurs de départ, et les verrous : jusqu'où on peut
  *            aller, et quand on peut envoyer.
- * POURQUOI — le chemin et l'étape viennent de l'adresse (`?chemin=avis&etape=2`), qu'on peut taper à
- *            la main : la page ne montre jamais une étape dont les précédentes ne sont pas remplies.
+ * POURQUOI — le choix est l'étape 1 (Uriel, 11/11), puis les deux chemins passent par les mêmes
+ *            écrans dans un ordre différent : l'avis d'abord et les photos facultatives, ou les photos
+ *            d'abord et l'avis facultatif. Le chemin et l'étape viennent de l'adresse
+ *            (`?chemin=avis&etape=3`), qu'on peut taper à la main : la page ne montre jamais un écran
+ *            dont les précédents ne sont pas remplis.
  */
 export const AUCUN_PRODUIT = 'none'
 export const TAILLES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL']
-export const ETAPES = ['Tes contenus', 'Les tailles', 'Ton histoire', 'Toi']
-export const ETAPES_AVIS = ['Ton avis', 'Toi']
 
 export type Chemin = 'photos' | 'avis'
+export type Ecran = 'avis' | 'photos' | 'tailles' | 'toi'
+
+/** Les écrans de chaque chemin, après le choix ; les tailles ne s'ouvrent que s'il y a des photos. */
+const ORDRE: Record<Chemin, Ecran[]> = {
+  avis: ['avis', 'photos', 'tailles', 'toi'],
+  photos: ['photos', 'tailles', 'avis', 'toi'],
+}
+
+/** La frise de chaque chemin ; avant le choix, celle d'un avis. */
+export const ETAPES: Record<Chemin, string[]> = {
+  avis: ['Ton choix', 'Ton avis', 'Tes photos', 'Toi'],
+  photos: ['Ton choix', 'Tes photos', 'Ton avis', 'Toi'],
+}
 
 /** Les avis s'affichent par type de vêtement, jamais par motif ; `page` dit où l'avis sera publié. */
 export const VETEMENTS = [
@@ -37,19 +51,6 @@ export const TOI_VIDE: Toi = { prenom: '', email: '', tailleCm: '', accordMarque
 
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
-/** La dernière étape ouverte : 1 sans fichier, 2 tant qu'un fichier n'a pas sa taille, sinon 4. */
-export function etapeAtteignable(contenus: Contenu[]): number {
-  if (contenus.length === 0) return 1
-  return contenus.every((c) => c.taille !== null) ? 4 : 2
-}
-
-/** L'étape de l'adresse, ramenée à ce qui est ouvert. */
-export function etapeAffichee(demandee: string | null, contenus: Contenu[]): number {
-  const n = Number(demandee)
-  const valide = Number.isInteger(n) && n >= 1 && n <= ETAPES.length ? n : 1
-  return Math.min(valide, etapeAtteignable(contenus))
-}
-
 /** Le chemin de l'adresse ; un lien de mission (`?quete=`) déjà imprimé ouvre les photos ; sinon, le choix. */
 export function cheminDe(params: URLSearchParams): Chemin | null {
   const chemin = params.get('chemin')
@@ -57,20 +58,49 @@ export function cheminDe(params: URLSearchParams): Chemin | null {
   return params.has('quete') ? 'photos' : null
 }
 
-/** Un avis seul : un vêtement, et une note ou quelques mots. */
+/** Un avis : un vêtement, et une note ou quelques mots. */
 export function avisComplet(h: Histoire): boolean {
   return h.vetement !== '' && (h.noteProduits > 0 || h.noteExperience > 0 || h.avis.trim() !== '')
 }
 
-/** L'étape de l'avis seul : « Toi » (2) seulement quand l'avis est complet. */
-export function etapeAvisAffichee(demandee: string | null, h: Histoire): number {
-  return demandee === '2' && avisComplet(h) ? 2 : 1
+/** Peut-on passer cet écran ? Seul ce que le chemin a choisi est obligatoire. */
+function rempli(chemin: Chemin, ecran: Ecran, h: Histoire, contenus: Contenu[]): boolean {
+  if (ecran === 'avis') return chemin === 'photos' || avisComplet(h)
+  if (ecran === 'photos') return chemin === 'avis' || contenus.length > 0
+  if (ecran === 'tailles') return contenus.every((c) => c.taille !== null)
+  return false
 }
 
-/** Un avis seul ne crée pas de compte : ni accord de compte, ni accord de diffusion des photos. */
-export function toiComplet(t: Toi, chemin: Chemin): boolean {
+/** Le numéro d'un écran dans l'adresse : le choix vaut 1, puis l'ordre du chemin. */
+export function numeroDeLEcran(chemin: Chemin, ecran: Ecran): number {
+  return ORDRE[chemin].indexOf(ecran) + 2
+}
+
+/** L'écran de l'adresse, ramené au premier qui n'est pas rempli ; sans photo, les tailles n'existent pas. */
+export function ecranAffiche(chemin: Chemin, demandee: string | null, h: Histoire, contenus: Contenu[]): Ecran {
+  const ordre = ORDRE[chemin].filter((e) => e !== 'tailles' || contenus.length > 0)
+  // Le premier écran d'un chemin porte son nom.
+  const demande = ORDRE[chemin][Number(demandee) - 2] ?? chemin
+  // Les tailles demandées sans photo : on reste aux photos.
+  const voulu = ordre.includes(demande) ? demande : 'photos'
+  return ordre.find((ecran) => ecran === voulu || !rempli(chemin, ecran, h, contenus)) ?? voulu
+}
+
+/** L'écran qui suit (ou précède), en sautant les tailles quand il n'y a pas de photo. */
+export function voisin(chemin: Chemin, ecran: Ecran, sens: 1 | -1, contenus: Contenu[]): Ecran {
+  const ordre = ORDRE[chemin].filter((e) => e !== 'tailles' || contenus.length > 0)
+  return ordre[ordre.indexOf(ecran) + sens] ?? ecran
+}
+
+/** L'étape de la frise d'un écran : le choix est la 1 ; les tailles comptent avec les photos. */
+export function etapeDeLaFrise(chemin: Chemin, ecran: Ecran): number {
+  return ETAPES[chemin].indexOf(ecran === 'avis' ? 'Ton avis' : ecran === 'toi' ? 'Toi' : 'Tes photos') + 1
+}
+
+/** Sans photo, pas de compte : le prénom et l'e-mail suffisent. Avec, les deux accords aussi. */
+export function toiComplet(t: Toi, avecPhotos: boolean): boolean {
   const identite = t.prenom.trim() !== '' && EMAIL.test(t.email.trim())
-  return chemin === 'avis' ? identite : identite && t.accordMarque && t.accordCompte
+  return avecPhotos ? identite && t.accordMarque && t.accordCompte : identite
 }
 
 /** La taille du modèle, en centimètres, seulement si elle est plausible (100 à 250). */

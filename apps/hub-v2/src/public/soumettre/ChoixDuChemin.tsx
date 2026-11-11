@@ -1,7 +1,9 @@
 /**
- * QUOI     — l'écran 0, « Que veux-tu partager ? » : deux cartes, « Un avis avec photos » et « Un avis
- *            seul », puis « Commencer ».
- * POURQUOI — un seul formulaire, deux chemins (spec avis et photos du 16/10, maquette Figma 644:1612).
+ * QUOI     — l'étape 1, « Que veux-tu partager ? » : deux cartes, « Des photos » et « Un avis », puis
+ *            « Commencer ».
+ * POURQUOI — un seul formulaire, deux chemins (spec avis et photos du 16/10, maquette Figma 644:1612) ;
+ *            le choix compte comme la première étape (Uriel, 11/11). Chaque chemin garde l'autre en
+ *            facultatif : une photo après l'avis, un avis après les photos.
  *            La carte choisie ne fait que se marquer : c'est « Commencer » qui écrit le chemin dans
  *            l'adresse, comme le bouton « Suivant » écrit l'étape.
  */
@@ -14,15 +16,15 @@ const CARTES: { chemin: Chemin; icone: string; titre: string; texte: string; dur
   {
     chemin: 'photos',
     icone: '📷',
-    titre: 'Un avis avec photos',
-    texte: 'Tes photos portées rejoignent l’accueil de la boutique et le mur « Ils nous portent ». Ton avis va sur la fiche du produit.',
+    titre: 'Des photos',
+    texte: 'Tes photos portées rejoignent l’accueil de la boutique et le mur « Ils nous portent ». Tu peux y joindre un avis.',
     duree: '≈ 3 minutes',
   },
   {
     chemin: 'avis',
     icone: '✍️',
-    titre: 'Un avis seul',
-    texte: 'Quelques étoiles et un mot sur le produit et ton expérience. Il va sur la fiche du produit.',
+    titre: 'Un avis',
+    texte: 'Quelques étoiles et un mot sur le produit et ton expérience. Tu pourras ajouter une photo.',
     duree: '≈ 30 secondes',
   },
 ]
@@ -31,7 +33,7 @@ export function ChoixDuChemin({ choisir }: { choisir: (chemin: Chemin) => void }
   const [choix, setChoix] = useState<Chemin | null>(null)
   return (
     <>
-      <EnTete surTitre="Pour commencer" titre="Que veux-tu partager ?">
+      <EnTete surTitre="Étape 1 sur 4" titre="Que veux-tu partager ?">
         Deux façons de raconter ce que tu vis avec Runes de Chêne.
       </EnTete>
 
@@ -55,7 +57,7 @@ export function ChoixDuChemin({ choisir }: { choisir: (chemin: Chemin) => void }
           </button>
         ))}
       </div>
-      <p className={styles.note}>Tu es ambassadeur ou partenaire ? Choisis « Un avis avec photos ».</p>
+      <p className={styles.note}>Tu es ambassadeur ou partenaire ? Choisis « Des photos ».</p>
 
       <Navigation>
         <BoutonSombre

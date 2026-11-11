@@ -1,8 +1,9 @@
 /**
- * QUOI     — étape 1 de l'avis seul, « Ton avis » : le vêtement, la qualité du produit, l'expérience,
+ * QUOI     — « Ton avis » : le vêtement, la qualité du produit, l'expérience,
  *            quelques mots (maquette Figma 644:1703), et le SAV en bas.
- * POURQUOI — 30 secondes, sans photo. « Suivant » attend un vêtement et une note ou un texte : sans
- *            vêtement, l'avis ne saurait pas sur quelle page aller. Un client qui a eu un souci doit
+ * POURQUOI — 30 secondes. Sur le chemin « Un avis », « Suivant » attend un vêtement et une note ou un
+ *            texte : sans vêtement, l'avis ne saurait pas sur quelle page aller. Sur le chemin « Des
+ *            photos », l'avis est facultatif. Un client qui a eu un souci doit
  *            trouver le SAV avant de laisser une mauvaise note.
  */
 import { ChoixDuVetement } from './ChoixDuVetement'
@@ -15,12 +16,18 @@ const LONGUEUR_MAX = 500
 const SAV = 'contact@runesdechene.com'
 
 export function EtapeAvis({
+  surTitre,
+  facultatif,
   histoire,
   changer,
+  precedent,
   suivant,
 }: {
+  surTitre: string
+  facultatif: boolean
   histoire: Histoire
   changer: (modif: Partial<Histoire>) => void
+  precedent: () => void
   suivant: () => void
 }) {
   const produits = 'La qualité du produit'
@@ -28,8 +35,8 @@ export function EtapeAvis({
   const page = VETEMENTS.find((v) => v.cle === histoire.vetement)?.page ?? 'la boutique'
   return (
     <>
-      <EnTete surTitre="Étape 1 sur 2" titre="Ton avis">
-        Comment s’est passée ta commande ?
+      <EnTete surTitre={surTitre} titre="Ton avis">
+        {facultatif ? 'Facultatif : comment s’est passée ta commande ?' : 'Comment s’est passée ta commande ?'}
       </EnTete>
 
       <ChoixDuVetement
@@ -76,8 +83,8 @@ export function EtapeAvis({
         mention « Client vérifié ».
       </p>
 
-      <Navigation>
-        <BoutonSombre disabled={!avisComplet(histoire)} onClick={suivant}>
+      <Navigation precedent={precedent}>
+        <BoutonSombre disabled={!facultatif && !avisComplet(histoire)} onClick={suivant}>
           Suivant →
         </BoutonSombre>
       </Navigation>

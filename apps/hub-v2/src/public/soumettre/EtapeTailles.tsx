@@ -15,11 +15,13 @@ import styles from './EtapeTailles.module.css'
 const nomDeTaille = (taille: string) => (taille === AUCUN_PRODUIT ? 'Aucun produit' : taille)
 
 export function EtapeTailles({
+  surTitre,
   contenus,
   choisirTaille,
   precedent,
   suivant,
 }: {
+  surTitre: string
   contenus: Contenu[]
   choisirTaille: (rang: number, taille: string) => void
   precedent: () => void
@@ -32,7 +34,7 @@ export function EtapeTailles({
 
   return (
     <>
-      <EnTete surTitre="Étape 2 sur 4" titre="Quelle taille portes-tu ?">
+      <EnTete surTitre={surTitre} titre="Quelle taille portes-tu ?">
         Une taille par contenu — ou « Aucun produit ».
       </EnTete>
 

@@ -1,6 +1,6 @@
 /**
- * QUOI     — étape 1, « Tes contenus » : la mission éventuelle, puis les photos et vidéos (dix au
- *            plus), déposées ou choisies, en vignettes qu'on peut retirer.
+ * QUOI     — « Tes photos » : la mission éventuelle, puis les photos et vidéos (dix au plus), déposées
+ *            ou choisies, en vignettes qu'on peut retirer. Facultatives sur le chemin « Un avis ».
  * POURQUOI — la mission vaut « envoi libre » tant que le joueur ne la choisit pas : `?quete=` (le
  *            lien d'une mission) la présélectionne seulement, il la voit et peut la changer. Un
  *            fichier refusé l'est ici, avec son nom et la raison, avant que rien ne parte.
@@ -15,20 +15,26 @@ import etape from './Etape.module.css'
 import styles from './EtapeContenus.module.css'
 
 export function EtapeContenus({
+  surTitre,
+  facultatif,
   missions,
   mission,
   choisirMission,
   contenus,
   ajouter,
   retirer,
+  precedent,
   suivant,
 }: {
+  surTitre: string
+  facultatif: boolean
   missions: Mission[]
   mission: string
   choisirMission: (slug: string) => void
   contenus: Contenu[]
   ajouter: (fichiers: File[]) => void
   retirer: (rang: number) => void
+  precedent: () => void
   suivant: () => void
 }) {
   const [refus, setRefus] = useState<string[]>([])
@@ -46,8 +52,8 @@ export function EtapeContenus({
 
   return (
     <>
-      <EnTete surTitre="Étape 1 sur 4" titre="Tes contenus">
-        Dépose tes photos et vidéos — jusqu’à {MAX_FICHIERS}.
+      <EnTete surTitre={surTitre} titre="Tes photos">
+        {facultatif ? 'Facultatif : ' : ''}tes photos et vidéos en tenue Runes de Chêne — jusqu’à {MAX_FICHIERS}.
       </EnTete>
 
       {missions.length > 0 && (
@@ -126,9 +132,9 @@ export function EtapeContenus({
         </ul>
       )}
 
-      <Navigation>
-        <BoutonSombre disabled={contenus.length === 0} onClick={suivant}>
-          Suivant →
+      <Navigation precedent={precedent}>
+        <BoutonSombre disabled={!facultatif && contenus.length === 0} onClick={suivant}>
+          {contenus.length === 0 && facultatif ? 'Continuer sans photo →' : 'Suivant →'}
         </BoutonSombre>
       </Navigation>
     </>
