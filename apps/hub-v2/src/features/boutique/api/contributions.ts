@@ -32,6 +32,8 @@ export type Contribution = {
   taille: string | null; produit: string | null; hauteur: number | null; epaules: number | null
   note_experience: number | null; note_produits: number | null; diffusion: boolean
   recompensee_le: string | null; images: PhotoDeContribution[]; etiquettes: Etiquette[]
+  /** Le type de vêtement d'un avis (mig 588) ; `fragments` : ceux des comptes de cet e-mail. */
+  vetement: string | null; fragments: number
 }
 export type ListeContributions = {
   total: number

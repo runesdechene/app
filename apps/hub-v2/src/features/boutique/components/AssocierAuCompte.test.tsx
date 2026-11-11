@@ -19,7 +19,7 @@ const fragments = [fragment(1, 'Hoplite'), fragment(2, 'Yggdrasil')]
 const contribution = (compte: string | null): Contribution => ({
   id: 'c1', quand: null, statut: 'pending', nom: 'Laure', email: null, instagram: null, role: 'client', compte, lieu: null,
   code_postal: null, departement: null, message: null, note_equipe: null, taille: null, produit: 'T-shirt Yggdrasil',
-  hauteur: null, epaules: null, note_experience: null, note_produits: null, diffusion: false, recompensee_le: null,
+  hauteur: null, epaules: null, note_experience: null, note_produits: null, diffusion: false, recompensee_le: null, vetement: null, fragments: 0,
   images: [], etiquettes: [],
 })
 

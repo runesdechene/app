@@ -1,12 +1,32 @@
 /**
- * QUOI     — ce qu'on sait d'une contribution sans la base : le libellé de ses statuts, si un fichier est une
- *            vidéo, le texte alternatif que Shopify reçoit, le nom d'un fichier téléchargé.
+ * QUOI     — ce qu'on sait d'une contribution sans la base : le libellé de ses statuts et de son vêtement, sa
+ *            balise (avis seul ou avec photos), « client vérifié », si un fichier est une vidéo, le texte
+ *            alternatif que Shopify reçoit, le nom d'un fichier téléchargé.
  * POURQUOI — les mêmes règles que l'ancien Hub (texte alternatif « Pierre mesure 1m83 et porte du M ») ; ici elles
  *            se testent seules, hors de l'écran.
  */
-import type { StatutContribution } from '../api/contributions'
+import type { Contribution, StatutContribution } from '../api/contributions'
 
 export const STATUTS: Record<StatutContribution, string> = { pending: 'À valider', approved: 'Publiée', archived: 'Archivée' }
+
+/** Les types de vêtement du formulaire public (`garment_type`, mig 588). */
+export const VETEMENTS: Record<string, string> = { tshirt: 'T-shirt', sweat: 'Sweat', casquette: 'Casquette', autre: 'Autre' }
+
+/** Un avis seul n'a pas d'image : c'est ainsi qu'on reconnaît son chemin. */
+export function baliseDuChemin(images: readonly unknown[]): 'Avis' | 'Avis + photos' {
+  return images.length === 0 ? 'Avis' : 'Avis + photos'
+}
+
+/** Le produit des photos, sinon le vêtement de l'avis. */
+export function produitOuVetement(c: Pick<Contribution, 'produit' | 'vetement'>): string {
+  return c.produit ?? (c.vetement ? VETEMENTS[c.vetement] : undefined) ?? 'Sans produit'
+}
+
+/** « Client vérifié » : l'e-mail de l'avis est celui d'un compte qui porte au moins un Fragment. */
+export function verification(fragments: number): string {
+  if (fragments === 0) return 'Aucun Fragment avec cet e-mail'
+  return `✓ Client vérifié (${String(fragments)} ${fragments > 1 ? 'Fragments' : 'Fragment'})`
+}
 
 const VIDEOS = /\.(mp4|mov|webm|avi|mkv|m4v)$/i
 

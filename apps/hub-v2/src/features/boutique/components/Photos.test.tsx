@@ -32,7 +32,7 @@ const contribution = (id: string, nom: string, surcharge: Partial<Contribution> 
   id, quand: '2026-10-10T10:00:00Z', statut: 'pending', nom, email: `${nom.toLowerCase()}@x.fr`, instagram: '@brune',
   role: 'client', compte: null, lieu: 'Lyon', code_postal: '69001', departement: 'Rhône', message: 'Superbe veste',
   note_equipe: null, taille: 'M', produit: 'Veste Hoplite', hauteur: 168, epaules: 40, note_experience: 4, note_produits: 5,
-  diffusion: true, recompensee_le: null, images: [photo(`${id}a`), photo(`${id}b`, 'https://x/clip.mp4')], etiquettes: [], ...surcharge,
+  diffusion: true, recompensee_le: null, vetement: null, fragments: 0, images: [photo(`${id}a`), photo(`${id}b`, 'https://x/clip.mp4')], etiquettes: [], ...surcharge,
 })
 const liste = (lignes: Contribution[]): ListeContributions => ({
   total: lignes.length,
@@ -105,6 +105,20 @@ test('« Valider et publier » verse les couronnes et passe à la suivante', asy
     expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-contributions'] })
     expect(invalider).toHaveBeenCalledWith({ queryKey: ['hub-ouverture'] })
   })
+})
+
+test('un avis seul : la balise « Avis », son vêtement, et « client vérifié » par ses Fragments', async () => {
+  afficher([contribution('c1', 'Brune', { images: [], produit: null, vetement: 'sweat', fragments: 2 })])
+  await screen.findByRole('heading', { name: 'Brune' })
+  expect(screen.getByRole('button', { name: /Brune/ })).toHaveTextContent('Avis · Sweat')
+  expect(screen.getByText(/✓ Client vérifié \(2 Fragments\)/)).toBeInTheDocument()
+})
+
+test('avec photos, la balise « Avis + photos » ; sans Fragment, on le dit', async () => {
+  afficher([contribution('c1', 'Brune')])
+  await screen.findByRole('heading', { name: 'Brune' })
+  expect(screen.getByRole('button', { name: /Brune/ })).toHaveTextContent('Avis + photos · Veste Hoplite')
+  expect(screen.getByText(/Aucun Fragment avec cet e-mail/)).toBeInTheDocument()
 })
 
 test('une contribution déjà récompensée n’a pas de champ de couronnes', async () => {

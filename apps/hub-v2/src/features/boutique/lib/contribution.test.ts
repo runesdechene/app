@@ -1,4 +1,9 @@
-import { adresseDeTelechargement, estUneVideo, nomDeFichier, texteAlternatif } from './contribution'
+import { adresseDeTelechargement, baliseDuChemin, estUneVideo, nomDeFichier, texteAlternatif } from './contribution'
+
+test('la balise du chemin : un avis sans image est un « Avis »', () => {
+  expect(baliseDuChemin([])).toBe('Avis')
+  expect(baliseDuChemin([{ id: 'p' }])).toBe('Avis + photos')
+})
 
 test('le texte alternatif de Shopify, comme l’ancien Hub', () => {
   expect(texteAlternatif('Pierre', 183, 'M')).toBe('Pierre mesure 1m83 et porte du M')

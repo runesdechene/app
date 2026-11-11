@@ -10,7 +10,7 @@
 import { dateCourte } from '@/shared/lib/dates'
 import type { Contribution } from '../api/contributions'
 import { useEcritureContribution } from '../hooks/useContributions'
-import { estUneVideo } from '../lib/contribution'
+import { baliseDuChemin, estUneVideo, produitOuVetement, verification } from '../lib/contribution'
 import { AssocierAuCompte } from './AssocierAuCompte'
 import { DecisionsDeContribution } from './DecisionsDeContribution'
 import { EtiquettesDeContribution } from './EtiquettesDeContribution'
@@ -34,7 +34,7 @@ export function LectureContribution({ contribution, onDecide }: { contribution: 
   const c = contribution
   const ou = [c.lieu, c.code_postal].filter(Boolean).join(' ')
   const infos = [
-    c.role && (ROLES[c.role] ?? c.role), c.email, c.instagram, ou, c.departement,
+    c.role && (ROLES[c.role] ?? c.role), baliseDuChemin(c.images), c.email, verification(c.fragments), c.instagram, ou, c.departement,
     c.hauteur !== null && `${String(c.hauteur)} cm`, c.epaules !== null && `épaules ${String(c.epaules)} cm`,
     c.quand && `reçue le ${dateCourte(c.quand)}`, c.compte && 'aussi Explorateur',
   ].filter(Boolean)
@@ -50,7 +50,7 @@ export function LectureContribution({ contribution, onDecide }: { contribution: 
           <h2 className={styles.nomDuClient}>{c.nom}</h2>
           <p className={styles.infos}>{infos.join(' · ')}</p>
         </div>
-        {c.produit && <span className={styles.produitPorte}>{`${c.produit}${c.taille ? ` · ${c.taille}` : ''}`}</span>}
+        {(c.produit ?? c.vetement) && <span className={styles.produitPorte}>{`${produitOuVetement(c)}${c.taille ? ` · ${c.taille}` : ''}`}</span>}
         <AssocierAuCompte contribution={c} />
       </header>
 

@@ -19,7 +19,7 @@ import type { Contribution, Filtre } from '../api/contributions'
 import { useContributions } from '../hooks/useContributions'
 import { useTelechargement } from '../hooks/useTelechargement'
 import { fichiersDeContributions } from '../lib/archive'
-import { estUneVideo } from '../lib/contribution'
+import { baliseDuChemin, estUneVideo, produitOuVetement } from '../lib/contribution'
 import { LectureContribution } from './LectureContribution'
 import boutique from './Boutique.module.css'
 import styles from './Photos.module.css'
@@ -39,8 +39,9 @@ function numeroDePage(texte: string | null): number {
 /** « ★★★★★  3 photos », « 1 photo, sans avis » (maquette 596:1319). */
 function resumeDeLaLigne(c: Contribution): string {
   const note = c.note_produits ?? c.note_experience
-  const photos = `${String(c.images.length)} ${pluriel(c.images.length, 'photo')}`
-  if (note === null) return `${photos}, sans avis`
+  // Un avis seul n'a pas de photo à compter.
+  const photos = c.images.length > 0 ? `${String(c.images.length)} ${pluriel(c.images.length, 'photo')}` : ''
+  if (note === null) return photos ? `${photos}, sans avis` : 'sans note'
   const pleines = Math.min(5, Math.max(0, Math.round(note)))
   return `${'★'.repeat(pleines)}${'☆'.repeat(5 - pleines)}  ${photos}`
 }
@@ -148,7 +149,7 @@ export function Photos() {
                   <Vignette contribution={c} />
                   <span className={styles.nom}>{c.nom}</span>
                   <span className={styles.quand}>{c.quand ? heureDuFil(c.quand) : ''}</span>
-                  <span className={styles.porte}>{c.produit ?? 'Sans produit'}</span>
+                  <span className={styles.porte}>{`${baliseDuChemin(c.images)} · ${produitOuVetement(c)}`}</span>
                   <span className={styles.notes}>{resumeDeLaLigne(c)}</span>
                 </button>
               ))}
