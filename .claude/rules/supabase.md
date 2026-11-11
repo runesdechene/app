@@ -411,3 +411,13 @@ même risque, pas encore traité.
 **How to apply :** pour effacer une valeur d'une colonne unique, une pierre tombale unique
 (`'supprime:' || id`), ou NULL si la colonne l'accepte. Un test de suppression se joue avec un compte
 déjà supprimé en base.
+
+## Une photo de contribution a sa vignette à côté (11/11/2026)
+
+**Le piège** : la vue « Photos » du Hub décodait 134 photos en 1920 px pour des cases de 180 px, 1 à 4 s
+par clic de filtre (mesuré : 40 à 75 ms sans les images). Le bucket `community-photos` n'avait aucune vignette.
+
+**How to apply :** comme les photos de lieux, toute image de `community-photos` a sa `<nom>_thumb.webp`
+(400 px) : posée à l'envoi (`useEnvoi`), rattrapée par `scripts/vignettes-photos-communaute.mjs`, retirée
+avec la photo (`nettoyer`). Une liste ou une grille affiche `Miniature` (vignette, photo entière en secours),
+jamais l'original. Un nouvel endroit qui dépose dans ce bucket pose aussi la vignette.
