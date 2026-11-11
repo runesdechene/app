@@ -102,7 +102,7 @@ export function EtapeToi({
       )}
 
       <Navigation precedent={precedent}>
-        <BoutonSombre envoi disabled={!toiComplet(toi)} onClick={envoyer}>
+        <BoutonSombre envoi disabled={!toiComplet(toi, 'photos')} onClick={envoyer}>
           Envoyer mes contenus ✦
         </BoutonSombre>
       </Navigation>
