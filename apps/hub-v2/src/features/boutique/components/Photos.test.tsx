@@ -114,6 +114,15 @@ test('un avis seul : la balise « Avis », son vêtement, et « client vérifié
   expect(screen.getByText(/✓ Client vérifié \(2 Fragments\)/)).toBeInTheDocument()
 })
 
+test('un avis seul n’a ni photo à télécharger ni couronnes : il n’a pas de compte', async () => {
+  afficher([contribution('c1', 'Brune', { images: [], vetement: 'tshirt' })])
+  await screen.findByRole('heading', { name: 'Brune' })
+  expect(screen.queryByRole('button', { name: /^↓ Télécharger/ })).not.toBeInTheDocument()
+  expect(screen.queryByLabelText('Couronnes offertes')).not.toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Valider et publier' }))
+  await waitFor(() => { expect(api.modererContribution).toHaveBeenCalledWith('c1', 'approved') })
+})
+
 test('avec photos, la balise « Avis + photos » ; sans Fragment, on le dit', async () => {
   afficher([contribution('c1', 'Brune')])
   await screen.findByRole('heading', { name: 'Brune' })

@@ -2,7 +2,7 @@
  * QUOI     — les décisions au bas d'une contribution : « Archiver » (en attente ou publiée) et, en attente
  *            ou archivée, « Couronnes offertes » + « Valider et publier ».
  * POURQUOI — les couronnes ne se versent qu'une fois : une contribution déjà récompensée n'a pas de champ,
- *            elle dit quand. La base décide et refuse ; son message reste sous les boutons.
+ *            elle dit quand. Un avis seul n'en a pas non plus : sans compte, rien à créditer (mig 588). La base décide et refuse ; son message reste sous les boutons.
  *            « Télécharger » (les photos en archive) et « Supprimer » (confirmation en ligne) ferment la rangée :
  *            supprimer est refusé en bloc si Shopify ou le stockage refuse, la contribution reste entière.
  */
@@ -38,15 +38,18 @@ export function DecisionsDeContribution({ contribution, ecriture, suppression, o
   }
 
   const nombre = contribution.images.length
+  const avisSeul = nombre === 0
   return (
     <section className={styles.decisions}>
-      <button type="button" className={styles.telechargerTout} disabled={telechargement.enCours}
-        onClick={() => { void telechargement.telecharger(fichiersDeContributions([contribution]), `${nettoyer(contribution.nom)}.zip`) }}>
-        {`↓ Télécharger ${nombre === 1 ? 'la photo' : `les ${String(nombre)} photos`}`}
-      </button>
+      {!avisSeul && (
+        <button type="button" className={styles.telechargerTout} disabled={telechargement.enCours}
+          onClick={() => { void telechargement.telecharger(fichiersDeContributions([contribution]), `${nettoyer(contribution.nom)}.zip`) }}>
+          {`↓ Télécharger ${nombre === 1 ? 'la photo' : `les ${String(nombre)} photos`}`}
+        </button>
+      )}
       {confirme ? (
         <span className={styles.rangee}>
-          <span>{`Supprimer cette contribution et ses ${String(nombre)} photos ?`}</span>
+          <span>{avisSeul ? 'Supprimer cet avis ?' : `Supprimer cette contribution et ses ${String(nombre)} photos ?`}</span>
           <button type="button" className={styles.plein} disabled={suppression.isPending} onClick={supprimer}>Confirmer</button>
           <button type="button" className={styles.contour} onClick={() => { setConfirme(false) }}>Annuler</button>
         </span>
@@ -60,14 +63,14 @@ export function DecisionsDeContribution({ contribution, ecriture, suppression, o
         <>
           {recompensee ? (
             <span className={styles.petit}>{`Déjà récompensée le ${dateCourte(recompensee)}`}</span>
-          ) : (
+          ) : !avisSeul && (
             <label className={styles.couronnes}>
               Couronnes offertes
               <input type="number" min={0} step={1} value={couronnes} onChange={(e) => { setCouronnes(e.target.value) }} />
             </label>
           )}
           <button type="button" className={styles.plein} disabled={ecriture.isPending}
-            onClick={() => { decider('approved', recompensee ? undefined : Math.max(0, Math.floor(Number(couronnes) || 0))) }}>
+            onClick={() => { decider('approved', recompensee || avisSeul ? undefined : Math.max(0, Math.floor(Number(couronnes) || 0))) }}>
             Valider et publier
           </button>
         </>
