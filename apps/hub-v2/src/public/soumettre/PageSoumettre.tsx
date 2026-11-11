@@ -1,24 +1,25 @@
 /**
- * QUOI     — /soumettre-contenu : un joueur envoie ses photos et vidéos en tenue Runes de Chêne, en
- *            quatre étapes (contenus, tailles, histoire, toi). On y arrive par un QR imprimé ou par
- *            le lien d'une mission (`?quete=<slug>`).
+ * QUOI     — /soumettre-contenu : un client partage un avis, avec ses photos en tenue Runes de Chêne
+ *            (quatre étapes : contenus, tailles, histoire, toi) ou seul (deux : ton avis, toi). Le
+ *            premier écran fait choisir ; le lien d'une mission (`?quete=<slug>`) ouvre les photos.
  * POURQUOI — le design de la page en ligne (ancien StudioSubmit), gardé par Uriel le 15/10 : sur PC,
  *            une carte à deux panneaux posée sur la photo du réglage Studio ; au téléphone, le
- *            formulaire seul, plein écran. L'étape est dans l'adresse (`?etape=2`) : le retour du
- *            navigateur revient d'une étape, et une étape tapée à la main n'ouvre jamais plus loin
- *            que ce qui est rempli.
+ *            formulaire seul, plein écran. Le chemin et l'étape sont dans l'adresse
+ *            (`?chemin=avis&etape=2`) : le retour du navigateur revient d'un écran, et une étape tapée
+ *            à la main n'ouvre jamais plus loin que ce qui est rempli.
  */
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PagePublique } from '../PagePublique'
 import { lireConfigStudio, lireMissions } from './api'
+import { ChoixDuChemin } from './ChoixDuChemin'
 import { EtapeContenus } from './EtapeContenus'
 import { EtapeHistoire } from './EtapeHistoire'
 import { EtapeTailles } from './EtapeTailles'
 import { EtapeToi } from './EtapeToi'
 import { Frise } from './Frise'
-import { etapeAffichee, HISTOIRE_VIDE, TOI_VIDE, type Contenu } from './lib/formulaire'
+import { cheminDe, ETAPES, ETAPES_AVIS, etapeAffichee, HISTOIRE_VIDE, TOI_VIDE, type Chemin, type Contenu } from './lib/formulaire'
 import { Succes } from './Succes'
 import { useEnvoi } from './useEnvoi'
 import styles from './PageSoumettre.module.css'
@@ -46,6 +47,7 @@ export function PageSoumettre() {
     [apercus],
   )
 
+  const chemin = cheminDe(params)
   const etape = etapeAffichee(params.get('etape'), contenus)
   const quete = params.get('quete') ?? ''
   const mission = missions.data?.some((m) => m.slug === quete) ? quete : ''
@@ -54,6 +56,15 @@ export function PageSoumettre() {
     setParams((p) => {
       const suite = new URLSearchParams(p)
       suite.set('etape', String(n))
+      return suite
+    })
+  }
+
+  function choisirChemin(c: Chemin) {
+    setParams((p) => {
+      const suite = new URLSearchParams(p)
+      suite.set('chemin', c)
+      suite.delete('etape')
       return suite
     })
   }
@@ -92,6 +103,13 @@ export function PageSoumettre() {
   const fond = config.data?.fond
   const colonne = config.data?.colonne
 
+  // La colonne et la frise suivent le chemin : le choix, l'avis seul, ou l'avis avec photos.
+  const colonneDuChemin = {
+    choix: { titre: <>Partager <br />ton aventure</>, etapes: ['Ton choix'], etape: 1 },
+    avis: { titre: <>Ton avis</>, etapes: ETAPES_AVIS, etape: 1 },
+    photos: { titre: <>Envoyer <br />mes contenus</>, etapes: ETAPES, etape },
+  }[chemin ?? 'choix']
+
   let corps
   if (reussite) {
     corps = <Succes reussite={reussite} couronnes={config.data?.couronnes ?? 0} />
@@ -109,11 +127,8 @@ export function PageSoumettre() {
           {colonne && <img className={styles.imageColonne} src={colonne} alt="" />}
           <div className={styles.colonneDedans}>
             <p className={styles.marque}>Runes de Chêne</p>
-            <h1 className={styles.titre}>
-              Envoyer <br />
-              mes contenus
-            </h1>
-            <Frise etape={etape} sens="vertical" />
+            <h1 className={styles.titre}>{colonneDuChemin.titre}</h1>
+            <Frise etapes={colonneDuChemin.etapes} etape={colonneDuChemin.etape} sens="vertical" />
             <p className={styles.citation}>
               « On te guide pas à pas. Quelques minutes, et tes clichés rejoignent le Mouvement. »
             </p>
@@ -121,8 +136,9 @@ export function PageSoumettre() {
         </aside>
 
         <section className={styles.panneau}>
-          <Frise etape={etape} sens="horizontal" />
-          {etape === 1 && (
+          <Frise etapes={colonneDuChemin.etapes} etape={colonneDuChemin.etape} sens="horizontal" />
+          {chemin === null && <ChoixDuChemin choisir={choisirChemin} />}
+          {chemin === 'photos' && etape === 1 && (
             <EtapeContenus
               missions={missions.data ?? []}
               mission={mission}
@@ -135,7 +151,7 @@ export function PageSoumettre() {
               }}
             />
           )}
-          {etape === 2 && (
+          {chemin === 'photos' && etape === 2 && (
             <EtapeTailles
               contenus={contenus}
               choisirTaille={choisirTaille}
@@ -147,7 +163,7 @@ export function PageSoumettre() {
               }}
             />
           )}
-          {etape === 3 && (
+          {chemin === 'photos' && etape === 3 && (
             <EtapeHistoire
               histoire={histoire}
               changer={(modif) => {
@@ -161,7 +177,7 @@ export function PageSoumettre() {
               }}
             />
           )}
-          {etape === 4 && (
+          {chemin === 'photos' && etape === 4 && (
             <EtapeToi
               toi={toi}
               changer={(modif) => {

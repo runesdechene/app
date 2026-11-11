@@ -31,7 +31,7 @@ export function EtapeTailles({
 
   return (
     <>
-      <EnTete n={2} titre="Quelle taille portes-tu ?">
+      <EnTete surTitre="Étape 2 sur 4" titre="Quelle taille portes-tu ?">
         Une taille par contenu — ou « Aucun produit ».
       </EnTete>
 

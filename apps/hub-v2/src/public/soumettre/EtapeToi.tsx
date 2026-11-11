@@ -26,7 +26,7 @@ export function EtapeToi({
 }) {
   return (
     <>
-      <EnTete n={4} titre="Toi" />
+      <EnTete surTitre="Étape 4 sur 4" titre="Toi" />
 
       <label className={etape.libelle} htmlFor="prenom">
         Prénom *

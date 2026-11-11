@@ -57,7 +57,7 @@ export function EtapeHistoire({
   const produits = 'Comment trouves-tu tes produits ?'
   return (
     <>
-      <EnTete n={3} titre="Ton histoire" />
+      <EnTete surTitre="Étape 3 sur 4" titre="Ton histoire" />
 
       <label className={etape.libelle} htmlFor="avis">
         Ton avis public (marque, expérience…) (optionnel)

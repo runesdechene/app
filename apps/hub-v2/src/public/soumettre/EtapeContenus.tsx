@@ -46,7 +46,7 @@ export function EtapeContenus({
 
   return (
     <>
-      <EnTete n={1} titre="Tes contenus">
+      <EnTete surTitre="Étape 1 sur 4" titre="Tes contenus">
         Dépose tes photos et vidéos — jusqu’à {MAX_FICHIERS}.
       </EnTete>
 

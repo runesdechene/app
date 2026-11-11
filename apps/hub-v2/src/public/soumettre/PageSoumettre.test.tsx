@@ -61,7 +61,7 @@ beforeEach(() => {
   faux.deposer.mockReset().mockResolvedValue({ data: { nouveauCompte: false }, error: null })
 })
 
-function ouvrir(adresse = '/soumettre-contenu') {
+function ouvrir(adresse = '/soumettre-contenu?chemin=photos') {
   const router = createMemoryRouter([{ path: '/soumettre-contenu', element: <PageSoumettre /> }], {
     initialEntries: [adresse],
   })
@@ -81,7 +81,7 @@ async function deposer(...noms: string[]) {
 }
 
 /** Les trois premières étapes passées, une taille M pour chaque fichier. */
-async function jusquAToi(noms = ['a.jpg', 'b.jpg'], adresse = '/soumettre-contenu') {
+async function jusquAToi(noms = ['a.jpg', 'b.jpg'], adresse = '/soumettre-contenu?chemin=photos') {
   ouvrir(adresse)
   await screen.findByRole('heading', { name: 'Tes contenus' })
   await deposer(...noms)
@@ -105,6 +105,27 @@ async function envoyer() {
   await userEvent.click(bouton(/^Envoyer mes contenus/))
 }
 
+describe('le choix', () => {
+  it('sans chemin, la page demande ce qu’on veut partager', async () => {
+    ouvrir('/soumettre-contenu')
+    expect(await screen.findByRole('heading', { name: 'Que veux-tu partager ?' })).toBeInTheDocument()
+    expect(bouton(/^Commencer/)).toBeDisabled()
+  })
+
+  it('« Un avis seul » puis « Commencer » ouvre l’avis, dans l’adresse', async () => {
+    const { router } = ouvrir('/soumettre-contenu')
+    await userEvent.click(await screen.findByRole('button', { name: /Un avis seul/ }))
+    await userEvent.click(bouton(/^Commencer/))
+    expect(await screen.findByRole('heading', { name: 'Ton avis', level: 1 })).toBeInTheDocument()
+    expect(router.state.location.search).toContain('chemin=avis')
+  })
+
+  it('un lien de mission déjà imprimé ouvre directement les photos', async () => {
+    ouvrir('/soumettre-contenu?quete=hoplite')
+    expect(await screen.findByRole('heading', { name: 'Tes contenus' })).toBeInTheDocument()
+  })
+})
+
 describe('la mission', () => {
   it('?quete=hoplite présélectionne la mission', async () => {
     ouvrir('/soumettre-contenu?quete=hoplite')
@@ -121,7 +142,7 @@ describe('la mission', () => {
 
 describe('les étapes', () => {
   it('on n’avance pas sans fichier, même en tapant ?etape=3', async () => {
-    ouvrir('/soumettre-contenu?etape=3')
+    ouvrir('/soumettre-contenu?chemin=photos&etape=3')
     expect(await screen.findByRole('heading', { name: 'Tes contenus' })).toBeInTheDocument()
     expect(bouton(/^Suivant/)).toBeDisabled()
   })
