@@ -1,6 +1,6 @@
 /**
  * QUOI     — /soumettre-contenu de bout en bout : le choix, les deux chemins (un avis, des photos) et
- *            leurs verrous, la mission présélectionnée, l'envoi fichier par fichier, le dépôt et ses refus.
+ *            leurs verrous, l'envoi fichier par fichier, le dépôt et ses refus.
  * POURQUOI — un joueur arrive d'un QR imprimé, sans compte : chaque verrou et chaque échec doit se
  *            lire. Supabase est simulé ; la compression aussi (jsdom ne dessine pas d'image).
  */
@@ -23,20 +23,6 @@ const { faux } = vi.hoisted(() => ({
 
 vi.mock('@/shared/supabase/client', () => ({
   supabase: {
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          order: () =>
-            Promise.resolve({
-              data: [
-                { slug: 'hoplite', title: 'L’Hoplite' },
-                { slug: 'druide', title: 'Le Druide' },
-              ],
-              error: null,
-            }),
-        }),
-      }),
-    }),
     rpc: (nom: string, args: Record<string, unknown>) =>
       nom === 'get_studio_config' ? Promise.resolve({ data: faux.config, error: null }) : faux.deposer(args),
     storage: { from: () => ({ upload: faux.upload }) },
@@ -135,17 +121,14 @@ describe('le choix', () => {
   })
 })
 
-describe('la mission', () => {
-  it('?quete=hoplite présélectionne la mission', async () => {
-    ouvrir('/soumettre-contenu?quete=hoplite')
-    const choix = await screen.findByRole('combobox', { name: /mission en cours/ })
-    expect(choix).toHaveValue('hoplite')
-  })
-
-  it('une quête inconnue ne présélectionne rien', async () => {
-    ouvrir('/soumettre-contenu?quete=fantome')
-    const choix = await screen.findByRole('combobox', { name: /mission en cours/ })
-    expect(choix).toHaveValue('')
+describe('les missions, mises de côté (Uriel, 11/11)', () => {
+  it('les photos ne proposent plus de mission, et l’envoi n’en porte pas', async () => {
+    await jusquAToi(['a.jpg'], '/soumettre-contenu?quete=hoplite')
+    await remplirToi()
+    await envoyer()
+    await screen.findByRole('heading', { name: 'Bienvenue dans le Mouvement !' })
+    expect(screen.queryByRole('combobox', { name: /mission/ })).not.toBeInTheDocument()
+    expect(faux.deposer.mock.calls[0]?.[0]).not.toHaveProperty('p_quest_ref')
   })
 })
 
@@ -165,14 +148,13 @@ describe('les étapes', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('« danse.gif » n’est pas accepté')
   })
 
-  it('l’étape est dans l’adresse, ?quete= y reste', async () => {
+  it('l’étape est dans l’adresse', async () => {
     const { router } = ouvrir('/soumettre-contenu?quete=hoplite')
     await deposer('a.jpg')
     await userEvent.click(bouton(/^Suivant/))
     expect(await screen.findByRole('heading', { name: 'Quelle taille portes-tu ?' })).toBeInTheDocument()
     const params = new URLSearchParams(router.state.location.search)
     expect(params.get('etape')).toBe('3')
-    expect(params.get('quete')).toBe('hoplite')
   })
 
   it('on n’avance pas sans une taille pour chaque fichier', async () => {
@@ -233,7 +215,6 @@ describe('l’envoi', () => {
         ],
         p_consent_brand: true,
         p_consent_account: true,
-        p_quest_ref: 'hoplite',
       }),
     )
     expect(screen.getByText('Pas parti : a.jpg')).toBeInTheDocument()

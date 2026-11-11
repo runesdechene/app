@@ -1,8 +1,9 @@
 /**
  * QUOI     — /soumettre-contenu : un client partage ce qu'il vit avec Runes de Chêne. Étape 1, il
  *            choisit : « Un avis » (son avis, puis des photos s'il veut, puis lui) ou « Des photos »
- *            (ses photos et leurs tailles, puis un avis s'il veut, puis lui). Le lien d'une mission
- *            (`?quete=<slug>`) ouvre directement les photos.
+ *            (ses photos et leurs tailles, puis un avis s'il veut, puis lui). Un ancien lien de
+ *            mission (`?quete=<slug>`) ouvre directement les photos ; les missions sont mises de
+ *            côté (Uriel, 11/11), la page ne les propose plus.
  * POURQUOI — le design de la page en ligne (ancien StudioSubmit), gardé par Uriel le 15/10 : sur PC,
  *            une carte à deux panneaux posée sur la photo du réglage Studio ; au téléphone, le
  *            formulaire seul, plein écran. Le chemin et l'étape sont dans l'adresse
@@ -14,7 +15,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import embleme from '@/assets/ui/embleme.png'
 import { PagePublique } from '../PagePublique'
-import { lireConfigStudio, lireMissions } from './api'
+import { lireConfigStudio } from './api'
 import { ChoixDuChemin } from './ChoixDuChemin'
 import { EtapeAvis } from './EtapeAvis'
 import { EtapeContenus } from './EtapeContenus'
@@ -49,7 +50,6 @@ function liberer(apercus: Set<string>) {
 
 export function PageSoumettre() {
   const [params, setParams] = useSearchParams()
-  const missions = useQuery({ queryKey: ['soumettre', 'missions'], queryFn: lireMissions })
   const config = useQuery({ queryKey: ['soumettre', 'config'], queryFn: lireConfigStudio })
   const [contenus, setContenus] = useState<Contenu[]>([])
   // Les adresses d'aperçu encore ouvertes : libérées au retrait, à l'envoi réussi et en quittant.
@@ -72,8 +72,6 @@ export function PageSoumettre() {
   const chemin = cheminDe(params)
   const ecran = chemin && ecranAffiche(chemin, params.get('etape'), histoire, contenus)
   const avecPhotos = contenus.length > 0
-  const quete = params.get('quete') ?? ''
-  const mission = missions.data?.some((m) => m.slug === quete) ? quete : ''
 
   function allerA(c: Chemin, e: Ecran) {
     setParams((p) => {
@@ -99,18 +97,6 @@ export function PageSoumettre() {
       suite.delete('etape')
       return suite
     })
-  }
-
-  function choisirMission(slug: string) {
-    setParams(
-      (p) => {
-        const suite = new URLSearchParams(p)
-        if (slug) suite.set('quete', slug)
-        else suite.delete('quete')
-        return suite
-      },
-      { replace: true },
-    )
   }
 
   function ajouter(fichiers: File[]) {
@@ -155,9 +141,6 @@ export function PageSoumettre() {
           <EtapeContenus
             surTitre={surTitre}
             facultatif={c === 'avis'}
-            missions={missions.data ?? []}
-            mission={mission}
-            choisirMission={choisirMission}
             contenus={contenus}
             ajouter={ajouter}
             retirer={retirer}
@@ -180,7 +163,7 @@ export function PageSoumettre() {
             erreur={erreur}
             precedent={precedent}
             envoyer={() => {
-              void envoyer(contenus, histoire, toi, mission).then((reussi) => {
+              void envoyer(contenus, histoire, toi).then((reussi) => {
                 if (reussi) liberer(apercus)
               })
             }}

@@ -26,7 +26,7 @@ export function useEnvoi() {
   const [reussite, setReussite] = useState<Reussite | null>(null)
 
   /** Rend vrai si l'envoi est enregistré. */
-  async function envoyer(contenus: Contenu[], histoire: Histoire, toi: Toi, quete: string): Promise<boolean> {
+  async function envoyer(contenus: Contenu[], histoire: Histoire, toi: Toi): Promise<boolean> {
     const avisSeul = contenus.length === 0
     setErreur(null)
     try {
@@ -55,7 +55,6 @@ export function useEnvoi() {
         accordCompte: !avisSeul && toi.accordCompte,
         message: histoire.avis,
         departement: histoire.departement,
-        quete: avisSeul ? '' : quete,
         tailleCm: tailleEnCm(toi.tailleCm),
         noteExperience: histoire.noteExperience,
         noteProduits: histoire.noteProduits,

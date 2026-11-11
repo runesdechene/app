@@ -26,8 +26,6 @@ vi.mock('@/shared/supabase/client', () => ({
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: vi.fn() } } }),
     },
     rpc: faux.rpc,
-    // /soumettre-contenu lit les missions ouvertes, sans compte.
-    from: () => ({ select: () => ({ eq: () => ({ order: () => Promise.resolve({ data: [], error: null }) }) }) }),
   },
 }))
 

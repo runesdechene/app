@@ -1,25 +1,18 @@
 /**
- * QUOI     — « Tes photos » : la mission éventuelle, puis les photos et vidéos (dix au plus), déposées
- *            ou choisies, en vignettes qu'on peut retirer. Facultatives sur le chemin « Un avis ».
- * POURQUOI — la mission vaut « envoi libre » tant que le joueur ne la choisit pas : `?quete=` (le
- *            lien d'une mission) la présélectionne seulement, il la voit et peut la changer. Un
- *            fichier refusé l'est ici, avec son nom et la raison, avant que rien ne parte.
+ * QUOI     — « Tes photos » : les photos et vidéos (dix au plus), déposées ou choisies, en vignettes
+ *            qu'on peut retirer. Facultatives sur le chemin « Un avis ».
+ * POURQUOI — un fichier refusé l'est ici, avec son nom et la raison, avant que rien ne parte.
  */
 import { useState, type DragEvent } from 'react'
 import { MessageDErreur } from '../briques/MessageDErreur'
-import type { Mission } from './api'
 import { BoutonSombre, EnTete, Navigation } from './Etape'
 import { estVideo, MAX_FICHIERS, trierLesAjouts } from './lib/fichiers'
 import type { Contenu } from './lib/formulaire'
-import etape from './Etape.module.css'
 import styles from './EtapeContenus.module.css'
 
 export function EtapeContenus({
   surTitre,
   facultatif,
-  missions,
-  mission,
-  choisirMission,
   contenus,
   ajouter,
   retirer,
@@ -28,9 +21,6 @@ export function EtapeContenus({
 }: {
   surTitre: string
   facultatif: boolean
-  missions: Mission[]
-  mission: string
-  choisirMission: (slug: string) => void
   contenus: Contenu[]
   ajouter: (fichiers: File[]) => void
   retirer: (rang: number) => void
@@ -56,31 +46,6 @@ export function EtapeContenus({
         {facultatif ? 'Facultatif : ' : ''}tes photos et vidéos en tenue Runes de Chêne — jusqu’à {MAX_FICHIERS}.
       </EnTete>
 
-      {missions.length > 0 && (
-        <div className={styles.mission}>
-          <label className={etape.libelle} htmlFor="mission">
-            Ces contenus répondent-ils à une mission en cours ?
-          </label>
-          <select
-            id="mission"
-            className={etape.champ}
-            value={mission}
-            onChange={(e) => {
-              choisirMission(e.target.value)
-            }}
-          >
-            <option value="">Envoi libre — aucune mission</option>
-            {missions.map((m) => (
-              <option key={m.slug} value={m.slug}>
-                {m.title}
-              </option>
-            ))}
-          </select>
-          <p className={etape.aide}>
-            Choisis une mission seulement si tes contenus correspondent à son thème. Sinon, laisse « Envoi libre ».
-          </p>
-        </div>
-      )}
 
       <label
         className={styles.depot}

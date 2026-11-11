@@ -1,14 +1,10 @@
 /*
- * QUOI     — étape 1 : la mission, la zone de dépôt, les vignettes (StudioSubmit.css, .studio__drop,
+ * QUOI     — « Tes photos » : la zone de dépôt, les vignettes (StudioSubmit.css, .studio__drop,
  *            __thumbs, __thumb).
  * ÉCARTS   — #d8c39a = --color-vignette ; #963e3e = --color-fiche-badge ; #2a2418 = --color-ombre ;
  *            le blanc à 40 % de la zone = --color-sur-accent à 40 % ; 14 px de coins = --radius-carte
  *            (15 px) ; 1,05rem = --corps-size.
  */
-.mission {
-  margin-bottom: var(--space-4);
-}
-
 /* La zone remplit la hauteur libre du panneau, comme sur l'ancienne page. */
 .depot {
   display: flex;
