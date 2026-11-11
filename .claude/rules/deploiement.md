@@ -237,3 +237,14 @@ Payé le 23/10/2026 : `shopify-sync` faisait un PATCH par fiche ; à 3 000 fiche
 Netlify la coupait sans réponse, l'écran n'affichait rien et la moitié des accords manquait. Une écriture
 de masse passe par une RPC qui prend un tableau jsonb (`jsonb_to_recordset`, ex. `synchro_lier_clients`,
 mig 553), par lots de 1 000.
+
+## Un site Netlify récent affiche « Powered by Netlify » par-dessus la page
+
+**Le piège** (payé du 14/10 au 11/11/2026, Hub V2) : un site créé sur l'offre gratuite naît avec
+`built_with_badge_enabled: true`. Netlify injecte alors `/.netlify/scripts/hud?variant=public`, un
+bandeau en bas à droite qui cachait les boutons de `/soumettre-contenu`, domaine personnalisé ou non.
+L'appli (site plus ancien) l'avait à `false`.
+
+**How to apply :** à la création d'un site, `netlify api updateSite --data
+'{"site_id":"<ID>","body":{"built_with_badge_enabled":false}}'`, puis vérifier :
+`curl -s https://<domaine>/ | grep -c 'netlify/scripts/hud'` doit répondre 0.
