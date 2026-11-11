@@ -9,8 +9,8 @@ export const PLACEMENTS: { valeur: Placement; libelle: string }[] = [
   { valeur: 'non_placees', libelle: 'Non placées' },
 ]
 
-/** Placée : sur la fiche produit Shopify, au mur « Ils nous portent » ou dans la communauté. */
-export const estPlacee = (p: PhotoPubliee) => p.fiche || p.mur || p.communaute
+/** Placée : avec son avis, sur la fiche produit Shopify, au mur « Ils nous portent » ou dans la communauté. */
+export const estPlacee = (p: PhotoPubliee) => p.avis || p.fiche || p.mur || p.communaute
 
 export function selonPlacement(photos: PhotoPubliee[], placement: Placement): PhotoPubliee[] {
   if (placement === 'toutes') return photos

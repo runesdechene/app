@@ -1,6 +1,6 @@
 /**
  * QUOI     — la vue « Photos » de « Photos et avis » : toutes les photos en grille, chacune avec les endroits où
- *            elle est publiée (fiche produit, mur, communauté), filtrables en placées / non placées.
+ *            elle est publiée (avis, fiche produit, mur, communauté), filtrables en placées / non placées.
  * POURQUOI — un clic ouvre la contribution de la photo dans la vue « Contributions », où se règlent les canaux.
  */
 import { Balise } from '@/shared/ui/Balise'
@@ -18,6 +18,7 @@ function Endroits({ photo }: { photo: PhotoPubliee }) {
   if (!estPlacee(photo)) return <Balise texte="Nulle part" teinte="sommeil" />
   return (
     <>
+      {photo.avis && <Balise texte="Avis" teinte="message" />}
       {photo.fiche && <Balise texte="Fiche produit" teinte="boutique" />}
       {photo.mur && <Balise texte="Mur" teinte="photo" />}
       {photo.communaute && <Balise texte="Communauté" teinte="compte" />}
