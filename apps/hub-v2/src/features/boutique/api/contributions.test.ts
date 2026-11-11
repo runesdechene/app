@@ -11,7 +11,7 @@ vi.mock('@/shared/lib/envoi', async (importOriginal) => ({
 
 const photo = (id: string, surcharge: Partial<PhotoDeContribution> = {}): PhotoDeContribution => ({
   id, url: `https://x/${id}.webp`, chemin: `c1/${id}.webp`, taille: 'M', produit_id: '12', produit_handle: 'veste',
-  produit_titre: 'Veste', media: null, communaute: false, mur: false, ...surcharge,
+  produit_titre: 'Veste', media: null, communaute: false, mur: false, avis: false, ...surcharge,
 })
 const contribution = (images: PhotoDeContribution[]) => ({ id: 'c1', nom: 'Brune', hauteur: 183, images }) as Contribution
 

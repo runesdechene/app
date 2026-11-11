@@ -26,7 +26,7 @@ vi.mock('../api/contributions', () => api)
 
 const photo = (id: string, url = `https://x/${id}.jpg`) => ({
   id, url, chemin: null, taille: 'M', produit_id: null, produit_handle: null, produit_titre: null,
-  media: null, communaute: false, mur: false,
+  media: null, communaute: false, mur: false, avis: false,
 })
 const contribution = (id: string, nom: string, surcharge: Partial<Contribution> = {}): Contribution => ({
   id, quand: '2026-10-10T10:00:00Z', statut: 'pending', nom, email: `${nom.toLowerCase()}@x.fr`, instagram: '@brune',

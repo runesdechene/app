@@ -1,15 +1,15 @@
 /**
  * QUOI     — une photo (ou une vidéo) d'une contribution, qui s'ouvre en grand dans un onglet, avec ses
- *            quatre canaux en pastilles (Communauté, Mur, Fiche produit, Média) et son produit Shopify ;
+ *            cinq canaux en pastilles (Avis, Communauté, Mur, Fiche produit, Média) et son produit Shopify ;
  *            télécharger et supprimer apparaissent sur la photo, au survol (maquette 596:1319).
- * POURQUOI — Communauté et Fiche produit n'existent que sur un produit relié ; « Média » est l'accord de
+ * POURQUOI — « Avis » n'existe que sur une contribution notée ; Communauté et Fiche produit, sur un produit relié ; « Média » est l'accord de
  *            diffusion de la contribution, qu'on lit ici sans le changer. Une écriture à la fois : les
  *            pastilles sont désactivées pendant qu'elle part et que la liste se relit, et son erreur reste sous la photo.
  */
 import { useIsFetching } from '@tanstack/react-query'
 import { useState } from 'react'
 import {
-  delierProduit, mettreSurLaFiche, montrerAuMur, montrerDansCommunaute, relierProduit, supprimerPhoto,
+  delierProduit, mettreSurLaFiche, montrerAuMur, montrerDansCommunaute, montrerDansLAvis, relierProduit, supprimerPhoto,
   type Contribution, type PhotoDeContribution as Photo,
 } from '../api/contributions'
 import { useEcritureDePhoto } from '../hooks/useContributions'
@@ -38,6 +38,7 @@ export function PhotoDeContribution({ contribution, photo, rang }: { contributio
   const relecture = useIsFetching({ queryKey: ['hub-contributions'] }) > 0
   const occupe = ecriture.isPending || relecture
   const pourquoi = sansProduit ? 'Relie d’abord un produit' : undefined
+  const sansAvis = contribution.note_produits === null && contribution.note_experience === null
 
   function ecrire(action: () => Promise<void>, apres: () => void = () => undefined) {
     ecriture.reset()
@@ -59,6 +60,9 @@ export function PhotoDeContribution({ contribution, photo, rang }: { contributio
       </div>
 
       <div className={styles.canaux}>
+        <Canal libelle="Avis" actif={photo.avis} desactive={sansAvis || occupe}
+          pourquoi={sansAvis ? 'Cette contribution n’a pas de note' : undefined}
+          onBascule={() => { ecrire(() => montrerDansLAvis(photo.id, !photo.avis)) }} />
         <Canal libelle="Communauté" actif={photo.communaute} desactive={sansProduit || occupe} pourquoi={pourquoi}
           onBascule={() => { ecrire(() => montrerDansCommunaute(photo.id, !photo.communaute)) }} />
         <Canal libelle="Mur" actif={photo.mur} desactive={occupe}

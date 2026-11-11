@@ -6,7 +6,7 @@ import type { Contribution, PhotoDeContribution as Photo } from '../api/contribu
 import { PhotoDeContribution } from './PhotoDeContribution'
 
 const api = vi.hoisted(() => ({
-  montrerAuMur: vi.fn(), montrerDansCommunaute: vi.fn(), relierProduit: vi.fn(), delierProduit: vi.fn(),
+  montrerAuMur: vi.fn(), montrerDansCommunaute: vi.fn(), montrerDansLAvis: vi.fn(), relierProduit: vi.fn(), delierProduit: vi.fn(),
   mettreSurLaFiche: vi.fn(), supprimerPhoto: vi.fn(),
 }))
 vi.mock('../api/contributions', () => api)
@@ -15,9 +15,11 @@ vi.mock('../api/shopify', () => shopify)
 
 const photo = (surcharge: Partial<Photo> = {}): Photo => ({
   id: 'p1', url: 'https://x/storage/v1/object/public/community-photos/c1/p1.webp', chemin: 'c1/p1.webp', taille: 'M',
-  produit_id: null, produit_handle: null, produit_titre: null, media: null, communaute: false, mur: false, ...surcharge,
+  produit_id: null, produit_handle: null, produit_titre: null, media: null, communaute: false, mur: false, avis: false, ...surcharge,
 })
-const contribution = { id: 'c1', nom: 'Brune', instagram: null, hauteur: 168, taille: 'M', diffusion: true, images: [] } as Partial<Contribution> as Contribution
+const contribution = {
+  id: 'c1', nom: 'Brune', instagram: null, hauteur: 168, taille: 'M', diffusion: true, images: [], note_produits: 5, note_experience: null,
+} as Partial<Contribution> as Contribution
 
 // Comme l'écran : une lecture des contributions observée, que l'écriture rafraîchit.
 function Lecture({ lire }: { lire: () => Promise<null> }) {
@@ -25,12 +27,12 @@ function Lecture({ lire }: { lire: () => Promise<null> }) {
   return null
 }
 
-function afficher(p: Photo, lire: () => Promise<null> = () => Promise.resolve(null)) {
+function afficher(p: Photo, lire: () => Promise<null> = () => Promise.resolve(null), c: Contribution = contribution) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
     <QueryClientProvider client={client}>
       <Lecture lire={lire} />
-      <PhotoDeContribution contribution={contribution} photo={p} rang={0} />
+      <PhotoDeContribution contribution={c} photo={p} rang={0} />
     </QueryClientProvider>,
   )
 }
@@ -46,6 +48,18 @@ test('sans produit, « Fiche produit » et « Communauté » sont désactivés e
   expect(screen.getByRole('button', { name: 'Communauté' })).toBeDisabled()
   expect(screen.getByRole('button', { name: 'Communauté' })).toHaveAttribute('title', 'Relie d’abord un produit')
   await waitFor(() => { expect(screen.getByRole('button', { name: 'Mur' })).toBeEnabled() })
+})
+
+test('« Avis » appelle montrerDansLAvis(id, true) sur une contribution notée', async () => {
+  afficher(photo())
+  await userEvent.click(screen.getByRole('button', { name: 'Avis' }))
+  await waitFor(() => { expect(api.montrerDansLAvis).toHaveBeenCalledWith('p1', true) })
+})
+
+test('sans note, « Avis » est désactivé et le texte dit pourquoi', () => {
+  afficher(photo(), undefined, { ...contribution, note_produits: null })
+  expect(screen.getByRole('button', { name: 'Avis' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: 'Avis' })).toHaveAttribute('title', 'Cette contribution n’a pas de note')
 })
 
 test('« Mur » appelle montrerAuMur(id, true)', async () => {

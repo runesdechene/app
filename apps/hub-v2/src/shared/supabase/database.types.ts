@@ -2519,6 +2519,7 @@ export type Database = {
           shopify_product_id: string | null
           shopify_product_title: string | null
           show_in_community: boolean
+          show_in_review: boolean
           show_on_wall: boolean
           size: string | null
           sort_order: number | null
@@ -2536,6 +2537,7 @@ export type Database = {
           shopify_product_id?: string | null
           shopify_product_title?: string | null
           show_in_community?: boolean
+          show_in_review?: boolean
           show_on_wall?: boolean
           size?: string | null
           sort_order?: number | null
@@ -2553,6 +2555,7 @@ export type Database = {
           shopify_product_id?: string | null
           shopify_product_title?: string | null
           show_in_community?: boolean
+          show_in_review?: boolean
           show_on_wall?: boolean
           size?: string | null
           sort_order?: number | null
@@ -8354,6 +8357,7 @@ export type Database = {
           shopify_product_id: string | null
           shopify_product_title: string | null
           show_in_community: boolean
+          show_in_review: boolean
           show_on_wall: boolean
           size: string | null
           sort_order: number | null
@@ -9220,6 +9224,10 @@ export type Database = {
       }
       set_submission_image_product: {
         Args: { p_image_id: string; p_product: string }
+        Returns: undefined
+      }
+      set_submission_image_review: {
+        Args: { p_image_id: string; p_show: boolean }
         Returns: undefined
       }
       set_submission_image_shopify_product: {

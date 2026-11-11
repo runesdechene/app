@@ -24,6 +24,8 @@ export type PhotoDeContribution = {
   id: string; url: string; chemin: string | null; taille: string | null
   produit_id: string | null; produit_handle: string | null; produit_titre: string | null
   media: string | null; communaute: boolean; mur: boolean
+  /** Montrée dans la carte de son avis (mig 594), cochée à la main. */
+  avis: boolean
 }
 export type Etiquette = { id: string; nom: string }
 export type Contribution = {
@@ -93,6 +95,9 @@ async function ecrire(requete: PromiseLike<{ error: { message: string } | null }
 
 export const montrerAuMur = (photoId: string, oui: boolean) =>
   ecrire(supabase.rpc('set_submission_image_wall', { p_image_id: photoId, p_show: oui }))
+
+export const montrerDansLAvis = (photoId: string, oui: boolean) =>
+  ecrire(supabase.rpc('set_submission_image_review', { p_image_id: photoId, p_show: oui }))
 
 export const montrerDansCommunaute = (photoId: string, oui: boolean) =>
   ecrire(supabase.rpc('set_submission_image_community', { p_image_id: photoId, p_show: oui }))
