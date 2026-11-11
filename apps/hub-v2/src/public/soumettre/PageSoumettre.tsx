@@ -14,12 +14,24 @@ import { useSearchParams } from 'react-router'
 import { PagePublique } from '../PagePublique'
 import { lireConfigStudio, lireMissions } from './api'
 import { ChoixDuChemin } from './ChoixDuChemin'
+import { EtapeAvis } from './EtapeAvis'
 import { EtapeContenus } from './EtapeContenus'
 import { EtapeHistoire } from './EtapeHistoire'
 import { EtapeTailles } from './EtapeTailles'
 import { EtapeToi } from './EtapeToi'
 import { Frise } from './Frise'
-import { cheminDe, ETAPES, ETAPES_AVIS, etapeAffichee, HISTOIRE_VIDE, TOI_VIDE, type Chemin, type Contenu } from './lib/formulaire'
+import {
+  cheminDe,
+  ETAPES,
+  ETAPES_AVIS,
+  etapeAffichee,
+  etapeAvisAffichee,
+  HISTOIRE_VIDE,
+  TOI_VIDE,
+  VETEMENTS,
+  type Chemin,
+  type Contenu,
+} from './lib/formulaire'
 import { Succes } from './Succes'
 import { useEnvoi } from './useEnvoi'
 import styles from './PageSoumettre.module.css'
@@ -36,8 +48,12 @@ export function PageSoumettre() {
   const [contenus, setContenus] = useState<Contenu[]>([])
   // Les adresses d'aperçu encore ouvertes : libérées au retrait, à l'envoi réussi et en quittant.
   const [apercus] = useState(() => new Set<string>())
-  const [histoire, setHistoire] = useState(HISTOIRE_VIDE)
-  const [toi, setToi] = useState(TOI_VIDE)
+  // Le lien de l'e-mail de demande d'avis pré-remplit le vêtement et l'adresse ; rien de plus.
+  const [histoire, setHistoire] = useState(() => {
+    const type = params.get('type') ?? ''
+    return VETEMENTS.some((v) => v.cle === type) ? { ...HISTOIRE_VIDE, vetement: type } : HISTOIRE_VIDE
+  })
+  const [toi, setToi] = useState(() => ({ ...TOI_VIDE, email: params.get('email') ?? '' }))
   const { envoyer, progression, erreur, reussite } = useEnvoi()
 
   useEffect(
@@ -49,6 +65,7 @@ export function PageSoumettre() {
 
   const chemin = cheminDe(params)
   const etape = etapeAffichee(params.get('etape'), contenus)
+  const etapeAvis = etapeAvisAffichee(params.get('etape'), histoire)
   const quete = params.get('quete') ?? ''
   const mission = missions.data?.some((m) => m.slug === quete) ? quete : ''
 
@@ -106,13 +123,13 @@ export function PageSoumettre() {
   // La colonne et la frise suivent le chemin : le choix, l'avis seul, ou l'avis avec photos.
   const colonneDuChemin = {
     choix: { titre: <>Partager <br />ton aventure</>, etapes: ['Ton choix'], etape: 1 },
-    avis: { titre: <>Ton avis</>, etapes: ETAPES_AVIS, etape: 1 },
+    avis: { titre: <>Ton avis</>, etapes: ETAPES_AVIS, etape: etapeAvis },
     photos: { titre: <>Envoyer <br />mes contenus</>, etapes: ETAPES, etape },
   }[chemin ?? 'choix']
 
   let corps
   if (reussite) {
-    corps = <Succes reussite={reussite} couronnes={config.data?.couronnes ?? 0} />
+    corps = <Succes reussite={reussite} couronnes={config.data?.couronnes ?? 0} chemin={chemin ?? 'photos'} />
   } else if (progression) {
     corps = (
       <div className={styles.attente}>
@@ -138,6 +155,17 @@ export function PageSoumettre() {
         <section className={styles.panneau}>
           <Frise etapes={colonneDuChemin.etapes} etape={colonneDuChemin.etape} sens="horizontal" />
           {chemin === null && <ChoixDuChemin choisir={choisirChemin} />}
+          {chemin === 'avis' && etapeAvis === 1 && (
+            <EtapeAvis
+              histoire={histoire}
+              changer={(modif) => {
+                setHistoire((h) => ({ ...h, ...modif }))
+              }}
+              suivant={() => {
+                allerA(2)
+              }}
+            />
+          )}
           {chemin === 'photos' && etape === 1 && (
             <EtapeContenus
               missions={missions.data ?? []}
@@ -177,18 +205,19 @@ export function PageSoumettre() {
               }}
             />
           )}
-          {chemin === 'photos' && etape === 4 && (
+          {((chemin === 'photos' && etape === 4) || (chemin === 'avis' && etapeAvis === 2)) && (
             <EtapeToi
+              chemin={chemin}
               toi={toi}
               changer={(modif) => {
                 setToi((t) => ({ ...t, ...modif }))
               }}
               erreur={erreur}
               precedent={() => {
-                allerA(3)
+                allerA(chemin === 'avis' ? 1 : 3)
               }}
               envoyer={() => {
-                void envoyer(contenus, histoire, toi, mission).then((reussi) => {
+                void envoyer(contenus, histoire, toi, mission, chemin).then((reussi) => {
                   if (reussi) liberer(apercus)
                 })
               }}

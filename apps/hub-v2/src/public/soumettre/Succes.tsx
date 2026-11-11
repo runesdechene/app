@@ -1,18 +1,31 @@
 /**
  * QUOI     — la carte de fin : « Bienvenue dans le Mouvement ! », les Couronnes de bienvenue d'un
- *            nouveau compte, le lien vers l'appli.
+ *            nouveau compte, le lien vers l'appli ; pour un avis seul, « Merci pour ton avis ! ».
  * POURQUOI — les Couronnes de bienvenue (réglage `ugc_welcome_crowns`) sont en pause mais
  *            reviendront en bonus : la carte les montre dès que le réglage dépasse zéro. Si des
  *            fichiers sont restés en route, le joueur sait lesquels.
  */
 import drapeau from '@/assets/ui/drapeau.svg'
+import type { Chemin } from './lib/formulaire'
 import type { Reussite } from './useEnvoi'
 import styles from './Succes.module.css'
 
 const APPLI = 'https://app.runesdechene.com'
 
-export function Succes({ reussite, couronnes }: { reussite: Reussite; couronnes: number }) {
+export function Succes({ reussite, couronnes, chemin }: { reussite: Reussite; couronnes: number; chemin: Chemin }) {
   const { nouveauCompte, echecs } = reussite
+  if (chemin === 'avis') {
+    return (
+      <div className={styles.carte}>
+        <img className={styles.drapeau} src={drapeau} alt="" />
+        <h2 className={styles.titre}>Merci pour ton avis !</h2>
+        <p className={styles.texte}>Il part en validation. Une fois relu, il rejoint la boutique.</p>
+        <a className={styles.appli} href={APPLI} target="_blank" rel="noopener noreferrer">
+          Ouvrir l’application →
+        </a>
+      </div>
+    )
+  }
   return (
     <div className={styles.carte}>
       <img className={styles.drapeau} src={drapeau} alt="" />

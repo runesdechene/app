@@ -28,6 +28,7 @@ export type Depot = {
   noteExperience: number
   noteProduits: number
   motEquipe: string
+  vetement: string
 }
 
 export async function lireMissions(): Promise<Mission[]> {
@@ -83,6 +84,7 @@ export async function deposerContenu(d: Depot): Promise<{ nouveauCompte: boolean
     ...(d.tailleCm !== null ? { p_model_height_cm: d.tailleCm } : {}),
     ...(d.noteExperience > 0 ? { p_rating_experience: d.noteExperience } : {}),
     ...(d.noteProduits > 0 ? { p_rating_products: d.noteProduits } : {}),
+    ...(d.vetement ? { p_garment_type: d.vetement } : {}),
   })
   if (error) throw new Error(error.hint === 'limite' ? TROP_D_ENVOIS : PAS_ENREGISTRE)
   return { nouveauCompte: estObjet(data) && data.nouveauCompte === true }

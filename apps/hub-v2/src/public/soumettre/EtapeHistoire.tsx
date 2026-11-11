@@ -1,46 +1,17 @@
 /**
- * QUOI     — étape 3, « Ton histoire » : l'avis public, deux notes en étoiles, un mot privé pour
- *            l'équipe, le département. Tout est facultatif.
- * POURQUOI — l'avis et les notes nourrissent les avis de la boutique ; le mot privé ne sort jamais
- *            du Hub. Cliquer l'étoile déjà choisie retire la note.
+ * QUOI     — étape 3, « Ton histoire » : le vêtement, l'avis public, deux notes en étoiles, un mot
+ *            privé pour l'équipe, le département. Tout est facultatif.
+ * POURQUOI — l'avis, les notes et le vêtement nourrissent les avis de la boutique, rangés par type de
+ *            vêtement ; le mot privé ne sort jamais du Hub.
  */
-import { useState } from 'react'
+import { ChoixDuVetement } from './ChoixDuVetement'
 import { EnTete, Navigation, BoutonSombre } from './Etape'
+import { Etoiles } from './Etoiles'
 import { DEPARTEMENTS } from './lib/departements'
 import type { Histoire } from './lib/formulaire'
 import etape from './Etape.module.css'
-import styles from './EtapeHistoire.module.css'
 
 const LONGUEUR_MAX = 500
-
-function Etoiles({ nom, note, noter }: { nom: string; note: number; noter: (n: number) => void }) {
-  const [survol, setSurvol] = useState(0)
-  return (
-    <div className={styles.etoiles} role="group" aria-label={nom}>
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button
-          key={n}
-          type="button"
-          className={styles.etoile}
-          data-allumee={n <= (survol || note)}
-          aria-label={`${String(n)} sur 5`}
-          aria-pressed={n === note}
-          onClick={() => {
-            noter(n === note ? 0 : n)
-          }}
-          onMouseEnter={() => {
-            setSurvol(n)
-          }}
-          onMouseLeave={() => {
-            setSurvol(0)
-          }}
-        >
-          ★
-        </button>
-      ))}
-    </div>
-  )
-}
 
 export function EtapeHistoire({
   histoire,
@@ -53,11 +24,18 @@ export function EtapeHistoire({
   precedent: () => void
   suivant: () => void
 }) {
-  const experience = 'Comment s’est passée ton expérience Runes de Chêne ?'
-  const produits = 'Comment trouves-tu tes produits ?'
+  const produits = 'La qualité du textile'
+  const experience = 'Ton expérience avec Runes de Chêne'
   return (
     <>
       <EnTete surTitre="Étape 3 sur 4" titre="Ton histoire" />
+
+      <ChoixDuVetement
+        vetement={histoire.vetement}
+        choisir={(cle) => {
+          changer({ vetement: cle })
+        }}
+      />
 
       <label className={etape.libelle} htmlFor="avis">
         Ton avis public (marque, expérience…) (optionnel)
@@ -74,21 +52,21 @@ export function EtapeHistoire({
         }}
       />
 
-      <p className={etape.libelle}>{experience}</p>
-      <Etoiles
-        nom={experience}
-        note={histoire.noteExperience}
-        noter={(n) => {
-          changer({ noteExperience: n })
-        }}
-      />
-
       <p className={etape.libelle}>{produits}</p>
       <Etoiles
         nom={produits}
         note={histoire.noteProduits}
         noter={(n) => {
           changer({ noteProduits: n })
+        }}
+      />
+
+      <p className={etape.libelle}>{experience}</p>
+      <Etoiles
+        nom={experience}
+        note={histoire.noteExperience}
+        noter={(n) => {
+          changer({ noteExperience: n })
         }}
       />
 

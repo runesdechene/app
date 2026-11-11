@@ -7,6 +7,7 @@
  */
 import { useState } from 'react'
 import { BoutonSombre, EnTete, Navigation } from './Etape'
+import { Pastille, Pastilles } from './Pastille'
 import { estVideo } from './lib/fichiers'
 import { AUCUN_PRODUIT, TAILLES, type Contenu } from './lib/formulaire'
 import styles from './EtapeTailles.module.css'
@@ -41,21 +42,19 @@ export function EtapeTailles({
         ) : (
           <img key={contenu.apercu} className={styles.cliche} src={contenu.apercu} alt="" />
         )}
-        <div className={styles.tailles}>
+        <Pastilles nom="Ta taille">
           {[...TAILLES, AUCUN_PRODUIT].map((t) => (
-            <button
+            <Pastille
               key={t}
-              type="button"
-              className={styles.taille}
-              aria-pressed={contenu.taille === t}
-              onClick={() => {
+              choisie={contenu.taille === t}
+              choisir={() => {
                 choisirTaille(rang, t)
               }}
             >
               {nomDeTaille(t)}
-            </button>
+            </Pastille>
           ))}
-        </div>
+        </Pastilles>
         <p className={styles.compte}>
           Contenu {rang + 1} / {contenus.length}
           {contenu.taille && ` · ${nomDeTaille(contenu.taille)}`}

@@ -5,7 +5,7 @@
  *            lire. Supabase est simulé ; la compression aussi (jsdom ne dessine pas d'image).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -288,6 +288,88 @@ describe('l’envoi', () => {
     await envoyer()
     await screen.findByRole('heading', { name: 'Bienvenue dans le Mouvement !' })
     for (const apercu of crees) expect(liberer).toHaveBeenCalledWith(apercu)
+  })
+})
+
+describe('l’avis seul', () => {
+  const etoile = (note: string, n: number) =>
+    within(screen.getByRole('group', { name: note })).getByRole('button', { name: `${String(n)} sur 5` })
+
+  async function remplirAvis() {
+    await userEvent.click(await screen.findByRole('button', { name: 'Sweat' }))
+    await userEvent.click(etoile('La qualité du textile', 4))
+  }
+
+  it('« Suivant » attend un vêtement et une note', async () => {
+    ouvrir('/soumettre-contenu?chemin=avis')
+    expect(await screen.findByRole('heading', { name: 'Ton avis', level: 2 })).toBeInTheDocument()
+    expect(bouton(/^Suivant/)).toBeDisabled()
+    await remplirAvis()
+    expect(bouton(/^Suivant/)).toBeEnabled()
+  })
+
+  it('l’avis part sans fichier, sans compte, avec son vêtement', async () => {
+    ouvrir('/soumettre-contenu?chemin=avis')
+    await remplirAvis()
+    await userEvent.type(screen.getByRole('textbox', { name: 'Ton avis, en quelques mots' }), 'Très doux')
+    await userEvent.click(bouton(/^Suivant/))
+    expect(await screen.findByText('Étape 2 sur 2')).toBeInTheDocument()
+    await userEvent.type(screen.getByRole('textbox', { name: 'Prénom *' }), 'Claire')
+    await userEvent.type(screen.getByRole('textbox', { name: 'E-mail *' }), 'claire@exemple.fr')
+    await userEvent.click(bouton(/^Publier mon avis/))
+
+    expect(await screen.findByRole('heading', { name: 'Merci pour ton avis !' })).toBeInTheDocument()
+    expect(faux.upload).not.toHaveBeenCalled()
+    expect(faux.deposer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        p_email: 'claire@exemple.fr',
+        p_nom: 'Claire',
+        p_images: [],
+        p_garment_type: 'sweat',
+        p_rating_products: 4,
+        p_message: 'Très doux',
+        p_consent_brand: true,
+        p_consent_account: false,
+      }),
+    )
+  })
+
+  it('le lien de l’e-mail pré-remplit le vêtement et l’adresse', async () => {
+    ouvrir('/soumettre-contenu?chemin=avis&email=claire@exemple.fr&type=sweat')
+    expect(await screen.findByRole('button', { name: 'Sweat' })).toHaveAttribute('aria-pressed', 'true')
+    await userEvent.click(etoile('Ton expérience avec Runes de Chêne', 5))
+    await userEvent.click(bouton(/^Suivant/))
+    expect(await screen.findByRole('textbox', { name: 'E-mail *' })).toHaveValue('claire@exemple.fr')
+  })
+
+  it('un type inconnu ne présélectionne rien', async () => {
+    ouvrir('/soumettre-contenu?chemin=avis&type=robe')
+    await screen.findByRole('heading', { name: 'Ton avis', level: 2 })
+    for (const pastille of ['T-shirt', 'Sweat', 'Casquette', 'Autre']) {
+      expect(bouton(pastille)).toHaveAttribute('aria-pressed', 'false')
+    }
+  })
+
+  it('?etape=2 sans avis rempli reste sur « Ton avis »', async () => {
+    ouvrir('/soumettre-contenu?chemin=avis&etape=2')
+    expect(await screen.findByRole('heading', { name: 'Ton avis', level: 2 })).toBeInTheDocument()
+  })
+
+  it('avec photos, « Ton histoire » demande aussi le vêtement, et les notes ont leurs nouveaux noms', async () => {
+    ouvrir()
+    await deposer('a.jpg')
+    await userEvent.click(bouton(/^Suivant/))
+    await userEvent.click(bouton('M'))
+    await userEvent.click(bouton(/^(Suivant|Continuer)/))
+    await screen.findByRole('heading', { name: 'Ton histoire' })
+    await userEvent.click(bouton('Casquette'))
+    await userEvent.click(etoile('La qualité du textile', 3))
+    expect(screen.getByRole('group', { name: 'Ton expérience avec Runes de Chêne' })).toBeInTheDocument()
+    await userEvent.click(bouton(/^Suivant/))
+    await remplirToi()
+    await envoyer()
+    await screen.findByRole('heading', { name: 'Bienvenue dans le Mouvement !' })
+    expect(faux.deposer).toHaveBeenCalledWith(expect.objectContaining({ p_garment_type: 'casquette', p_rating_products: 3 }))
   })
 })
 

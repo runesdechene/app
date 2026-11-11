@@ -1,23 +1,27 @@
 /**
- * QUOI     — étape 4, « Toi » : prénom, e-mail, taille facultative, les deux accords, puis l'envoi.
- * POURQUOI — l'e-mail retrouve le compte du joueur, ou en crée un (deuxième accord) ; le bouton
+ * QUOI     — la dernière étape, « Toi » : prénom, e-mail, puis l'envoi. Avec photos, s'y ajoutent la
+ *            taille facultative et les deux accords ; un avis seul s'en passe.
+ * POURQUOI — avec photos, l'e-mail retrouve le compte du joueur, ou en crée un (deuxième accord) ; un
+ *            avis seul ne crée pas de compte, il dit seulement « client vérifié » par l'e-mail. Le bouton
  *            reste inactif tant qu'un champ obligatoire manque. Une erreur d'envoi s'affiche ici, le
  *            formulaire intact, pour réessayer d'un geste.
  */
 import { CaseACocher } from '../briques/CaseACocher'
 import { MessageDErreur } from '../briques/MessageDErreur'
 import { BoutonSombre, EnTete, Navigation } from './Etape'
-import { toiComplet, type Toi } from './lib/formulaire'
+import { toiComplet, type Chemin, type Toi } from './lib/formulaire'
 import etape from './Etape.module.css'
 import styles from './EtapeToi.module.css'
 
 export function EtapeToi({
+  chemin,
   toi,
   changer,
   erreur,
   precedent,
   envoyer,
 }: {
+  chemin: Chemin
   toi: Toi
   changer: (modif: Partial<Toi>) => void
   erreur: string | null
@@ -26,7 +30,7 @@ export function EtapeToi({
 }) {
   return (
     <>
-      <EnTete surTitre="Étape 4 sur 4" titre="Toi" />
+      <EnTete surTitre={chemin === 'avis' ? 'Étape 2 sur 2' : 'Étape 4 sur 4'} titre="Toi" />
 
       <label className={etape.libelle} htmlFor="prenom">
         Prénom *
@@ -58,42 +62,46 @@ export function EtapeToi({
         }}
       />
 
-      <label className={etape.libelle} htmlFor="taille">
-        Ta taille (optionnel)
-      </label>
-      <input
-        id="taille"
-        className={etape.champ}
-        type="number"
-        inputMode="numeric"
-        min={100}
-        max={250}
-        placeholder="ex. 178 (en cm)"
-        value={toi.tailleCm}
-        onChange={(e) => {
-          changer({ tailleCm: e.target.value })
-        }}
-      />
-      <p className={etape.aide}>Si ta photo est retenue sur une fiche produit, ça aide les autres à choisir leur taille.</p>
+      {chemin === 'photos' && (
+        <>
+          <label className={etape.libelle} htmlFor="taille">
+            Ta taille (optionnel)
+          </label>
+          <input
+            id="taille"
+            className={etape.champ}
+            type="number"
+            inputMode="numeric"
+            min={100}
+            max={250}
+            placeholder="ex. 178 (en cm)"
+            value={toi.tailleCm}
+            onChange={(e) => {
+              changer({ tailleCm: e.target.value })
+            }}
+          />
+          <p className={etape.aide}>Si ta photo est retenue sur une fiche produit, ça aide les autres à choisir leur taille.</p>
 
-      <div className={styles.accords}>
-        <CaseACocher
-          checked={toi.accordMarque}
-          onChange={(e) => {
-            changer({ accordMarque: e.target.checked })
-          }}
-        >
-          J’accepte que mes contenus soient diffusés par la marque ou ses réseaux. *
-        </CaseACocher>
-        <CaseACocher
-          checked={toi.accordCompte}
-          onChange={(e) => {
-            changer({ accordCompte: e.target.checked })
-          }}
-        >
-          J’accepte la création de mon compte Runes de Chêne (accès à l’application). *
-        </CaseACocher>
-      </div>
+          <div className={styles.accords}>
+            <CaseACocher
+              checked={toi.accordMarque}
+              onChange={(e) => {
+                changer({ accordMarque: e.target.checked })
+              }}
+            >
+              J’accepte que mes contenus soient diffusés par la marque ou ses réseaux. *
+            </CaseACocher>
+            <CaseACocher
+              checked={toi.accordCompte}
+              onChange={(e) => {
+                changer({ accordCompte: e.target.checked })
+              }}
+            >
+              J’accepte la création de mon compte Runes de Chêne (accès à l’application). *
+            </CaseACocher>
+          </div>
+        </>
+      )}
 
       {erreur && (
         <div className={styles.erreur}>
@@ -102,8 +110,8 @@ export function EtapeToi({
       )}
 
       <Navigation precedent={precedent}>
-        <BoutonSombre envoi disabled={!toiComplet(toi, 'photos')} onClick={envoyer}>
-          Envoyer mes contenus ✦
+        <BoutonSombre envoi disabled={!toiComplet(toi, chemin)} onClick={envoyer}>
+          {chemin === 'avis' ? 'Publier mon avis ✦' : 'Envoyer mes contenus ✦'}
         </BoutonSombre>
       </Navigation>
     </>

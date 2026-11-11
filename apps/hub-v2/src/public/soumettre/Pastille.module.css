@@ -1,0 +1,45 @@
+/*
+ * QUOI     — une rangée de pastilles à choix unique : les tailles (étape 2), le type de vêtement
+ *            (« Ton histoire », « Ton avis »). Sorti d'EtapeTailles.module.css (StudioSubmit.css,
+ *            .studio__sizes, __sz).
+ * ÉCARTS   — #d8c39a = --color-vignette ; #fffaf0 = --color-sur-accent ; #46352e =
+ *            --color-boutique-brun ; #2a2418 = --color-ombre ; 9 px de coins = --radius-petit.
+ */
+.rangee {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  justify-content: center;
+}
+
+.pastille {
+  padding: 7px 13px;
+  border: 1.5px solid var(--color-vignette);
+  border-radius: var(--radius-petit);
+  background: var(--color-sur-accent);
+  color: var(--color-boutique-brun);
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    border-color var(--duree-douce) var(--courbe-douce),
+    color var(--duree-douce) var(--courbe-douce);
+}
+
+.pastille[aria-pressed='true'] {
+  border-color: var(--color-ombre);
+  background: var(--color-ombre);
+  color: var(--color-sur-accent);
+}
+
+.rangee[data-alignement='debut'] {
+  justify-content: flex-start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pastille {
+    transition: none;
+  }
+}
