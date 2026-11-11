@@ -12,6 +12,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
+import embleme from '@/assets/ui/embleme.png'
 import { PagePublique } from '../PagePublique'
 import { lireConfigStudio, lireMissions } from './api'
 import { ChoixDuChemin } from './ChoixDuChemin'
@@ -212,7 +213,7 @@ export function PageSoumettre() {
             <p className={styles.marque}>Runes de Chêne</p>
             <h1 className={styles.titre}>{TITRES[chemin ?? 'choix']}</h1>
             <Frise etapes={etapes} etape={etape} sens="vertical" />
-            <p className={styles.citation}>« On te guide pas à pas. Quelques minutes, et ce que tu partages rejoint le Mouvement. »</p>
+            <img className={styles.embleme} src={embleme} alt="" />
           </div>
         </aside>
 
