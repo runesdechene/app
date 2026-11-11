@@ -1,5 +1,5 @@
 /**
- * QUOI     — étape 1, « Ton avis » : le vêtement, la qualité du produit, l'expérience,
+ * QUOI     — étape 1 de l'avis seul, « Ton avis » : le vêtement, la qualité du produit, l'expérience,
  *            quelques mots (maquette Figma 644:1703), et le SAV en bas.
  * POURQUOI — 30 secondes, sans photo. « Suivant » attend un vêtement et une note ou un texte : sans
  *            vêtement, l'avis ne saurait pas sur quelle page aller. Un client qui a eu un souci doit
@@ -28,7 +28,7 @@ export function EtapeAvis({
   const page = VETEMENTS.find((v) => v.cle === histoire.vetement)?.page ?? 'la boutique'
   return (
     <>
-      <EnTete surTitre="Étape 1 sur 3" titre="Ton avis">
+      <EnTete surTitre="Étape 1 sur 2" titre="Ton avis">
         Comment s’est passée ta commande ?
       </EnTete>
 

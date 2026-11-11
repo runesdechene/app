@@ -1,6 +1,6 @@
 /**
- * QUOI     — étape 3, « Toi » : prénom, e-mail, puis l'envoi. Avec photos, s'y ajoutent la taille,
- *            un mot privé pour l'équipe et le département, facultatifs, et les deux accords.
+ * QUOI     — la dernière étape, « Toi » : prénom, e-mail, puis l'envoi. Avec photos, s'y ajoutent la
+ *            taille facultative et les deux accords ; un avis seul s'en passe.
  * POURQUOI — avec photos, l'e-mail retrouve le compte du joueur, ou en crée un (deuxième accord) ; un
  *            avis seul ne crée pas de compte, il dit seulement « client vérifié » par l'e-mail. Le bouton
  *            reste inactif tant qu'un champ obligatoire manque. Une erreur d'envoi s'affiche ici, le
@@ -9,35 +9,28 @@
 import { CaseACocher } from '../briques/CaseACocher'
 import { MessageDErreur } from '../briques/MessageDErreur'
 import { BoutonSombre, EnTete, Navigation } from './Etape'
-import { DEPARTEMENTS } from './lib/departements'
-import { toiComplet, type Histoire, type Toi } from './lib/formulaire'
+import { toiComplet, type Chemin, type Toi } from './lib/formulaire'
 import etape from './Etape.module.css'
 import styles from './EtapeToi.module.css'
 
-const LONGUEUR_MAX = 500
-
 export function EtapeToi({
-  avecPhotos,
+  chemin,
   toi,
   changer,
-  histoire,
-  changerHistoire,
   erreur,
   precedent,
   envoyer,
 }: {
-  avecPhotos: boolean
+  chemin: Chemin
   toi: Toi
   changer: (modif: Partial<Toi>) => void
-  histoire: Histoire
-  changerHistoire: (modif: Partial<Histoire>) => void
   erreur: string | null
   precedent: () => void
   envoyer: () => void
 }) {
   return (
     <>
-      <EnTete surTitre="Étape 3 sur 3" titre="Toi" />
+      <EnTete surTitre={chemin === 'avis' ? 'Étape 2 sur 2' : 'Étape 4 sur 4'} titre="Toi" />
 
       <label className={etape.libelle} htmlFor="prenom">
         Prénom *
@@ -69,7 +62,7 @@ export function EtapeToi({
         }}
       />
 
-      {avecPhotos && (
+      {chemin === 'photos' && (
         <>
           <label className={etape.libelle} htmlFor="taille">
             Ta taille (optionnel)
@@ -88,40 +81,6 @@ export function EtapeToi({
             }}
           />
           <p className={etape.aide}>Si ta photo est retenue sur une fiche produit, ça aide les autres à choisir leur taille.</p>
-
-          <label className={etape.libelle} htmlFor="mot">
-            Un mot pour l’équipe ? <span className={etape.discret}>(privé — ne sera jamais publié)</span>
-          </label>
-          <textarea
-            id="mot"
-            className={etape.champ}
-            rows={3}
-            maxLength={LONGUEUR_MAX}
-            value={histoire.motEquipe}
-            placeholder="Message privé à l’équipe Runes de Chêne…"
-            onChange={(e) => {
-              changerHistoire({ motEquipe: e.target.value })
-            }}
-          />
-
-          <label className={etape.libelle} htmlFor="departement">
-            Département (optionnel)
-          </label>
-          <select
-            id="departement"
-            className={etape.champ}
-            value={histoire.departement}
-            onChange={(e) => {
-              changerHistoire({ departement: e.target.value })
-            }}
-          >
-            <option value="">— Je préfère ne pas dire / hors France —</option>
-            {DEPARTEMENTS.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
 
           <div className={styles.accords}>
             <CaseACocher
@@ -151,8 +110,8 @@ export function EtapeToi({
       )}
 
       <Navigation precedent={precedent}>
-        <BoutonSombre envoi disabled={!toiComplet(toi, avecPhotos)} onClick={envoyer}>
-          {avecPhotos ? 'Envoyer mes contenus ✦' : 'Publier mon avis ✦'}
+        <BoutonSombre envoi disabled={!toiComplet(toi, chemin)} onClick={envoyer}>
+          {chemin === 'avis' ? 'Publier mon avis ✦' : 'Envoyer mes contenus ✦'}
         </BoutonSombre>
       </Navigation>
     </>

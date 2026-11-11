@@ -1,25 +1,37 @@
 /**
- * QUOI     — /soumettre-contenu : un client laisse son avis, puis, s'il le veut, ses photos en tenue
- *            Runes de Chêne, puis son prénom et son e-mail. Trois étapes ; le lien d'une mission
- *            (`?quete=<slug>`) présélectionne la mission à l'étape des photos.
+ * QUOI     — /soumettre-contenu : un client partage un avis, avec ses photos en tenue Runes de Chêne
+ *            (quatre étapes : contenus, tailles, histoire, toi) ou seul (deux : ton avis, toi). Le
+ *            premier écran fait choisir ; le lien d'une mission (`?quete=<slug>`) ouvre les photos.
  * POURQUOI — le design de la page en ligne (ancien StudioSubmit), gardé par Uriel le 15/10 : sur PC,
  *            une carte à deux panneaux posée sur la photo du réglage Studio ; au téléphone, le
- *            formulaire seul, plein écran. L'avis d'abord et les photos ensuite (Uriel, 11/11) : on
- *            n'a rien à choisir avant d'écrire, et on peut ajouter une photo après. L'écran est dans
- *            l'adresse (`?etape=2`) : le retour du navigateur revient d'un écran, et un écran tapé à
- *            la main n'ouvre jamais plus loin que ce qui est rempli.
+ *            formulaire seul, plein écran. Le chemin et l'étape sont dans l'adresse
+ *            (`?chemin=avis&etape=2`) : le retour du navigateur revient d'un écran, et une étape tapée
+ *            à la main n'ouvre jamais plus loin que ce qui est rempli.
  */
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PagePublique } from '../PagePublique'
 import { lireConfigStudio, lireMissions } from './api'
+import { ChoixDuChemin } from './ChoixDuChemin'
 import { EtapeAvis } from './EtapeAvis'
 import { EtapeContenus } from './EtapeContenus'
+import { EtapeHistoire } from './EtapeHistoire'
 import { EtapeTailles } from './EtapeTailles'
 import { EtapeToi } from './EtapeToi'
 import { Frise } from './Frise'
-import { ECRANS, ETAPES, etapeAffichee, etapeDeLaFrise, HISTOIRE_VIDE, TOI_VIDE, VETEMENTS, type Contenu } from './lib/formulaire'
+import {
+  cheminDe,
+  ETAPES,
+  ETAPES_AVIS,
+  etapeAffichee,
+  etapeAvisAffichee,
+  HISTOIRE_VIDE,
+  TOI_VIDE,
+  VETEMENTS,
+  type Chemin,
+  type Contenu,
+} from './lib/formulaire'
 import { Succes } from './Succes'
 import { useEnvoi } from './useEnvoi'
 import styles from './PageSoumettre.module.css'
@@ -51,8 +63,9 @@ export function PageSoumettre() {
     [apercus],
   )
 
-  const ecran = etapeAffichee(params.get('etape'), histoire, contenus)
-  const avecPhotos = contenus.length > 0
+  const chemin = cheminDe(params)
+  const etape = etapeAffichee(params.get('etape'), contenus)
+  const etapeAvis = etapeAvisAffichee(params.get('etape'), histoire)
   const quete = params.get('quete') ?? ''
   const mission = missions.data?.some((m) => m.slug === quete) ? quete : ''
 
@@ -60,6 +73,15 @@ export function PageSoumettre() {
     setParams((p) => {
       const suite = new URLSearchParams(p)
       suite.set('etape', String(n))
+      return suite
+    })
+  }
+
+  function choisirChemin(c: Chemin) {
+    setParams((p) => {
+      const suite = new URLSearchParams(p)
+      suite.set('chemin', c)
+      suite.delete('etape')
       return suite
     })
   }
@@ -98,13 +120,16 @@ export function PageSoumettre() {
   const fond = config.data?.fond
   const colonne = config.data?.colonne
 
-  function changerHistoire(modif: Partial<typeof histoire>) {
-    setHistoire((h) => ({ ...h, ...modif }))
-  }
+  // La colonne et la frise suivent le chemin : le choix, l'avis seul, ou l'avis avec photos.
+  const colonneDuChemin = {
+    choix: { titre: <>Partager <br />ton aventure</>, etapes: ['Ton choix'], etape: 1 },
+    avis: { titre: <>Ton avis</>, etapes: ETAPES_AVIS, etape: etapeAvis },
+    photos: { titre: <>Envoyer <br />mes contenus</>, etapes: ETAPES, etape },
+  }[chemin ?? 'choix']
 
   let corps
   if (reussite) {
-    corps = <Succes reussite={reussite} couronnes={config.data?.couronnes ?? 0} avisSeul={!avecPhotos} />
+    corps = <Succes reussite={reussite} couronnes={config.data?.couronnes ?? 0} chemin={chemin ?? 'photos'} />
   } else if (progression) {
     corps = (
       <div className={styles.attente}>
@@ -119,24 +144,29 @@ export function PageSoumettre() {
           {colonne && <img className={styles.imageColonne} src={colonne} alt="" />}
           <div className={styles.colonneDedans}>
             <p className={styles.marque}>Runes de Chêne</p>
-            <h1 className={styles.titre}>Ton avis</h1>
-            <Frise etapes={ETAPES} etape={etapeDeLaFrise(ecran)} sens="vertical" />
-            <p className={styles.citation}>« On te guide pas à pas. Quelques minutes, et ton avis rejoint le Mouvement. »</p>
+            <h1 className={styles.titre}>{colonneDuChemin.titre}</h1>
+            <Frise etapes={colonneDuChemin.etapes} etape={colonneDuChemin.etape} sens="vertical" />
+            <p className={styles.citation}>
+              « On te guide pas à pas. Quelques minutes, et tes clichés rejoignent le Mouvement. »
+            </p>
           </div>
         </aside>
 
         <section className={styles.panneau}>
-          <Frise etapes={ETAPES} etape={etapeDeLaFrise(ecran)} sens="horizontal" />
-          {ecran === ECRANS.avis && (
+          <Frise etapes={colonneDuChemin.etapes} etape={colonneDuChemin.etape} sens="horizontal" />
+          {chemin === null && <ChoixDuChemin choisir={choisirChemin} />}
+          {chemin === 'avis' && etapeAvis === 1 && (
             <EtapeAvis
               histoire={histoire}
-              changer={changerHistoire}
+              changer={(modif) => {
+                setHistoire((h) => ({ ...h, ...modif }))
+              }}
               suivant={() => {
-                allerA(ECRANS.photos)
+                allerA(2)
               }}
             />
           )}
-          {ecran === ECRANS.photos && (
+          {chemin === 'photos' && etape === 1 && (
             <EtapeContenus
               missions={missions.data ?? []}
               mission={mission}
@@ -144,41 +174,50 @@ export function PageSoumettre() {
               contenus={contenus}
               ajouter={ajouter}
               retirer={retirer}
-              precedent={() => {
-                allerA(ECRANS.avis)
-              }}
               suivant={() => {
-                allerA(avecPhotos ? ECRANS.tailles : ECRANS.toi)
+                allerA(2)
               }}
             />
           )}
-          {ecran === ECRANS.tailles && (
+          {chemin === 'photos' && etape === 2 && (
             <EtapeTailles
               contenus={contenus}
               choisirTaille={choisirTaille}
               precedent={() => {
-                allerA(ECRANS.photos)
+                allerA(1)
               }}
               suivant={() => {
-                allerA(ECRANS.toi)
+                allerA(3)
               }}
             />
           )}
-          {ecran === ECRANS.toi && (
+          {chemin === 'photos' && etape === 3 && (
+            <EtapeHistoire
+              histoire={histoire}
+              changer={(modif) => {
+                setHistoire((h) => ({ ...h, ...modif }))
+              }}
+              precedent={() => {
+                allerA(2)
+              }}
+              suivant={() => {
+                allerA(4)
+              }}
+            />
+          )}
+          {((chemin === 'photos' && etape === 4) || (chemin === 'avis' && etapeAvis === 2)) && (
             <EtapeToi
-              avecPhotos={avecPhotos}
+              chemin={chemin}
               toi={toi}
               changer={(modif) => {
                 setToi((t) => ({ ...t, ...modif }))
               }}
-              histoire={histoire}
-              changerHistoire={changerHistoire}
               erreur={erreur}
               precedent={() => {
-                allerA(avecPhotos ? ECRANS.tailles : ECRANS.photos)
+                allerA(chemin === 'avis' ? 1 : 3)
               }}
               envoyer={() => {
-                void envoyer(contenus, histoire, toi, mission).then((reussi) => {
+                void envoyer(contenus, histoire, toi, mission, chemin).then((reussi) => {
                   if (reussi) liberer(apercus)
                 })
               }}
@@ -190,7 +229,7 @@ export function PageSoumettre() {
   }
 
   return (
-    <PagePublique titre="Ton avis — Runes de Chêne" disposition="carte" photo={fond ? <img className={styles.fond} src={fond} alt="" /> : undefined}>
+    <PagePublique titre="Envoyer mes contenus — Runes de Chêne" disposition="carte" photo={fond ? <img className={styles.fond} src={fond} alt="" /> : undefined}>
       {corps}
     </PagePublique>
   )
