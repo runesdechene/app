@@ -2377,6 +2377,7 @@ export type Database = {
           consent_brand_usage: boolean
           created_at: string | null
           departement: string | null
+          garment_type: string | null
           id: string
           location_name: string | null
           location_zip: string | null
@@ -2405,6 +2406,7 @@ export type Database = {
           consent_brand_usage?: boolean
           created_at?: string | null
           departement?: string | null
+          garment_type?: string | null
           id?: string
           location_name?: string | null
           location_zip?: string | null
@@ -2433,6 +2435,7 @@ export type Database = {
           consent_brand_usage?: boolean
           created_at?: string | null
           departement?: string | null
+          garment_type?: string | null
           id?: string
           location_name?: string | null
           location_zip?: string | null
@@ -7611,6 +7614,7 @@ export type Database = {
         Args: { p_fragment: number; p_modele: string; p_vecteur: Json }
         Returns: number
       }
+      anecdote_au_hasard: { Args: { p_fragment: number }; Returns: Json }
       answer_enigma: {
         Args: { p_answer: string; p_enigma_id: number; p_user_id: string }
         Returns: Json
@@ -7886,6 +7890,7 @@ export type Database = {
           p_consent_brand: boolean
           p_departement?: string
           p_email: string
+          p_garment_type?: string
           p_images: Json
           p_message?: string
           p_model_height_cm?: number
@@ -8239,6 +8244,7 @@ export type Database = {
           consent_brand_usage: boolean
           created_at: string | null
           departement: string | null
+          garment_type: string | null
           id: string
           location_name: string | null
           location_zip: string | null
@@ -8846,6 +8852,7 @@ export type Database = {
         Args: { p_murmure: number; p_texte: string }
         Returns: undefined
       }
+      mon_accord_nouvelles: { Args: never; Returns: boolean }
       mon_codex: { Args: never; Returns: Json }
       mon_energie: { Args: never; Returns: Json }
       mon_entree: { Args: never; Returns: Json }
@@ -8879,6 +8886,7 @@ export type Database = {
         Args: { p_eveil: number; p_reponse: string }
         Returns: Json
       }
+      peut_apprendre_vue: { Args: never; Returns: boolean }
       plant_flag: {
         Args: {
           p_expedition_name?: string
