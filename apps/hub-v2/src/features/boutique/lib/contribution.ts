@@ -10,7 +10,7 @@ import type { Contribution, StatutContribution } from '../api/contributions'
 export const STATUTS: Record<StatutContribution, string> = { pending: 'À valider', approved: 'Publiée', archived: 'Archivée' }
 
 /** Les types de vêtement du formulaire public (`garment_type`, mig 588). */
-export const VETEMENTS: Record<string, string> = { tshirt: 'T-shirt', sweat: 'Sweat', casquette: 'Casquette', autre: 'Autre' }
+export const VETEMENTS: Record<string, string> = { tshirt: 'T-shirt', sweatshirt: 'Sweatshirt', veste_zip: 'Veste Zip' }
 
 /** Un avis seul n'a pas d'image : c'est ainsi qu'on reconnaît son chemin. */
 export function baliseDuChemin(images: readonly unknown[]): 'Avis' | 'Avis + photos' {

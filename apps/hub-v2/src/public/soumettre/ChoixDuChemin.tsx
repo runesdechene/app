@@ -22,7 +22,7 @@ const CARTES: { chemin: Chemin; icone: string; titre: string; texte: string; dur
     chemin: 'avis',
     icone: '✍️',
     titre: 'Un avis seul',
-    texte: 'Quelques étoiles et un mot sur le textile et ton expérience. Il va sur la fiche du produit.',
+    texte: 'Quelques étoiles et un mot sur le produit et ton expérience. Il va sur la fiche du produit.',
     duree: '≈ 30 secondes',
   },
 ]

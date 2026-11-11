@@ -17,7 +17,7 @@ qu'on peut laisser sans photo (plus contraignante). Pas de second système : le 
 1. **Un formulaire, deux chemins**, choisis au premier écran : « Un avis avec photos » (≈ 3 min) et
    « Un avis seul » (≈ 30 s). Les ambassadeurs et partenaires prennent « avis avec photos » : leurs
    photos vont aussi sur l'accueil, la note et le petit mot y ont leur place.
-2. **Les avis s'affichent par type de vêtement** (T-shirt, sweat, casquette…), jamais par motif :
+2. **Les avis s'affichent par type de vêtement** (T-shirt, Sweatshirt, Veste Zip : ce que la boutique vend, Uriel 11/11), jamais par motif :
    trop peu d'avis par motif, et le textile est le même d'un motif à l'autre.
 3. **« Client vérifié »**, avec dessous en plus petit « (e-mail concordant) », quand l'e-mail donné
    correspond à un compte de l'appli qui possède **au moins un Fragment** (preuve d'un achat, en
@@ -39,8 +39,8 @@ qu'on peut laisser sans photo (plus contraignante). Pas de second système : le 
   Le choix est dans l'adresse (`?chemin=photos|avis`), comme l'étape (`?etape=`).
 - **Avis avec photos** : les quatre étapes d'aujourd'hui (contenus, tailles, histoire, toi), plus la
   case haute définition sous les photos déposées ; « Ton histoire » demande le type de vêtement.
-- **Avis seul** : deux étapes. « Ton avis » : le type de vêtement (pastilles T-shirt, Sweat,
-  Casquette, Autre), « La qualité du textile » (étoiles), « Ton expérience avec Runes de Chêne »
+- **Avis seul** : deux étapes. « Ton avis » : le type de vêtement (pastilles T-shirt, Sweatshirt,
+  Veste Zip — mig 589), « La qualité du produit » (étoiles), « Ton expérience avec Runes de Chêne »
   (étoiles), « Ton avis, en quelques mots ». « Toi » : prénom, e-mail.
 - **Arrivée par le lien de J+14** : `?chemin=avis&email=…&type=…` saute l'écran 0. L'e-mail dans
   l'adresse n'est qu'un pré-remplissage : il ne donne rien de plus que le formulaire direct.

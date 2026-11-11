@@ -24,7 +24,7 @@ export function EtapeHistoire({
   precedent: () => void
   suivant: () => void
 }) {
-  const produits = 'La qualité du textile'
+  const produits = 'La qualité du produit'
   const experience = 'Ton expérience avec Runes de Chêne'
   return (
     <>

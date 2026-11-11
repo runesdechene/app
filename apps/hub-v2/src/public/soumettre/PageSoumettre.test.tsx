@@ -296,8 +296,8 @@ describe('l’avis seul', () => {
     within(screen.getByRole('group', { name: note })).getByRole('button', { name: `${String(n)} sur 5` })
 
   async function remplirAvis() {
-    await userEvent.click(await screen.findByRole('button', { name: 'Sweat' }))
-    await userEvent.click(etoile('La qualité du textile', 4))
+    await userEvent.click(await screen.findByRole('button', { name: 'Sweatshirt' }))
+    await userEvent.click(etoile('La qualité du produit', 4))
   }
 
   it('« Suivant » attend un vêtement et une note', async () => {
@@ -325,7 +325,7 @@ describe('l’avis seul', () => {
         p_email: 'claire@exemple.fr',
         p_nom: 'Claire',
         p_images: [],
-        p_garment_type: 'sweat',
+        p_garment_type: 'sweatshirt',
         p_rating_products: 4,
         p_message: 'Très doux',
         p_consent_brand: true,
@@ -335,19 +335,28 @@ describe('l’avis seul', () => {
   })
 
   it('le lien de l’e-mail pré-remplit le vêtement et l’adresse', async () => {
-    ouvrir('/soumettre-contenu?chemin=avis&email=claire@exemple.fr&type=sweat')
-    expect(await screen.findByRole('button', { name: 'Sweat' })).toHaveAttribute('aria-pressed', 'true')
+    ouvrir('/soumettre-contenu?chemin=avis&email=claire@exemple.fr&type=sweatshirt')
+    expect(await screen.findByRole('button', { name: 'Sweatshirt' })).toHaveAttribute('aria-pressed', 'true')
     await userEvent.click(etoile('Ton expérience avec Runes de Chêne', 5))
     await userEvent.click(bouton(/^Suivant/))
     expect(await screen.findByRole('textbox', { name: 'E-mail *' })).toHaveValue('claire@exemple.fr')
   })
 
   it('un type inconnu ne présélectionne rien', async () => {
-    ouvrir('/soumettre-contenu?chemin=avis&type=robe')
+    ouvrir('/soumettre-contenu?chemin=avis&type=casquette')
     await screen.findByRole('heading', { name: 'Ton avis', level: 2 })
-    for (const pastille of ['T-shirt', 'Sweat', 'Casquette', 'Autre']) {
+    for (const pastille of ['T-shirt', 'Sweatshirt', 'Veste Zip']) {
       expect(bouton(pastille)).toHaveAttribute('aria-pressed', 'false')
     }
+  })
+
+  it('un souci renvoie vers le SAV, par e-mail', async () => {
+    ouvrir('/soumettre-contenu?chemin=avis')
+    expect(await screen.findByRole('textbox', { name: 'Ton avis, en quelques mots' })).toHaveAttribute(
+      'placeholder',
+      'Ce que tu as pensé de ton achat',
+    )
+    expect(screen.getByRole('link', { name: 'contact@runesdechene.com' })).toHaveAttribute('href', 'mailto:contact@runesdechene.com')
   })
 
   it('?etape=2 sans avis rempli reste sur « Ton avis »', async () => {
@@ -362,14 +371,14 @@ describe('l’avis seul', () => {
     await userEvent.click(bouton('M'))
     await userEvent.click(bouton(/^(Suivant|Continuer)/))
     await screen.findByRole('heading', { name: 'Ton histoire' })
-    await userEvent.click(bouton('Casquette'))
-    await userEvent.click(etoile('La qualité du textile', 3))
+    await userEvent.click(bouton('Veste Zip'))
+    await userEvent.click(etoile('La qualité du produit', 3))
     expect(screen.getByRole('group', { name: 'Ton expérience avec Runes de Chêne' })).toBeInTheDocument()
     await userEvent.click(bouton(/^Suivant/))
     await remplirToi()
     await envoyer()
     await screen.findByRole('heading', { name: 'Bienvenue dans le Mouvement !' })
-    expect(faux.deposer).toHaveBeenCalledWith(expect.objectContaining({ p_garment_type: 'casquette', p_rating_products: 3 }))
+    expect(faux.deposer).toHaveBeenCalledWith(expect.objectContaining({ p_garment_type: 'veste_zip', p_rating_products: 3 }))
   })
 })
 

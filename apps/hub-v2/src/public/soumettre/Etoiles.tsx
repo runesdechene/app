@@ -1,5 +1,5 @@
 /**
- * QUOI     — une note en cinq étoiles (« La qualité du textile », « Ton expérience avec Runes de
+ * QUOI     — une note en cinq étoiles (« La qualité du produit », « Ton expérience avec Runes de
  *            Chêne »), dans « Ton histoire » comme dans « Ton avis ».
  * POURQUOI — cliquer l'étoile déjà choisie retire la note ; le survol allume les étoiles jusqu'au
  *            pointeur, pour voir la note avant de la poser.

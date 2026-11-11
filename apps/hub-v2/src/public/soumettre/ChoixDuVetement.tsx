@@ -1,5 +1,5 @@
 /**
- * QUOI     — « Ton vêtement » : T-shirt, Sweat, Casquette, Autre.
+ * QUOI     — « Ton vêtement » : T-shirt, Sweatshirt, Veste Zip, les vêtements de la boutique.
  * POURQUOI — les avis s'affichent par type de vêtement, jamais par motif (le textile est le même
  *            d'un motif à l'autre) : chaque avis porte le sien.
  */

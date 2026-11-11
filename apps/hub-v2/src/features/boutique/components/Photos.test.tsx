@@ -108,9 +108,9 @@ test('« Valider et publier » verse les couronnes et passe à la suivante', asy
 })
 
 test('un avis seul : la balise « Avis », son vêtement, et « client vérifié » par ses Fragments', async () => {
-  afficher([contribution('c1', 'Brune', { images: [], produit: null, vetement: 'sweat', fragments: 2 })])
+  afficher([contribution('c1', 'Brune', { images: [], produit: null, vetement: 'sweatshirt', fragments: 2 })])
   await screen.findByRole('heading', { name: 'Brune' })
-  expect(screen.getByRole('button', { name: /Brune/ })).toHaveTextContent('Avis · Sweat')
+  expect(screen.getByRole('button', { name: /Brune/ })).toHaveTextContent('Avis · Sweatshirt')
   expect(screen.getByText(/✓ Client vérifié \(2 Fragments\)/)).toBeInTheDocument()
 })
 

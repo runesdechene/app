@@ -15,9 +15,8 @@ export type Chemin = 'photos' | 'avis'
 /** Les avis s'affichent par type de vêtement, jamais par motif ; `page` dit où l'avis sera publié. */
 export const VETEMENTS = [
   { cle: 'tshirt', nom: 'T-shirt', page: 'la page des T-shirts' },
-  { cle: 'sweat', nom: 'Sweat', page: 'la page des sweats' },
-  { cle: 'casquette', nom: 'Casquette', page: 'la page des casquettes' },
-  { cle: 'autre', nom: 'Autre', page: 'la boutique' },
+  { cle: 'sweatshirt', nom: 'Sweatshirt', page: 'la page des sweatshirts' },
+  { cle: 'veste_zip', nom: 'Veste Zip', page: 'la page des vestes zip' },
 ]
 
 export type Contenu = { fichier: File; apercu: string; taille: string | null }

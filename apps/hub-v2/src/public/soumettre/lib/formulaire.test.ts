@@ -25,10 +25,10 @@ describe('avisComplet', () => {
   })
 
   it('demande une note ou quelques mots', () => {
-    expect(avisComplet({ ...HISTOIRE_VIDE, vetement: 'sweat' })).toBe(false)
-    expect(avisComplet({ ...HISTOIRE_VIDE, vetement: 'sweat', avis: '   ' })).toBe(false)
-    expect(avisComplet({ ...HISTOIRE_VIDE, vetement: 'sweat', noteProduits: 4 })).toBe(true)
-    expect(avisComplet({ ...HISTOIRE_VIDE, vetement: 'sweat', avis: 'Très doux' })).toBe(true)
+    expect(avisComplet({ ...HISTOIRE_VIDE, vetement: 'sweatshirt' })).toBe(false)
+    expect(avisComplet({ ...HISTOIRE_VIDE, vetement: 'sweatshirt', avis: '   ' })).toBe(false)
+    expect(avisComplet({ ...HISTOIRE_VIDE, vetement: 'sweatshirt', noteProduits: 4 })).toBe(true)
+    expect(avisComplet({ ...HISTOIRE_VIDE, vetement: 'sweatshirt', avis: 'Très doux' })).toBe(true)
   })
 })
 
