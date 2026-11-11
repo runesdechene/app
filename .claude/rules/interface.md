@@ -394,3 +394,13 @@ une garde (`<Navigate>` sur un état du compte).
 
 Et ajouter un élément dans une rangée existante, c'est relire la disposition de la rangée : un
 `display: flex` sans `flex-wrap` ne s'agrandit pas, il écrase.
+
+## Une maquette Figma se pose là où Uriel peut l'ouvrir (11/11/2026)
+
+**Le piège** : la capture de la fiche produit (`generate_figma_design`) est tombée à x = 131 250 sur
+« Page 1 », et j'ai posé la maquette à côté. Uriel : « encore une fois trop à droite, je ne peux pas
+y accéder ».
+
+**How to apply :** une maquette neuve va sur sa propre page, nommée par le sujet (« Boutique — Avis »),
+à partir de (0, 0) ; une capture s'y déplace aussitôt (`page.appendChild(n)`, puis `x`/`y`). Le lien
+donné porte le `node-id` du cadre.
