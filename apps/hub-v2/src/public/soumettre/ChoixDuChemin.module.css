@@ -1,6 +1,7 @@
 /*
  * QUOI     — l'écran du choix (maquette Figma 644:1612, « 1 · Le choix ») : deux cartes côte à côte
- *            sur PC, l'une sous l'autre au téléphone ; la carte choisie prend le filet or.
+ *            sur PC, l'une sous l'autre au téléphone ; la carte survolée prend le filet or, un clic
+ *            ouvre son chemin.
  * ÉCARTS   — la note des ambassadeurs, en italique sur la maquette, passe en romain (jamais
  *            d'italique, 02/11) ; jetons repris d'Etape.module.css.
  */
@@ -26,12 +27,8 @@
   transition: border-color var(--duree-douce) var(--courbe-douce);
 }
 
-.carte:hover,
-.carte[aria-pressed='true'] {
+.carte:hover {
   border-color: var(--color-boutique-or);
-}
-
-.carte[aria-pressed='true'] {
   box-shadow: inset 0 0 0 1px var(--color-boutique-or);
 }
 

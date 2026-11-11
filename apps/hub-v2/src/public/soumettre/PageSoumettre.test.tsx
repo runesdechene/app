@@ -118,13 +118,12 @@ describe('le choix', () => {
     ouvrir('/soumettre-contenu')
     expect(await screen.findByRole('heading', { name: 'Que veux-tu partager ?' })).toBeInTheDocument()
     expect(screen.getByText('Étape 1 sur 4')).toBeInTheDocument()
-    expect(bouton(/^Commencer/)).toBeDisabled()
+    expect(screen.queryByRole('button', { name: /^Commencer/ })).not.toBeInTheDocument()
   })
 
-  it('« Un avis » puis « Commencer » ouvre l’avis, dans l’adresse', async () => {
+  it('un clic sur « Un avis » ouvre l’avis, dans l’adresse', async () => {
     const { router } = ouvrir('/soumettre-contenu')
     await userEvent.click(await screen.findByRole('button', { name: /^Un avis/ }))
-    await userEvent.click(bouton(/^Commencer/))
     expect(await screen.findByRole('heading', { name: 'Ton avis', level: 1 })).toBeInTheDocument()
     expect(router.state.location.search).toContain('chemin=avis')
   })

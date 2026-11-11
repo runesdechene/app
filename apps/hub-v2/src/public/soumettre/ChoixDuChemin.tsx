@@ -1,14 +1,12 @@
 /**
- * QUOI     — l'étape 1, « Que veux-tu partager ? » : deux cartes, « Des photos » et « Un avis », puis
- *            « Commencer ».
+ * QUOI     — l'étape 1, « Que veux-tu partager ? » : deux cartes, « Des photos » et « Un avis » ; un
+ *            clic sur l'une ouvre son chemin.
  * POURQUOI — un seul formulaire, deux chemins (spec avis et photos du 16/10, maquette Figma 644:1612) ;
  *            le choix compte comme la première étape (Uriel, 11/11). Chaque chemin garde l'autre en
  *            facultatif : une photo après l'avis, un avis après les photos.
- *            La carte choisie ne fait que se marquer : c'est « Commencer » qui écrit le chemin dans
- *            l'adresse, comme le bouton « Suivant » écrit l'étape.
+ *            Pas de bouton « Commencer » (Uriel, 11/11) : la carte suffit.
  */
-import { useState } from 'react'
-import { BoutonSombre, EnTete, Navigation } from './Etape'
+import { EnTete } from './Etape'
 import type { Chemin } from './lib/formulaire'
 import styles from './ChoixDuChemin.module.css'
 
@@ -30,7 +28,6 @@ const CARTES: { chemin: Chemin; icone: string; titre: string; texte: string; dur
 ]
 
 export function ChoixDuChemin({ choisir }: { choisir: (chemin: Chemin) => void }) {
-  const [choix, setChoix] = useState<Chemin | null>(null)
   return (
     <>
       <EnTete surTitre="Étape 1 sur 4" titre="Que veux-tu partager ?">
@@ -43,9 +40,8 @@ export function ChoixDuChemin({ choisir }: { choisir: (chemin: Chemin) => void }
             key={c.chemin}
             type="button"
             className={styles.carte}
-            aria-pressed={choix === c.chemin}
             onClick={() => {
-              setChoix(c.chemin)
+              choisir(c.chemin)
             }}
           >
             <span className={styles.icone} aria-hidden="true">
@@ -59,16 +55,6 @@ export function ChoixDuChemin({ choisir }: { choisir: (chemin: Chemin) => void }
       </div>
       <p className={styles.note}>Tu es ambassadeur ou partenaire ? Choisis « Des photos ».</p>
 
-      <Navigation>
-        <BoutonSombre
-          disabled={choix === null}
-          onClick={() => {
-            if (choix) choisir(choix)
-          }}
-        >
-          Commencer →
-        </BoutonSombre>
-      </Navigation>
     </>
   )
 }
