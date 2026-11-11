@@ -1,6 +1,7 @@
 /**
- * QUOI     — étape 1, « Tes contenus » : la mission éventuelle, puis les photos et vidéos (dix au
- *            plus), déposées ou choisies, en vignettes qu'on peut retirer.
+ * QUOI     — étape 2, « Tes photos », facultative : la mission éventuelle, puis les photos et vidéos
+ *            (dix au plus), déposées ou choisies, en vignettes qu'on peut retirer. Sans photo, on
+ *            continue vers « Toi ».
  * POURQUOI — la mission vaut « envoi libre » tant que le joueur ne la choisit pas : `?quete=` (le
  *            lien d'une mission) la présélectionne seulement, il la voit et peut la changer. Un
  *            fichier refusé l'est ici, avec son nom et la raison, avant que rien ne parte.
@@ -21,6 +22,7 @@ export function EtapeContenus({
   contenus,
   ajouter,
   retirer,
+  precedent,
   suivant,
 }: {
   missions: Mission[]
@@ -29,6 +31,7 @@ export function EtapeContenus({
   contenus: Contenu[]
   ajouter: (fichiers: File[]) => void
   retirer: (rang: number) => void
+  precedent: () => void
   suivant: () => void
 }) {
   const [refus, setRefus] = useState<string[]>([])
@@ -46,8 +49,8 @@ export function EtapeContenus({
 
   return (
     <>
-      <EnTete surTitre="Étape 1 sur 4" titre="Tes contenus">
-        Dépose tes photos et vidéos — jusqu’à {MAX_FICHIERS}.
+      <EnTete surTitre="Étape 2 sur 3" titre="Tes photos">
+        Facultatif : tes photos et vidéos en tenue Runes de Chêne — jusqu’à {MAX_FICHIERS}.
       </EnTete>
 
       {missions.length > 0 && (
@@ -126,10 +129,8 @@ export function EtapeContenus({
         </ul>
       )}
 
-      <Navigation>
-        <BoutonSombre disabled={contenus.length === 0} onClick={suivant}>
-          Suivant →
-        </BoutonSombre>
+      <Navigation precedent={precedent}>
+        <BoutonSombre onClick={suivant}>{contenus.length === 0 ? 'Continuer sans photo →' : 'Suivant →'}</BoutonSombre>
       </Navigation>
     </>
   )

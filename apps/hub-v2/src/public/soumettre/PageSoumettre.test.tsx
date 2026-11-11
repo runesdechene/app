@@ -1,6 +1,7 @@
 /**
- * QUOI     — /soumettre-contenu de bout en bout : la mission présélectionnée, les quatre étapes et
- *            leurs verrous, l'envoi fichier par fichier, le dépôt et ses refus.
+ * QUOI     — /soumettre-contenu de bout en bout : l'avis, les photos facultatives et leurs tailles,
+ *            toi ; les verrous, la mission présélectionnée, l'envoi fichier par fichier, le dépôt et
+ *            ses refus.
  * POURQUOI — un joueur arrive d'un QR imprimé, sans compte : chaque verrou et chaque échec doit se
  *            lire. Supabase est simulé ; la compression aussi (jsdom ne dessine pas d'image).
  */
@@ -61,7 +62,7 @@ beforeEach(() => {
   faux.deposer.mockReset().mockResolvedValue({ data: { nouveauCompte: false }, error: null })
 })
 
-function ouvrir(adresse = '/soumettre-contenu?chemin=photos') {
+function ouvrir(adresse = '/soumettre-contenu') {
   const router = createMemoryRouter([{ path: '/soumettre-contenu', element: <PageSoumettre /> }], {
     initialEntries: [adresse],
   })
@@ -80,17 +81,32 @@ async function deposer(...noms: string[]) {
   await userEvent.upload(screen.getByLabelText(/Glisse ou clique pour ajouter/), noms.map(photo))
 }
 
-/** Les trois premières étapes passées, une taille M pour chaque fichier. */
-async function jusquAToi(noms = ['a.jpg', 'b.jpg'], adresse = '/soumettre-contenu?chemin=photos') {
-  ouvrir(adresse)
-  await screen.findByRole('heading', { name: 'Tes contenus' })
+const etoile = (note: string, n: number) =>
+  within(screen.getByRole('group', { name: note })).getByRole('button', { name: `${String(n)} sur 5` })
+
+async function remplirAvis() {
+  await userEvent.click(await screen.findByRole('button', { name: 'Sweatshirt' }))
+  await userEvent.click(etoile('La qualité du produit', 4))
+}
+
+/** « Ton avis » rempli (Sweatshirt, 4 étoiles), on arrive aux photos. */
+async function jusquAuxPhotos(adresse = '/soumettre-contenu') {
+  const { router } = ouvrir(adresse)
+  await remplirAvis()
+  await userEvent.click(bouton(/^Suivant/))
+  await screen.findByRole('heading', { name: 'Tes photos' })
+  return router
+}
+
+/** L'avis, les photos et une taille M pour chacune : on arrive à « Toi ». */
+async function jusquAToi(noms = ['a.jpg', 'b.jpg'], adresse = '/soumettre-contenu') {
+  await jusquAuxPhotos(adresse)
   await deposer(...noms)
   await userEvent.click(bouton(/^Suivant/))
   for (let i = 0; i < noms.length; i++) {
     await userEvent.click(bouton('M'))
     await userEvent.click(bouton(/^(Suivant|Continuer)/))
   }
-  await userEvent.click(bouton(/^Suivant/))
   await screen.findByRole('heading', { name: 'Toi' })
 }
 
@@ -105,50 +121,46 @@ async function envoyer() {
   await userEvent.click(bouton(/^Envoyer mes contenus/))
 }
 
-describe('le choix', () => {
-  it('sans chemin, la page demande ce qu’on veut partager', async () => {
-    ouvrir('/soumettre-contenu')
-    expect(await screen.findByRole('heading', { name: 'Que veux-tu partager ?' })).toBeInTheDocument()
-    expect(bouton(/^Commencer/)).toBeDisabled()
+describe('l’ordre', () => {
+  it('la page s’ouvre sur « Ton avis », la première de trois étapes', async () => {
+    ouvrir()
+    expect(await screen.findByRole('heading', { name: 'Ton avis', level: 2 })).toBeInTheDocument()
+    expect(screen.getByText('Étape 1 sur 3')).toBeInTheDocument()
   })
 
-  it('« Un avis seul » puis « Commencer » ouvre l’avis, dans l’adresse', async () => {
-    const { router } = ouvrir('/soumettre-contenu')
-    await userEvent.click(await screen.findByRole('button', { name: /Un avis seul/ }))
-    await userEvent.click(bouton(/^Commencer/))
-    expect(await screen.findByRole('heading', { name: 'Ton avis', level: 1 })).toBeInTheDocument()
-    expect(router.state.location.search).toContain('chemin=avis')
-  })
-
-  it('un lien de mission déjà imprimé ouvre directement les photos', async () => {
-    ouvrir('/soumettre-contenu?quete=hoplite')
-    expect(await screen.findByRole('heading', { name: 'Tes contenus' })).toBeInTheDocument()
+  it('les photos sont facultatives : « Continuer sans photo » mène à « Toi »', async () => {
+    await jusquAuxPhotos()
+    expect(screen.getByText('Étape 2 sur 3')).toBeInTheDocument()
+    await userEvent.click(bouton(/^Continuer sans photo/))
+    expect(await screen.findByRole('heading', { name: 'Toi' })).toBeInTheDocument()
+    expect(screen.getByText('Étape 3 sur 3')).toBeInTheDocument()
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
   })
 })
 
 describe('la mission', () => {
   it('?quete=hoplite présélectionne la mission', async () => {
-    ouvrir('/soumettre-contenu?quete=hoplite')
+    await jusquAuxPhotos('/soumettre-contenu?quete=hoplite')
     const choix = await screen.findByRole('combobox', { name: /mission en cours/ })
     expect(choix).toHaveValue('hoplite')
   })
 
   it('une quête inconnue ne présélectionne rien', async () => {
-    ouvrir('/soumettre-contenu?quete=fantome')
+    await jusquAuxPhotos('/soumettre-contenu?quete=fantome')
     const choix = await screen.findByRole('combobox', { name: /mission en cours/ })
     expect(choix).toHaveValue('')
   })
 })
 
 describe('les étapes', () => {
-  it('on n’avance pas sans fichier, même en tapant ?etape=3', async () => {
-    ouvrir('/soumettre-contenu?chemin=photos&etape=3')
-    expect(await screen.findByRole('heading', { name: 'Tes contenus' })).toBeInTheDocument()
+  it('on n’avance pas sans avis, même en tapant ?etape=4', async () => {
+    ouvrir('/soumettre-contenu?etape=4')
+    expect(await screen.findByRole('heading', { name: 'Ton avis', level: 2 })).toBeInTheDocument()
     expect(bouton(/^Suivant/)).toBeDisabled()
   })
 
   it('un fichier refusé se dit, avec son nom', async () => {
-    ouvrir()
+    await jusquAuxPhotos()
     await userEvent.upload(
       screen.getByLabelText(/Glisse ou clique pour ajouter/),
       new File(['x'], 'danse.gif', { type: 'image/gif' }),
@@ -157,17 +169,18 @@ describe('les étapes', () => {
   })
 
   it('l’étape est dans l’adresse, ?quete= y reste', async () => {
-    const { router } = ouvrir('/soumettre-contenu?quete=hoplite')
+    const router = await jusquAuxPhotos('/soumettre-contenu?quete=hoplite')
     await deposer('a.jpg')
     await userEvent.click(bouton(/^Suivant/))
     expect(await screen.findByRole('heading', { name: 'Quelle taille portes-tu ?' })).toBeInTheDocument()
+    expect(screen.getByText('Étape 2 sur 3')).toBeInTheDocument()
     const params = new URLSearchParams(router.state.location.search)
-    expect(params.get('etape')).toBe('2')
+    expect(params.get('etape')).toBe('3')
     expect(params.get('quete')).toBe('hoplite')
   })
 
   it('on n’avance pas sans une taille pour chaque fichier', async () => {
-    ouvrir()
+    await jusquAuxPhotos()
     await deposer('a.jpg', 'b.jpg')
     await userEvent.click(bouton(/^Suivant/))
     expect(bouton(/^Suivant/)).toBeDisabled()
@@ -177,7 +190,7 @@ describe('les étapes', () => {
     expect(bouton(/^Continuer/)).toBeDisabled()
     await userEvent.click(bouton('Aucun produit'))
     await userEvent.click(bouton(/^Continuer/))
-    expect(await screen.findByRole('heading', { name: 'Ton histoire' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Toi' })).toBeInTheDocument()
   })
 
   it('on n’envoie pas sans prénom, e-mail et les deux accords', async () => {
@@ -292,16 +305,8 @@ describe('l’envoi', () => {
 })
 
 describe('l’avis seul', () => {
-  const etoile = (note: string, n: number) =>
-    within(screen.getByRole('group', { name: note })).getByRole('button', { name: `${String(n)} sur 5` })
-
-  async function remplirAvis() {
-    await userEvent.click(await screen.findByRole('button', { name: 'Sweatshirt' }))
-    await userEvent.click(etoile('La qualité du produit', 4))
-  }
-
   it('« Suivant » attend un vêtement et une note', async () => {
-    ouvrir('/soumettre-contenu?chemin=avis')
+    ouvrir()
     expect(await screen.findByRole('heading', { name: 'Ton avis', level: 2 })).toBeInTheDocument()
     expect(bouton(/^Suivant/)).toBeDisabled()
     await remplirAvis()
@@ -309,11 +314,12 @@ describe('l’avis seul', () => {
   })
 
   it('l’avis part sans fichier, sans compte, avec son vêtement', async () => {
-    ouvrir('/soumettre-contenu?chemin=avis')
+    ouvrir()
     await remplirAvis()
     await userEvent.type(screen.getByRole('textbox', { name: 'Ton avis, en quelques mots' }), 'Très doux')
     await userEvent.click(bouton(/^Suivant/))
-    expect(await screen.findByText('Étape 2 sur 2')).toBeInTheDocument()
+    await userEvent.click(await screen.findByRole('button', { name: /^Continuer sans photo/ }))
+    expect(await screen.findByText('Étape 3 sur 3')).toBeInTheDocument()
     await userEvent.type(screen.getByRole('textbox', { name: 'Prénom *' }), 'Claire')
     await userEvent.type(screen.getByRole('textbox', { name: 'E-mail *' }), 'claire@exemple.fr')
     await userEvent.click(bouton(/^Publier mon avis/))
@@ -335,15 +341,16 @@ describe('l’avis seul', () => {
   })
 
   it('le lien de l’e-mail pré-remplit le vêtement et l’adresse', async () => {
-    ouvrir('/soumettre-contenu?chemin=avis&email=claire@exemple.fr&type=sweatshirt')
+    ouvrir('/soumettre-contenu?email=claire@exemple.fr&type=sweatshirt')
     expect(await screen.findByRole('button', { name: 'Sweatshirt' })).toHaveAttribute('aria-pressed', 'true')
     await userEvent.click(etoile('Ton expérience avec Runes de Chêne', 5))
     await userEvent.click(bouton(/^Suivant/))
+    await userEvent.click(await screen.findByRole('button', { name: /^Continuer sans photo/ }))
     expect(await screen.findByRole('textbox', { name: 'E-mail *' })).toHaveValue('claire@exemple.fr')
   })
 
   it('un type inconnu ne présélectionne rien', async () => {
-    ouvrir('/soumettre-contenu?chemin=avis&type=casquette')
+    ouvrir('/soumettre-contenu?type=casquette')
     await screen.findByRole('heading', { name: 'Ton avis', level: 2 })
     for (const pastille of ['T-shirt', 'Sweatshirt', 'Veste Zip']) {
       expect(bouton(pastille)).toHaveAttribute('aria-pressed', 'false')
@@ -351,7 +358,7 @@ describe('l’avis seul', () => {
   })
 
   it('un souci renvoie vers le SAV, par e-mail', async () => {
-    ouvrir('/soumettre-contenu?chemin=avis')
+    ouvrir()
     expect(await screen.findByRole('textbox', { name: 'Ton avis, en quelques mots' })).toHaveAttribute(
       'placeholder',
       'Ce que tu as pensé de ton achat, de ton expérience auprès de notre boutique ou de notre stand…',
@@ -360,31 +367,24 @@ describe('l’avis seul', () => {
   })
 
   it('?etape=2 sans avis rempli reste sur « Ton avis »', async () => {
-    ouvrir('/soumettre-contenu?chemin=avis&etape=2')
+    ouvrir('/soumettre-contenu?etape=2')
     expect(await screen.findByRole('heading', { name: 'Ton avis', level: 2 })).toBeInTheDocument()
   })
 
-  it('avec photos, « Ton histoire » demande aussi le vêtement, et les notes ont leurs nouveaux noms', async () => {
-    ouvrir()
-    await deposer('a.jpg')
-    await userEvent.click(bouton(/^Suivant/))
-    await userEvent.click(bouton('M'))
-    await userEvent.click(bouton(/^(Suivant|Continuer)/))
-    await screen.findByRole('heading', { name: 'Ton histoire' })
-    await userEvent.click(bouton('Veste Zip'))
-    await userEvent.click(etoile('La qualité du produit', 3))
-    expect(screen.getByRole('group', { name: 'Ton expérience avec Runes de Chêne' })).toBeInTheDocument()
-    await userEvent.click(bouton(/^Suivant/))
+  it('avec photos, l’avis part avec son vêtement et ses notes', async () => {
+    await jusquAToi(['a.jpg'])
     await remplirToi()
     await envoyer()
     await screen.findByRole('heading', { name: 'Bienvenue dans le Mouvement !' })
-    expect(faux.deposer).toHaveBeenCalledWith(expect.objectContaining({ p_garment_type: 'veste_zip', p_rating_products: 3 }))
+    expect(faux.deposer).toHaveBeenCalledWith(expect.objectContaining({ p_garment_type: 'sweatshirt', p_rating_products: 4 }))
   })
 })
 
 describe('les aperçus', () => {
   it('sont libérés quand on quitte la page', async () => {
     const { rendu } = ouvrir()
+    await remplirAvis()
+    await userEvent.click(bouton(/^Suivant/))
     await deposer('a.jpg', 'b.jpg')
     const crees = creees()
     expect(liberer).not.toHaveBeenCalled()

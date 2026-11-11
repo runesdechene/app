@@ -93,8 +93,8 @@ const PAGES_PUBLIQUES = [
   { adresse: '/flyer', titre: /^Runes de Chêne/ },
   { adresse: '/flyer/', titre: /^Runes de Chêne/ },
   { adresse: '/flyercadeau', titre: /un mouvement s’éveille$/ },
-  { adresse: '/soumettre-contenu?quete=hoplite', titre: 'Envoyer mes contenus' },
-  { adresse: '/soumettre-contenu/', titre: 'Partager ton aventure' },
+  { adresse: '/soumettre-contenu?quete=hoplite', titre: 'Ton avis' },
+  { adresse: '/soumettre-contenu/', titre: 'Ton avis' },
 ]
 
 describe.each([
@@ -104,7 +104,7 @@ describe.each([
   test.each(PAGES_PUBLIQUES)('$adresse ouvre sa page publique, sans la porte ni la coquille', async ({ adresse, titre }) => {
     faux.session = session
     monter(adresse)
-    expect(await screen.findByRole('heading', { name: titre })).toBeInTheDocument()
+    expect((await screen.findAllByRole('heading', { name: titre }))[0]).toBeInTheDocument()
     expect(faux.rpc).not.toHaveBeenCalledWith('hub_est_admin')
     expect(screen.queryByRole('navigation', { name: 'Menu du Hub' })).not.toBeInTheDocument()
   })
