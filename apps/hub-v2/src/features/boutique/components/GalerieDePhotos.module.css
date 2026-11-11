@@ -1,0 +1,65 @@
+/*
+ * QUOI     — la grille de la vue « Photos » : des vignettes carrées, où elle est publiée, puis qui l'a envoyée.
+ */
+.barre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.compte {
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.carte {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-bloc);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: background var(--duree-douce) var(--courbe-douce);
+}
+.carte:hover { background: var(--color-surface); }
+
+.image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-petit);
+  background: var(--color-vignette);
+  object-fit: cover;
+}
+
+.endroits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.nom {
+  font-weight: var(--weight-semi);
+  font-size: var(--flux-size);
+  color: var(--color-encre);
+}
+
+.produit {
+  font-size: var(--legende-size);
+  color: var(--color-texte-doux);
+}

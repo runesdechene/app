@@ -9,6 +9,7 @@ import {
   ajouterEtiquette, creerEtiquette, lireContributions, lireEtiquettes, modererContribution, modifierMessage,
   retirerEtiquette, supprimerContribution, type Contribution, type Criteres, type StatutContribution,
 } from '../api/contributions'
+import { lirePhotos } from '../api/photos'
 import { chercherProduits } from '../api/shopify'
 
 export function useContributions(criteres: Criteres) {
@@ -23,7 +24,11 @@ export function useProduitsShopify(terme: string) {
   return useQuery({ queryKey: ['hub-produits-shopify', terme], queryFn: () => chercherProduits(terme), enabled: terme.trim().length >= 2 })
 }
 
-const A_RAFRAICHIR = ['hub-contributions', 'hub-ouverture']
+export function usePhotos() {
+  return useQuery({ queryKey: ['hub-photos'], queryFn: lirePhotos })
+}
+
+const A_RAFRAICHIR = ['hub-contributions', 'hub-photos', 'hub-ouverture']
 
 // Pas d'attente : la contribution décidée peut quitter la liste au rafraîchissement, et l'écran
 // doit avoir choisi la suivante avant que sa lecture disparaisse.

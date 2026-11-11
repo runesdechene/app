@@ -5,6 +5,7 @@
  *            le blanc à 40 % de la zone = --color-sur-accent à 40 % ; 14 px de coins = --radius-carte
  *            (15 px) ; 1,05rem = --corps-size.
  */
+
 /* La zone remplit la hauteur libre du panneau, comme sur l'ancienne page. */
 .depot {
   display: flex;

@@ -16,10 +16,13 @@ import { EnTeteDePage } from '@/shared/ui/EnTeteDePage'
 import { Pages } from '@/shared/ui/Pages'
 import { Tuile } from '@/shared/ui/Tuile'
 import type { Contribution, Filtre } from '../api/contributions'
+import type { PhotoPubliee } from '../api/photos'
 import { useContributions } from '../hooks/useContributions'
 import { useTelechargement } from '../hooks/useTelechargement'
 import { fichiersDeContributions } from '../lib/archive'
 import { baliseDuChemin, estUneVideo, produitOuVetement } from '../lib/contribution'
+import { PLACEMENTS } from '../lib/photos'
+import { GalerieDePhotos } from './GalerieDePhotos'
 import { LectureContribution } from './LectureContribution'
 import boutique from './Boutique.module.css'
 import styles from './Photos.module.css'
@@ -29,6 +32,7 @@ const FILTRES: { valeur: Filtre; libelle: string }[] = [
   { valeur: 'pending', libelle: 'À valider' }, { valeur: 'approved', libelle: 'Publiées' },
   { valeur: 'archived', libelle: 'Archivées' }, { valeur: 'toutes', libelle: 'Toutes' },
 ]
+const VUES = [{ valeur: 'contributions', libelle: 'Contributions' }, { valeur: 'photos', libelle: 'Photos' }] as const
 const nombre = new Intl.NumberFormat('fr-FR')
 
 function numeroDePage(texte: string | null): number {
@@ -58,6 +62,8 @@ export function Photos() {
   const [params, setParams] = useSearchParams()
   const [depuisLe, setDepuisLe] = useState('')
   const telechargement = useTelechargement()
+  const vue = params.get('vue') === 'photos' ? 'photos' : 'contributions'
+  const placement = PLACEMENTS.find((p) => p.valeur === params.get('place'))?.valeur ?? 'toutes'
   const filtre = FILTRES.find((f) => f.valeur === params.get('filtre'))?.valeur ?? 'pending'
   const recherche = params.get('q') ?? ''
   const decalage = (numeroDePage(params.get('page')) - 1) * PAR_PAGE
@@ -77,7 +83,8 @@ export function Photos() {
 
   function changer(cle: string, valeur: string) {
     const suivants = new URLSearchParams(params)
-    if (valeur === '' || (cle === 'filtre' && valeur === 'pending')) suivants.delete(cle)
+    const parDefaut = { filtre: 'pending', vue: 'contributions', place: 'toutes' }[cle]
+    if (valeur === '' || valeur === parDefaut) suivants.delete(cle)
     else suivants.set(cle, valeur)
     if (cle !== 'page') suivants.delete('page')
     suivants.delete('c')
@@ -89,6 +96,11 @@ export function Photos() {
     if (id === undefined) suivants.delete('c')
     else suivants.set('c', id)
     setParams(suivants, { replace: true })
+  }
+
+  /** Une photo ouvre sa contribution : toutes les contributions, cherchées par le nom, celle-ci choisie. */
+  function ouvrir(photo: PhotoPubliee) {
+    setParams(new URLSearchParams({ filtre: 'toutes', q: photo.nom, c: photo.contribution }))
   }
 
   function apresDecision() {
@@ -133,31 +145,41 @@ export function Photos() {
         </div>
       )}
       <div className={styles.barre}>
-        <ChoixSegmente nom="Filtre" options={FILTRES} choisi={filtre} onChoix={(v) => { changer('filtre', v) }} />
-        <span className={styles.air} />
-        <ChampDeRecherche valeur={recherche} onChange={(q) => { changer('q', q) }} etiquette="Un nom, un e-mail…" />
+        <ChoixSegmente nom="Vue" options={[...VUES]} choisi={vue} onChoix={(v) => { changer('vue', v) }} />
       </div>
-      {isError && <p className={boutique.calme}>La base ne répond pas.</p>}
-      {lignes?.length === 0 && <Bloc><p className={boutique.calme}>Aucune contribution ici.</p></Bloc>}
-      {lignes && choisie && (
-        <div className={styles.volets}>
-          <div className={styles.file}>
-            <Bloc>
-              {lignes.map((c) => (
-                <button key={c.id} type="button" className={styles.ligne} aria-current={c.id === choisie.id}
-                  onClick={() => { choisir(c.id) }}>
-                  <Vignette contribution={c} />
-                  <span className={styles.nom}>{c.nom}</span>
-                  <span className={styles.quand}>{c.quand ? heureDuFil(c.quand) : ''}</span>
-                  <span className={styles.porte}>{`${baliseDuChemin(c.images)} · ${produitOuVetement(c)}`}</span>
-                  <span className={styles.notes}>{resumeDeLaLigne(c)}</span>
-                </button>
-              ))}
-            </Bloc>
-            <Pages total={total} decalage={decalage} parPage={PAR_PAGE} onDecalage={(d) => { changer('page', String(d / PAR_PAGE + 1)) }} />
-          </div>
-          <LectureContribution key={choisie.id} contribution={choisie} onDecide={apresDecision} />
+      {vue === 'photos' && (
+        <GalerieDePhotos placement={placement} onPlacement={(p) => { changer('place', p) }} onOuvrir={ouvrir} />
+      )}
+      {vue === 'contributions' && (
+        <>
+        <div className={styles.barre}>
+          <ChoixSegmente nom="Filtre" options={FILTRES} choisi={filtre} onChoix={(v) => { changer('filtre', v) }} />
+          <span className={styles.air} />
+          <ChampDeRecherche valeur={recherche} onChange={(q) => { changer('q', q) }} etiquette="Un nom, un e-mail…" />
         </div>
+        {isError && <p className={boutique.calme}>La base ne répond pas.</p>}
+        {lignes?.length === 0 && <Bloc><p className={boutique.calme}>Aucune contribution ici.</p></Bloc>}
+        {lignes && choisie && (
+          <div className={styles.volets}>
+            <div className={styles.file}>
+              <Bloc>
+                {lignes.map((c) => (
+                  <button key={c.id} type="button" className={styles.ligne} aria-current={c.id === choisie.id}
+                    onClick={() => { choisir(c.id) }}>
+                    <Vignette contribution={c} />
+                    <span className={styles.nom}>{c.nom}</span>
+                    <span className={styles.quand}>{c.quand ? heureDuFil(c.quand) : ''}</span>
+                    <span className={styles.porte}>{`${baliseDuChemin(c.images)} · ${produitOuVetement(c)}`}</span>
+                    <span className={styles.notes}>{resumeDeLaLigne(c)}</span>
+                  </button>
+                ))}
+              </Bloc>
+              <Pages total={total} decalage={decalage} parPage={PAR_PAGE} onDecalage={(d) => { changer('page', String(d / PAR_PAGE + 1)) }} />
+            </div>
+            <LectureContribution key={choisie.id} contribution={choisie} onDecide={apresDecision} />
+          </div>
+        )}
+        </>
       )}
     </div>
   )

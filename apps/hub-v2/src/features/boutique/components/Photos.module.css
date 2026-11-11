@@ -188,7 +188,6 @@
 }
 
 .texteDuMessage {
-  font-style: italic;
   font-size: var(--recit-enigme-size);
   color: var(--color-texte);
   white-space: pre-line;
@@ -215,7 +214,6 @@
 
 .noteEquipe span {
   font-size: var(--legende-size);
-  font-style: italic;
 }
 
 /* Les photos, quatre de front, chacune avec ses canaux en pastilles */

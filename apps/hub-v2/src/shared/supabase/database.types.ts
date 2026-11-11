@@ -8573,6 +8573,7 @@ export type Database = {
         Returns: undefined
       }
       hub_ouverture: { Args: { p_periode: string }; Returns: Json }
+      hub_photos: { Args: never; Returns: Json }
       hub_poser_anniversaire: {
         Args: { p_jour: number; p_mois: number; p_user: string }
         Returns: undefined
