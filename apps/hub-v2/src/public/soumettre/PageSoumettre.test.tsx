@@ -354,7 +354,7 @@ describe('l’avis seul', () => {
     ouvrir('/soumettre-contenu?chemin=avis')
     expect(await screen.findByRole('textbox', { name: 'Ton avis, en quelques mots' })).toHaveAttribute(
       'placeholder',
-      'Ce que tu as pensé de ton achat',
+      'Ce que tu as pensé de ton achat, de ton expérience auprès de notre boutique ou de notre stand…',
     )
     expect(screen.getByRole('link', { name: 'contact@runesdechene.com' })).toHaveAttribute('href', 'mailto:contact@runesdechene.com')
   })

@@ -66,7 +66,7 @@ export function EtapeAvis({
         rows={4}
         maxLength={LONGUEUR_MAX}
         value={histoire.avis}
-        placeholder="Ce que tu as pensé de ton achat"
+        placeholder="Ce que tu as pensé de ton achat, de ton expérience auprès de notre boutique ou de notre stand…"
         onChange={(e) => {
           changer({ avis: e.target.value })
         }}
