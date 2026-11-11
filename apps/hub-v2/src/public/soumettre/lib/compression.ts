@@ -1,5 +1,6 @@
 /**
- * QUOI     — une photo réduite à 1920 px au plus et convertie en WebP (qualité 0,82), avant l'envoi.
+ * QUOI     — une photo réduite à 1920 px au plus et convertie en WebP (qualité 0,82), avant l'envoi ;
+ *            sa vignette, à 400 px (VIGNETTE).
  * POURQUOI — une photo de téléphone pèse 5 à 10 Mo ; le joueur l'envoie souvent depuis un réseau
  *            mobile, et le Hub n'en a pas besoin de plus. Réglages repris de l'ancien StudioSubmit.
  *            Une vidéo passe telle quelle : le navigateur ne sait pas la réduire.
@@ -9,6 +10,7 @@
 import { estVideo } from './fichiers'
 
 const COTE_MAX = 1920
+export const VIGNETTE = 400
 const QUALITE = 0.82
 
 function lireImage(f: File): Promise<HTMLImageElement> {
@@ -27,10 +29,10 @@ function lireImage(f: File): Promise<HTMLImageElement> {
   })
 }
 
-export async function versWebp(f: File): Promise<File> {
+export async function versWebp(f: File, coteMax = COTE_MAX): Promise<File> {
   if (estVideo(f)) return f
   const image = await lireImage(f)
-  const echelle = Math.min(1, COTE_MAX / Math.max(image.width, image.height))
+  const echelle = Math.min(1, coteMax / Math.max(image.width, image.height))
   const toile = document.createElement('canvas')
   toile.width = Math.round(image.width * echelle)
   toile.height = Math.round(image.height * echelle)

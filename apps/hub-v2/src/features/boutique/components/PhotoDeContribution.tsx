@@ -13,8 +13,9 @@ import {
   type Contribution, type PhotoDeContribution as Photo,
 } from '../api/contributions'
 import { useEcritureDePhoto } from '../hooks/useContributions'
-import { adresseDeTelechargement, estUneVideo, nomDeFichier, texteAlternatif } from '../lib/contribution'
+import { adresseDeTelechargement, nomDeFichier, texteAlternatif } from '../lib/contribution'
 import { ChoixDuProduit } from './ChoixDuProduit'
+import { Miniature } from './Miniature'
 import styles from './Photos.module.css'
 
 /** Un canal de diffusion, en pastille : pleine quand la photo y est, en contour sinon. */
@@ -47,9 +48,7 @@ export function PhotoDeContribution({ contribution, photo, rang }: { contributio
     <figure className={styles.photo}>
       <div className={styles.cadre}>
         <a href={photo.url} target="_blank" rel="noreferrer">
-          {estUneVideo(photo.url)
-            ? <video src={photo.url} muted preload="metadata" />
-            : <img src={photo.url} alt={texteAlternatif(contribution.nom, contribution.hauteur, photo.taille ?? contribution.taille)} loading="lazy" />}
+          <Miniature url={photo.url} alt={texteAlternatif(contribution.nom, contribution.hauteur, photo.taille ?? contribution.taille)} />
         </a>
         <div className={styles.surLaPhoto}>
           <a className={styles.rond} aria-label="Télécharger" title="Télécharger"

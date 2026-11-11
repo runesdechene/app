@@ -6,6 +6,7 @@
  *            autre erreur devient une seule phrase, jamais le texte du serveur (même règle que
  *            cadeau/api.ts).
  */
+import { vignetteDe } from '@/shared/lib/vignette'
 import { supabase } from '@/shared/supabase/client'
 import { typeDuFichier } from './lib/fichiers'
 
@@ -50,6 +51,14 @@ export async function envoyerFichierPublic(f: File, dossier: string): Promise<st
     .upload(chemin, f, { contentType: typeDuFichier(f) ?? f.type, upsert: false })
   if (error) throw error
   return chemin
+}
+
+/** La vignette se pose à côté de la photo (vignetteDe) : la vue « Photos » du Hub la sert en petit. */
+export async function envoyerVignette(f: File, cheminPhoto: string): Promise<void> {
+  const chemin = vignetteDe(cheminPhoto)
+  if (!chemin) return
+  const { error } = await supabase.storage.from('community-photos').upload(chemin, f, { contentType: 'image/webp', upsert: false })
+  if (error) throw error
 }
 
 // Un champ facultatif vide n'est pas envoyé : la fonction prend alors NULL, sa valeur par défaut.

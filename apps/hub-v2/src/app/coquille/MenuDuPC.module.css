@@ -7,6 +7,7 @@
   border-right: 1px solid var(--color-sable);
   background: var(--color-barre);
   overflow-y: auto;
+  scrollbar-width: none; /* le menu défile encore à la molette, sans barre (Uriel, 11/11) */
 }
 
 .marque {

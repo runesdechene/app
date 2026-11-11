@@ -29,7 +29,11 @@ vi.mock('@/shared/supabase/client', () => ({
   },
 }))
 
-vi.mock('./lib/compression', () => ({ versWebp: (f: File) => Promise.resolve(f) }))
+// La vignette (côté réduit) échoue comme dans jsdom : seules les photos partent, l'envoi n'en dépend pas.
+vi.mock('./lib/compression', () => ({
+  VIGNETTE: 400,
+  versWebp: (f: File, cote?: number) => (cote ? Promise.reject(new Error('pas de toile')) : Promise.resolve(f)),
+}))
 
 const CHEMIN = /^submissions\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.jpg$/
 

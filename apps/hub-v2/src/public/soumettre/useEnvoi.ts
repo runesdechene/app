@@ -8,8 +8,8 @@
  *            formulaire reste tel quel pour réessayer.
  */
 import { useState } from 'react'
-import { deposerContenu, envoyerFichierPublic, PAS_ENREGISTRE, TROP_D_ENVOIS, type Depot } from './api'
-import { versWebp } from './lib/compression'
+import { deposerContenu, envoyerFichierPublic, envoyerVignette, PAS_ENREGISTRE, TROP_D_ENVOIS, type Depot } from './api'
+import { versWebp, VIGNETTE } from './lib/compression'
 import { tailleEnCm, type Contenu, type Histoire, type Toi } from './lib/formulaire'
 
 export const AUCUN_FICHIER = 'Aucun fichier n’a pu partir. Vérifie ta connexion, puis réessaie.'
@@ -37,7 +37,10 @@ export function useEnvoi() {
         setProgression(`Envoi du fichier ${String(i + 1)} sur ${String(contenus.length)}…`)
         try {
           const pret = await versWebp(c.fichier).catch(() => c.fichier)
-          images.push({ path: await envoyerFichierPublic(pret, dossier), size: c.taille })
+          const chemin = await envoyerFichierPublic(pret, dossier)
+          images.push({ path: chemin, size: c.taille })
+          // Une vignette manquée n'empêche rien : le Hub retombe sur la photo entière.
+          await versWebp(c.fichier, VIGNETTE).then((v) => envoyerVignette(v, chemin)).catch(() => undefined)
         } catch {
           // Ce fichier reste de côté ; les autres partent quand même.
           echecs.push(c.fichier.name)

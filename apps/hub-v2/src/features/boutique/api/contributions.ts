@@ -10,6 +10,7 @@
  *            nouvel essai : la tolérance du « Not Found » l'absorbe.
  */
 import { cheminDepuisAdresse, retirerFichiers } from '@/shared/lib/envoi'
+import { vignetteDe } from '@/shared/lib/vignette'
 import { supabase } from '@/shared/supabase/client'
 import { texteAlternatif } from '../lib/contribution'
 import { pousserImage, retirerImage, type ProduitShopify } from './shopify'
@@ -131,9 +132,10 @@ async function nettoyer(photos: PhotoDeContribution[]): Promise<void> {
     if (photo.produit_id && photo.media) await retirerImage(photo.produit_id, photo.media)
   }
   const chemins = photos.flatMap((p) => {
-    // Là où le fichier est vraiment : son adresse d'abord, le chemin enregistré à défaut.
+    // Là où le fichier est vraiment : son adresse d'abord, le chemin enregistré à défaut. Sa vignette part avec.
     const chemin = cheminDepuisAdresse(BUCKET, p.url) ?? p.chemin
-    return chemin ? [chemin] : []
+    const vignette = chemin && vignetteDe(chemin)
+    return [chemin, vignette].filter((x): x is string => Boolean(x))
   })
   await retirerFichiers(BUCKET, chemins)
 }

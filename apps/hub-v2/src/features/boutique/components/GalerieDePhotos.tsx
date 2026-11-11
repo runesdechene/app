@@ -9,8 +9,8 @@ import { ChoixSegmente } from '@/shared/ui/ChoixSegmente'
 import { pluriel } from '@/shared/lib/texte'
 import type { PhotoPubliee } from '../api/photos'
 import { usePhotos } from '../hooks/useContributions'
-import { estUneVideo } from '../lib/contribution'
 import { estPlacee, PLACEMENTS, selonPlacement, type Placement } from '../lib/photos'
+import { Miniature } from './Miniature'
 import boutique from './Boutique.module.css'
 import styles from './GalerieDePhotos.module.css'
 
@@ -44,9 +44,7 @@ export function GalerieDePhotos({ placement, onPlacement, onOuvrir }: {
         {photos.map((p) => (
           <li key={p.id}>
             <button type="button" className={styles.carte} onClick={() => { onOuvrir(p) }}>
-              {estUneVideo(p.url)
-                ? <video className={styles.image} src={p.url} muted preload="metadata" />
-                : <img className={styles.image} src={p.url} alt={`Photo de ${p.nom}`} loading="lazy" />}
+              <Miniature className={styles.image} url={p.url} alt={`Photo de ${p.nom}`} />
               <span className={styles.endroits}><Endroits photo={p} /></span>
               <span className={styles.nom}>{p.nom}</span>
               {p.produit_titre && <span className={styles.produit}>{p.produit_titre}</span>}

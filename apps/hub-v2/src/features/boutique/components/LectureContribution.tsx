@@ -16,6 +16,7 @@ import { DecisionsDeContribution } from './DecisionsDeContribution'
 import { EtiquettesDeContribution } from './EtiquettesDeContribution'
 import { MessageDeContribution } from './MessageDeContribution'
 import { PhotoDeContribution } from './PhotoDeContribution'
+import { Miniature } from './Miniature'
 import styles from './Photos.module.css'
 
 const ROLES: Record<string, string> = { client: 'Client', ambassadeur: 'Ambassadeur', partenaire: 'Partenaire' }
@@ -44,7 +45,7 @@ export function LectureContribution({ contribution, onDecide }: { contribution: 
     <section className={styles.lecture} aria-label={`La contribution de ${c.nom}`}>
       <header className={styles.tete}>
         {portrait
-          ? <img className={styles.portrait} src={portrait} alt="" />
+          ? <Miniature className={styles.portrait} url={portrait} />
           : <span className={styles.portrait} aria-hidden="true">{c.nom.slice(0, 1).toUpperCase()}</span>}
         <div className={styles.qui}>
           <h2 className={styles.nomDuClient}>{c.nom}</h2>

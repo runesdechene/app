@@ -32,7 +32,7 @@ describe('supprimerContribution', () => {
     expect(ordre).toEqual(['retirerImage', 'retirerFichiers', 'delete_photo_submission'])
     expect(mocks.retirerImage).toHaveBeenCalledTimes(1)
     expect(mocks.retirerImage).toHaveBeenCalledWith('12', '99')
-    expect(mocks.retirerFichiers).toHaveBeenCalledWith('community-photos', ['c1/a.webp', 'c1/b.webp'])
+    expect(mocks.retirerFichiers).toHaveBeenCalledWith('community-photos', ['c1/a.webp', 'c1/a_thumb.webp', 'c1/b.webp', 'c1/b_thumb.webp'])
     expect(mocks.rpc).toHaveBeenCalledWith('delete_photo_submission', { p_submission_id: 'c1' })
   })
 
@@ -54,7 +54,7 @@ describe('supprimerContribution', () => {
     await supprimerContribution(contribution([photo('a', {
       chemin: null, url: 'https://x/storage/v1/object/public/community-photos/c1/a%20b.webp?t=1',
     })]))
-    expect(mocks.retirerFichiers).toHaveBeenCalledWith('community-photos', ['c1/a b.webp'])
+    expect(mocks.retirerFichiers).toHaveBeenCalledWith('community-photos', ['c1/a b.webp', 'c1/a b_thumb.webp'])
   })
 
   test('le bucket refuse : la base n’est pas touchée', async () => {
@@ -67,7 +67,7 @@ describe('supprimerContribution', () => {
     await supprimerContribution(contribution([photo('a', {
       chemin: 'c1/ancien.webp', url: 'https://x/storage/v1/object/public/community-photos/c1/a.webp',
     })]))
-    expect(mocks.retirerFichiers).toHaveBeenCalledWith('community-photos', ['c1/a.webp'])
+    expect(mocks.retirerFichiers).toHaveBeenCalledWith('community-photos', ['c1/a.webp', 'c1/a_thumb.webp'])
   })
 
   test('une adresse hors du bucket n’a rien à y retirer', async () => {

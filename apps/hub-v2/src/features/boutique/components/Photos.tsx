@@ -20,10 +20,11 @@ import type { PhotoPubliee } from '../api/photos'
 import { useContributions } from '../hooks/useContributions'
 import { useTelechargement } from '../hooks/useTelechargement'
 import { fichiersDeContributions } from '../lib/archive'
-import { baliseDuChemin, estUneVideo, produitOuVetement } from '../lib/contribution'
+import { baliseDuChemin, produitOuVetement } from '../lib/contribution'
 import { PLACEMENTS } from '../lib/photos'
 import { GalerieDePhotos } from './GalerieDePhotos'
 import { LectureContribution } from './LectureContribution'
+import { Miniature } from './Miniature'
 import boutique from './Boutique.module.css'
 import styles from './Photos.module.css'
 
@@ -53,9 +54,7 @@ function resumeDeLaLigne(c: Contribution): string {
 function Vignette({ contribution }: { contribution: Contribution }) {
   const url = contribution.images[0]?.url
   if (!url) return <span className={styles.vignette} />
-  return estUneVideo(url)
-    ? <video className={styles.vignette} src={url} muted preload="metadata" />
-    : <img className={styles.vignette} src={url} alt="" loading="lazy" />
+  return <Miniature className={styles.vignette} url={url} />
 }
 
 export function Photos() {
