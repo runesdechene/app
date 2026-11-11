@@ -404,3 +404,14 @@ y accéder ».
 **How to apply :** une maquette neuve va sur sa propre page, nommée par le sujet (« Boutique — Avis »),
 à partir de (0, 0) ; une capture s'y déplace aussitôt (`page.appendChild(n)`, puis `x`/`y`). Le lien
 donné porte le `node-id` du cadre.
+
+## L'ombre d'un bouton ne se coupe pas (11/11/2026)
+
+**Le piège** : dans la maquette des avis, les cadres en auto-layout (`clipsContent` vrai par défaut)
+coupaient l'ombre portée des boutons, et une rangée trop étroite faisait disparaître nom, gélule et
+date au lieu de passer à la ligne. Uriel : « les boutons ont un ombrage coupé, faudra faire gaffe ».
+
+**How to apply :** dans Figma, `clipsContent = false` sur tout cadre qui contient un bouton ou une
+carte ombrée ; une rangée de balises passe en `layoutWrap = 'WRAP'`. En CSS, même chose : pas
+d'`overflow: hidden` sur le parent d'un bouton ombré, `flex-wrap: wrap` sur une rangée de balises.
+Regarder la capture avant de rendre la main.
